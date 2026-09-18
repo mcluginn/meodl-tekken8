@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MEODL Esports • Tekken 8 Double Elimination (MES UPHSD)</title>
+  <title>MEODL Esports • Tournament Backup System (SAFE COPY)</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -178,6 +178,23 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
   <!-- ======================================================== -->
   <!-- TOP NAVIGATION / EWGF SYSTEM HEADER                      -->
   <!-- ======================================================== -->
+  
+  <!-- Top Safe Mode Notice Banner -->
+  <div class="bg-amber-950/80 border-b border-amber-800/80 px-4 py-1.5 text-xs text-amber-300 flex items-center justify-between z-50">
+    <div class="flex items-center gap-2 max-w-7xl mx-auto w-full justify-between flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200 font-mono font-bold text-[10px] uppercase tracking-wider">Safe Backup</span>
+        <span>This is the <strong>Separate Standalone Backup HTML</strong>. Edits here are isolated to the backup slot.</span>
+      </div>
+      <div class="flex items-center gap-2 text-[11px] font-mono">
+        <button onclick="cloneFromLive()" class="px-2 py-0.5 rounded bg-zinc-900 hover:bg-zinc-800 border border-amber-600/50 text-amber-300 hover:text-white transition-colors">📥 Pull Live Data</button>
+        <button onclick="pushToLive()" class="px-2 py-0.5 rounded bg-zinc-900 hover:bg-zinc-800 border border-amber-600/50 text-amber-300 hover:text-white transition-colors">📤 Restore to Live</button>
+        <button onclick="exportMasterBackupJSON()" class="px-2 py-0.5 rounded bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold transition-colors">📦 Export All JSON</button>
+        <a href="index.html" class="px-2 py-0.5 rounded text-zinc-400 hover:text-white underline ml-2">Go to Live ➔</a>
+      </div>
+    </div>
+  </div>
+
   <header class="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800/80 px-4 lg:px-8 py-2.5 transition-all shadow-md">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
@@ -203,6 +220,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
             <span class="text-sm font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-amber-300 font-mono">
               MEODL Esports
             </span>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold flex items-center gap-1 shadow-sm mr-1"><span>🛡️</span><span>BACKUP</span></span>
             <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-0.5 gap-1">
               <a href="index.html" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/60 font-bold shadow-sm">TEKKEN 8</a>
               <a href="codm.html" class="text-[10px] font-mono px-1.5 py-0.5 rounded text-zinc-400 hover:text-amber-300 hover:bg-zinc-800 font-semibold transition-colors">CODM</a>
@@ -287,10 +305,6 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
             <a href="javascript:void(0)" onclick="copyStandingsClipboard()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
               <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
               <span>Copy Standings Text</span>
-            </a>
-            <a href="backup.html" class="flex items-center gap-2 px-3 py-2 text-amber-300 hover:bg-zinc-800 border-t border-zinc-800/80 mt-1 font-semibold">
-              <span>🛡️</span>
-              <span>Open Backup HTML</span>
             </a>
             <input type="file" id="json-file-input" class="hidden" accept=".json" onchange="handleJSONUpload(event)">
           </div>
@@ -1058,7 +1072,8 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
       'GF2': { order: 31, code: 'GF-RESET', time: '3:48 PM', targetMins: 228, duration: 8,  bestOf: 3, label: 'GF2 Reset (If Needed)', isConditional: true }
     };
 
-    const STORAGE_KEY = 'ewgf_tekken_bracket_v1';
+    const STORAGE_KEY = 'ewgf_tekken_bracket_backup';
+    const LIVE_STORAGE_KEY = 'ewgf_tekken_bracket_v1';
 
     // -------------------------------------------------------------------------
     // 2. STATE MANAGEMENT & STORAGE SAFETIES
