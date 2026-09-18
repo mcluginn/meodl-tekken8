@@ -54,7 +54,10 @@
 
   <!-- External Data and Engine Modules -->
   <script src="./assets/meodl_data.js"></script>
-  <script src="./assets/meodl_engine.js"></script>
+    <script src="./assets/meodl_engine.js"></script>
+  <script src="./assets/qrcode.min.js"></script>
+  <script src="./assets/html5-qrcode.min.js"></script>
+  <script src="./assets/meodl_attendance.js"></script>
 
   <!-- Complete Standalone Styling & Fallbacks -->
   <style>
@@ -136,6 +139,14 @@
         </button>
 
         <!-- Official Guidelines Modal Button -->
+        <a href="scanner.html" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-700/80 text-xs font-mono font-bold text-cyan-300 transition-all shadow-sm" title="Launch Mobile Gate Scanner">
+          <span>📷</span>
+          <span class="hidden md:inline">Scanner</span>
+        </a>
+        <a href="student_qr.html" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-mono font-medium text-zinc-300 hover:text-white transition-all shadow-sm" title="Open Student Passes Portal">
+          <span>🪪</span>
+          <span class="hidden md:inline">Passes</span>
+        </a>
         <button onclick="openGuidelinesModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-all shadow-sm" title="View Official Event Rules & Guidelines">
           <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
           <span class="hidden sm:inline">Rules</span>
@@ -156,6 +167,22 @@
             <a href="javascript:void(0)" onclick="triggerJSONImport()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
               <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
               <span>Import League Backup</span>
+            </a>
+            <a href="print_cards.html" target="_blank" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400 border-t border-zinc-800/80 mt-1">
+              <span>🖨️</span>
+              <span>Print Lanyard Badges (A4)</span>
+            </a>
+            <a href="javascript:void(0)" onclick="exportAttendanceCSV()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
+              <span>📊</span>
+              <span>Export Attendance CSV</span>
+            </a>
+            <a href="javascript:void(0)" onclick="exportQRCodesCSV()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
+              <span>🏷️</span>
+              <span>Export QR Codes CSV</span>
+            </a>
+            <a href="javascript:void(0)" onclick="exportAttendanceAuditCSV()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
+              <span>📋</span>
+              <span>Export Gate Audit Log</span>
             </a>
             <a href="backup.html" class="flex items-center gap-2 px-3 py-2 text-amber-300 hover:bg-zinc-800 border-t border-zinc-800/80 mt-1 font-semibold">
               <span>🛡️</span>
@@ -179,6 +206,10 @@
       <div class="flex items-center p-1 rounded-xl bg-zinc-900/90 border border-zinc-800/80 text-xs font-medium space-x-1 shrink-0">
         <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="nav-tab active-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-cyan-400 bg-zinc-800 shadow-sm font-semibold">
           <span>🏆 Dashboard & Groupings</span>
+        </button>
+        <button onclick="navigateTo('attendance')" id="nav-attendance" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span>📋 Venue Presence</span>
+          <span id="nav-attendance-count" class="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-cyan-950 text-cyan-300 font-bold border border-cyan-700/60">0/175</span>
         </button>
         <button onclick="navigateTo('basketball')" id="nav-basketball" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
           <span>🏀 Basketball</span>
@@ -263,6 +294,61 @@
               <div class="text-[10px] text-zinc-400 uppercase font-mono mt-0.5">Athletes</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- MEODL VENUE PRESENCE WIDGET -->
+      <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 p-5 shadow-card">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4 pb-3 border-b border-zinc-800">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">📋</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-sm font-bold text-white font-mono uppercase tracking-wide">MEODL Venue Presence</h3>
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-mono bg-cyan-950 text-cyan-400 border border-cyan-800/60 font-bold uppercase">LIVE ATTENDANCE</span>
+              </div>
+              <p class="text-[11px] text-zinc-400 mt-0.5">Real-time gate check-in/out tracking for all 175 registered student athletes</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap font-mono text-xs">
+            <a href="scanner.html" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-lg shadow-cyan-950 transition-all hover:scale-[1.02]">
+              <span>📷</span> Launch Scanner
+            </a>
+            <button onclick="navigateTo('attendance')" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-cyan-300 font-semibold border border-zinc-700 transition-colors">
+              Manage Attendance ➔
+            </button>
+            <a href="print_cards.html" target="_blank" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold border border-zinc-700 transition-colors">
+              🖨️ Print Badges
+            </a>
+            <a href="student_qr.html" target="_blank" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold border border-zinc-700 transition-colors">
+              🪪 Student Passes
+            </a>
+          </div>
+        </div>
+
+        <!-- KPI summary counters -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4 font-mono">
+          <div class="bg-zinc-950/80 border border-zinc-800 rounded-xl p-3 text-center">
+            <span class="text-[10px] text-zinc-400 block uppercase">Total Registered</span>
+            <span id="dash-presence-total" class="text-2xl font-black text-white">175</span>
+          </div>
+          <div class="bg-emerald-950/60 border border-emerald-800/60 rounded-xl p-3 text-center">
+            <span class="text-[10px] text-emerald-400 block uppercase">🟢 Inside Venue</span>
+            <span id="dash-presence-inside" class="text-2xl font-black text-emerald-400">0</span>
+          </div>
+          <div class="bg-zinc-950/80 border border-zinc-800 rounded-xl p-3 text-center">
+            <span class="text-[10px] text-zinc-400 block uppercase">🔴 Outside Venue</span>
+            <span id="dash-presence-outside" class="text-2xl font-black text-zinc-300">175</span>
+          </div>
+          <div class="bg-amber-950/60 border border-amber-800/60 rounded-xl p-3 text-center">
+            <span class="text-[10px] text-amber-400 block uppercase">⚠ Overdue Return</span>
+            <span id="dash-presence-overdue" class="text-2xl font-black text-amber-400">0</span>
+          </div>
+        </div>
+
+        <!-- 4 Team Presence Ratios -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono" id="dash-team-presence-grid">
+          <!-- Will render 4 team ratio cards: Rankine, Otto, Brayton, Diesel -->
         </div>
       </div>
 
@@ -375,6 +461,157 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="events-grid-cards">
           <!-- Rendered dynamically for all 13 events -->
         </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW: VENUE PRESENCE & ATTENDANCE MANAGEMENT (#view-attendance) -->
+    <div id="view-attendance" class="hidden flex-1 p-4 lg:p-8 max-w-7xl mx-auto w-full z-10 space-y-6">
+      
+      <!-- Top Title Strip -->
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-card">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-cyan-950/90 border border-cyan-500/40 flex items-center justify-center text-2xl shadow-inner">
+            📋
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl font-black text-white font-mono uppercase tracking-wide">MEODL Venue Presence & Attendance</h1>
+              <span class="px-2 py-0.5 rounded-full text-[9px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-700/60 font-bold uppercase">175 ATHLETES</span>
+            </div>
+            <p class="text-xs text-zinc-400 mt-1 font-mono">Real-time gate checkpoint control • Unique cryptographically secure QR identity system</p>
+          </div>
+        </div>
+
+        <!-- Action Links -->
+        <div class="flex items-center gap-2 flex-wrap font-mono text-xs">
+          <a href="scanner.html" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-lg shadow-cyan-950 transition-all hover:scale-[1.02]">
+            <span>📷</span> Mobile Scanner
+          </a>
+          <a href="print_cards.html" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-semibold border border-zinc-700 transition-colors">
+            <span>🖨️</span> Print Badges
+          </a>
+          <a href="student_qr.html" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-cyan-300 font-semibold border border-zinc-700 transition-colors">
+            <span>🪪</span> Passes Portal
+          </a>
+          <button onclick="exportAttendanceCSV()" class="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold border border-zinc-700 transition-colors">
+            📥 CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
+        <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
+          <span class="text-xs text-zinc-400 block uppercase">Total Registered</span>
+          <span id="att-kpi-total" class="text-2xl font-black text-white mt-1 block">175</span>
+          <span class="text-[10px] text-zinc-500 block mt-0.5">Official Roster</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-800/60">
+          <span class="text-xs text-emerald-400 block uppercase">🟢 Inside Venue</span>
+          <span id="att-kpi-inside" class="text-2xl font-black text-emerald-400 mt-1 block">0</span>
+          <span id="att-kpi-inside-pct" class="text-[10px] text-emerald-300/70 block mt-0.5">0% of athletes</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
+          <span class="text-xs text-zinc-400 block uppercase">🔴 Outside Venue</span>
+          <span id="att-kpi-outside" class="text-2xl font-black text-zinc-300 mt-1 block">175</span>
+          <span class="text-[10px] text-zinc-500 block mt-0.5">Off premise</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-amber-950/60 border border-amber-800/60">
+          <span class="text-xs text-amber-400 block uppercase">⚠ Overdue Return</span>
+          <span id="att-kpi-overdue" class="text-2xl font-black text-amber-400 mt-1 block">0</span>
+          <span class="text-[10px] text-amber-300/70 block mt-0.5">Past expected time</span>
+        </div>
+      </div>
+
+      <!-- Team Presence Breakdown Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 font-mono" id="att-team-cards-grid">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Main Data Panel: Search, Filters, Tabs & Table -->
+      <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 shadow-card space-y-4">
+        
+        <!-- Controls Strip -->
+        <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
+          <!-- View Tabs (Roster vs Audit) -->
+          <div class="flex items-center bg-zinc-950 border border-zinc-800 rounded-xl p-1 gap-1 font-mono text-xs">
+            <button id="tab-btn-roster" onclick="switchAttendanceTab('roster')" class="px-3 py-1.5 rounded-lg bg-zinc-800 text-cyan-300 font-bold shadow-sm transition-all">
+              👥 Student Roster
+            </button>
+            <button id="tab-btn-audit" onclick="switchAttendanceTab('audit')" class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white font-medium transition-all">
+              📋 Gate Audit Logs
+            </button>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="flex items-center gap-2 flex-wrap font-mono text-xs flex-1 max-w-xl justify-end">
+            <input 
+              type="text" 
+              id="att-search-input" 
+              oninput="filterAttendanceView()" 
+              placeholder="Search athlete or MEODL-XXXX..." 
+              class="flex-1 min-w-[180px] px-3 py-1.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white text-xs placeholder-zinc-500 focus:outline-none focus:border-cyan-500"
+            />
+            
+            <select id="att-team-filter" onchange="filterAttendanceView()" class="px-2.5 py-1.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs focus:outline-none focus:border-cyan-500">
+              <option value="all">All Teams</option>
+              <option value="rankine">Rankine (55)</option>
+              <option value="otto">Otto (36)</option>
+              <option value="brayton">Brayton (33)</option>
+              <option value="diesel">Diesel (51)</option>
+            </select>
+
+            <select id="att-status-filter" onchange="filterAttendanceView()" class="px-2.5 py-1.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs focus:outline-none focus:border-cyan-500">
+              <option value="all">All Status</option>
+              <option value="INSIDE">🟢 Inside</option>
+              <option value="OUTSIDE">🔴 Outside</option>
+              <option value="OVERDUE">⚠ Overdue</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Roster Table View -->
+        <div id="att-roster-view" class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead>
+              <tr class="text-zinc-500 border-b border-zinc-800">
+                <th class="py-2.5 px-3">CODE</th>
+                <th class="py-2.5 px-3">STUDENT ATHLETE</th>
+                <th class="py-2.5 px-3">TEAM</th>
+                <th class="py-2.5 px-3">VENUE STATUS</th>
+                <th class="py-2.5 px-3">LAST SEEN</th>
+                <th class="py-2.5 px-3">EXIT / RETURN</th>
+                <th class="py-2.5 px-3 text-right">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="att-roster-table-body" class="divide-y divide-zinc-800/60">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Audit Log View (Initially hidden) -->
+        <div id="att-audit-view" class="hidden overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead>
+              <tr class="text-zinc-500 border-b border-zinc-800">
+                <th class="py-2.5 px-3">TIMESTAMP</th>
+                <th class="py-2.5 px-3">CODE</th>
+                <th class="py-2.5 px-3">NAME</th>
+                <th class="py-2.5 px-3">TEAM</th>
+                <th class="py-2.5 px-3">ACTION</th>
+                <th class="py-2.5 px-3">METHOD</th>
+                <th class="py-2.5 px-3">GATE STAFF</th>
+                <th class="py-2.5 px-3">NOTES / RETURN</th>
+              </tr>
+            </thead>
+            <tbody id="att-audit-table-body" class="divide-y divide-zinc-800/60">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+
       </div>
 
     </div>
@@ -1120,6 +1357,45 @@
     </div>
   </div>
 
+  <!-- 5. STUDENT PERSONAL QR PASS MODAL -->
+  <div id="student-qr-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-zinc-950 border-2 border-cyan-500/70 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 relative">
+      <button onclick="closeStudentQRModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white text-lg w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center">✕</button>
+      
+      <div class="flex items-center gap-2 border-b border-zinc-800 pb-3">
+        <img src="./assets/mes_logo.png" alt="MES Seal" class="w-7 h-7 rounded-full bg-white p-0.5" />
+        <div>
+          <span class="text-[10px] font-mono tracking-widest text-zinc-400 block uppercase leading-none">MEODL 2026 PASS</span>
+          <span id="qr-modal-team-title" class="text-xs font-bold text-white font-mono uppercase">TEAM PASS</span>
+        </div>
+      </div>
+
+      <div class="text-center pt-1">
+        <h3 id="qr-modal-student-name" class="text-base font-extrabold text-white font-sans uppercase">STUDENT NAME</h3>
+        <p id="qr-modal-student-code" class="text-xs font-mono font-bold text-cyan-400 mt-0.5">MEODL-0000</p>
+      </div>
+
+      <!-- QR canvas -->
+      <div class="bg-white p-4 rounded-2xl flex items-center justify-center max-w-[220px] mx-auto shadow-inner">
+        <div id="qr-modal-canvas" class="w-[180px] h-[180px] flex items-center justify-center"></div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 text-xs font-mono">
+        <span class="text-zinc-400">Current Status:</span>
+        <span id="qr-modal-status-badge" class="px-2 py-0.5 rounded font-bold">OUTSIDE</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-800 font-mono text-xs">
+        <button onclick="regenerateActiveStudentQR()" class="py-2 px-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-amber-400 font-semibold" title="Revoke old QR and generate new">
+          🔄 Revoke / Regen
+        </button>
+        <button onclick="closeStudentQRModal()" class="py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Preserved Tekken Modals (Match Edit, JSON, Presentation) -->
   <!-- Match Quick Edit / Score Modal -->
   <div id="match-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
@@ -1400,7 +1676,12 @@
       const badge = document.getElementById('active-event-badge');
       const defs = window.MEODL_ENGINE ? window.MEODL_ENGINE.EVENT_DEFINITIONS : {};
 
-      if (viewId === 'dashboard') {
+      if (viewId === 'attendance') {
+        appState.activeSport = null;
+        document.getElementById('view-attendance').classList.remove('hidden');
+        if (badge) badge.textContent = 'VENUE PRESENCE';
+        renderAttendanceView();
+      } else if (viewId === 'dashboard') {
         appState.activeSport = null;
         document.getElementById('view-dashboard').classList.remove('hidden');
         if (badge) badge.textContent = 'DASHBOARD';
@@ -1443,6 +1724,7 @@
       recalculateLeaderboard();
       renderEventsGrid();
       handleRosterSearch();
+      updateAttendanceMetrics();
     }
 
     function renderTeamCards() {
@@ -1649,14 +1931,37 @@
       else if (isLive) { statusBadge = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 live-pulse font-bold'; statusText = 'Live'; }
       else if (!hasBoth) { statusBadge = 'bg-zinc-900 text-zinc-600 border-zinc-800'; statusText = 'Waiting'; }
 
+      const getPresenceBadge = (name) => {
+        if (!name || !window.MEODL_ATTENDANCE) return '';
+        const clean = String(name).toUpperCase();
+        const teams = ['RANKINE', 'OTTO', 'BRAYTON', 'DIESEL'];
+        const matchedTeam = teams.find(t => clean.includes(t));
+        if (matchedTeam) {
+          const stats = window.MEODL_ATTENDANCE.getStats();
+          const t = stats.byTeam[matchedTeam.toLowerCase()];
+          if (t) {
+            return `<span class="text-[9px] font-mono font-bold px-1 rounded ${t.inside === t.total ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-zinc-800 text-zinc-300'}" title="Venue Presence">${t.inside}/${t.total} 🟢</span>`;
+          }
+        }
+        const student = window.MEODL_ATTENDANCE.getStudents().find(s => s.name.toUpperCase() === clean || clean.includes(s.name.toUpperCase()));
+        if (student) {
+          return student.status === 'INSIDE' 
+            ? `<span class="text-[9px] font-mono px-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800" title="Present inside venue">INSIDE 🟢</span>`
+            : `<span class="text-[9px] font-mono px-1 rounded bg-zinc-800 text-zinc-400" title="Outside venue">OUTSIDE 🔴</span>`;
+        }
+        return '';
+      };
+
       const renderPlayer = (p, score, isWin, slot) => {
         const name = p ? p.name : '<span class="text-zinc-600 italic">Waiting...</span>';
         const seed = p ? '#' + p.seed : '-';
+        const presBadge = p ? getPresenceBadge(p.name) : '';
         return `
           <div class="flex items-center justify-between p-2 rounded-lg transition-all ${isWin ? 'bg-cyan-950/40 border border-cyan-500/50 text-cyan-300 font-bold' : 'bg-zinc-900/60 text-zinc-200'}">
             <div class="flex items-center gap-2 truncate pr-2">
               <span class="text-[10px] font-mono px-1 rounded bg-zinc-800 text-zinc-400 font-semibold">${seed}</span>
               <span class="truncate text-xs ${isWin ? 'text-cyan-300 font-bold' : ''}">${name}</span>
+              ${presBadge}
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
               ${hasBoth && !isCompleted ? `
@@ -2155,6 +2460,90 @@
     // -------------------------------------------------------------------------
     // SETTINGS MODAL (BRACKET TYPE & NAMES)
     // -------------------------------------------------------------------------
+    function openUniMatchModal(sportId, matchId) {
+      const modal = document.getElementById('uni-match-modal');
+      const content = document.getElementById('uni-modal-content');
+      const ev = appState.events[sportId];
+      if (!modal || !content || !ev || !ev.bracket || !ev.bracket.matches[matchId]) return;
+
+      const m = ev.bracket.matches[matchId];
+      document.getElementById('uni-modal-match-code').textContent = (ev.name || sportId).toUpperCase() + ' • ' + (m.code || matchId);
+      document.getElementById('uni-modal-match-label').textContent = m.label || 'Match Inspection';
+
+      const p1Name = m.p1 ? m.p1.name : 'Waiting for competitor';
+      const p2Name = m.p2 ? m.p2.name : 'Waiting for competitor';
+
+      // Check venue presence
+      let pres1 = 'Unknown';
+      let pres2 = 'Unknown';
+      if (window.MEODL_ATTENDANCE) {
+        const stats = window.MEODL_ATTENDANCE.getStats();
+        ['rankine', 'otto', 'brayton', 'diesel'].forEach(t => {
+          if (p1Name.toLowerCase().includes(t)) pres1 = `${stats.byTeam[t].inside}/${stats.byTeam[t].total} inside venue 🟢`;
+          if (p2Name.toLowerCase().includes(t)) pres2 = `${stats.byTeam[t].inside}/${stats.byTeam[t].total} inside venue 🟢`;
+        });
+      }
+
+      content.innerHTML = `
+        <div class="space-y-3 font-mono text-xs">
+          <!-- Competitors & Presence Verification -->
+          <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
+            <div class="flex items-center justify-between pb-1.5 border-b border-zinc-850">
+              <span class="font-bold text-white truncate">${p1Name}</span>
+              <span class="text-[10px] text-cyan-400 font-bold">${pres1}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-white truncate">${p2Name}</span>
+              <span class="text-[10px] text-cyan-400 font-bold">${pres2}</span>
+            </div>
+          </div>
+
+          <!-- Score Adjustment -->
+          <div class="flex items-center justify-around p-4 rounded-xl bg-zinc-950 border border-zinc-800 text-center">
+            <div>
+              <span class="text-[10px] text-zinc-500 block mb-1">SCORE 1</span>
+              <div class="flex items-center gap-2">
+                <button onclick="adjustUniScore('${sportId}', '${matchId}', 1, -1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">-</button>
+                <span class="text-xl font-black text-cyan-400">${m.score1}</span>
+                <button onclick="adjustUniScore('${sportId}', '${matchId}', 1, 1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">+</button>
+              </div>
+            </div>
+            <div class="text-zinc-600 font-bold text-sm">VS</div>
+            <div>
+              <span class="text-[10px] text-zinc-500 block mb-1">SCORE 2</span>
+              <div class="flex items-center gap-2">
+                <button onclick="adjustUniScore('${sportId}', '${matchId}', 2, -1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">-</button>
+                <span class="text-xl font-black text-cyan-400">${m.score2}</span>
+                <button onclick="adjustUniScore('${sportId}', '${matchId}', 2, 1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Marshal Confirmation Button -->
+          <div class="flex items-center justify-between gap-2 pt-2 border-t border-zinc-850">
+            <button onclick="confirmParticipantsPresent('${sportId}', '${matchId}')" class="flex-1 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 font-bold text-xs">
+              ✓ Confirm Competitors Present
+            </button>
+            <button onclick="closeUniMatchModal()" class="py-2 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs">
+              Done
+            </button>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeUniMatchModal() {
+      const modal = document.getElementById('uni-match-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function confirmParticipantsPresent(sportId, matchId) {
+      showToast('Marshal Verified: Both competitors confirmed present for ' + matchId);
+      closeUniMatchModal();
+    }
+
     function openSettingsModal() {
       const modal = document.getElementById('settings-modal');
       const sportId = appState.activeSport;
@@ -4198,13 +4587,397 @@
   
 
     // -------------------------------------------------------------------------
+    // ATTENDANCE & VENUE PRESENCE CONTROLLER
+    // -------------------------------------------------------------------------
+    let currentAttendanceTab = 'roster';
+    let activeModalStudentId = null;
+
+    function switchAttendanceTab(tab) {
+      currentAttendanceTab = tab;
+      const rosterBtn = document.getElementById('tab-btn-roster');
+      const auditBtn = document.getElementById('tab-btn-audit');
+      const rosterView = document.getElementById('att-roster-view');
+      const auditView = document.getElementById('att-audit-view');
+
+      if (tab === 'roster') {
+        rosterBtn.className = 'px-3 py-1.5 rounded-lg bg-zinc-800 text-cyan-300 font-bold shadow-sm transition-all';
+        auditBtn.className = 'px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white font-medium transition-all';
+        rosterView.classList.remove('hidden');
+        auditView.classList.add('hidden');
+        renderAttendanceRosterTable();
+      } else {
+        auditBtn.className = 'px-3 py-1.5 rounded-lg bg-zinc-800 text-cyan-300 font-bold shadow-sm transition-all';
+        rosterBtn.className = 'px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white font-medium transition-all';
+        auditView.classList.remove('hidden');
+        rosterView.classList.add('hidden');
+        renderAttendanceAuditTable();
+      }
+    }
+
+    function renderAttendanceView() {
+      updateAttendanceMetrics();
+      renderAttendanceTeamCards();
+      if (currentAttendanceTab === 'roster') {
+        renderAttendanceRosterTable();
+      } else {
+        renderAttendanceAuditTable();
+      }
+    }
+
+    function renderAttendanceTeamCards() {
+      const grid = document.getElementById('att-team-cards-grid');
+      if (!grid || !window.MEODL_ATTENDANCE) return;
+
+      const stats = window.MEODL_ATTENDANCE.getStats();
+      const teamStyles = {
+        rankine: { badge: 'bg-red-950/80 text-red-400 border-red-700/80', bar: 'bg-red-500' },
+        otto: { badge: 'bg-amber-950/80 text-amber-400 border-amber-700/80', bar: 'bg-amber-500' },
+        brayton: { badge: 'bg-cyan-950/80 text-cyan-400 border-cyan-700/80', bar: 'bg-cyan-500' },
+        diesel: { badge: 'bg-emerald-950/80 text-emerald-400 border-emerald-700/80', bar: 'bg-emerald-500' }
+      };
+
+      grid.innerHTML = Object.entries(stats.byTeam).map(([key, t]) => {
+        const pct = t.total ? Math.round((t.inside / t.total) * 100) : 0;
+        const ts = teamStyles[key] || teamStyles.rankine;
+        return `
+          <div onclick="filterAttendanceByTeam('${key}')" class="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-zinc-600 transition-all cursor-pointer shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white">${t.name}</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${ts.badge}">
+                ${t.inside}/${t.total} INSIDE
+              </span>
+            </div>
+            <div class="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden mb-2">
+              <div class="${ts.bar} h-1.5 rounded-full transition-all" style="width: ${pct}%;"></div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-zinc-400 font-mono">
+              <span>${pct}% Present</span>
+              ${t.overdue > 0 ? `<span class="text-amber-400 font-bold animate-pulse">⚠ ${t.overdue} Overdue</span>` : `<span class="text-zinc-500">${t.outside} Outside</span>`}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterAttendanceByTeam(teamKey) {
+      const select = document.getElementById('att-team-filter');
+      if (select) {
+        select.value = teamKey;
+        filterAttendanceView();
+      }
+    }
+
+    function filterAttendanceView() {
+      if (currentAttendanceTab === 'roster') {
+        renderAttendanceRosterTable();
+      }
+    }
+
+    function renderAttendanceRosterTable() {
+      const tbody = document.getElementById('att-roster-table-body');
+      if (!tbody || !window.MEODL_ATTENDANCE) return;
+
+      const q = (document.getElementById('att-search-input')?.value || '').trim().toLowerCase();
+      const teamFilter = document.getElementById('att-team-filter')?.value || 'all';
+      const statusFilter = document.getElementById('att-status-filter')?.value || 'all';
+
+      let students = window.MEODL_ATTENDANCE.getStudents();
+
+      if (teamFilter !== 'all') {
+        students = students.filter(s => s.team === teamFilter);
+      }
+
+      if (statusFilter !== 'all') {
+        if (statusFilter === 'OVERDUE') {
+          students = students.filter(s => window.MEODL_ATTENDANCE.isOverdue(s));
+        } else {
+          students = students.filter(s => s.status === statusFilter);
+        }
+      }
+
+      if (q) {
+        students = students.filter(s => 
+          s.name.toLowerCase().includes(q) || 
+          s.studentCode.toLowerCase().includes(q) ||
+          (s.teamName || s.team).toLowerCase().includes(q)
+        );
+      }
+
+      if (!students.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-zinc-500 font-mono text-xs">No student athlete matches the current search filters.</td></tr>';
+        return;
+      }
+
+      const teamStyles = {
+        rankine: 'bg-red-950/80 text-red-400 border-red-700/80',
+        otto: 'bg-amber-950/80 text-amber-400 border-amber-700/80',
+        brayton: 'bg-cyan-950/80 text-cyan-400 border-cyan-700/80',
+        diesel: 'bg-emerald-950/80 text-emerald-400 border-emerald-700/80'
+      };
+
+      tbody.innerHTML = students.map(s => {
+        const isOverdue = window.MEODL_ATTENDANCE.isOverdue(s);
+        let statusBadge = '';
+        if (isOverdue) {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-700 animate-pulse">⚠ OVERDUE</span>';
+        } else if (s.status === 'INSIDE') {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">🟢 INSIDE</span>';
+        } else {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-900 text-zinc-400 border border-zinc-700">🔴 OUTSIDE</span>';
+        }
+
+        let lastSeenText = '—';
+        if (s.lastCheckIn && s.status === 'INSIDE') {
+          const d = new Date(s.lastCheckIn);
+          lastSeenText = 'In: ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        } else if (s.lastCheckOut) {
+          const d = new Date(s.lastCheckOut);
+          lastSeenText = 'Out: ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        let exitDetails = '—';
+        if (s.status === 'OUTSIDE' && s.exitReason) {
+          exitDetails = s.exitReason + (s.expectedReturn ? ` (Exp: ${s.expectedReturn})` : '');
+        }
+
+        const quickActionText = s.status === 'INSIDE' ? 'Check Out' : 'Check In';
+        const quickActionColor = s.status === 'INSIDE' ? 'text-red-400 hover:bg-red-950/50' : 'text-emerald-400 hover:bg-emerald-950/50';
+
+        return `
+          <tr class="hover:bg-zinc-950/50 transition-colors">
+            <td class="py-2 px-3 font-bold text-cyan-400">${s.studentCode}</td>
+            <td class="py-2 px-3 font-semibold text-white truncate max-w-[200px]">${s.name}</td>
+            <td class="py-2 px-3">
+              <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${teamStyles[s.team] || ''}">
+                ${s.team.toUpperCase()}
+              </span>
+            </td>
+            <td class="py-2 px-3">${statusBadge}</td>
+            <td class="py-2 px-3 text-zinc-400 text-[11px]">${lastSeenText}</td>
+            <td class="py-2 px-3 text-zinc-400 text-[11px] truncate max-w-[160px]">${exitDetails}</td>
+            <td class="py-2 px-3 text-right">
+              <div class="flex items-center justify-end gap-1">
+                <button onclick="quickToggleStudentAttendance('${s.id}')" class="px-2 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-[10px] font-bold ${quickActionColor} transition-colors">
+                  ${quickActionText}
+                </button>
+                <button onclick="openStudentQRModal('${s.id}')" class="p-1 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-cyan-400 text-xs" title="View Personal QR Pass">
+                  🪪
+                </button>
+                <button onclick="promptRegenerateQR('${s.id}')" class="p-1 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-amber-400 text-xs" title="Revoke & Regenerate QR">
+                  🔄
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderAttendanceAuditTable() {
+      const tbody = document.getElementById('att-audit-table-body');
+      if (!tbody || !window.MEODL_ATTENDANCE) return;
+
+      const logs = window.MEODL_ATTENDANCE.getAuditLog();
+      if (!logs.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-zinc-500 font-mono text-xs">No gate audit logs recorded yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = logs.slice(0, 100).map(l => {
+        const isCheckIn = l.action === 'check_in';
+        const actionBadge = isCheckIn 
+          ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">CHECK IN</span>'
+          : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-950 text-red-300 border border-red-800">CHECK OUT</span>';
+
+        const d = l.timestamp ? new Date(l.timestamp) : new Date();
+        const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <tr class="hover:bg-zinc-950/50 transition-colors">
+            <td class="py-2 px-3 text-zinc-400 text-[11px]">${dateStr}</td>
+            <td class="py-2 px-3 text-cyan-400 font-bold">${l.studentCode || '—'}</td>
+            <td class="py-2 px-3 text-white font-semibold truncate max-w-[180px]">${l.studentName || '—'}</td>
+            <td class="py-2 px-3 text-zinc-400 uppercase">${l.team || '—'}</td>
+            <td class="py-2 px-3">${actionBadge}</td>
+            <td class="py-2 px-3 text-zinc-400 uppercase text-[10px]">${l.method || 'qr_scan'}</td>
+            <td class="py-2 px-3 text-zinc-300">${l.performedBy || 'Gate'}</td>
+            <td class="py-2 px-3 text-zinc-400 text-[11px]">${l.reason || l.expectedReturn || '—'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function quickToggleStudentAttendance(studentId) {
+      if (!window.MEODL_ATTENDANCE) return;
+      const s = window.MEODL_ATTENDANCE.getStudentById(studentId);
+      if (!s) return;
+
+      if (s.status === 'INSIDE') {
+        const reason = prompt(`Enter exit reason for ${s.name}:`, 'Lunch Break') || 'Temporary Exit';
+        const ret = prompt('Expected return time (e.g. 14:30, optional):', '');
+        window.MEODL_ATTENDANCE.recordCheckOut(studentId, {
+          reason: reason,
+          expectedReturn: ret || null,
+          performedBy: 'Dashboard Admin',
+          method: 'manual'
+        });
+        showToast(`Checked out: ${s.name}`);
+      } else {
+        window.MEODL_ATTENDANCE.recordCheckIn(studentId, {
+          performedBy: 'Dashboard Admin',
+          method: 'manual'
+        });
+        showToast(`Checked in: ${s.name}`);
+      }
+      renderAttendanceView();
+    }
+
+    function promptRegenerateQR(studentId) {
+      if (!window.MEODL_ATTENDANCE) return;
+      const s = window.MEODL_ATTENDANCE.getStudentById(studentId);
+      if (!s) return;
+
+      const conf = confirm(`REGENERATE QR FOR ${s.name}?
+
+This will permanently REVOKE their current QR code card and generate a new secure pass.`);
+      if (conf) {
+        window.MEODL_ATTENDANCE.regenerateQR(studentId, 'Lead Organizer');
+        showToast(`New QR active for ${s.name}. Old pass revoked.`);
+        openStudentQRModal(studentId);
+      }
+    }
+
+    function openStudentQRModal(studentId) {
+      activeModalStudentId = studentId;
+      const s = window.MEODL_ATTENDANCE ? window.MEODL_ATTENDANCE.getStudentById(studentId) : null;
+      if (!s) return;
+
+      document.getElementById('qr-modal-student-name').textContent = s.name;
+      document.getElementById('qr-modal-student-code').textContent = s.studentCode;
+      document.getElementById('qr-modal-team-title').textContent = s.teamName || ('TEAM ' + s.team.toUpperCase());
+
+      const statusBadge = document.getElementById('qr-modal-status-badge');
+      if (s.status === 'INSIDE') {
+        statusBadge.textContent = '🟢 INSIDE VENUE';
+        statusBadge.className = 'px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700/80 font-bold';
+      } else {
+        statusBadge.textContent = '🔴 OUTSIDE VENUE';
+        statusBadge.className = 'px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-700 font-semibold';
+      }
+
+      const canvasTarget = document.getElementById('qr-modal-canvas');
+      canvasTarget.innerHTML = '';
+      const payload = window.MEODL_ATTENDANCE.getQRPayload(s);
+
+      if (window.QRCode) {
+        new QRCode(canvasTarget, {
+          text: payload,
+          width: 180,
+          height: 180,
+          colorDark: '#09090b',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      } else {
+        canvasTarget.innerHTML = `<div class="text-[10px] text-zinc-800 p-2 font-mono">${payload}</div>`;
+      }
+
+      document.getElementById('student-qr-modal').classList.remove('hidden');
+    }
+
+    function closeStudentQRModal() {
+      document.getElementById('student-qr-modal').classList.add('hidden');
+      activeModalStudentId = null;
+    }
+
+    function regenerateActiveStudentQR() {
+      if (activeModalStudentId) {
+        promptRegenerateQR(activeModalStudentId);
+      }
+    }
+
+    function updateAttendanceMetrics() {
+      if (!window.MEODL_ATTENDANCE) return;
+      const stats = window.MEODL_ATTENDANCE.getStats();
+
+      // Header Pill
+      const navCount = document.getElementById('nav-attendance-count');
+      if (navCount) navCount.textContent = `${stats.inside}/${stats.total}`;
+
+      // Dashboard Widget Counters
+      const dTotal = document.getElementById('dash-presence-total');
+      const dInside = document.getElementById('dash-presence-inside');
+      const dOutside = document.getElementById('dash-presence-outside');
+      const dOverdue = document.getElementById('dash-presence-overdue');
+      if (dTotal) dTotal.textContent = stats.total;
+      if (dInside) dInside.textContent = stats.inside;
+      if (dOutside) dOutside.textContent = stats.outside;
+      if (dOverdue) dOverdue.textContent = stats.overdue;
+
+      // Attendance View KPIs
+      const aTotal = document.getElementById('att-kpi-total');
+      const aInside = document.getElementById('att-kpi-inside');
+      const aInsidePct = document.getElementById('att-kpi-inside-pct');
+      const aOutside = document.getElementById('att-kpi-outside');
+      const aOverdue = document.getElementById('att-kpi-overdue');
+      if (aTotal) aTotal.textContent = stats.total;
+      if (aInside) aInside.textContent = stats.inside;
+      if (aInsidePct) aInsidePct.textContent = stats.total ? Math.round((stats.inside / stats.total) * 100) + '% of athletes' : '0%';
+      if (aOutside) aOutside.textContent = stats.outside;
+      if (aOverdue) aOverdue.textContent = stats.overdue;
+
+      // Dashboard team grid
+      const dashTeamGrid = document.getElementById('dash-team-presence-grid');
+      if (dashTeamGrid) {
+        const teamStyles = {
+          rankine: { badge: 'bg-red-950/80 text-red-400 border-red-700/80', bar: 'bg-red-500' },
+          otto: { badge: 'bg-amber-950/80 text-amber-400 border-amber-700/80', bar: 'bg-amber-500' },
+          brayton: { badge: 'bg-cyan-950/80 text-cyan-400 border-cyan-700/80', bar: 'bg-cyan-500' },
+          diesel: { badge: 'bg-emerald-950/80 text-emerald-400 border-emerald-700/80', bar: 'bg-emerald-500' }
+        };
+        dashTeamGrid.innerHTML = Object.entries(stats.byTeam).map(([key, t]) => {
+          const pct = t.total ? Math.round((t.inside / t.total) * 100) : 0;
+          const ts = teamStyles[key] || teamStyles.rankine;
+          return `
+            <div onclick="navigateTo('attendance'); filterAttendanceByTeam('${key}');" class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 hover:border-zinc-600 transition-all cursor-pointer shadow-inner">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] font-bold text-white">${t.name}</span>
+                <span class="px-1.5 py-0.2 rounded text-[9px] font-bold border ${ts.badge}">
+                  ${t.inside}/${t.total}
+                </span>
+              </div>
+              <div class="w-full bg-zinc-900 rounded-full h-1 overflow-hidden mb-1.5">
+                <div class="${ts.bar} h-1 rounded-full transition-all" style="width: ${pct}%;"></div>
+              </div>
+              <div class="flex items-center justify-between text-[9px] text-zinc-400 font-mono">
+                <span>${pct}% Inside</span>
+                ${t.overdue > 0 ? `<span class="text-amber-400 font-bold">⚠ ${t.overdue} Overdue</span>` : `<span class="text-zinc-500">${t.outside} Out</span>`}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function exportAttendanceCSV() {
+      if (window.MEODL_ATTENDANCE) window.MEODL_ATTENDANCE.exportAttendanceCSV();
+    }
+
+    function exportQRCodesCSV() {
+      if (window.MEODL_ATTENDANCE) window.MEODL_ATTENDANCE.exportQRCodesCSV();
+    }
+
+    function exportAttendanceAuditCSV() {
+      if (window.MEODL_ATTENDANCE) window.MEODL_ATTENDANCE.exportLogsCSV();
+    }
+
+    // -------------------------------------------------------------------------
     // MASTER INITIALIZATION ON DOM READY
     // -------------------------------------------------------------------------
     window.addEventListener('DOMContentLoaded', () => {
       loadAppState();
       updateUndoBadge();
-      
-      // Hash-based routing
+      updateAttendanceMetrics();
       const hash = (window.location.hash || '#dashboard').replace('#', '');
       navigateTo(hash || 'dashboard');
     });

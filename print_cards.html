@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEODL Printable ID Cards & Lanyard Badges (A4 Grid)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <script src="./assets/qrcode.min.js"></script>
+  <script src="./assets/meodl_data.js"></script>
+  <script src="./assets/meodl_attendance.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #0f1117;
+      color: #111827;
+      font-family: 'Inter', sans-serif;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* A4 Print Layout Rules */
+    @page {
+      size: A4 portrait;
+      margin: 10mm 8mm 10mm 8mm;
+    }
+
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .a4-sheet {
+        page-break-after: always;
+        break-after: page;
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        min-height: auto !important;
+      }
+      .card-item {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+    }
+
+    /* Screen preview */
+    .a4-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      background: white;
+      margin: 20px auto;
+      padding: 8mm;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+    }
+
+    .cut-guide {
+      border: 1px dashed #cbd5e1;
+    }
+
+    .punch-hole {
+      width: 12px;
+      height: 12px;
+      border: 1.5px dashed #94a3b8;
+      border-radius: 9999px;
+      margin: 0 auto 6px auto;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Sticky Screen Controls (Hidden when printing) -->
+  <header class="no-print sticky top-0 z-50 bg-zinc-950/95 backdrop-blur-md border-b border-zinc-800 px-4 py-3 text-zinc-100 shadow-xl">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <a href="index.html#attendance" class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono font-bold text-zinc-300">
+          ↩ MEODL HUB
+        </a>
+        <div>
+          <h1 class="text-sm font-bold font-mono tracking-wide text-white">PRINTABLE LANYARD PASSES</h1>
+          <p class="text-[11px] text-zinc-400 font-mono">A4 2×4 Grid (8 Badges per page with cut & hole guides)</p>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex items-center gap-2.5 flex-wrap font-mono text-xs">
+        <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1">
+          <span class="text-zinc-400">Team:</span>
+          <select id="team-filter" onchange="renderSheets()" class="bg-transparent text-white font-bold focus:outline-none">
+            <option value="all" class="bg-zinc-900 text-white">All Teams (175 Cards)</option>
+            <option value="rankine" class="bg-zinc-900 text-red-400">Rankine (55 Cards)</option>
+            <option value="otto" class="bg-zinc-900 text-amber-400">Otto (36 Cards)</option>
+            <option value="brayton" class="bg-zinc-900 text-cyan-400">Brayton (33 Cards)</option>
+            <option value="diesel" class="bg-zinc-900 text-emerald-400">Diesel (51 Cards)</option>
+          </select>
+        </div>
+
+        <button onclick="window.print()" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-lg shadow-cyan-900/40">
+          <span>🖨️</span> PRINT CARDS
+        </button>
+
+        <button onclick="exportQRCsv()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold">
+          📥 CSV
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container for printable A4 sheets -->
+  <div id="sheets-container" class="py-4"></div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSheets();
+    });
+
+    function renderSheets() {
+      const container = document.getElementById('sheets-container');
+      container.innerHTML = '<div class="text-center text-zinc-400 py-12 font-mono text-sm">Generating printable QR badges...</div>';
+
+      if (!window.MEODL_ATTENDANCE) {
+        setTimeout(renderSheets, 200);
+        return;
+      }
+
+      const teamFilter = document.getElementById('team-filter').value;
+      let students = window.MEODL_ATTENDANCE.getStudents();
+
+      if (teamFilter !== 'all') {
+        students = students.filter(s => s.team === teamFilter);
+      }
+
+      if (!students.length) {
+        container.innerHTML = '<div class="text-center text-zinc-400 py-12 font-mono text-sm">No students found for this filter.</div>';
+        return;
+      }
+
+      const CARDS_PER_SHEET = 8; // 2 x 4
+      const totalSheets = Math.ceil(students.length / CARDS_PER_SHEET);
+      container.innerHTML = '';
+
+      const teamColors = {
+        rankine: { badge: 'bg-red-100 text-red-800 border-red-300', header: 'bg-red-700 text-white', accent: '#b91c1c' },
+        otto: { badge: 'bg-amber-100 text-amber-800 border-amber-300', header: 'bg-amber-600 text-white', accent: '#d97706' },
+        brayton: { badge: 'bg-cyan-100 text-cyan-800 border-cyan-300', header: 'bg-cyan-700 text-white', accent: '#0e7490' },
+        diesel: { badge: 'bg-emerald-100 text-emerald-800 border-emerald-300', header: 'bg-emerald-700 text-white', accent: '#047857' }
+      };
+
+      for (let sIdx = 0; sIdx < totalSheets; sIdx++) {
+        const sheetStudents = students.slice(sIdx * CARDS_PER_SHEET, (sIdx + 1) * CARDS_PER_SHEET);
+        const sheetEl = document.createElement('div');
+        sheetEl.className = 'a4-sheet';
+
+        sheetEl.innerHTML = `
+          <div class="grid grid-cols-2 gap-3 h-full">
+            ${sheetStudents.map(student => {
+              const tc = teamColors[student.team] || teamColors.rankine;
+              return `
+                <div class="card-item cut-guide rounded-xl p-3 flex flex-col justify-between bg-white border-2 border-zinc-200 relative overflow-hidden" style="height: 64mm;">
+                  <!-- Punch Hole Guide -->
+                  <div class="punch-hole" title="Lanyard Punch Guide"></div>
+
+                  <!-- Header Banner -->
+                  <div class="flex items-center justify-between border-b pb-1.5 mb-1.5">
+                    <div class="flex items-center gap-1.5">
+                      <img src="./assets/mes_logo.png" alt="MES Seal" class="w-6 h-6 rounded-full border bg-white" />
+                      <div>
+                        <span class="text-[8px] font-mono tracking-widest text-zinc-500 block uppercase leading-none">MEODL 2026</span>
+                        <span class="text-[10px] font-bold text-zinc-900 font-mono tracking-wider block leading-tight uppercase">UPHSD DALTA</span>
+                      </div>
+                    </div>
+                    <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded border uppercase ${tc.badge}">
+                      ${student.teamName || ('TEAM ' + student.team.toUpperCase())}
+                    </span>
+                  </div>
+
+                  <!-- Center: Name, Code & QR -->
+                  <div class="flex items-center justify-between gap-2 flex-1">
+                    <div class="flex-1 pr-1">
+                      <p class="text-[11px] font-extrabold text-zinc-950 font-sans uppercase leading-tight line-clamp-2">
+                        ${student.name}
+                      </p>
+                      <p class="text-xs font-mono font-bold text-zinc-800 mt-1">
+                        ${student.studentCode}
+                      </p>
+                      <p class="text-[8px] font-mono text-zinc-500 mt-1">
+                        Official Athlete Pass
+                      </p>
+                    </div>
+
+                    <!-- QR Code container -->
+                    <div class="w-[80px] h-[80px] flex items-center justify-center bg-white p-1 rounded border border-zinc-300 flex-shrink-0" id="qr-${student.id}">
+                    </div>
+                  </div>
+
+                  <!-- Footer -->
+                  <div class="pt-1 border-t border-zinc-200 flex items-center justify-between text-[7px] font-mono text-zinc-400 uppercase">
+                    <span>KEEP VISIBLE IN VENUE</span>
+                    <span>DO NOT TRANSFER</span>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+
+        container.appendChild(sheetEl);
+
+        // Generate QRs on this sheet
+        sheetStudents.forEach(student => {
+          const target = document.getElementById('qr-' + student.id);
+          if (target && window.QRCode) {
+            const payload = window.MEODL_ATTENDANCE.getQRPayload(student);
+            new QRCode(target, {
+              text: payload,
+              width: 74,
+              height: 74,
+              colorDark: '#000000',
+              colorLight: '#ffffff',
+              correctLevel: QRCode.CorrectLevel.M
+            });
+          }
+        });
+      }
+    }
+
+    function exportQRCsv() {
+      if (window.MEODL_ATTENDANCE) {
+        window.MEODL_ATTENDANCE.exportQRCodesCSV();
+      }
+    }
+  </script>
+</body>
+</html>
