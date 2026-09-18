@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEODL Esports • Call of Duty: Mobile (MES UPHSD)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+            },
+            colors: {
+              tactical: {
+                50: '#fffbeb',
+                100: '#fef3c7',
+                400: '#fbbf24',
+                500: '#f59e0b',
+                600: '#d97706',
+                DEFAULT: '#eab308',
+              },
+              obsidian: '#08090c',
+              cardBg: '#0f1117',
+              cardHover: '#161922',
+            },
+            boxShadow: {
+              'tactical': '0 0 25px -3px rgba(234, 179, 8, 0.35)',
+              'tactical-lg': '0 0 40px -4px rgba(245, 158, 11, 0.45)',
+              'card': '0 10px 25px -5px rgba(0,0,0,0.6), 0 8px 10px -6px rgba(0,0,0,0.6)',
+            }
+          }
+        }
+      };
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #08090c;
+      color: #f4f4f5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #08090c; }
+    ::-webkit-scrollbar-thumb { background: #262933; border-radius: 9999px; border: 2px solid #08090c; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f4455; }
+
+    .bg-carbon-grid {
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, rgba(234, 179, 8, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(234, 179, 8, 0.04) 1px, transparent 1px);
+    }
+    .bracket-viewport { overflow: auto !important; scroll-behavior: smooth; }
+    .connector-line { transition: stroke 0.3s ease, stroke-width 0.3s ease, filter 0.3s ease; }
+    .connector-active { stroke: #eab308; stroke-width: 2.2px; filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.8)); }
+    .connector-inactive { stroke: #262933; stroke-width: 1.5px; }
+    .num-mono { font-variant-numeric: tabular-nums; }
+    
+    .tactical-glass {
+      background: linear-gradient(180deg, rgba(20, 22, 30, 0.92), rgba(12, 14, 20, 0.9));
+      border: 1px solid rgba(234, 179, 8, 0.18);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(16px);
+    }
+    .hud-strip {
+      border: 1px solid rgba(234, 179, 8, 0.16);
+      background: linear-gradient(180deg, rgba(14, 16, 23, 0.95), rgba(9, 10, 15, 0.9));
+      box-shadow: 0 10px 35px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+      backdrop-filter: blur(18px);
+    }
+    .live-pulse {
+      box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.6);
+      animation: livePulse 1.8s infinite;
+    }
+    @keyframes livePulse {
+      0% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.6); }
+      70% { box-shadow: 0 0 0 9px rgba(234, 179, 8, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0); }
+    }
+    .match-node {
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+    .match-node:hover {
+      transform: translateY(-2px);
+      border-color: rgba(234, 179, 8, 0.5);
+    }
+    .match-node.match-live {
+      border-color: rgba(234, 179, 8, 0.8) !important;
+      box-shadow: 0 0 28px rgba(234, 179, 8, 0.2), 0 14px 30px rgba(0,0,0,.4);
+    }
+    .match-node.match-complete {
+      border-color: rgba(234, 179, 8, 0.25);
+    }
+    .score-button {
+      width: 28px; height: 28px; border-radius: 8px;
+      border: 1px solid rgba(234, 179, 8, 0.2);
+      background: rgba(255, 255, 255, 0.04);
+      color: #cbd5e1; font: 700 13px 'JetBrains Mono', monospace;
+      transition: all .12s ease;
+    }
+    .score-button:hover {
+      border-color: rgba(234, 179, 8, 0.6);
+      color: #fde047;
+      background: rgba(234, 179, 8, 0.12);
+      transform: translateY(-1px);
+    }
+    .nav-tab.active-tab {
+      color: #fde047;
+      border-bottom: 2px solid #eab308;
+    }
+    .presentation-mode header, .presentation-mode #global-game-nav {
+      display: none !important;
+    }
+    .presentation-mode #view-bracket {
+      height: 100vh !important;
+    }
+  </style>
+</head>
+
+<body class="bg-obsidian text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-amber-500/20 selection:text-amber-300">
+
+  <!-- ======================================================== -->
+  <!-- 1. MULTI-GAME TOURNAMENT HUB SWITCHER                    -->
+  <!-- ======================================================== -->
+  <nav id="global-game-nav" class="bg-black/90 border-b border-zinc-800/80 px-4 lg:px-8 py-1.5 flex items-center justify-between text-xs font-mono relative z-50">
+    <div class="flex items-center gap-2 overflow-x-auto py-0.5">
+      <span class="text-zinc-500 uppercase tracking-widest text-[10px] font-bold hidden sm:inline">Tournaments:</span>
+      <a href="index.html" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-900/90 text-zinc-400 hover:text-cyan-300 hover:bg-cyan-950/40 border border-zinc-800 hover:border-cyan-500/40 font-medium transition-all">
+        <span class="w-2 h-2 rounded-full bg-cyan-500/50"></span>
+        <span>TEKKEN 8</span>
+        <span class="text-[10px] px-1 rounded bg-zinc-800 text-zinc-300">16P</span>
+      </a>
+      <a href="codm.html" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/50 font-bold transition-all shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span>COD: MOBILE</span>
+        <span class="text-[10px] px-1 rounded bg-amber-900/60 text-amber-200">4 Teams</span>
+      </a>
+      <a href="ml.html" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-900/90 text-zinc-400 hover:text-sky-300 hover:bg-sky-950/40 border border-zinc-800 hover:border-sky-500/40 font-medium transition-all">
+        <span class="w-2 h-2 rounded-full bg-sky-500/50"></span>
+        <span>MOBILE LEGENDS</span>
+        <span class="text-[10px] px-1 rounded bg-zinc-800 text-zinc-300">4 Teams</span>
+      </a>
+    </div>
+    <div class="flex items-center gap-3 text-zinc-400 text-[11px] hidden md:flex">
+      <span class="flex items-center gap-1"><span class="text-amber-400 font-bold">MES</span> UPHSD DALTA Esports</span>
+    </div>
+  </nav>
+
+  <!-- ======================================================== -->
+  <!-- 2. HEADER & BRANDING                                     -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-xl border-b border-amber-900/30 px-4 lg:px-8 py-2.5 transition-all shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand, MES Logo & Game Art Icon -->
+      <div class="flex items-center gap-3.5">
+        <!-- MES Society Seal -->
+        <div class="relative group cursor-pointer" onclick="switchView('bracket')" title="Mechanical Engineering Society • UPHSD">
+          <div class="w-11 h-11 rounded-full p-0.5 bg-gradient-to-tr from-amber-500 via-zinc-700 to-amber-300 shadow-tactical hover:scale-105 transition-transform">
+            <img src="./assets/mes_logo.png" alt="MES UPHSD Seal" class="w-full h-full object-cover rounded-full bg-white/95 p-0.5">
+          </div>
+          <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-400 border-2 border-zinc-950 flex items-center justify-center text-[8px] font-bold text-zinc-950">⚙</span>
+        </div>
+
+        <!-- Tactical Emblem -->
+        <div class="hidden sm:flex items-center justify-center w-10 h-10 rounded-lg bg-zinc-900 border border-amber-500/50 shadow-tactical group cursor-pointer" onclick="switchView('bracket')">
+          <svg class="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="22" y1="12" x2="18" y2="12"></line>
+            <line x1="6" y1="12" x2="2" y2="12"></line>
+            <line x1="12" y1="6" x2="12" y2="2"></line>
+            <line x1="12" y1="22" x2="12" y2="18"></line>
+          </svg>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 font-mono">
+              MEODL Esports
+            </span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-700/60 font-bold">
+              CALL OF DUTY: MOBILE
+            </span>
+          </div>
+          <div class="text-xs text-zinc-400 flex items-center gap-2 flex-wrap">
+            <span class="text-amber-400 font-semibold font-mono text-[11px]">MES • UPHSD DALTA</span>
+            <span class="text-zinc-600">•</span>
+            <span>4-Team Double Elimination</span>
+            <span class="text-zinc-600">•</span>
+            <span class="text-zinc-400">1st Yr to 4th Yr</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Counters (Zero Time/Clock elements) -->
+      <div class="hidden md:flex items-center gap-4 text-xs font-mono bg-zinc-900/90 border border-zinc-800/80 rounded-lg px-3.5 py-1.5 shadow-inner">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          <span class="text-zinc-400">Status:</span>
+          <span id="metric-status" class="text-amber-400 font-bold">In Progress</span>
+        </div>
+        <div class="h-3 w-px bg-zinc-800"></div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-zinc-400">Completed:</span>
+          <span id="metric-completed" class="text-yellow-400 font-bold">0 / 5</span>
+        </div>
+        <div class="h-3 w-px bg-zinc-800"></div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-zinc-400">Leader:</span>
+          <span id="metric-leader" class="text-zinc-200 font-semibold">TBD</span>
+        </div>
+      </div>
+
+      <!-- Actions: Sound, Sim, Reset, Stage Mode -->
+      <div class="flex items-center gap-2">
+        <button id="btn-sound" onclick="toggleSound()" class="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-amber-400 transition-colors" title="Toggle Sound FX">
+          <svg id="sound-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+
+        <button onclick="simulateNextMatch()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-all hover:border-amber-500/50 shadow-sm" title="Simulate 1 Match Result">
+          <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>Sim Next</span>
+        </button>
+
+        <button onclick="toggleStageMode()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-xs font-semibold text-amber-300 transition-all shadow-sm" title="Stage Presentation Mode">
+          <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+          <span class="hidden sm:inline">Stage View</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- 3. HERO BANNER WITH USER KEY ART                         -->
+  <!-- ======================================================== -->
+  <div class="relative overflow-hidden border-b border-zinc-800/80 bg-zinc-950">
+    <div class="absolute inset-0 bg-cover bg-center opacity-25 filter blur-[1px]" style="background-image: url('./assets/codm_cover.png');"></div>
+    <div class="absolute inset-0 bg-gradient-to-r from-obsidian via-obsidian/90 to-transparent"></div>
+    <div class="relative max-w-7xl mx-auto px-4 lg:px-8 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-xl overflow-hidden border border-amber-500/40 shadow-tactical bg-zinc-900 flex-shrink-0">
+          <img src="./assets/codm_cover.png" alt="Call of Duty: Mobile" class="w-full h-full object-cover object-center">
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40">5v5 MULTIPLAYER</span>
+            <span class="text-xs font-mono text-zinc-400">BEST OF 3 / BO5 FINALS</span>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+            CALL OF DUTY: MOBILE
+            <span class="text-amber-400 font-mono text-base font-bold">CHAMPIONSHIP</span>
+          </h1>
+          <p class="text-xs text-zinc-400">Mechanical Engineering Society • Class Year Level Rivalry (1st to 4th Year)</p>
+        </div>
+      </div>
+
+      <!-- Quick Action Navigation Tabs -->
+      <div class="flex items-center gap-1 p-1 rounded-xl bg-zinc-900/90 border border-zinc-800 text-xs font-mono">
+        <button onclick="switchView('bracket')" id="tab-bracket" class="nav-tab active-tab px-3 py-1.5 rounded-lg transition-colors font-semibold">Bracket</button>
+        <button onclick="switchView('matches')" id="tab-matches" class="nav-tab px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-colors">Matches</button>
+        <button onclick="switchView('standings')" id="tab-standings" class="nav-tab px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-colors">Standings</button>
+        <button onclick="switchView('control')" id="tab-control" class="nav-tab px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-colors">Control Room</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 4. MAIN CONTENT VIEWS                                    -->
+  <!-- ======================================================== -->
+  <main class="flex-1 flex flex-col max-w-7xl w-full mx-auto p-4 lg:p-6 gap-6">
+
+    <!-- ---------------------------------------------------- -->
+    <!-- VIEW A: BRACKET VIEW (DEFAULT)                       -->
+    <!-- ---------------------------------------------------- -->
+    <div id="view-bracket" class="flex-1 flex flex-col gap-6">
+      
+      <!-- Upper Bracket Section -->
+      <div class="tactical-glass rounded-2xl p-4 sm:p-6 border border-zinc-800/90">
+        <div class="flex items-center justify-between pb-4 border-b border-zinc-800/80 mb-6">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+            <h2 class="text-base font-bold font-mono tracking-wide text-zinc-100 uppercase">Upper Bracket</h2>
+          </div>
+          <span class="text-xs font-mono text-amber-400/90 bg-amber-950/40 border border-amber-800/40 px-2.5 py-0.5 rounded-full">Winner Advances • Loser to Lower Bracket</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
+          <!-- UB Round 1: Semifinals -->
+          <div class="flex flex-col gap-6">
+            <div class="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+              <span>Upper Semifinals (BO3)</span>
+              <span class="text-[10px] text-zinc-500">First to 2 Wins</span>
+            </div>
+            
+            <!-- Match 1: UB1 -->
+            <div id="card-UB1" class="match-node rounded-xl bg-cardBg border border-zinc-800 p-3.5 shadow-card cursor-pointer" onclick="openScoreModal('UB1')">
+              <!-- Content rendered via JS -->
+            </div>
+
+            <!-- Match 2: UB2 -->
+            <div id="card-UB2" class="match-node rounded-xl bg-cardBg border border-zinc-800 p-3.5 shadow-card cursor-pointer" onclick="openScoreModal('UB2')">
+              <!-- Content rendered via JS -->
+            </div>
+          </div>
+
+          <!-- UB Round 2: Upper Final -->
+          <div class="flex flex-col gap-6 justify-center">
+            <div class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+              <span>Upper Final (BO3)</span>
+              <span class="text-[10px] text-amber-400/80">Winner to Grand Finals</span>
+            </div>
+
+            <!-- Match 3: UB3 -->
+            <div id="card-UB3" class="match-node rounded-xl bg-cardBg border border-zinc-800 p-3.5 shadow-card cursor-pointer" onclick="openScoreModal('UB3')">
+              <!-- Content rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lower Bracket Section -->
+      <div class="tactical-glass rounded-2xl p-4 sm:p-6 border border-zinc-800/90">
+        <div class="flex items-center justify-between pb-4 border-b border-zinc-800/80 mb-6">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+            <h2 class="text-base font-bold font-mono tracking-wide text-zinc-100 uppercase">Lower Bracket (Elimination)</h2>
+          </div>
+          <span class="text-xs font-mono text-red-400/90 bg-red-950/40 border border-red-800/40 px-2.5 py-0.5 rounded-full">1 Loss = Eliminated</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- LB Round 1: Semifinal -->
+          <div class="flex flex-col gap-6">
+            <div class="text-xs font-mono font-bold text-zinc-400 uppercase tracking-wider flex items-center justify-between">
+              <span>Lower Semifinal (BO3)</span>
+              <span class="text-[10px] text-zinc-500">Loser finishes 4th Place</span>
+            </div>
+
+            <!-- Match 4: LB1 -->
+            <div id="card-LB1" class="match-node rounded-xl bg-cardBg border border-zinc-800 p-3.5 shadow-card cursor-pointer" onclick="openScoreModal('LB1')">
+              <!-- Content rendered via JS -->
+            </div>
+          </div>
+
+          <!-- LB Round 2: Lower Final -->
+          <div class="flex flex-col gap-6">
+            <div class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+              <span>Lower Final (BO3)</span>
+              <span class="text-[10px] text-amber-400/80">Winner to Grand Finals • Loser 3rd</span>
+            </div>
+
+            <!-- Match 5: LB2 -->
+            <div id="card-LB2" class="match-node rounded-xl bg-cardBg border border-zinc-800 p-3.5 shadow-card cursor-pointer" onclick="openScoreModal('LB2')">
+              <!-- Content rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grand Finals Section -->
+      <div class="tactical-glass rounded-2xl p-4 sm:p-6 border border-amber-500/30 shadow-tactical">
+        <div class="flex items-center justify-between pb-4 border-b border-zinc-800/80 mb-6">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-yellow-400 animate-pulse"></span>
+            <h2 class="text-base font-bold font-mono tracking-wide text-amber-300 uppercase">Grand Finals</h2>
+          </div>
+          <span class="text-xs font-mono text-yellow-300 bg-yellow-950/40 border border-yellow-800/40 px-2.5 py-0.5 rounded-full">Championship Match</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          <!-- Grand Finals Match 1 -->
+          <div class="flex flex-col gap-3">
+            <div class="text-xs font-mono font-bold text-yellow-400 uppercase tracking-wider flex items-center justify-between">
+              <span>Grand Finals (GF1)</span>
+              <span class="text-[10px] text-zinc-400">Upper Champ vs Lower Champ</span>
+            </div>
+            <div id="card-GF1" class="match-node rounded-xl bg-cardBg border border-zinc-800 p-3.5 shadow-card cursor-pointer" onclick="openScoreModal('GF1')">
+              <!-- Content rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Grand Finals Reset (Conditional) -->
+          <div class="flex flex-col gap-3">
+            <div class="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+              <span>Grand Finals Reset (GF2)</span>
+              <span id="reset-badge" class="text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">If Needed</span>
+            </div>
+            <div id="card-GF2" class="match-node rounded-xl bg-cardBg border border-zinc-800 p-3.5 shadow-card cursor-pointer opacity-60" onclick="openScoreModal('GF2')">
+              <!-- Content rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- VIEW B: MATCH QUEUE                                  -->
+    <!-- ---------------------------------------------------- -->
+    <div id="view-matches" class="hidden flex-col gap-4">
+      <div class="tactical-glass rounded-2xl p-6 border border-zinc-800">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-bold font-mono text-white">TOURNAMENT MATCH SEQUENCE</h2>
+          <span class="text-xs font-mono text-zinc-400">Sequential Order (No Timers)</span>
+        </div>
+        <div id="match-queue-list" class="flex flex-col gap-3">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- VIEW C: STANDINGS                                    -->
+    <!-- ---------------------------------------------------- -->
+    <div id="view-standings" class="hidden flex-col gap-6">
+      <div class="tactical-glass rounded-2xl p-6 border border-zinc-800">
+        <h2 class="text-lg font-bold font-mono text-white mb-6 flex items-center gap-2">
+          <span class="text-amber-400">🏆</span> TOURNAMENT FINAL STANDINGS
+        </h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <!-- 1st Place -->
+          <div class="rounded-xl border border-yellow-500/50 bg-yellow-950/20 p-5 flex flex-col items-center text-center shadow-tactical">
+            <div class="w-12 h-12 rounded-full bg-yellow-500/20 border border-yellow-500/60 flex items-center justify-center text-2xl mb-2">🥇</div>
+            <div class="text-[11px] font-mono text-yellow-400 font-bold uppercase tracking-wider">Champion</div>
+            <div id="standings-1st" class="text-base font-bold text-white mt-1">TBD</div>
+            <div class="text-xs text-zinc-400 mt-1">1st Place</div>
+          </div>
+
+          <!-- 2nd Place -->
+          <div class="rounded-xl border border-zinc-400/40 bg-zinc-900/60 p-5 flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-zinc-800 border border-zinc-600 flex items-center justify-center text-2xl mb-2">🥈</div>
+            <div class="text-[11px] font-mono text-zinc-300 font-bold uppercase tracking-wider">Runner-Up</div>
+            <div id="standings-2nd" class="text-base font-bold text-white mt-1">TBD</div>
+            <div class="text-xs text-zinc-400 mt-1">2nd Place</div>
+          </div>
+
+          <!-- 3rd Place -->
+          <div class="rounded-xl border border-amber-700/40 bg-amber-950/10 p-5 flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-amber-900/30 border border-amber-700 flex items-center justify-center text-2xl mb-2">🥉</div>
+            <div class="text-[11px] font-mono text-amber-500 font-bold uppercase tracking-wider">3rd Place</div>
+            <div id="standings-3rd" class="text-base font-bold text-white mt-1">TBD</div>
+            <div class="text-xs text-zinc-400 mt-1">Bronze Finalist</div>
+          </div>
+
+          <!-- 4th Place -->
+          <div class="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 flex flex-col items-center text-center">
+            <div class="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-xl mb-2">🎖️</div>
+            <div class="text-[11px] font-mono text-zinc-400 font-bold uppercase tracking-wider">4th Place</div>
+            <div id="standings-4th" class="text-base font-bold text-white mt-1">TBD</div>
+            <div class="text-xs text-zinc-400 mt-1">Lower Semifinalist</div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-zinc-900/80 text-zinc-400 uppercase border-b border-zinc-800">
+              <tr>
+                <th class="p-3">Rank</th>
+                <th class="p-3">Team / Year Level</th>
+                <th class="p-3 text-center">Matches W-L</th>
+                <th class="p-3 text-center">Games W-L</th>
+                <th class="p-3 text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody id="standings-table-body" class="divide-y divide-zinc-800/60">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- VIEW D: CONTROL ROOM                                 -->
+    <!-- ---------------------------------------------------- -->
+    <div id="view-control" class="hidden flex-col gap-6">
+      <div class="tactical-glass rounded-2xl p-6 border border-zinc-800">
+        <h2 class="text-lg font-bold font-mono text-white mb-4">TOURNAMENT CONTROL & TEAM SETUP</h2>
+        <p class="text-xs text-zinc-400 mb-6">Edit team names or reset tournament bracket state below.</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div class="p-4 rounded-xl bg-cardBg border border-zinc-800">
+            <label class="block text-xs font-mono text-amber-400 mb-1">Seed 1 Team Name</label>
+            <input id="team-name-1" type="text" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-sm text-white focus:border-amber-400 focus:outline-none" value="4th Year">
+          </div>
+          <div class="p-4 rounded-xl bg-cardBg border border-zinc-800">
+            <label class="block text-xs font-mono text-amber-400 mb-1">Seed 2 Team Name</label>
+            <input id="team-name-2" type="text" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-sm text-white focus:border-amber-400 focus:outline-none" value="3rd Year">
+          </div>
+          <div class="p-4 rounded-xl bg-cardBg border border-zinc-800">
+            <label class="block text-xs font-mono text-amber-400 mb-1">Seed 3 Team Name</label>
+            <input id="team-name-3" type="text" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-sm text-white focus:border-amber-400 focus:outline-none" value="2nd Year">
+          </div>
+          <div class="p-4 rounded-xl bg-cardBg border border-zinc-800">
+            <label class="block text-xs font-mono text-amber-400 mb-1">Seed 4 Team Name</label>
+            <input id="team-name-4" type="text" class="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2 text-sm text-white focus:border-amber-400 focus:outline-none" value="1st Year">
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 flex-wrap">
+          <button onclick="saveTeamNames()" class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs font-mono transition-all">Save Team Names</button>
+          <button onclick="resetTournament()" class="px-4 py-2 rounded-lg bg-red-900/40 hover:bg-red-800/60 border border-red-700/60 text-red-300 font-bold text-xs font-mono transition-all">Reset All Bracket Data</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- 5. MATCH SCORING MODAL                                   -->
+  <!-- ======================================================== -->
+  <div id="score-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="tactical-glass rounded-2xl w-full max-w-lg p-6 border border-amber-500/40 shadow-tactical flex flex-col gap-5">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+        <div>
+          <span id="modal-match-round" class="text-xs font-mono font-bold text-amber-400">UPPER SEMIFINAL 1</span>
+          <h3 id="modal-match-title" class="text-base font-bold text-white">Score Match</h3>
+        </div>
+        <button onclick="closeScoreModal()" class="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800">✕</button>
+      </div>
+
+      <!-- Match status selector -->
+      <div class="flex items-center gap-2 text-xs font-mono">
+        <span class="text-zinc-400">Status:</span>
+        <button onclick="setModalStatus('ready')" id="status-btn-ready" class="px-2.5 py-1 rounded bg-zinc-800 text-zinc-300">Ready</button>
+        <button onclick="setModalStatus('live')" id="status-btn-live" class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold">Live</button>
+        <button onclick="setModalStatus('completed')" id="status-btn-completed" class="px-2.5 py-1 rounded bg-zinc-800 text-zinc-300">Completed</button>
+      </div>
+
+      <!-- Teams & Score Control -->
+      <div class="grid grid-cols-2 gap-4 items-center bg-zinc-900/90 p-4 rounded-xl border border-zinc-800">
+        <!-- Team 1 -->
+        <div class="flex flex-col items-center text-center gap-2">
+          <span id="modal-p1-seed" class="text-[10px] font-mono text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded">SEED 1</span>
+          <span id="modal-p1-name" class="font-bold text-sm text-white">4th Year</span>
+          <div class="flex items-center gap-2 mt-2">
+            <button onclick="adjustModalScore(1, -1)" class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-base">-</button>
+            <span id="modal-p1-score" class="text-3xl font-extrabold font-mono text-amber-400 min-w-[36px]">0</span>
+            <button onclick="adjustModalScore(1, 1)" class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-base">+</button>
+          </div>
+        </div>
+
+        <!-- Team 2 -->
+        <div class="flex flex-col items-center text-center gap-2">
+          <span id="modal-p2-seed" class="text-[10px] font-mono text-zinc-400 bg-zinc-800 px-2 py-0.5 rounded">SEED 4</span>
+          <span id="modal-p2-name" class="font-bold text-sm text-white">1st Year</span>
+          <div class="flex items-center gap-2 mt-2">
+            <button onclick="adjustModalScore(2, -1)" class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-base">-</button>
+            <span id="modal-p2-score" class="text-3xl font-extrabold font-mono text-amber-400 min-w-[36px]">0</span>
+            <button onclick="adjustModalScore(2, 1)" class="w-8 h-8 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-base">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Set Buttons (BO3) -->
+      <div class="flex items-center justify-between gap-2 text-xs font-mono">
+        <span class="text-zinc-400">Quick Result:</span>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <button onclick="quickFinish(2, 0)" class="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">2-0 (T1)</button>
+          <button onclick="quickFinish(2, 1)" class="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">2-1 (T1)</button>
+          <button onclick="quickFinish(1, 2)" class="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">1-2 (T2)</button>
+          <button onclick="quickFinish(0, 2)" class="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">0-2 (T2)</button>
+        </div>
+      </div>
+
+      <!-- Footer action buttons -->
+      <div class="flex items-center justify-between pt-2 border-t border-zinc-800">
+        <button onclick="closeScoreModal()" class="px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300">Cancel</button>
+        <button onclick="saveModalScore()" class="px-5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold text-xs font-mono transition-all">Confirm & Save</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Audio Synthesizer & Logic Scripts -->
+  <script>
+    // ---------------------------------------------------------
+    // 1. DATA DEFINITIONS (CODM 4-TEAM DOUBLE ELIMINATION)
+    // ---------------------------------------------------------
+    const STORAGE_KEY = 'meodl_codm_bracket_v1';
+
+    const INITIAL_TEAMS = [
+      { id: 't1', seed: 1, name: '4th Year' },
+      { id: 't2', seed: 2, name: '3rd Year' },
+      { id: 't3', seed: 3, name: '2nd Year' },
+      { id: 't4', seed: 4, name: '1st Year' }
+    ];
+
+    const MATCH_CONFIG = {
+      // UPPER BRACKET
+      'UB1': { id: 'UB1', name: 'Upper Semifinal 1', bestOf: 3, targetWins: 2, p1Source: 'seed1', p2Source: 'seed4', winDest: { match: 'UB3', slot: 1 }, lossDest: { match: 'LB1', slot: 1 } },
+      'UB2': { id: 'UB2', name: 'Upper Semifinal 2', bestOf: 3, targetWins: 2, p1Source: 'seed2', p2Source: 'seed3', winDest: { match: 'UB3', slot: 2 }, lossDest: { match: 'LB1', slot: 2 } },
+      'UB3': { id: 'UB3', name: 'Upper Final', bestOf: 3, targetWins: 2, winDest: { match: 'GF1', slot: 1 }, lossDest: { match: 'LB2', slot: 1 } },
+      
+      // LOWER BRACKET
+      'LB1': { id: 'LB1', name: 'Lower Semifinal', bestOf: 3, targetWins: 2, winDest: { match: 'LB2', slot: 2 }, lossDest: null }, // Loser takes 4th
+      'LB2': { id: 'LB2', name: 'Lower Final', bestOf: 3, targetWins: 2, winDest: { match: 'GF1', slot: 2 }, lossDest: null }, // Loser takes 3rd
+
+      // GRAND FINALS
+      'GF1': { id: 'GF1', name: 'Grand Finals', bestOf: 3, targetWins: 2, winDest: null, lossDest: null },
+      'GF2': { id: 'GF2', name: 'Grand Finals Reset', bestOf: 3, targetWins: 2, winDest: null, lossDest: null }
+    };
+
+    let state = {
+      teams: JSON.parse(JSON.stringify(INITIAL_TEAMS)),
+      matches: {},
+      soundEnabled: true,
+      activeModalMatch: null,
+      modalScore1: 0,
+      modalScore2: 0,
+      modalStatus: 'ready'
+    };
+
+    // ---------------------------------------------------------
+    // 2. STATE INITIALIZATION & PERSISTENCE
+    // ---------------------------------------------------------
+    function initDefaultMatches() {
+      const matches = {};
+      for (const [id, cfg] of Object.entries(MATCH_CONFIG)) {
+        matches[id] = {
+          id: id,
+          name: cfg.name,
+          bestOf: cfg.bestOf,
+          targetWins: cfg.targetWins,
+          status: 'ready', // 'ready', 'live', 'completed'
+          p1: null,
+          p2: null,
+          s1: 0,
+          s2: 0,
+          winner: null,
+          loser: null
+        };
+      }
+      return matches;
+    }
+
+    function populateInitialSeeds() {
+      const tMap = {};
+      state.teams.forEach(t => { tMap[t.seed] = t; });
+
+      // UB1: Seed 1 vs Seed 4
+      state.matches['UB1'].p1 = tMap[1] || null;
+      state.matches['UB1'].p2 = tMap[4] || null;
+
+      // UB2: Seed 2 vs Seed 3
+      state.matches['UB2'].p1 = tMap[2] || null;
+      state.matches['UB2'].p2 = tMap[3] || null;
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          state.teams = parsed.teams || INITIAL_TEAMS;
+          state.matches = parsed.matches || initDefaultMatches();
+          state.soundEnabled = parsed.soundEnabled !== undefined ? parsed.soundEnabled : true;
+        } else {
+          state.matches = initDefaultMatches();
+          populateInitialSeeds();
+        }
+      } catch (e) {
+        state.matches = initDefaultMatches();
+        populateInitialSeeds();
+      }
+      recalculateBracket();
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          teams: state.teams,
+          matches: state.matches,
+          soundEnabled: state.soundEnabled
+        }));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // ---------------------------------------------------------
+    // 3. SOUND SYNTHESIZER (WEB AUDIO API)
+    // ---------------------------------------------------------
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+      },
+      playBeep(freq = 440, duration = 0.08) {
+        if (!state.soundEnabled) return;
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch(e){}
+      },
+      playVictory() {
+        if (!state.soundEnabled) return;
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+          setTimeout(() => this.playBeep(f, 0.12), i * 100);
+        });
+      }
+    };
+
+    function toggleSound() {
+      state.soundEnabled = !state.soundEnabled;
+      document.getElementById('sound-icon').style.opacity = state.soundEnabled ? '1' : '0.4';
+      saveState();
+      AudioEngine.playBeep(state.soundEnabled ? 660 : 330);
+    }
+
+    // ---------------------------------------------------------
+    // 4. BRACKET ADVANCEMENT LOGIC
+    // ---------------------------------------------------------
+    function recalculateBracket() {
+      // Reset dependent match participants
+      ['UB3', 'LB1', 'LB2', 'GF1', 'GF2'].forEach(id => {
+        state.matches[id].p1 = null;
+        state.matches[id].p2 = null;
+      });
+
+      // Populate Seeded Matches
+      populateInitialSeeds();
+
+      // UB1 & UB2 -> UB3 (winners) & LB1 (losers)
+      const ub1 = state.matches['UB1'];
+      const ub2 = state.matches['UB2'];
+
+      if (ub1.winner) state.matches['UB3'].p1 = ub1.winner;
+      if (ub2.winner) state.matches['UB3'].p2 = ub2.winner;
+
+      if (ub1.loser) state.matches['LB1'].p1 = ub1.loser;
+      if (ub2.loser) state.matches['LB1'].p2 = ub2.loser;
+
+      // LB1 Winner & UB3 Loser -> LB2
+      const lb1 = state.matches['LB1'];
+      const ub3 = state.matches['UB3'];
+
+      if (ub3.loser) state.matches['LB2'].p1 = ub3.loser;
+      if (lb1.winner) state.matches['LB2'].p2 = lb1.winner;
+
+      // UB3 Winner & LB2 Winner -> GF1
+      const lb2 = state.matches['LB2'];
+      if (ub3.winner) state.matches['GF1'].p1 = ub3.winner;
+      if (lb2.winner) state.matches['GF1'].p2 = lb2.winner;
+
+      // Check Grand Finals Reset:
+      // If Lower Champ (GF1.p2) defeats Upper Champ (GF1.p1) in GF1, GF2 is activated!
+      const gf1 = state.matches['GF1'];
+      const gf2Card = document.getElementById('card-GF2');
+      const resetBadge = document.getElementById('reset-badge');
+
+      if (gf1.status === 'completed' && gf1.winner && gf1.p2 && gf1.winner.id === gf1.p2.id) {
+        // Lower bracket champion won GF1 -> Reset triggered!
+        state.matches['GF2'].p1 = gf1.winner;
+        state.matches['GF2'].p2 = gf1.loser;
+        if (gf2Card) gf2Card.classList.remove('opacity-60');
+        if (resetBadge) {
+          resetBadge.textContent = 'Active (Reset Triggered)';
+          resetBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold';
+        }
+      } else {
+        state.matches['GF2'].p1 = null;
+        state.matches['GF2'].p2 = null;
+        if (gf2Card) gf2Card.classList.add('opacity-60');
+        if (resetBadge) {
+          resetBadge.textContent = 'If Needed';
+          resetBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-400';
+        }
+      }
+
+      renderAll();
+    }
+
+    // ---------------------------------------------------------
+    // 5. RENDERING
+    // ---------------------------------------------------------
+    function renderMatchNode(matchId) {
+      const m = state.matches[matchId];
+      const el = document.getElementById(`card-${matchId}`);
+      if (!el || !m) return;
+
+      const p1 = m.p1;
+      const p2 = m.p2;
+      const isComplete = m.status === 'completed';
+      const isLive = m.status === 'live';
+
+      el.className = `match-node rounded-xl bg-cardBg border p-3.5 shadow-card cursor-pointer ${
+        isLive ? 'match-live border-amber-500/80' : isComplete ? 'match-complete border-zinc-800' : 'border-zinc-800/80 hover:border-zinc-700'
+      }`;
+
+      const statusBadge = isLive 
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/50 live-pulse">LIVE</span>`
+        : isComplete 
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-mono text-zinc-400 bg-zinc-900 border border-zinc-800">FINAL</span>`
+        : `<span class="px-2 py-0.5 rounded text-[10px] font-mono text-zinc-500 bg-zinc-900 border border-zinc-800/60">READY</span>`;
+
+      const p1Winner = isComplete && m.winner && p1 && m.winner.id === p1.id;
+      const p2Winner = isComplete && m.winner && p2 && m.winner.id === p2.id;
+
+      el.innerHTML = `
+        <div class="flex items-center justify-between pb-2 border-b border-zinc-800/70 mb-2.5">
+          <span class="text-[11px] font-mono text-zinc-400 font-bold uppercase">${m.name}</span>
+          ${statusBadge}
+        </div>
+        <div class="flex flex-col gap-1.5">
+          <!-- Team 1 -->
+          <div class="flex items-center justify-between p-2 rounded-lg ${p1Winner ? 'bg-amber-950/30 border border-amber-500/40 text-amber-300 font-bold' : 'bg-zinc-900/50 text-zinc-300'}">
+            <div class="flex items-center gap-2 truncate">
+              <span class="text-[10px] font-mono text-zinc-500">${p1 ? `S${p1.seed}` : '-'}</span>
+              <span class="truncate text-xs ${p1Winner ? 'text-amber-300 font-bold' : ''}">${p1 ? p1.name : '<span class="text-zinc-600 italic">Waiting...</span>'}</span>
+            </div>
+            <span class="font-mono text-sm font-bold ml-2 ${p1Winner ? 'text-amber-400' : 'text-zinc-400'}">${m.s1}</span>
+          </div>
+
+          <!-- Team 2 -->
+          <div class="flex items-center justify-between p-2 rounded-lg ${p2Winner ? 'bg-amber-950/30 border border-amber-500/40 text-amber-300 font-bold' : 'bg-zinc-900/50 text-zinc-300'}">
+            <div class="flex items-center gap-2 truncate">
+              <span class="text-[10px] font-mono text-zinc-500">${p2 ? `S${p2.seed}` : '-'}</span>
+              <span class="truncate text-xs ${p2Winner ? 'text-amber-300 font-bold' : ''}">${p2 ? p2.name : '<span class="text-zinc-600 italic">Waiting...</span>'}</span>
+            </div>
+            <span class="font-mono text-sm font-bold ml-2 ${p2Winner ? 'text-amber-400' : 'text-zinc-400'}">${m.s2}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAll() {
+      // 1. Bracket cards
+      Object.keys(state.matches).forEach(renderMatchNode);
+
+      // 2. Metrics
+      let completedCount = 0;
+      let liveCount = 0;
+      Object.values(state.matches).forEach(m => {
+        if (m.status === 'completed') completedCount++;
+        if (m.status === 'live') liveCount++;
+      });
+      const metricComp = document.getElementById('metric-completed');
+      if (metricComp) metricComp.textContent = `${completedCount} / ${state.matches['GF2'].status !== 'ready' || (state.matches['GF1'].winner && state.matches['GF1'].p2 && state.matches['GF1'].winner.id === state.matches['GF1'].p2.id) ? 6 : 5}`;
+
+      const metricStatus = document.getElementById('metric-status');
+      if (metricStatus) {
+        if (isTournamentOver()) {
+          metricStatus.textContent = 'Finished';
+          metricStatus.className = 'text-yellow-400 font-bold';
+        } else if (liveCount > 0) {
+          metricStatus.textContent = `${liveCount} Live`;
+          metricStatus.className = 'text-amber-400 font-bold';
+        } else {
+          metricStatus.textContent = 'In Progress';
+          metricStatus.className = 'text-zinc-300 font-bold';
+        }
+      }
+
+      // Leader / Champion metric
+      const leader = getChampion();
+      const metricLeader = document.getElementById('metric-leader');
+      if (metricLeader) metricLeader.textContent = leader ? leader.name : 'TBD';
+
+      // 3. Matches Queue list
+      renderMatchQueue();
+
+      // 4. Standings
+      renderStandings();
+    }
+
+    function isTournamentOver() {
+      const gf1 = state.matches['GF1'];
+      const gf2 = state.matches['GF2'];
+      if (!gf1 || gf1.status !== 'completed') return false;
+      if (gf1.winner && gf1.p1 && gf1.winner.id === gf1.p1.id) return true; // Upper champ won GF1
+      return gf2 && gf2.status === 'completed'; // GF2 finished
+    }
+
+    function getChampion() {
+      const gf1 = state.matches['GF1'];
+      const gf2 = state.matches['GF2'];
+      if (gf2 && gf2.status === 'completed' && gf2.winner) return gf2.winner;
+      if (gf1 && gf1.status === 'completed' && gf1.p1 && gf1.winner && gf1.winner.id === gf1.p1.id) return gf1.winner;
+      return null;
+    }
+
+    function renderMatchQueue() {
+      const list = document.getElementById('match-queue-list');
+      if (!list) return;
+      list.innerHTML = '';
+
+      const matchOrder = ['UB1', 'UB2', 'LB1', 'UB3', 'LB2', 'GF1', 'GF2'];
+      matchOrder.forEach((id, idx) => {
+        const m = state.matches[id];
+        if (!m) return;
+        if (id === 'GF2' && !state.matches['GF2'].p1) return; // Hide reset if not needed
+
+        const div = document.createElement('div');
+        div.className = 'p-3.5 rounded-xl bg-cardBg border border-zinc-800 flex items-center justify-between cursor-pointer hover:border-amber-500/40 transition-all';
+        div.onclick = () => openScoreModal(id);
+
+        const statusTag = m.status === 'completed'
+          ? `<span class="px-2 py-0.5 rounded text-[10px] font-mono text-amber-400 bg-amber-950/40 border border-amber-800/40">COMPLETED</span>`
+          : m.status === 'live'
+          ? `<span class="px-2 py-0.5 rounded text-[10px] font-mono text-yellow-300 bg-yellow-950/40 border border-yellow-800/40 live-pulse font-bold">LIVE NOW</span>`
+          : `<span class="px-2 py-0.5 rounded text-[10px] font-mono text-zinc-400 bg-zinc-800">READY</span>`;
+
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="font-mono text-xs font-bold text-zinc-500 w-6">#${idx + 1}</span>
+            <div>
+              <div class="text-xs font-bold font-mono text-white">${m.name}</div>
+              <div class="text-[11px] text-zinc-400">
+                ${m.p1 ? m.p1.name : 'TBD'} vs ${m.p2 ? m.p2.name : 'TBD'}
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="font-mono text-sm font-bold text-amber-400">${m.s1} - ${m.s2}</span>
+            ${statusTag}
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function renderStandings() {
+      const champ = getChampion();
+      const s1st = document.getElementById('standings-1st');
+      const s2nd = document.getElementById('standings-2nd');
+      const s3rd = document.getElementById('standings-3rd');
+      const s4th = document.getElementById('standings-4th');
+
+      if (s1st) s1st.textContent = champ ? champ.name : 'TBD';
+
+      // 2nd Place: Loser of GF
+      let second = null;
+      const gf1 = state.matches['GF1'];
+      const gf2 = state.matches['GF2'];
+      if (gf2 && gf2.status === 'completed') second = gf2.loser;
+      else if (gf1 && gf1.status === 'completed' && gf1.loser && gf1.winner.id === gf1.p1?.id) second = gf1.loser;
+      if (s2nd) s2nd.textContent = second ? second.name : 'TBD';
+
+      // 3rd Place: Loser of LB2 (Lower Final)
+      const lb2 = state.matches['LB2'];
+      const third = (lb2 && lb2.status === 'completed') ? lb2.loser : null;
+      if (s3rd) s3rd.textContent = third ? third.name : 'TBD';
+
+      // 4th Place: Loser of LB1 (Lower Semifinal)
+      const lb1 = state.matches['LB1'];
+      const fourth = (lb1 && lb1.status === 'completed') ? lb1.loser : null;
+      if (s4th) s4th.textContent = fourth ? fourth.name : 'TBD';
+
+      // Table body
+      const tbody = document.getElementById('standings-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      // Calculate stats
+      const stats = {};
+      state.teams.forEach(t => {
+        stats[t.id] = { team: t, mW: 0, mL: 0, gW: 0, gL: 0, rank: 99 };
+      });
+
+      Object.values(state.matches).forEach(m => {
+        if (m.status === 'completed' && m.p1 && m.p2) {
+          if (stats[m.p1.id]) {
+            stats[m.p1.id].gW += m.s1;
+            stats[m.p1.id].gL += m.s2;
+            if (m.winner && m.winner.id === m.p1.id) stats[m.p1.id].mW++;
+            else stats[m.p1.id].mL++;
+          }
+          if (stats[m.p2.id]) {
+            stats[m.p2.id].gW += m.s2;
+            stats[m.p2.id].gL += m.s1;
+            if (m.winner && m.winner.id === m.p2.id) stats[m.p2.id].mW++;
+            else stats[m.p2.id].mL++;
+          }
+        }
+      });
+
+      if (champ && stats[champ.id]) stats[champ.id].rank = 1;
+      if (second && stats[second.id]) stats[second.id].rank = 2;
+      if (third && stats[third.id]) stats[third.id].rank = 3;
+      if (fourth && stats[fourth.id]) stats[fourth.id].rank = 4;
+
+      const sorted = Object.values(stats).sort((a, b) => a.rank - b.rank || (b.mW - a.mW) || ((b.gW - b.gL) - (a.gW - a.gL)));
+
+      sorted.forEach((item, i) => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-zinc-900/50 transition-colors';
+        const rankLabel = item.rank === 1 ? '🥇 1st' : item.rank === 2 ? '🥈 2nd' : item.rank === 3 ? '🥉 3rd' : item.rank === 4 ? '4th' : `${i + 1}`;
+        tr.innerHTML = `
+          <td class="p-3 font-bold text-amber-400">${rankLabel}</td>
+          <td class="p-3 font-bold text-white">${item.team.name} <span class="text-zinc-500 font-normal text-[10px]">(Seed ${item.team.seed})</span></td>
+          <td class="p-3 text-center text-zinc-200">${item.mW} - ${item.mL}</td>
+          <td class="p-3 text-center text-zinc-200">${item.gW} - ${item.gL}</td>
+          <td class="p-3 text-right text-xs ${item.rank === 1 ? 'text-yellow-400 font-bold' : item.rank === 4 || item.rank === 3 ? 'text-zinc-500' : 'text-zinc-300'}">
+            ${item.rank === 1 ? 'CHAMPION' : item.rank === 2 ? 'RUNNER-UP' : item.rank === 3 ? 'BRONZE' : item.rank === 4 ? 'ELIMINATED' : 'ACTIVE'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ---------------------------------------------------------
+    // 6. MODAL SCORE MANAGEMENT
+    // ---------------------------------------------------------
+    function openScoreModal(matchId) {
+      const m = state.matches[matchId];
+      if (!m) return;
+      if (!m.p1 && !m.p2) {
+        alert('Both teams must be determined before scoring this match.');
+        return;
+      }
+
+      state.activeModalMatch = matchId;
+      state.modalScore1 = m.s1 || 0;
+      state.modalScore2 = m.s2 || 0;
+      state.modalStatus = m.status || 'ready';
+
+      document.getElementById('modal-match-round').textContent = m.name.toUpperCase();
+      document.getElementById('modal-match-title').textContent = `${m.p1 ? m.p1.name : 'TBD'} vs ${m.p2 ? m.p2.name : 'TBD'}`;
+      
+      document.getElementById('modal-p1-name').textContent = m.p1 ? m.p1.name : 'TBD';
+      document.getElementById('modal-p1-seed').textContent = m.p1 ? `SEED ${m.p1.seed}` : '-';
+      document.getElementById('modal-p1-score').textContent = state.modalScore1;
+
+      document.getElementById('modal-p2-name').textContent = m.p2 ? m.p2.name : 'TBD';
+      document.getElementById('modal-p2-seed').textContent = m.p2 ? `SEED ${m.p2.seed}` : '-';
+      document.getElementById('modal-p2-score').textContent = state.modalScore2;
+
+      updateModalStatusButtons();
+      document.getElementById('score-modal').classList.remove('hidden');
+      AudioEngine.playBeep(520, 0.05);
+    }
+
+    function closeScoreModal() {
+      document.getElementById('score-modal').classList.add('hidden');
+      state.activeModalMatch = null;
+    }
+
+    function adjustModalScore(teamNum, delta) {
+      if (teamNum === 1) {
+        state.modalScore1 = Math.max(0, state.modalScore1 + delta);
+        document.getElementById('modal-p1-score').textContent = state.modalScore1;
+      } else {
+        state.modalScore2 = Math.max(0, state.modalScore2 + delta);
+        document.getElementById('modal-p2-score').textContent = state.modalScore2;
+      }
+      AudioEngine.playBeep(440, 0.04);
+    }
+
+    function quickFinish(s1, s2) {
+      state.modalScore1 = s1;
+      state.modalScore2 = s2;
+      state.modalStatus = 'completed';
+      document.getElementById('modal-p1-score').textContent = s1;
+      document.getElementById('modal-p2-score').textContent = s2;
+      updateModalStatusButtons();
+      AudioEngine.playBeep(600, 0.06);
+    }
+
+    function setModalStatus(status) {
+      state.modalStatus = status;
+      updateModalStatusButtons();
+    }
+
+    function updateModalStatusButtons() {
+      ['ready', 'live', 'completed'].forEach(st => {
+        const btn = document.getElementById(`status-btn-${st}`);
+        if (!btn) return;
+        if (state.modalStatus === st) {
+          btn.className = 'px-2.5 py-1 rounded bg-amber-500 text-zinc-950 font-bold';
+        } else {
+          btn.className = 'px-2.5 py-1 rounded bg-zinc-800 text-zinc-300 hover:text-white';
+        }
+      });
+    }
+
+    function saveModalScore() {
+      const matchId = state.activeModalMatch;
+      if (!matchId) return;
+
+      const m = state.matches[matchId];
+      m.s1 = state.modalScore1;
+      m.s2 = state.modalScore2;
+      m.status = state.modalStatus;
+
+      // Determine winner if completed
+      if (m.status === 'completed' || m.s1 >= m.targetWins || m.s2 >= m.targetWins) {
+        m.status = 'completed';
+        if (m.s1 > m.s2) {
+          m.winner = m.p1;
+          m.loser = m.p2;
+        } else if (m.s2 > m.s1) {
+          m.winner = m.p2;
+          m.loser = m.p1;
+        }
+      } else if (m.status === 'ready' && (m.s1 > 0 || m.s2 > 0)) {
+        m.status = 'live';
+      }
+
+      closeScoreModal();
+      recalculateBracket();
+      saveState();
+
+      if (m.status === 'completed') {
+        AudioEngine.playVictory();
+      } else {
+        AudioEngine.playBeep(480, 0.08);
+      }
+    }
+
+    // ---------------------------------------------------------
+    // 7. SIMULATE & CONTROL ROOM
+    // ---------------------------------------------------------
+    function simulateNextMatch() {
+      const matchOrder = ['UB1', 'UB2', 'LB1', 'UB3', 'LB2', 'GF1', 'GF2'];
+      for (const id of matchOrder) {
+        const m = state.matches[id];
+        if (!m || m.status === 'completed') continue;
+        if (!m.p1 || !m.p2) continue; // Waiting for teams
+
+        // Simulate
+        const p1Wins = Math.random() > 0.45;
+        m.s1 = p1Wins ? 2 : Math.floor(Math.random() * 2);
+        m.s2 = p1Wins ? Math.floor(Math.random() * 2) : 2;
+        m.status = 'completed';
+        m.winner = p1Wins ? m.p1 : m.p2;
+        m.loser = p1Wins ? m.p2 : m.p1;
+
+        recalculateBracket();
+        saveState();
+        AudioEngine.playVictory();
+        return;
+      }
+      alert('All scheduled tournament matches are already completed!');
+    }
+
+    function resetTournament() {
+      if (!confirm('Are you sure you want to reset all match results for Call of Duty: Mobile?')) return;
+      state.matches = initDefaultMatches();
+      populateInitialSeeds();
+      recalculateBracket();
+      saveState();
+      AudioEngine.playBeep(300, 0.15);
+    }
+
+    function saveTeamNames() {
+      const n1 = document.getElementById('team-name-1').value.trim() || '4th Year';
+      const n2 = document.getElementById('team-name-2').value.trim() || '3rd Year';
+      const n3 = document.getElementById('team-name-3').value.trim() || '2nd Year';
+      const n4 = document.getElementById('team-name-4').value.trim() || '1st Year';
+
+      state.teams[0].name = n1;
+      state.teams[1].name = n2;
+      state.teams[2].name = n3;
+      state.teams[3].name = n4;
+
+      recalculateBracket();
+      saveState();
+      alert('Team names updated successfully!');
+    }
+
+    function switchView(viewName) {
+      ['bracket', 'matches', 'standings', 'control'].forEach(v => {
+        const viewEl = document.getElementById(`view-${v}`);
+        const tabEl = document.getElementById(`tab-${v}`);
+        if (viewEl) viewEl.classList.toggle('hidden', v !== viewName);
+        if (tabEl) {
+          if (v === viewName) {
+            tabEl.className = 'nav-tab active-tab px-3 py-1.5 rounded-lg transition-colors font-semibold';
+          } else {
+            tabEl.className = 'nav-tab px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white transition-colors';
+          }
+        }
+      });
+      AudioEngine.playBeep(480, 0.04);
+    }
+
+    function toggleStageMode() {
+      document.body.classList.toggle('presentation-mode');
+      if (document.body.classList.contains('presentation-mode')) {
+        switchView('bracket');
+      }
+    }
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (!document.getElementById('score-modal').classList.contains('hidden')) {
+          closeScoreModal();
+        } else if (document.body.classList.contains('presentation-mode')) {
+          document.body.classList.remove('presentation-mode');
+        }
+      }
+    });
+
+    // Run on startup
+    loadState();
+  </script>
+</body>
+</html>

@@ -1,6 +1,13 @@
-# MEODL Esports — Tekken 8 Tournament System
+# MEODL Esports — Tournament Systems Hub
 
-Production-ready, dark-mode interactive web application and tournament management engine for a **16-player Double Elimination Tekken 8 Championship** (15 active competitors + 1 Seed #1 BYE), styled after the modern esports analytics aesthetic of `ewgf.gg`.
+Production-ready, dark-mode interactive web applications and tournament management engines for the **Mechanical Engineering Society (MES) • UPHSD DALTA** esports championships.
+
+### 🎮 Supported Tournaments:
+1. **Tekken 8 Championship** (`index.html`) — 16-Player Double Elimination (15 active competitors + 1 Seed #1 BYE), 12:00 PM – 5:00 PM venue schedule, all BO3.
+2. **Call of Duty: Mobile (CODM)** (`codm.html`) — 4-Team Double Elimination (1st Year to 4th Year ME), tactical military gold UI, pure match sequence (no clocks/timers), BO3/BO5, Grand Finals Reset logic.
+3. **Mobile Legends: Bang Bang (MLBB)** (`ml.html`) — 4-Team Double Elimination (1st Year to 4th Year ME), celestial mythic neon UI, pure match sequence (no clocks/timers), BO3/BO5, Grand Finals Reset logic.
+
+Seamless 1-click tournament navigation switcher available across all pages!
 
 ---
 

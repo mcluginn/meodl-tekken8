@@ -140,13 +140,40 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
 .score-button{width:28px;height:28px;border-radius:8px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);color:#cbd5e1;font:700 13px 'JetBrains Mono',monospace;transition:all .12s ease}.score-button:hover{border-color:rgba(34,211,238,.32);color:#67e8f9;background:rgba(34,211,238,.08);transform:translateY(-1px)}.score-button:active{transform:translateY(0) scale(.96)}
 .nav-tab{position:relative}.nav-tab.active-tab::after{content:'';position:absolute;left:18%;right:18%;bottom:-1px;height:2px;border-radius:99px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.9}
 .command-button{border:1px solid rgba(148,163,184,.13);background:rgba(255,255,255,.035);color:#cbd5e1;transition:all .16s ease}.command-button:hover{border-color:rgba(34,211,238,.28);background:rgba(34,211,238,.055);color:#e2e8f0}.command-button.primary{border-color:rgba(34,211,238,.28);background:linear-gradient(180deg,rgba(8,145,178,.32),rgba(8,145,178,.16));color:#a5f3fc}
-.presentation-mode header{transform:translateY(-100%);transition:transform .3s ease}.presentation-mode #view-full{height:100vh!important}.presentation-mode .bracket-viewport{cursor:grab}
+.presentation-mode header, .presentation-mode #global-game-nav{transform:translateY(-100%);display:none!important;transition:transform .3s ease}.presentation-mode #view-full{height:100vh!important}.presentation-mode .bracket-viewport{cursor:grab}
 #toast-container{bottom:22px;left:50%;right:auto;transform:translateX(-50%);align-items:center}
 </style>
 
 </head>
 
 <body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-300">
+
+  <!-- ======================================================== -->
+  <!-- 0. MULTI-GAME TOURNAMENT HUB SWITCHER                    -->
+  <!-- ======================================================== -->
+  <nav id="global-game-nav" class="bg-black/90 border-b border-zinc-800/80 px-4 lg:px-8 py-1.5 flex items-center justify-between text-xs font-mono relative z-50">
+    <div class="flex items-center gap-2 overflow-x-auto py-0.5">
+      <span class="text-zinc-500 uppercase tracking-widest text-[10px] font-bold hidden sm:inline">Tournaments:</span>
+      <a href="index.html" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-bold transition-all shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+        <span>TEKKEN 8</span>
+        <span class="text-[10px] px-1 rounded bg-cyan-900/60 text-cyan-200">16P</span>
+      </a>
+      <a href="codm.html" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-900/90 text-zinc-400 hover:text-amber-300 hover:bg-amber-950/40 border border-zinc-800 hover:border-amber-500/40 font-medium transition-all">
+        <span class="w-2 h-2 rounded-full bg-amber-500/50"></span>
+        <span>COD: MOBILE</span>
+        <span class="text-[10px] px-1 rounded bg-zinc-800 text-zinc-300">4 Teams</span>
+      </a>
+      <a href="ml.html" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-900/90 text-zinc-400 hover:text-sky-300 hover:bg-sky-950/40 border border-zinc-800 hover:border-sky-500/40 font-medium transition-all">
+        <span class="w-2 h-2 rounded-full bg-sky-500/50"></span>
+        <span>MOBILE LEGENDS</span>
+        <span class="text-[10px] px-1 rounded bg-zinc-800 text-zinc-300">4 Teams</span>
+      </a>
+    </div>
+    <div class="flex items-center gap-3 text-zinc-400 text-[11px] hidden md:flex">
+      <span class="flex items-center gap-1"><span class="text-amber-400 font-bold">MES</span> UPHSD DALTA Esports</span>
+    </div>
+  </nav>
 
   <!-- ======================================================== -->
   <!-- TOP NAVIGATION / EWGF SYSTEM HEADER                      -->
