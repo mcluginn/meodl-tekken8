@@ -1,0 +1,2691 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEODL Esports • Tekken 8 Double Elimination (MES UPHSD)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind Configuration -->
+  <script>
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+            },
+            colors: {
+              obsidian: '#09090b',
+              cardBg: '#111317',
+              cardHover: '#161920',
+              electric: {
+                400: '#38bdf8',
+                500: '#06b6d4',
+                DEFAULT: '#00f0ff',
+              },
+              mishima: {
+                300: '#fef08a',
+                400: '#facc15',
+                500: '#eab308',
+              }
+            },
+            boxShadow: {
+              'electric': '0 0 20px -3px rgba(6, 182, 212, 0.4)',
+              'electric-lg': '0 0 35px -4px rgba(0, 240, 255, 0.5)',
+              'mishima': '0 0 25px -3px rgba(250, 204, 21, 0.45)',
+              'card': '0 10px 25px -5px rgba(0,0,0,0.6), 0 8px 10px -6px rgba(0,0,0,0.6)',
+            }
+          }
+        }
+      };
+    }
+  </script>
+
+  <!-- Complete Standalone Styling & Fallbacks -->
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #09090b;
+      color: #f4f4f5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Custom Sleek Dark Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #09090b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 9999px;
+      border: 2px solid #09090b;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+
+    /* Grid pattern background */
+    .bg-grid-pattern {
+      background-size: 36px 36px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    }
+
+    /* Viewport with smooth scroll */
+    .bracket-viewport {
+      overflow: auto !important;
+      scroll-behavior: smooth;
+    }
+
+    /* SVG Connector Transitions */
+    .connector-line {
+      transition: stroke 0.3s ease, stroke-width 0.3s ease, filter 0.3s ease;
+    }
+    .connector-active {
+      stroke: #38bdf8;
+      stroke-width: 2.2px;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.8));
+    }
+    .connector-inactive {
+      stroke: #27272a;
+      stroke-width: 1.5px;
+    }
+
+    .num-mono {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Subtle image blend mask */
+    .hero-art-mask {
+      -webkit-mask-image: radial-gradient(circle at 85% 25%, black 25%, transparent 75%);
+      mask-image: radial-gradient(circle at 85% 25%, black 25%, transparent 75%);
+    }
+  </style>
+
+<style id="enhancement-layer">
+:root{--accent:#22d3ee;--gold:#f5c451;--success:#34d399;--danger:#fb7185}
+html{background:#07090d}
+body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transparent 26%),radial-gradient(circle at 96% 10%,rgba(245,196,81,.06),transparent 23%),linear-gradient(180deg,#07090d 0%,#090b10 42%,#080a0e 100%)}
+.enhanced-glass{background:linear-gradient(180deg,rgba(18,22,29,.9),rgba(10,12,16,.88));border:1px solid rgba(148,163,184,.13);box-shadow:0 14px 40px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.035);backdrop-filter:blur(16px)}
+.hud-strip{border:1px solid rgba(148,163,184,.12);background:linear-gradient(180deg,rgba(10,13,18,.94),rgba(10,12,16,.8));box-shadow:0 10px 35px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.03);backdrop-filter:blur(18px)}
+.hud-metric{min-width:100px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05)}
+.hud-metric .value{font-size:15px;font-weight:800}.hud-metric .label{color:#71717a;font-size:9px;text-transform:uppercase;letter-spacing:.11em;font-family:'JetBrains Mono',monospace}
+.control-hero{position:relative;overflow:hidden;border:1px solid rgba(34,211,238,.16);background:radial-gradient(circle at 82% 18%,rgba(34,211,238,.12),transparent 25%),radial-gradient(circle at 10% 100%,rgba(245,196,81,.06),transparent 30%),linear-gradient(180deg,rgba(17,21,28,.96),rgba(8,11,15,.96));box-shadow:0 18px 60px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.035)}
+.next-match-card{border:1px solid rgba(34,211,238,.18);background:linear-gradient(180deg,rgba(13,20,27,.96),rgba(9,13,18,.92));box-shadow:0 14px 35px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.03)}
+.player-versus-card{min-height:156px;border-radius:18px;border:1px solid rgba(148,163,184,.11);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.012));box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+.queue-item{transition:transform .16s ease,border-color .16s ease,background .16s ease}.queue-item:hover{transform:translateX(2px);border-color:rgba(34,211,238,.22);background:rgba(34,211,238,.035)}
+.shortcut-key{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 7px;border-radius:6px;border:1px solid rgba(148,163,184,.18);background:rgba(255,255,255,.04);color:#cbd5e1;font:600 10px 'JetBrains Mono',monospace;box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}
+.live-pulse{box-shadow:0 0 0 0 rgba(52,211,153,.55);animation:livePulse 1.8s infinite}@keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+.match-node{transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.match-node:hover{transform:translateY(-2px);border-color:rgba(71,85,105,.9)}.match-node.match-live{border-color:rgba(52,211,153,.46)!important;box-shadow:0 0 28px rgba(52,211,153,.08),0 14px 30px rgba(0,0,0,.28)}.match-node.match-ready{border-color:rgba(56,189,248,.23)}.match-node.match-complete{border-color:rgba(34,211,238,.18)}
+.score-button{width:28px;height:28px;border-radius:8px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);color:#cbd5e1;font:700 13px 'JetBrains Mono',monospace;transition:all .12s ease}.score-button:hover{border-color:rgba(34,211,238,.32);color:#67e8f9;background:rgba(34,211,238,.08);transform:translateY(-1px)}.score-button:active{transform:translateY(0) scale(.96)}
+.nav-tab{position:relative}.nav-tab.active-tab::after{content:'';position:absolute;left:18%;right:18%;bottom:-1px;height:2px;border-radius:99px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.9}
+.command-button{border:1px solid rgba(148,163,184,.13);background:rgba(255,255,255,.035);color:#cbd5e1;transition:all .16s ease}.command-button:hover{border-color:rgba(34,211,238,.28);background:rgba(34,211,238,.055);color:#e2e8f0}.command-button.primary{border-color:rgba(34,211,238,.28);background:linear-gradient(180deg,rgba(8,145,178,.32),rgba(8,145,178,.16));color:#a5f3fc}
+.presentation-mode header{transform:translateY(-100%);transition:transform .3s ease}.presentation-mode #view-full{height:100vh!important}.presentation-mode .bracket-viewport{cursor:grab}
+#toast-container{bottom:22px;left:50%;right:auto;transform:translateX(-50%);align-items:center}
+</style>
+
+</head>
+
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-300">
+
+  <!-- ======================================================== -->
+  <!-- TOP NAVIGATION / EWGF SYSTEM HEADER                      -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800/80 px-4 lg:px-8 py-2.5 transition-all shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand, MES Logo & Tekken Emblem -->
+      <div class="flex items-center gap-3.5">
+        <!-- MES Society Seal -->
+        <div class="relative group cursor-pointer" onclick="switchView('full')" title="Mechanical Engineering Society • UPHSD">
+          <div class="w-11 h-11 rounded-full p-0.5 bg-gradient-to-tr from-amber-500 via-zinc-700 to-cyan-400 shadow-mishima hover:scale-105 transition-transform">
+            <img src="./assets/mes_logo.png" alt="MES UPHSD Seal" class="w-full h-full object-cover rounded-full bg-white/95 p-0.5">
+          </div>
+          <span class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-amber-400 border-2 border-zinc-950 flex items-center justify-center text-[7px] font-bold text-zinc-950">⚙</span>
+        </div>
+
+        <!-- Electric Emblem -->
+        <div class="hidden sm:flex items-center justify-center w-10 h-10 rounded-lg bg-zinc-900 border border-cyan-500/50 shadow-electric group cursor-pointer" onclick="switchView('full')">
+          <svg class="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-amber-300 font-mono">
+              MEODL Esports
+            </span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800/60 font-bold">
+              TEKKEN 8
+            </span>
+          </div>
+          <div class="text-xs text-zinc-400 flex items-center gap-2 flex-wrap">
+            <span class="text-amber-400 font-semibold font-mono text-[11px]">MES • UPHSD DALTA</span>
+            <span class="text-zinc-600">•</span>
+            <span>16-Player Double Elimination</span>
+            <span class="text-zinc-600">•</span>
+            <span class="text-zinc-400">15 Players + 1 BYE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Counters -->
+      <div class="hidden md:flex items-center gap-4 text-xs font-mono bg-zinc-900/90 border border-zinc-800/80 rounded-lg px-3 py-1.5 shadow-inner">
+        <!-- Room Cutoff Badge -->
+        <div class="flex items-center gap-2 px-2.5 py-0.5 rounded-md bg-red-950/80 border border-red-700/80 text-[11px] font-mono font-bold text-red-300 shadow-sm" title="Hard venue closing time: 5:00 PM">
+          <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+          <span>ROOM CLOSES: 5:00 PM</span>
+        </div>
+        <div class="h-3 w-px bg-zinc-800"></div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-zinc-400">Live:</span>
+          <span id="metric-live" class="text-emerald-400 font-bold">0</span>
+        </div>
+        <div class="h-3 w-px bg-zinc-800"></div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-zinc-400">Completed:</span>
+          <span id="metric-completed" class="text-cyan-400 font-bold">1/30</span>
+        </div>
+        <div class="h-3 w-px bg-zinc-800"></div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-zinc-400">Total Sets:</span>
+          <span id="metric-total" class="text-zinc-200 font-semibold">30</span>
+        </div>
+      </div>
+
+      <!-- Quick Utility Actions -->
+      <div class="flex items-center gap-2">
+        <!-- Sound FX toggle -->
+        <button id="btn-sound" onclick="toggleSound()" class="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-cyan-400 transition-colors" title="Toggle Sound FX">
+          <svg id="sound-icon-svg" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+
+        <!-- Auto-Simulate Next Match -->
+        <button onclick="simulateNextMatch()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-all hover:border-cyan-500/50 shadow-sm" title="Simulate 1 Match Result">
+          <svg class="w-3.5 h-3.5 text-cyan-400" fill="currentColor" viewBox="0 0 24 24">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>Sim Next</span>
+        </button>
+
+        <!-- Export Menu -->
+        <div class="relative inline-block text-left">
+          <button onclick="toggleExportDropdown()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-all shadow-sm">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span class="hidden sm:inline">Export</span>
+            <svg class="w-3 h-3 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div id="export-dropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-zinc-900 border border-zinc-800 shadow-card py-1.5 z-50 text-xs">
+            <a href="javascript:void(0)" onclick="exportBracketJSON()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+              <span>Export JSON State</span>
+            </a>
+            <a href="javascript:void(0)" onclick="triggerJSONImport()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <span>Import JSON State</span>
+            </a>
+            <a href="javascript:void(0)" onclick="copyStandingsClipboard()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy Standings Text</span>
+            </a>
+            <input type="file" id="json-file-input" class="hidden" accept=".json" onchange="handleJSONUpload(event)">
+          </div>
+        </div>
+
+        <button id="btn-presentation" onclick="togglePresentationMode()" class="command-button hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" title="Toggle presentation mode (P)"><span>◉</span><span>Stage</span></button>
+        <button onclick="toggleFullscreen()" class="command-button p-2 rounded-lg" title="Fullscreen"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"></path></svg></button>
+
+        <!-- Reset Button -->
+        <button onclick="confirmResetTournament()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 text-xs font-medium text-red-400 hover:text-red-200 transition-all shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          <span class="hidden sm:inline">Reset</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Segmented Tab Switcher (shadcn pill aesthetic) -->
+    <div class="max-w-7xl mx-auto mt-2.5 pt-2 border-t border-zinc-900 flex items-center justify-between overflow-x-auto pb-1 gap-2">
+      <div class="flex items-center p-1 rounded-xl bg-zinc-900/90 border border-zinc-800/80 text-xs font-medium space-x-1 shrink-0">
+        <button onclick="switchView('full')" id="tab-full" class="nav-tab active-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-cyan-400 bg-zinc-800 shadow-sm font-semibold">
+          <span>Full Bracket</span>
+        </button>
+        <button onclick="switchView('winners')" id="tab-winners" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+          <span>Winners Bracket</span>
+        </button>
+        <button onclick="switchView('losers')" id="tab-losers" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span>Losers Bracket</span>
+        </button>
+        <button onclick="switchView('finals')" id="tab-finals" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+          <span>Grand Finals</span>
+        </button>
+        <button onclick="switchView('control')" id="tab-control" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200"><span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Control Room</span></button>
+        <button onclick="switchView('schedule')" id="tab-schedule" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span>Schedule</span>
+        </button>
+        <button onclick="switchView('matches')" id="tab-matches" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span>Match List</span>
+        </button>
+        <button onclick="switchView('standings')" id="tab-standings" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span>Standings</span>
+        </button>
+      </div>
+
+      <!-- Quick Canvas Zoom Controls -->
+      <div id="bracket-zoom-controls" class="flex items-center gap-1 bg-zinc-900/90 border border-zinc-800/80 rounded-lg p-1 text-xs text-zinc-400 shrink-0">
+        <button onclick="zoomBracket(-0.1)" class="p-1.5 hover:text-white rounded hover:bg-zinc-800" title="Zoom Out">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+        </button>
+        <span id="zoom-level-text" class="font-mono text-[11px] px-1.5 text-zinc-300 font-semibold">100%</span>
+        <button onclick="zoomBracket(0.1)" class="p-1.5 hover:text-white rounded hover:bg-zinc-800" title="Zoom In">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+        </button>
+        <button onclick="resetZoomBracket()" class="p-1.5 hover:text-white rounded hover:bg-zinc-800 ml-0.5" title="Reset View">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+        </button>
+      </div>
+      <div class="max-w-7xl mx-auto mt-2 flex items-center gap-2 overflow-x-auto pb-1 presentation-hide">
+        <!-- Venue Cutoff Pill -->
+        <div class="hud-strip rounded-xl px-2.5 py-1.5 flex items-center gap-2 shrink-0 border-red-900/80 bg-red-950/50">
+          <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+          <span class="text-[10px] font-mono uppercase tracking-wider text-red-300 font-extrabold">ROOM CLOSES: 5:00 PM</span>
+        </div>
+
+        <!-- Clock, Status & Pace Strip -->
+        <div class="hud-strip rounded-xl px-3 py-1.5 flex items-center gap-3 shrink-0">
+          <div class="hud-metric">
+            <div class="label">Clock</div>
+            <div id="sched-hud-clock" class="value text-zinc-100 font-bold">12:00 PM</div>
+          </div>
+          <div class="h-4 w-px bg-zinc-800"></div>
+          <div class="hud-metric">
+            <div class="label">Status</div>
+            <div id="sched-hud-status" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">ON SCHEDULE</div>
+          </div>
+          <div class="h-4 w-px bg-zinc-800"></div>
+          <div class="hud-metric">
+            <div class="label">Pace</div>
+            <div id="sched-hud-pace" class="value text-zinc-300 font-bold">+0m</div>
+          </div>
+          <div class="h-4 w-px bg-zinc-800"></div>
+          <div class="hud-metric">
+            <div class="label">Est. Finish</div>
+            <div id="sched-hud-finish" class="value text-cyan-300 font-bold">4:12 PM</div>
+          </div>
+        </div>
+
+        <!-- Current Active Set Strip -->
+        <div class="hud-strip rounded-xl px-3 py-1.5 min-w-[240px] flex-1 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] font-mono uppercase tracking-[.16em] text-zinc-500">Current</span>
+              <span id="sched-hud-curr-code" class="text-[10px] font-mono text-cyan-400 font-bold">W2</span>
+              <span id="sched-hud-target-time" class="text-[9px] font-mono text-zinc-400">(Call: 12:00 PM)</span>
+            </div>
+            <div id="sched-hud-curr-names" class="text-xs font-semibold text-zinc-200 truncate">Almoro vs Limbo</div>
+          </div>
+          <button onclick="openNextReadyMatch()" class="command-button shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-semibold">Open Next</button>
+        </div>
+
+        <!-- Next On Deck Strip -->
+        <div class="hud-strip rounded-xl px-3 py-1.5 min-w-[190px] shrink-0 hidden lg:flex flex-col justify-center">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[9px] font-mono uppercase tracking-[.16em] text-amber-500 font-bold">Next</span>
+            <span id="sched-hud-next-code" class="text-[10px] font-mono text-amber-400 font-bold">W3</span>
+            <span id="sched-hud-next-target" class="text-[9px] font-mono text-zinc-500">(12:08 PM)</span>
+          </div>
+          <div id="sched-hud-next-names" class="text-xs text-zinc-300 truncate">Quilitis vs Lacorte</div>
+        </div>
+
+        <div class="hud-strip rounded-xl px-3 py-2 flex items-center gap-2 shrink-0">
+          <span class="text-[9px] font-mono uppercase tracking-[.16em] text-zinc-500">Keys</span>
+          <span class="shortcut-key">N</span>
+          <span class="shortcut-key">P</span>
+          <span class="shortcut-key">F</span>
+        </div>
+      </div></div>
+    </div>
+  </header>
+
+
+
+  <!-- ======================================================== -->
+  <!-- MAIN CONTENT CONTAINER                                   -->
+  <!-- ======================================================== -->
+  <main class="flex-1 relative bg-grid-pattern flex flex-col">
+    
+    <!-- Ambient Tekken 8 Hero Art Watermark (Fixed Background Glow) -->
+    <div class="pointer-events-none fixed right-0 top-16 w-full max-w-4xl h-full opacity-10 overflow-hidden mix-blend-screen select-none z-0 hero-art-mask">
+      <img src="./assets/tekken8_cover.jpg" alt="Tekken 8 Hero Ambient" class="w-full h-full object-cover object-top filter contrast-125">
+    </div>
+
+    <div id="view-control" class="view-panel hidden flex-1 p-6 overflow-y-auto max-w-7xl mx-auto w-full z-10">
+      <div class="control-hero rounded-3xl p-5 sm:p-7 mb-5">
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
+          <div><div class="flex items-center gap-2 mb-2"><span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-950/70 border border-emerald-800/60 text-[10px] font-mono font-bold text-emerald-300"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 live-pulse"></span> LIVE CONTROL</span><span class="text-[10px] font-mono uppercase tracking-[.2em] text-zinc-500">MEODL ESPORTS • TOURNAMENT OPS</span></div><h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Control Room</h2><p class="mt-1 text-sm text-zinc-400 max-w-2xl">Run the tournament from one place. Start a set, update scores, move winners automatically, and keep the next match visible to the stage crew.</p></div>
+          <div class="flex flex-wrap items-center gap-2"><button onclick="openNextReadyMatch()" class="command-button primary px-4 py-2 rounded-xl text-xs font-semibold">Open Next Ready</button><button onclick="simulateNextMatch()" class="command-button px-4 py-2 rounded-xl text-xs font-semibold">Simulate Next</button><button onclick="togglePresentationMode()" class="command-button px-4 py-2 rounded-xl text-xs font-semibold">Stage Mode</button></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 xl:grid-cols-[1.55fr_.9fr] gap-5">
+        <section class="enhanced-glass rounded-2xl p-5"><div class="flex items-center justify-between gap-3 mb-4"><div><div class="text-[10px] font-mono uppercase tracking-[.18em] text-cyan-400">Primary console</div><h3 id="control-match-title" class="text-lg font-bold text-white mt-1">No match selected</h3></div><div id="control-match-status" class="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-zinc-800 text-zinc-400 border border-zinc-700">STANDBY</div></div><div id="control-console" class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 items-stretch"></div><div class="mt-4 pt-4 border-t border-zinc-800/70 flex flex-wrap items-center justify-between gap-3"><div class="flex flex-wrap items-center gap-2"><button id="control-live-btn" class="command-button px-3 py-2 rounded-lg text-xs font-semibold" onclick="toggleActiveMatchLive()">Start Live</button><button class="command-button px-3 py-2 rounded-lg text-xs font-semibold" onclick="openActiveControlMatch()">Full Scoreboard</button><button class="command-button px-3 py-2 rounded-lg text-xs font-semibold" onclick="resetActiveControlMatch()">Reset Set</button></div><div class="text-[10px] font-mono text-zinc-500">N = next • P = stage mode • F = fullscreen</div></div></section>
+        <aside class="enhanced-glass rounded-2xl p-5"><div class="flex items-center justify-between mb-4"><div><div class="text-[10px] font-mono uppercase tracking-[.18em] text-amber-400">Queue</div><h3 class="text-lg font-bold text-white mt-1">Next up</h3></div><span id="queue-count" class="text-[10px] font-mono text-zinc-500">0 ready</span></div><div id="control-queue" class="space-y-2"></div></aside>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
+        <section class="enhanced-glass rounded-2xl p-5"><div class="text-[10px] font-mono uppercase tracking-[.18em] text-zinc-500">Tournament state</div><div class="grid grid-cols-2 gap-2 mt-3" id="control-state-grid"></div></section>
+        <section class="enhanced-glass rounded-2xl p-5"><div class="text-[10px] font-mono uppercase tracking-[.18em] text-zinc-500">Bracket route</div><div id="control-route" class="mt-3 text-xs text-zinc-300 leading-relaxed"></div></section>
+        <section class="enhanced-glass rounded-2xl p-5"><div class="text-[10px] font-mono uppercase tracking-[.18em] text-zinc-500">Operator shortcuts</div><div class="mt-3 space-y-2 text-xs text-zinc-400"><div class="flex items-center justify-between"><span>Open next ready set</span><span class="shortcut-key">N</span></div><div class="flex items-center justify-between"><span>Toggle stage/presentation mode</span><span class="shortcut-key">P</span></div><div class="flex items-center justify-between"><span>Toggle fullscreen</span><span class="shortcut-key">F</span></div><div class="flex items-center justify-between"><span>Open match search</span><span class="shortcut-key">/</span></div></div></section>
+      </div>
+    </div>
+
+    <!-- 1. FULL BRACKET VIEW (Horizontal & Vertical Scrollable) -->
+    <div id="view-full" class="view-panel flex-1 relative w-full h-[calc(100vh-125px)] overflow-hidden z-10">
+      <!-- Floating Navigation Hint Pill -->
+      <div class="absolute top-4 left-6 z-30 pointer-events-none hidden md:flex items-center gap-3 bg-zinc-950/90 border border-zinc-800/90 backdrop-blur-md px-4 py-2 rounded-full text-[11px] text-zinc-300 shadow-xl">
+        <img src="./assets/mes_logo.png" alt="MES" class="w-4 h-4 rounded-full">
+        <span>UPHSD Mechanical Engineering Society Tekken 8 Championship</span>
+        <span class="text-zinc-600">•</span>
+        <span class="text-cyan-400">Scroll horizontally to view all rounds</span>
+      </div>
+
+      <!-- Scrollable Bracket Viewport -->
+      <div id="bracket-viewport" class="bracket-viewport w-full h-full overflow-auto relative">
+        <div id="bracket-canvas" class="origin-top-left transition-transform duration-75 p-8" style="transform: scale(1); min-width: 2900px;">
+          
+          <!-- Dynamic SVG Connection Layer -->
+          <svg id="bracket-svg" class="absolute top-0 left-0 pointer-events-none z-10 w-full h-full" style="min-width: 2900px; min-height: 2200px;">
+            <defs>
+              <linearGradient id="cyan-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8"/>
+                <stop offset="100%" stop-color="#38bdf8" stop-opacity="1"/>
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <!-- Bracket Sections Layout -->
+          <div class="flex flex-col gap-12 relative z-20">
+            
+            <!-- SECTION A: WINNERS BRACKET -->
+            <div>
+              <div class="flex items-center gap-2.5 mb-4 pl-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-electric"></div>
+                <h2 class="text-sm font-bold uppercase tracking-wider text-cyan-300 font-mono">
+                  Winners Bracket (Top Seed Path)
+                </h2>
+                <span class="text-xs text-zinc-500 font-mono">• Best of 3 / Best of 5 (Finals)</span>
+              </div>
+              
+              <!-- Winners Rounds Grid -->
+              <div class="flex gap-14 items-stretch">
+                <!-- WR1: Round of 16 (8 matches) -->
+                <div class="flex flex-col gap-4 w-72 shrink-0">
+                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
+                    <span>WINNERS R1</span>
+                    <span class="text-zinc-500">BO3</span>
+                  </div>
+                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-wr1"></div>
+                </div>
+
+                <!-- WR2: Quarterfinals (4 matches) -->
+                <div class="flex flex-col gap-4 w-72 shrink-0">
+                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
+                    <span>QUARTERFINALS</span>
+                    <span class="text-zinc-500">BO3</span>
+                  </div>
+                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-wr2"></div>
+                </div>
+
+                <!-- WR3: Semifinals (2 matches) -->
+                <div class="flex flex-col gap-4 w-72 shrink-0">
+                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
+                    <span>SEMIFINALS</span>
+                    <span class="text-zinc-500">BO3</span>
+                  </div>
+                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-wr3"></div>
+                </div>
+
+                <!-- WR4: Winners Finals (1 match) -->
+                <div class="flex flex-col gap-4 w-72 shrink-0">
+                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-cyan-800/50 text-xs font-mono font-bold text-cyan-300 flex justify-between shadow-sm">
+                    <span>WINNERS FINALS</span>
+                    <span class="text-cyan-400">BO5</span>
+                  </div>
+                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-wr4"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION B: GRAND FINALS & CHAMPION PODIUM -->
+            <div class="pt-4 border-t border-zinc-900/80">
+              <div class="flex items-center gap-2.5 mb-4 pl-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-mishima"></div>
+                <h2 class="text-sm font-bold uppercase tracking-wider text-amber-300 font-mono">
+                  Grand Finals Championship
+                </h2>
+                <span class="text-xs text-zinc-500 font-mono">• Best of 5 (1st to 3) • Bracket Reset Rules apply</span>
+              </div>
+              
+              <div class="flex gap-14 items-center pl-4" id="col-gf">
+                <!-- GF1 and GF2 Cards will render here -->
+              </div>
+            </div>
+
+            <!-- SECTION C: LOSERS BRACKET -->
+            <div class="pt-4 border-t border-zinc-900/80">
+              <div class="flex items-center gap-2.5 mb-4 pl-2">
+                <div class="w-2.5 h-2.5 rounded-full bg-red-400 shadow-lg"></div>
+                <h2 class="text-sm font-bold uppercase tracking-wider text-red-300 font-mono">
+                  Losers Bracket (Redemption Path)
+                </h2>
+                <span class="text-xs text-zinc-500 font-mono">• 1 Loss = Eliminated • Cross-bracket routing</span>
+              </div>
+              
+              <!-- Losers Rounds Grid -->
+              <div class="flex gap-14 items-stretch">
+                <!-- LR1: 3 Matches (L2, L3, L4 - M2 Loser gets Auto-BYE to LR2 L5) -->
+                <div class="flex flex-col gap-4 w-72 shrink-0">
+                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
+                    <span>LOSERS R1</span>
+                    <span class="text-zinc-500">BO3</span>
+                  </div>
+                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr1"></div>
+                </div>
+
+                <!-- LR2: 4 Matches (L5, L6, L7, L8) -->
+                <div class="flex flex-col gap-4 w-72 shrink-0">
+                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
+                    <span>LOSERS R2</span>
+                    <span class="text-zinc-500">BO3</span>
+                  </div>
+                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr2"></div>
+                </div>
+
+                <!-- LR3: 2 Matches (L9, L10) -->
+                <div class="flex flex-col gap-4 w-72 shrink-0">
+                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
+                    <span>LOSERS R3</span>
+                    <span class="text-zinc-500">BO3</span>
+                  </div>
+                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr3"></div>
+                </div>
+
+                <!-- LR4: 2 Matches (L11, L12) -->
+                <div class="flex flex-col gap-4 w-72 shrink-0">
+                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
+                    <span>LOSERS QUARTERS</span>
+                    <span class="text-amber-400">BO5</span>
+                  </div>
+                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr4"></div>
+                </div>
+
+                <!-- LR5: 1 Match (L13 - Losers Semifinals) -->
+                <div class="flex flex-col gap-4 w-72 shrink-0">
+                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
+                    <span>LOSERS SEMIS</span>
+                    <span class="text-amber-400">BO5</span>
+                  </div>
+                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr5"></div>
+                </div>
+
+                <!-- LR6: 1 Match (L14 - Losers Finals) -->
+                <div class="flex flex-col gap-4 w-72 shrink-0">
+                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-red-800/50 text-xs font-mono font-bold text-red-300 flex justify-between shadow-sm">
+                    <span>LOSERS FINALS</span>
+                    <span class="text-red-400">BO5</span>
+                  </div>
+                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr6"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. WINNERS ONLY VIEW -->
+    <div id="view-winners" class="view-panel hidden flex-1 p-6 overflow-y-auto max-w-7xl mx-auto w-full z-10">
+      <div class="mb-6">
+        <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-cyan-400 shadow-electric"></span>
+          <span>Winners Bracket Flow</span>
+        </h2>
+        <p class="text-sm text-zinc-400">Track the undefeated path from Round of 16 to the Grand Finals</p>
+      </div>
+      <div id="winners-focused-container" class="overflow-x-auto pb-8"></div>
+    </div>
+
+    <!-- 3. LOSERS ONLY VIEW -->
+    <div id="view-losers" class="view-panel hidden flex-1 p-6 overflow-y-auto max-w-7xl mx-auto w-full z-10">
+      <div class="mb-6">
+        <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-amber-400 shadow-mishima"></span>
+          <span>Losers Bracket Gauntlet</span>
+        </h2>
+        <p class="text-sm text-zinc-400">Elimination rounds 1 through 6 leading into Grand Finals contention</p>
+      </div>
+      <div id="losers-focused-container" class="overflow-x-auto pb-8"></div>
+    </div>
+
+    <!-- 4. GRAND FINALS SPOTLIGHT VIEW -->
+    <div id="view-finals" class="view-panel hidden flex-1 p-6 overflow-y-auto max-w-5xl mx-auto w-full z-10">
+      <div id="finals-spotlight-container" class="py-4 flex flex-col items-center gap-6"></div>
+    </div>
+
+    <!-- 5. MATCH LIST / SCHEDULE VIEW -->
+    <div id="view-matches" class="view-panel hidden flex-1 p-6 overflow-y-auto max-w-7xl mx-auto w-full z-10">
+      <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-extrabold text-white">
+            Tournament Match Schedule & Queue
+          </h2>
+          <p class="text-sm text-zinc-400">Comprehensive list of all tournament fixtures with fast score updates</p>
+        </div>
+        
+        <div class="flex flex-wrap items-center gap-2 justify-end"><label class="relative block"><span class="sr-only">Search matches</span><input id="match-search" oninput="setMatchSearch(this.value)" class="w-56 bg-zinc-900 border border-zinc-800 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-cyan-700" placeholder="Search player / code…" /><svg class="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></label>
+        <!-- Filter Pills -->
+        <div class="flex items-center gap-1.5 p-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono">
+          <button onclick="setMatchFilter('all')" id="filter-all" class="px-2.5 py-1 rounded-md filter-btn bg-zinc-800 text-white font-semibold">All</button>
+          <button onclick="setMatchFilter('live')" id="filter-live" class="px-2.5 py-1 rounded-md filter-btn text-zinc-400 hover:text-white">Live</button>
+          <button onclick="setMatchFilter('ready')" id="filter-ready" class="px-2.5 py-1 rounded-md filter-btn text-zinc-400 hover:text-white">Ready</button>
+          <button onclick="setMatchFilter('completed')" id="filter-completed" class="px-2.5 py-1 rounded-md filter-btn text-zinc-400 hover:text-white">Completed</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Match Table Card -->
+      <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl overflow-hidden shadow-card">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-zinc-950/80 border-b border-zinc-800 text-xs font-mono text-zinc-400 uppercase tracking-wider">
+              <tr>
+                <th class="py-3 px-4">Code</th>
+                <th class="py-3 px-4">Round</th>
+                <th class="py-3 px-4">Format</th>
+                <th class="py-3 px-4">Competitors & Score</th>
+                <th class="py-3 px-4 text-center">Status</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="match-list-tbody" class="divide-y divide-zinc-800/60 font-sans"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    
+    <!-- 5.5 SCHEDULE & VENUE CUTOFF DASHBOARD -->
+    <div id="view-schedule" class="view-panel hidden flex-1 p-6 overflow-y-auto max-w-7xl mx-auto w-full z-10">
+      <!-- Hero Banner -->
+      <div class="control-hero rounded-3xl p-5 sm:p-7 mb-5 border border-amber-500/30">
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
+          <div>
+            <div class="flex items-center gap-2 mb-2 flex-wrap">
+              <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-red-950/80 border border-red-700/80 text-[10px] font-mono font-bold text-red-300">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping"></span>
+                ROOM CLOSES: 5:00 PM (HARD VENUE CUTOFF)
+              </span>
+              <span class="text-[10px] font-mono uppercase tracking-[.2em] text-zinc-400">12:00 PM – 5:00 PM • 5 HOURS</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              Tournament Schedule & Venue Cutoff
+            </h2>
+            <p class="mt-1 text-sm text-zinc-300 max-w-2xl">
+              Target call schedule with rolling transitions (BO3 = 8 mins, BO5 = 12 mins). Matches start early whenever previous sets finish early. Entire tournament must conclude before 5:00 PM room closure.
+            </p>
+          </div>
+          
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Clock Mode Toggle & Stepper -->
+            <div class="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-mono">
+              <button onclick="toggleClockMode()" id="clock-mode-btn" class="px-2.5 py-1 rounded-lg bg-zinc-800 text-zinc-200 font-semibold" title="Toggle Real / Sim Clock">
+                ● Clock: Real Time
+              </button>
+              <button onclick="stepSimClock(-5)" class="px-2 py-1 rounded hover:bg-zinc-800 text-zinc-400" title="Step -5 mins">-5m</button>
+              <button onclick="stepSimClock(5)" class="px-2 py-1 rounded hover:bg-zinc-800 text-cyan-400 font-bold" title="Step +5 mins">+5m</button>
+              <button onclick="resetSimClock()" class="px-2 py-1 rounded hover:bg-zinc-800 text-zinc-400" title="Reset Clock to 12:00 PM">Reset</button>
+            </div>
+            <button onclick="simulateNextMatch()" class="command-button px-3 py-2 rounded-xl text-xs font-semibold">Simulate Next</button>
+            <button onclick="openNextReadyMatch()" class="command-button primary px-4 py-2 rounded-xl text-xs font-semibold">Open Next Set</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule Metric KPI Cards Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+        <div class="enhanced-glass rounded-2xl p-4 border border-red-900/60 bg-red-950/20">
+          <div class="text-[9px] font-mono uppercase tracking-[.18em] text-red-400 font-bold">Hard Cutoff</div>
+          <div class="mt-1 text-2xl font-black text-red-400 num-mono">5:00 PM</div>
+          <div class="mt-1 text-[10px] text-zinc-400">Strict room closure</div>
+        </div>
+
+        <div class="enhanced-glass rounded-2xl p-4">
+          <div class="text-[9px] font-mono uppercase tracking-[.18em] text-zinc-400 font-bold">Current Clock</div>
+          <div id="sched-card-clock" class="mt-1 text-2xl font-black text-zinc-100 num-mono">12:00 PM</div>
+          <div id="sched-card-clock-mode" class="mt-1 text-[10px] text-zinc-500 font-mono">Live System Time</div>
+        </div>
+
+        <div class="enhanced-glass rounded-2xl p-4">
+          <div class="text-[9px] font-mono uppercase tracking-[.18em] text-zinc-400 font-bold">Pace Status</div>
+          <div id="sched-card-status-pill" class="mt-1 inline-block px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">
+            ON SCHEDULE
+          </div>
+          <div id="sched-card-pace-delta" class="mt-1 text-[10px] text-zinc-400 font-mono">+0m delta</div>
+        </div>
+
+        <div class="enhanced-glass rounded-2xl p-4">
+          <div class="text-[9px] font-mono uppercase tracking-[.18em] text-cyan-400 font-bold">Current Set</div>
+          <div id="sched-card-current" class="mt-1 text-lg font-extrabold text-white truncate">W2</div>
+          <div id="sched-card-current-time" class="mt-1 text-[10px] text-zinc-400 font-mono">Target: 12:00 PM</div>
+        </div>
+
+        <div class="enhanced-glass rounded-2xl p-4">
+          <div class="text-[9px] font-mono uppercase tracking-[.18em] text-amber-400 font-bold">Next Set</div>
+          <div id="sched-card-next" class="mt-1 text-lg font-extrabold text-white truncate">W3</div>
+          <div id="sched-card-next-time" class="mt-1 text-[10px] text-zinc-400 font-mono">Target: 12:08 PM</div>
+        </div>
+
+        <div class="enhanced-glass rounded-2xl p-4">
+          <div class="text-[9px] font-mono uppercase tracking-[.18em] text-sky-400 font-bold">Projected Finish</div>
+          <div id="sched-card-est-finish" class="mt-1 text-2xl font-black text-sky-300 num-mono">4:12 PM</div>
+          <div id="sched-card-buffer" class="mt-1 text-[10px] text-emerald-400 font-mono">+48m buffer to 5PM</div>
+        </div>
+      </div>
+
+      <!-- Schedule Table -->
+      <div class="bg-zinc-900/90 border border-zinc-800 rounded-2xl overflow-hidden shadow-card">
+        <div class="p-4 border-b border-zinc-800 flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h3 class="text-base font-bold text-white">Full Tournament Call Sheet</h3>
+            <p class="text-xs text-zinc-400">Target schedule starting at 12:00 PM with rolling starts. Room closes at 5:00 PM.</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-mono text-zinc-400 flex-wrap">
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Live</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-400"></span> Completed</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-sky-400"></span> Ready</span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-600"></span> Scheduled</span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-zinc-950/80 border-b border-zinc-800 text-xs font-mono text-zinc-400 uppercase tracking-wider">
+              <tr>
+                <th class="py-3 px-4 w-12 text-center">#</th>
+                <th class="py-3 px-4">Target Call</th>
+                <th class="py-3 px-4">Match</th>
+                <th class="py-3 px-4">Format</th>
+                <th class="py-3 px-4">Competitors</th>
+                <th class="py-3 px-4">Actual Start</th>
+                <th class="py-3 px-4 text-center">Status</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="schedule-table-tbody" class="divide-y divide-zinc-800/60 font-sans"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. STANDINGS VIEW -->
+    <div id="view-standings" class="view-panel hidden flex-1 p-6 overflow-y-auto max-w-5xl mx-auto w-full z-10">
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <img src="./assets/mes_logo.png" alt="MES Seal" class="w-6 h-6 rounded-full">
+            <span class="text-xs font-mono text-amber-400 font-bold uppercase">Mechanical Engineering Society • UPHSD</span>
+          </div>
+          <h2 class="text-xl font-extrabold text-white">
+            Tournament Live Leaderboard & Standings
+          </h2>
+          <p class="text-sm text-zinc-400">Dynamic rankings updated in real-time as players advance or get eliminated</p>
+        </div>
+        <button onclick="copyStandingsClipboard()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-cyan-400">
+          <span>Copy Summary</span>
+        </button>
+      </div>
+
+      <div id="standings-summary" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3"></div>
+      <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl overflow-hidden shadow-card">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-zinc-950/80 border-b border-zinc-800 text-xs font-mono text-zinc-400 uppercase tracking-wider">
+              <tr>
+                <th class="py-3 px-4 text-center w-16">Rank</th>
+                <th class="py-3 px-4">Seed</th>
+                <th class="py-3 px-4">Player</th>
+                <th class="py-3 px-4">Year Level</th>
+                <th class="py-3 px-4">Character</th>
+                <th class="py-3 px-4 text-center">Record (W-L)</th>
+                <th class="py-3 px-4 text-right">Status / Stage</th>
+              </tr>
+            </thead>
+            <tbody id="standings-tbody" class="divide-y divide-zinc-800/60 font-sans"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  
+  <!-- Presentation Mode Schedule HUD Overlay -->
+  <div class="presentation-schedule-hud hidden fixed top-4 right-6 z-50 px-4 py-2 rounded-xl bg-zinc-950/90 border border-zinc-700/80 backdrop-blur-md flex items-center gap-3 text-xs font-mono text-zinc-300 shadow-2xl">
+    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span><span class="text-red-300 font-bold">ROOM CLOSES: 5:00 PM</span></div>
+    <span class="text-zinc-600">•</span>
+    <span id="pres-sched-clock">12:00 PM</span>
+    <span class="text-zinc-600">•</span>
+    <span id="pres-sched-status" class="text-emerald-300 font-bold">ON SCHEDULE</span>
+    <span class="text-zinc-600">•</span>
+    <span id="pres-sched-finish">Est: 4:12 PM</span>
+  </div>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODALS & DRAWERS                                         -->
+  <!-- ======================================================== -->
+
+  <!-- Match Quick Edit / Score Modal -->
+  <div id="match-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden">
+      <!-- Subtle top Tekken 8 glow accent -->
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-amber-400 to-red-500"></div>
+
+      <button onclick="closeMatchModal()" class="absolute top-4 right-4 text-zinc-400 hover:text-white p-1.5 rounded-lg hover:bg-zinc-800">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+
+      <div class="flex items-center gap-2 mb-4">
+        <span id="modal-match-code" class="text-xs font-mono font-bold px-2 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">
+          WR1-M1
+        </span>
+        <span id="modal-match-format" class="text-xs font-mono text-zinc-400">
+          Best of 3
+        </span>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 border border-amber-800/60">
+          MES UPHSD
+        </span>
+      </div>
+
+      <h3 id="modal-match-title" class="text-lg font-bold text-white mb-6">
+        Match Detail & Score Entry
+      </h3>
+
+      <!-- Competitors Face-Off Container -->
+      <div id="modal-competitors-box" class="space-y-4 mb-6"></div>
+
+      <!-- Quick Actions -->
+      <div id="modal-live-control" class="mb-4"></div>
+      <div class="flex items-center justify-between pt-4 border-t border-zinc-800 text-xs">
+        <button onclick="resetCurrentMatchScore()" class="px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium">
+          Reset Match
+        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="closeMatchModal()" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold shadow-electric">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Tournament Confirmation Modal -->
+  <div id="reset-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex items-center gap-3 mb-4 text-red-400">
+        <div class="p-2 rounded-xl bg-red-950/60 border border-red-800/60">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </div>
+        <h3 class="text-base font-bold text-white">Reset Tournament Bracket?</h3>
+      </div>
+      <p class="text-sm text-zinc-400 mb-6 leading-relaxed">
+        This action will wipe all match scores and return the tournament to its initial seeded state with Earl Justin Paduga's Round 1 BYE.
+      </p>
+      <div class="flex items-center justify-end gap-3">
+        <button onclick="closeResetModal()" class="px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300">
+          Cancel
+        </button>
+        <button onclick="executeResetTournament()" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-xs font-medium text-white shadow-lg">
+          Yes, Reset All
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT: BRACKET ENGINE & CONTROLLER                  -->
+  <!-- ======================================================== -->
+  <script>
+    // -------------------------------------------------------------------------
+    // 1. CONSTANTS & INITIAL DATA (15 PLAYERS + 1 BYE)
+    // -------------------------------------------------------------------------
+    const INITIAL_PLAYERS = [
+      { id: 'p1', seed: 1, name: 'Paduga, Earl Justin', year: '4th Year', character: 'Jin' },
+      { id: 'p2', seed: 2, name: 'Dimapilis, Eidrian', year: '3rd Year', character: 'Kazuya' },
+      { id: 'p3', seed: 3, name: 'Martinez, Jay Mar', year: '3rd Year', character: 'Reina' },
+      { id: 'p4', seed: 4, name: 'Quilitis, Vince Aljoe', year: '3rd Year', character: 'Bryan' },
+      { id: 'p5', seed: 5, name: 'Banatin, Cristoff Jimson T.', year: '1st Year', character: 'Victor' },
+      { id: 'p6', seed: 6, name: 'Caganan, John Cedric T.', year: '1st Year', character: 'Dragunov' },
+      { id: 'p7', seed: 7, name: 'Cremen, Amir Mckale D.', year: '1st Year', character: 'King' },
+      { id: 'p8', seed: 8, name: 'Almoro', year: '2nd Year', character: 'Hwoarang' },
+      { id: 'p9', seed: 9, name: 'Limbo', year: '2nd Year', character: 'Paul' },
+      { id: 'p10', seed: 10, name: 'Hernandez', year: '2nd Year', character: 'Devil Jin' },
+      { id: 'p11', seed: 11, name: 'Olino', year: '2nd Year', character: 'Law' },
+      { id: 'p12', seed: 12, name: 'Contreras', year: '2nd Year', character: 'Lars' },
+      { id: 'p13', seed: 13, name: 'Lacorte', year: '2nd Year', character: 'Jun' },
+      { id: 'p14', seed: 14, name: 'Manzanilla', year: '2nd Year', character: 'Yoshimitsu' },
+      { id: 'p15', seed: 15, name: 'Gavino', year: '2nd Year', character: 'Steve' },
+      { id: 'bye', seed: 16, name: 'BYE', year: 'Auto-Adv', isBye: true, character: 'None' }
+    ];
+
+    const TEKKEN_CHARACTERS = [
+      'Jin', 'Kazuya', 'Reina', 'Devil Jin', 'Jun', 'Dragunov', 'Victor',
+      'Bryan', 'King', 'Paul', 'Law', 'Lars', 'Yoshimitsu', 'Steve',
+      'Hwoarang', 'Xiaoyu', 'Azucena', 'Shaheen', 'Claudio', 'Feng',
+      'Leroy', 'Asuka', 'Lili', 'Alisa', 'Raven', 'Leo', 'Panda', 'Kuma',
+      'Zafina', 'Jack-8', 'Eddy', 'Heihachi', 'Lidia'
+    ];
+
+    const MATCH_DEFINITIONS = {
+      // WINNERS ROUND 1 (WR1)
+      'W1': { code: 'WR1-M1', round: 'wr1', label: 'Winners R1', bestOf: 3, targetWins: 2, p1Source: 'seed1', p2Source: 'seed16', winDest: { match: 'W9', slot: 1 }, lossDest: null },
+      'W2': { code: 'WR1-M2', round: 'wr1', label: 'Winners R1', bestOf: 3, targetWins: 2, p1Source: 'seed8', p2Source: 'seed9', winDest: { match: 'W9', slot: 2 }, lossDest: { match: 'L5', slot: 2 } }, // M2 loser to L5 directly
+      'W3': { code: 'WR1-M3', round: 'wr1', label: 'Winners R1', bestOf: 3, targetWins: 2, p1Source: 'seed4', p2Source: 'seed13', winDest: { match: 'W10', slot: 1 }, lossDest: { match: 'L2', slot: 1 } },
+      'W4': { code: 'WR1-M4', round: 'wr1', label: 'Winners R1', bestOf: 3, targetWins: 2, p1Source: 'seed5', p2Source: 'seed12', winDest: { match: 'W10', slot: 2 }, lossDest: { match: 'L2', slot: 2 } },
+      'W5': { code: 'WR1-M5', round: 'wr1', label: 'Winners R1', bestOf: 3, targetWins: 2, p1Source: 'seed2', p2Source: 'seed15', winDest: { match: 'W11', slot: 1 }, lossDest: { match: 'L3', slot: 1 } },
+      'W6': { code: 'WR1-M6', round: 'wr1', label: 'Winners R1', bestOf: 3, targetWins: 2, p1Source: 'seed7', p2Source: 'seed10', winDest: { match: 'W11', slot: 2 }, lossDest: { match: 'L3', slot: 2 } },
+      'W7': { code: 'WR1-M7', round: 'wr1', label: 'Winners R1', bestOf: 3, targetWins: 2, p1Source: 'seed3', p2Source: 'seed14', winDest: { match: 'W12', slot: 1 }, lossDest: { match: 'L4', slot: 1 } },
+      'W8': { code: 'WR1-M8', round: 'wr1', label: 'Winners R1', bestOf: 3, targetWins: 2, p1Source: 'seed6', p2Source: 'seed11', winDest: { match: 'W12', slot: 2 }, lossDest: { match: 'L4', slot: 2 } },
+
+      // WINNERS ROUND 2 (WR2 - Quarterfinals)
+      'W9': { code: 'WR2-M1', round: 'wr2', label: 'Quarterfinals', bestOf: 3, targetWins: 2, winDest: { match: 'W13', slot: 1 }, lossDest: { match: 'L6', slot: 1 } },
+      'W10': { code: 'WR2-M2', round: 'wr2', label: 'Quarterfinals', bestOf: 3, targetWins: 2, winDest: { match: 'W13', slot: 2 }, lossDest: { match: 'L5', slot: 1 } },
+      'W11': { code: 'WR2-M3', round: 'wr2', label: 'Quarterfinals', bestOf: 3, targetWins: 2, winDest: { match: 'W14', slot: 1 }, lossDest: { match: 'L8', slot: 1 } },
+      'W12': { code: 'WR2-M4', round: 'wr2', label: 'Quarterfinals', bestOf: 3, targetWins: 2, winDest: { match: 'W14', slot: 2 }, lossDest: { match: 'L7', slot: 1 } },
+
+      // WINNERS ROUND 3 (WR3 - Semifinals)
+      'W13': { code: 'WR3-M1', round: 'wr3', label: 'Semifinals', bestOf: 3, targetWins: 2, winDest: { match: 'W15', slot: 1 }, lossDest: { match: 'L12', slot: 2 } },
+      'W14': { code: 'WR3-M2', round: 'wr3', label: 'Semifinals', bestOf: 3, targetWins: 2, winDest: { match: 'W15', slot: 2 }, lossDest: { match: 'L11', slot: 2 } },
+
+      // WINNERS ROUND 4 (WR4 - Winners Finals)
+      'W15': { code: 'WR4-M1', round: 'wr4', label: 'Winners Finals', bestOf: 5, targetWins: 3, winDest: { match: 'GF1', slot: 1 }, lossDest: { match: 'L14', slot: 2 } },
+
+      // LOSERS ROUND 1 (LR1)
+      'L2': { code: 'LR1-M1', round: 'lr1', label: 'Losers R1', bestOf: 3, targetWins: 2, winDest: { match: 'L6', slot: 2 }, lossDest: null },
+      'L3': { code: 'LR1-M2', round: 'lr1', label: 'Losers R1', bestOf: 3, targetWins: 2, winDest: { match: 'L7', slot: 2 }, lossDest: null },
+      'L4': { code: 'LR1-M3', round: 'lr1', label: 'Losers R1', bestOf: 3, targetWins: 2, winDest: { match: 'L8', slot: 2 }, lossDest: null },
+
+      // LOSERS ROUND 2 (LR2)
+      'L5': { code: 'LR2-M1', round: 'lr2', label: 'Losers R2', bestOf: 3, targetWins: 2, winDest: { match: 'L9', slot: 1 }, lossDest: null },
+      'L6': { code: 'LR2-M2', round: 'lr2', label: 'Losers R2', bestOf: 3, targetWins: 2, winDest: { match: 'L9', slot: 2 }, lossDest: null },
+      'L7': { code: 'LR2-M3', round: 'lr2', label: 'Losers R2', bestOf: 3, targetWins: 2, winDest: { match: 'L10', slot: 1 }, lossDest: null },
+      'L8': { code: 'LR2-M4', round: 'lr2', label: 'Losers R2', bestOf: 3, targetWins: 2, winDest: { match: 'L10', slot: 2 }, lossDest: null },
+
+      // LOSERS ROUND 3 (LR3)
+      'L9': { code: 'LR3-M1', round: 'lr3', label: 'Losers R3', bestOf: 3, targetWins: 2, winDest: { match: 'L11', slot: 1 }, lossDest: null },
+      'L10': { code: 'LR3-M2', round: 'lr3', label: 'Losers R3', bestOf: 3, targetWins: 2, winDest: { match: 'L12', slot: 1 }, lossDest: null },
+
+      // LOSERS ROUND 4 (LR4 - Quarterfinals)
+      'L11': { code: 'LR4-M1', round: 'lr4', label: 'Losers Quarters', bestOf: 5, targetWins: 3, winDest: { match: 'L13', slot: 1 }, lossDest: null },
+      'L12': { code: 'LR4-M2', round: 'lr4', label: 'Losers Quarters', bestOf: 5, targetWins: 3, winDest: { match: 'L13', slot: 2 }, lossDest: null },
+
+      // LOSERS ROUND 5 (LR5 - Semifinals)
+      'L13': { code: 'LR5-M1', round: 'lr5', label: 'Losers Semis', bestOf: 5, targetWins: 3, winDest: { match: 'L14', slot: 1 }, lossDest: null },
+
+      // LOSERS ROUND 6 (LR6 - Losers Finals)
+      'L14': { code: 'LR6-M1', round: 'lr6', label: 'Losers Finals', bestOf: 5, targetWins: 3, winDest: { match: 'GF1', slot: 2 }, lossDest: null },
+
+      // GRAND FINALS (GF1)
+      'GF1': { code: 'GF-M1', round: 'gf', label: 'Grand Finals', bestOf: 5, targetWins: 3, winDest: null, lossDest: null },
+
+      // GRAND FINALS RESET (GF2)
+      'GF2': { code: 'GF-RESET', round: 'gf', label: 'Grand Finals Reset', bestOf: 5, targetWins: 3, winDest: null, lossDest: null }
+    };
+
+    
+    // -------------------------------------------------------------------------
+    // 1.1 SCHEDULE TARGETS (12:00 PM START, BO3 = 8M, BO5 = 12M, 5:00 PM CUTOFF)
+    // -------------------------------------------------------------------------
+    const SCHEDULE_TARGETS = {
+      'W1':  { order: 1,  code: 'WR1-M1', time: '12:00 PM', targetMins: 0,   duration: 0,  bestOf: 3, label: 'W1 BYE / Auto Advance', isBye: true },
+      'W2':  { order: 2,  code: 'WR1-M2', time: '12:00 PM', targetMins: 0,   duration: 8,  bestOf: 3, label: 'W2' },
+      'W3':  { order: 3,  code: 'WR1-M3', time: '12:08 PM', targetMins: 8,   duration: 8,  bestOf: 3, label: 'W3' },
+      'W4':  { order: 4,  code: 'WR1-M4', time: '12:16 PM', targetMins: 16,  duration: 8,  bestOf: 3, label: 'W4' },
+      'W5':  { order: 5,  code: 'WR1-M5', time: '12:24 PM', targetMins: 24,  duration: 8,  bestOf: 3, label: 'W5' },
+      'W6':  { order: 6,  code: 'WR1-M6', time: '12:32 PM', targetMins: 32,  duration: 8,  bestOf: 3, label: 'W6' },
+      'W7':  { order: 7,  code: 'WR1-M7', time: '12:40 PM', targetMins: 40,  duration: 8,  bestOf: 3, label: 'W7' },
+      'W8':  { order: 8,  code: 'WR1-M8', time: '12:48 PM', targetMins: 48,  duration: 8,  bestOf: 3, label: 'W8' },
+
+      'L2':  { order: 9,  code: 'LR1-M1', time: '12:56 PM', targetMins: 56,  duration: 8,  bestOf: 3, label: 'L2' },
+      'L3':  { order: 10, code: 'LR1-M2', time: '1:04 PM',  targetMins: 64,  duration: 8,  bestOf: 3, label: 'L3' },
+      'L4':  { order: 11, code: 'LR1-M3', time: '1:12 PM',  targetMins: 72,  duration: 8,  bestOf: 3, label: 'L4' },
+
+      'W9':  { order: 12, code: 'WR2-M1', time: '1:20 PM',  targetMins: 80,  duration: 8,  bestOf: 3, label: 'W9' },
+      'W10': { order: 13, code: 'WR2-M2', time: '1:28 PM',  targetMins: 88,  duration: 8,  bestOf: 3, label: 'W10' },
+      'W11': { order: 14, code: 'WR2-M3', time: '1:36 PM',  targetMins: 96,  duration: 8,  bestOf: 3, label: 'W11' },
+      'W12': { order: 15, code: 'WR2-M4', time: '1:44 PM',  targetMins: 104, duration: 8,  bestOf: 3, label: 'W12' },
+
+      'L5':  { order: 16, code: 'LR2-M1', time: '1:52 PM',  targetMins: 112, duration: 8,  bestOf: 3, label: 'L5' },
+      'L6':  { order: 17, code: 'LR2-M2', time: '2:00 PM',  targetMins: 120, duration: 8,  bestOf: 3, label: 'L6' },
+      'L7':  { order: 18, code: 'LR2-M3', time: '2:08 PM',  targetMins: 128, duration: 8,  bestOf: 3, label: 'L7' },
+      'L8':  { order: 19, code: 'LR2-M4', time: '2:16 PM',  targetMins: 136, duration: 8,  bestOf: 3, label: 'L8' },
+
+      'L9':  { order: 20, code: 'LR3-M1', time: '2:24 PM',  targetMins: 144, duration: 8,  bestOf: 3, label: 'L9' },
+      'L10': { order: 21, code: 'LR3-M2', time: '2:32 PM',  targetMins: 152, duration: 8,  bestOf: 3, label: 'L10' },
+
+      'W13': { order: 22, code: 'WR3-M1', time: '2:40 PM',  targetMins: 160, duration: 8,  bestOf: 3, label: 'W13' },
+      'W14': { order: 23, code: 'WR3-M2', time: '2:48 PM',  targetMins: 168, duration: 8,  bestOf: 3, label: 'W14' },
+
+      'L11': { order: 24, code: 'LR4-M1', time: '2:56 PM',  targetMins: 176, duration: 12, bestOf: 5, label: 'L11' },
+      'L12': { order: 25, code: 'LR4-M2', time: '3:08 PM',  targetMins: 188, duration: 12, bestOf: 5, label: 'L12' },
+      'L13': { order: 26, code: 'LR5-M1', time: '3:20 PM',  targetMins: 200, duration: 12, bestOf: 5, label: 'L13' },
+      'W15': { order: 27, code: 'WR4-M1', time: '3:32 PM',  targetMins: 212, duration: 12, bestOf: 5, label: 'W15' },
+      'L14': { order: 28, code: 'LR6-M1', time: '3:44 PM',  targetMins: 224, duration: 12, bestOf: 5, label: 'L14' },
+
+      'SETUP': { order: 29, code: 'GF-SETUP', time: '3:56 PM', targetMins: 236, duration: 4, label: 'Grand Finals Setup / Intros', isSetup: true },
+      'GF1': { order: 30, code: 'GF-M1',  time: '4:00 PM',  targetMins: 240, duration: 12, bestOf: 5, label: 'GF1' },
+      'GF2': { order: 31, code: 'GF-RESET', time: '4:12 PM', targetMins: 252, duration: 12, bestOf: 5, label: 'GF2 Reset (If Needed)', isConditional: true }
+    };
+
+    const STORAGE_KEY = 'ewgf_tekken_bracket_v1';
+
+    // -------------------------------------------------------------------------
+    // 2. STATE MANAGEMENT & STORAGE SAFETIES
+    // -------------------------------------------------------------------------
+    let state = {
+      players: JSON.parse(JSON.stringify(INITIAL_PLAYERS)),
+      matches: {},
+      grandFinalsResetNeeded: false,
+      activeView: 'full',
+      matchFilter: 'all',
+      matchSearch: '',
+      soundEnabled: true,
+      zoom: 1.0,
+      clockMode: 'auto',
+      simClockMins: 0
+    };
+
+    let activeModalMatchId = null;
+    let audioCtx = null;
+
+    
+    // -------------------------------------------------------------------------
+    // 1.2 SCHEDULE & CLOCK HELPERS
+    // -------------------------------------------------------------------------
+    function minsToTimeString(mins) {
+      let totalMin = 12 * 60 + Math.round(mins);
+      let h = Math.floor(totalMin / 60) % 24;
+      let m = totalMin % 60;
+      if (m < 0) m += 60;
+      let ampm = h >= 12 && h < 24 ? 'PM' : 'AM';
+      let h12 = h % 12;
+      if (h12 === 0) h12 = 12;
+      return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+    }
+
+    function isVenueHoursNow() {
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const minsOfDay = h * 60 + m;
+      return minsOfDay >= 11 * 60 + 30 && minsOfDay <= 17 * 60 + 30; // 11:30 AM to 5:30 PM
+    }
+
+    function getTourneyTimeNow() {
+      if (state.clockMode === 'live' || (state.clockMode === 'auto' && isVenueHoursNow())) {
+        const now = new Date();
+        return (now.getHours() - 12) * 60 + now.getMinutes() + now.getSeconds() / 60;
+      }
+      return state.simClockMins !== undefined ? state.simClockMins : 0;
+    }
+
+    function toggleClockMode() {
+      if (state.clockMode === 'live') {
+        state.clockMode = 'sim';
+        showToast('Switched to Tournament Sim Clock (12:00 PM Start)');
+      } else {
+        state.clockMode = 'live';
+        showToast('Switched to Live Real-Time Clock');
+      }
+      safeSetStorage(STORAGE_KEY, JSON.stringify(state));
+      updateScheduleMetrics();
+      renderScheduleView();
+    }
+
+    function stepSimClock(deltaMinutes) {
+      state.clockMode = 'sim';
+      state.simClockMins = Math.max(0, Math.min(360, (state.simClockMins || 0) + deltaMinutes));
+      showToast(`Sim Clock set to ${minsToTimeString(state.simClockMins)} (${deltaMinutes >= 0 ? '+' : ''}${deltaMinutes}m)`);
+      safeSetStorage(STORAGE_KEY, JSON.stringify(state));
+      updateScheduleMetrics();
+      renderScheduleView();
+    }
+
+    function resetSimClock() {
+      state.clockMode = 'sim';
+      state.simClockMins = 0;
+      showToast('Sim Clock reset to 12:00 PM Tournament Start');
+      safeSetStorage(STORAGE_KEY, JSON.stringify(state));
+      updateScheduleMetrics();
+      renderScheduleView();
+    }
+
+    function calculateScheduleMetrics() {
+      const allMatches = MATCH_PRIORITY.map(id => state.matches[id]).filter(Boolean);
+      const nowMins = getTourneyTimeNow();
+      const currentTimeStr = minsToTimeString(nowMins);
+
+      // Find currently live match, or active match
+      const liveMatch = allMatches.find(m => m.isLive && !m.completed);
+      const nextReady = getNextReadyMatch();
+      
+      const activeMatch = liveMatch || nextReady || allMatches.find(m => !m.completed) || allMatches[allMatches.length - 1];
+      const activeSched = (activeMatch && SCHEDULE_TARGETS[activeMatch.id]) || { targetMins: 0, time: '12:00 PM' };
+      
+      let nextMatch = null;
+      if (activeMatch) {
+        const idx = MATCH_PRIORITY.indexOf(activeMatch.id);
+        for (let i = idx + 1; i < MATCH_PRIORITY.length; i++) {
+          const candidate = state.matches[MATCH_PRIORITY[i]];
+          if (candidate && !candidate.completed) {
+            nextMatch = candidate;
+            break;
+          }
+        }
+      }
+
+      let paceDiff = 0;
+      if (activeMatch) {
+        if (activeMatch.actualStartMins !== null && activeMatch.actualStartMins !== undefined) {
+          paceDiff = activeSched.targetMins - activeMatch.actualStartMins;
+        } else {
+          paceDiff = activeSched.targetMins - nowMins;
+        }
+      }
+
+      let remainingMins = 0;
+      const uncompleted = allMatches.filter(m => !m.completed);
+      
+      uncompleted.forEach(m => {
+        let dur = m.bestOf === 5 ? 12 : 8;
+        if (m.id === 'GF2') {
+          if (!state.grandFinalsResetNeeded && state.matches['GF1']?.completed) {
+            dur = 0;
+          }
+        }
+        if (m.isLive) {
+          dur = Math.max(2, dur - 3);
+        }
+        remainingMins += dur;
+      });
+
+      if (!state.matches['GF1']?.completed && !state.matches['GF1']?.isLive) {
+        remainingMins += 4; // GF setup buffer
+      }
+
+      const estFinishMins = nowMins + remainingMins;
+      const estFinishTimeStr = minsToTimeString(estFinishMins);
+      const minutesBufferToCutoff = 300 - estFinishMins;
+
+      let status = 'ON SCHEDULE';
+      let statusColorClass = 'bg-emerald-950/80 text-emerald-300 border-emerald-700/80';
+      let alertMessage = '';
+
+      if (nowMins >= 300 || estFinishMins >= 300) {
+        status = 'ROOM CUTOFF';
+        statusColorClass = 'bg-red-900 text-white border-2 border-red-500 animate-pulse font-black';
+      } else if (estFinishMins >= 285 || paceDiff <= -15) {
+        status = 'CRITICAL';
+        statusColorClass = 'bg-red-950/90 text-red-300 border-red-600 animate-pulse font-bold';
+      } else if (paceDiff <= -4) {
+        status = 'BEHIND';
+        statusColorClass = 'bg-amber-950/80 text-amber-300 border-amber-700/80 font-bold';
+      } else if (paceDiff >= 4) {
+        status = 'AHEAD';
+        statusColorClass = 'bg-cyan-950/80 text-cyan-300 border-cyan-700/80 font-bold';
+      } else {
+        status = 'ON SCHEDULE';
+        statusColorClass = 'bg-emerald-950/80 text-emerald-300 border-emerald-700/80 font-bold';
+      }
+
+      return {
+        currentTimeStr,
+        nowMins,
+        activeMatch,
+        nextMatch,
+        activeSchedTime: activeSched.time,
+        actualStartTime: activeMatch?.actualStartTime || '--',
+        paceDiff: Math.round(paceDiff),
+        estFinishTimeStr,
+        minutesBufferToCutoff: Math.round(minutesBufferToCutoff),
+        status,
+        statusColorClass,
+        alertMessage,
+        remainingMins
+      };
+    }
+
+    function safeGetStorage(key) {
+      try { return localStorage.getItem(key); } catch(e) { return null; }
+    }
+    function safeSetStorage(key, val) {
+      try { localStorage.setItem(key, val); } catch(e) {}
+    }
+    function safeRemoveStorage(key) {
+      try { localStorage.removeItem(key); } catch(e) {}
+    }
+
+    function playElectricSound() {
+      if (!state.soundEnabled) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(750, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.18);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      } catch (e) {}
+    }
+
+    function toggleSound() {
+      state.soundEnabled = !state.soundEnabled;
+      const svg = document.getElementById('sound-icon-svg');
+      if (svg) {
+        if (state.soundEnabled) {
+          svg.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+          showToast('Sound Effects Enabled');
+        } else {
+          svg.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+          showToast('Sound Effects Muted');
+        }
+      }
+      safeSetStorage(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function initializeTournamentState() {
+      state.matches = {};
+      
+      for (const [id, def] of Object.entries(MATCH_DEFINITIONS)) {
+        const sched = SCHEDULE_TARGETS[id] || {};
+        state.matches[id] = {
+          id: id,
+          code: def.code,
+          round: def.round,
+          label: def.label,
+          bestOf: def.bestOf,
+          targetWins: def.targetWins,
+          scheduledTime: sched.time || '12:00 PM',
+          targetCallMins: sched.targetMins !== undefined ? sched.targetMins : 0,
+          actualStartTime: null,
+          actualStartMins: null,
+          actualEndTime: null,
+          durationMins: null,
+          p1: null,
+          p2: null,
+          score1: 0,
+          score2: 0,
+          winner: null,
+          completed: false,
+          isLive: false
+        };
+      }
+
+      state.matches['W1'].p1 = getPlayerBySeed(1);
+      state.matches['W1'].p2 = getPlayerBySeed(16); // BYE
+
+      state.matches['W2'].p1 = getPlayerBySeed(8);
+      state.matches['W2'].p2 = getPlayerBySeed(9);
+
+      state.matches['W3'].p1 = getPlayerBySeed(4);
+      state.matches['W3'].p2 = getPlayerBySeed(13);
+
+      state.matches['W4'].p1 = getPlayerBySeed(5);
+      state.matches['W4'].p2 = getPlayerBySeed(12);
+
+      state.matches['W5'].p1 = getPlayerBySeed(2);
+      state.matches['W5'].p2 = getPlayerBySeed(15);
+
+      state.matches['W6'].p1 = getPlayerBySeed(7);
+      state.matches['W6'].p2 = getPlayerBySeed(10);
+
+      state.matches['W7'].p1 = getPlayerBySeed(3);
+      state.matches['W7'].p2 = getPlayerBySeed(14);
+
+      state.matches['W8'].p1 = getPlayerBySeed(6);
+      state.matches['W8'].p2 = getPlayerBySeed(11);
+
+      // AUTO-ADVANCE W1 (Paduga vs BYE)
+      state.matches['W1'].score1 = 2;
+      state.matches['W1'].score2 = 0;
+      state.matches['W1'].winner = 1;
+      state.matches['W1'].completed = true;
+      state.matches['W1'].actualStartTime = '12:00 PM';
+      state.matches['W1'].actualStartMins = 0;
+      state.matches['W1'].actualEndTime = '12:00 PM';
+      state.matches['W1'].durationMins = 0;
+
+      propagateBracket();
+    }
+
+    function getPlayerBySeed(seed) {
+      return state.players.find(p => p.seed === seed) || null;
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. PROPAGATION ENGINE & CASCADE RESOLUTION
+    // -------------------------------------------------------------------------
+    function propagateBracket() {
+      const sequence = [
+        'W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8',
+        'L2', 'L3', 'L4',
+        'W9', 'W10', 'W11', 'W12',
+        'L5', 'L6', 'L7', 'L8',
+        'L9', 'L10',
+        'W13', 'W14',
+        'L11', 'L12',
+        'L13',
+        'W15',
+        'L14',
+        'GF1',
+        'GF2'
+      ];
+
+      for (const mId of sequence) {
+        const m = state.matches[mId];
+        const def = MATCH_DEFINITIONS[mId];
+
+        if (m.score1 >= def.targetWins || m.score2 >= def.targetWins) {
+          m.completed = true;
+          m.winner = m.score1 > m.score2 ? 1 : 2;
+        } else if (!m.winner) {
+          m.completed = false;
+        }
+
+        const winnerPlayer = m.winner === 1 ? m.p1 : (m.winner === 2 ? m.p2 : null);
+        const loserPlayer = m.winner === 1 ? m.p2 : (m.winner === 2 ? m.p1 : null);
+
+        // Propagate Winner
+        if (def.winDest) {
+          const targetMatch = state.matches[def.winDest.match];
+          if (targetMatch) {
+            if (def.winDest.slot === 1) {
+              if (targetMatch.p1?.id !== winnerPlayer?.id) {
+                targetMatch.p1 = winnerPlayer;
+                invalidateMatchIfChanged(targetMatch);
+              }
+            } else if (def.winDest.slot === 2) {
+              if (targetMatch.p2?.id !== winnerPlayer?.id) {
+                targetMatch.p2 = winnerPlayer;
+                invalidateMatchIfChanged(targetMatch);
+              }
+            }
+          }
+        }
+
+        // Propagate Loser
+        if (def.lossDest) {
+          const targetMatch = state.matches[def.lossDest.match];
+          if (targetMatch) {
+            const actualLoser = loserPlayer && !loserPlayer.isBye ? loserPlayer : null;
+            if (def.lossDest.slot === 1) {
+              if (targetMatch.p1?.id !== actualLoser?.id) {
+                targetMatch.p1 = actualLoser;
+                invalidateMatchIfChanged(targetMatch);
+              }
+            } else if (def.lossDest.slot === 2) {
+              if (targetMatch.p2?.id !== actualLoser?.id) {
+                targetMatch.p2 = actualLoser;
+                invalidateMatchIfChanged(targetMatch);
+              }
+            }
+          }
+        }
+
+        // Grand Finals Reset Check
+        if (mId === 'GF1') {
+          const gf2 = state.matches['GF2'];
+          if (m.completed) {
+            if (m.winner === 2) {
+              state.grandFinalsResetNeeded = true;
+              gf2.p1 = m.p1;
+              gf2.p2 = m.p2;
+            } else {
+              state.grandFinalsResetNeeded = false;
+              gf2.p1 = null;
+              gf2.p2 = null;
+              gf2.score1 = 0;
+              gf2.score2 = 0;
+              gf2.completed = false;
+              gf2.winner = null;
+            }
+          } else {
+            state.grandFinalsResetNeeded = false;
+            gf2.p1 = null;
+            gf2.p2 = null;
+            gf2.completed = false;
+          }
+        }
+      }
+
+      safeSetStorage(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function invalidateMatchIfChanged(match) {
+      const currentP1 = match.p1?.id || null;
+      const currentP2 = match.p2?.id || null;
+      const hadBinding = Object.prototype.hasOwnProperty.call(match, '__boundP1');
+      const changed = hadBinding && (match.__boundP1 !== currentP1 || match.__boundP2 !== currentP2);
+      match.__boundP1 = currentP1; match.__boundP2 = currentP2;
+      if (changed || !match.p1 || !match.p2) {
+        match.score1 = 0; match.score2 = 0; match.completed = false; match.winner = null; match.isLive = false;
+      }
+    }
+
+    function selectMatchWinner(matchId, winnerSlot) {
+      const match = state.matches[matchId];
+      if (!match || !match.p1 || !match.p2) return;
+
+      const nowM = getTourneyTimeNow();
+      if (!match.actualStartTime) {
+        match.actualStartMins = nowM;
+        match.actualStartTime = minsToTimeString(nowM);
+      }
+      match.actualEndTime = minsToTimeString(nowM);
+      match.durationMins = match.actualStartMins !== null ? Math.max(1, Math.round(nowM - match.actualStartMins)) : (match.bestOf === 5 ? 12 : 8);
+
+      const targetWins = match.targetWins;
+      if (winnerSlot === 1) {
+        match.score1 = targetWins;
+        if (match.score2 >= targetWins) match.score2 = targetWins - 1;
+        match.winner = 1;
+        match.completed = true;
+        match.isLive = false;
+      } else {
+        match.score2 = targetWins;
+        if (match.score1 >= targetWins) match.score1 = targetWins - 1;
+        match.winner = 2;
+        match.completed = true;
+        match.isLive = false;
+      }
+
+      playElectricSound();
+      propagateBracket();
+      renderAllViews();
+      showToast(`${match.code}: ${winnerSlot === 1 ? match.p1.name : match.p2.name} won!`);
+    }
+
+    function adjustScore(matchId, slot, delta) {
+      const match = state.matches[matchId];
+      if (!match || !match.p1 || !match.p2) return;
+
+      const nowM = getTourneyTimeNow();
+      if (!match.actualStartTime) {
+        match.actualStartMins = nowM;
+        match.actualStartTime = minsToTimeString(nowM);
+      }
+
+      const maxScore = match.targetWins;
+
+      if (slot === 1) {
+        match.score1 = Math.max(0, Math.min(maxScore, match.score1 + delta));
+      } else {
+        match.score2 = Math.max(0, Math.min(maxScore, match.score2 + delta));
+      }
+
+      if (match.score1 === maxScore) {
+        match.winner = 1;
+        match.completed = true;
+        match.isLive = false;
+        playElectricSound();
+      } else if (match.score2 === maxScore) {
+        match.winner = 2;
+        match.completed = true;
+        match.isLive = false;
+        playElectricSound();
+      } else {
+        match.completed = false;
+        match.winner = null;
+      }
+
+      propagateBracket();
+      renderAllViews();
+    }
+
+    function updatePlayerCharacter(playerId, characterName) {
+      const player = state.players.find(p => p.id === playerId);
+      if (player) {
+        player.character = characterName;
+        for (const m of Object.values(state.matches)) {
+          if (m.p1?.id === playerId) m.p1.character = characterName;
+          if (m.p2?.id === playerId) m.p2.character = characterName;
+        }
+        safeSetStorage(STORAGE_KEY, JSON.stringify(state));
+        renderAllViews();
+        showToast(`${player.name} main set to ${characterName}`);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. RENDERING VIEWS & MATCH CARDS
+    // -------------------------------------------------------------------------
+    function renderAllViews() {
+      renderBracketColumns();
+      renderFocusedWinners();
+      renderFocusedLosers();
+      renderFinalsSpotlight();
+      renderMatchList();
+      renderStandings();
+      updateMetrics();
+      if (typeof updateEnhancedMetrics === 'function') updateEnhancedMetrics();
+      if (typeof updateScheduleMetrics === 'function') updateScheduleMetrics();
+      if (typeof renderScheduleView === 'function') renderScheduleView();
+      if (typeof renderControlRoom === 'function') renderControlRoom();
+
+      requestAnimationFrame(() => {
+        drawConnectors();
+      });
+    }
+
+    function createMatchCardHTML(match) {
+      const isCompleted = match.completed;
+      const isLive = match.isLive;
+      const hasBothPlayers = !!(match.p1 && match.p2 && !match.p1.isBye && !match.p2.isBye);
+
+      let statusBadgeClass = 'bg-zinc-800 text-zinc-400 border-zinc-700';
+      let statusText = 'WAITING';
+
+      if (isCompleted) {
+        statusBadgeClass = 'bg-cyan-950 text-cyan-400 border-cyan-800 font-bold';
+        statusText = 'DONE';
+      } else if (isLive) {
+        statusBadgeClass = 'bg-emerald-950 text-emerald-400 border-emerald-700 font-bold animate-pulse';
+        statusText = 'LIVE';
+      } else if (hasBothPlayers) {
+        statusBadgeClass = 'bg-zinc-800 text-sky-300 border-sky-800/60';
+        statusText = 'READY';
+      }
+
+      const renderRow = (player, score, isWinner, isLoser, slotNum) => {
+        if (!player) {
+          return `
+            <div class="flex items-center justify-between p-2 rounded-lg border border-dashed border-zinc-800/80 bg-zinc-950/40 text-xs text-zinc-500">
+              <span class="italic font-mono">TBD</span>
+              <span class="font-mono text-zinc-600">-</span>
+            </div>
+          `;
+        }
+
+        const isBye = player.isBye;
+        const winnerBorder = isWinner ? 'border-cyan-500/70 bg-cyan-950/25 shadow-electric' : 'border-zinc-800/60 bg-zinc-900/50';
+        const loserOpacity = isLoser ? 'opacity-40 grayscale-[40%]' : '';
+
+        return `
+          <div class="flex items-center justify-between p-2 rounded-lg border ${winnerBorder} ${loserOpacity} transition-all hover:bg-zinc-800/60">
+            <div class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer" onclick="selectMatchWinner('${match.id}', ${slotNum})">
+              <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-medium shrink-0">
+                #${player.seed}
+              </span>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-bold text-zinc-100 truncate ${isWinner ? 'text-cyan-300' : ''}">
+                    ${player.name}
+                  </span>
+                  ${isWinner ? '<span class="text-cyan-400 text-xs font-bold">✓</span>' : ''}
+                </div>
+                <div class="flex items-center gap-1.5 text-[10px] text-zinc-400">
+                  <span class="font-mono text-zinc-500">${player.year}</span>
+                  ${!isBye ? `
+                    <span class="text-zinc-600">•</span>
+                    <span class="text-sky-400 font-medium">${player.character || 'No Pick'}</span>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+
+            ${!isBye ? `
+              <div class="flex items-center gap-1 shrink-0 ml-2">
+                <button onclick="event.stopPropagation(); adjustScore('${match.id}', ${slotNum}, -1)" class="score-button" title="Minus point">-</button>
+                <span class="w-5 text-center font-mono font-bold text-sm num-mono ${isWinner ? 'text-cyan-400 font-extrabold' : 'text-zinc-200'}">${score}</span>
+                <button onclick="event.stopPropagation(); adjustScore('${match.id}', ${slotNum}, 1)" class="score-button" title="Add point">+</button>
+              </div>
+            ` : `
+              <span class="font-mono text-xs text-zinc-500 pr-1">BYE</span>
+            `}
+          </div>
+        `;
+      };
+
+      const p1Winner = match.winner === 1;
+      const p1Loser = match.winner === 2;
+      const p2Winner = match.winner === 2;
+      const p2Loser = match.winner === 1;
+
+      return `
+        <div id="card-${match.id}" data-match-id="${match.id}" class="match-node relative bg-zinc-900/90 backdrop-blur-md rounded-xl border border-zinc-800/90 hover:border-zinc-700 p-2.5 transition-all shadow-card ${isLive ? 'match-live live-pulse' : (hasBothPlayers && !isCompleted ? 'match-ready' : (isCompleted ? 'match-complete' : ''))}">
+          <div class="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-zinc-800/80">
+            <div class="flex items-center gap-1.5 cursor-pointer" onclick="openMatchModal('${match.id}')">
+              <span class="font-mono font-bold text-[11px] text-cyan-400 hover:underline">
+                ${match.code}
+              </span>
+              <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400">
+                BO${match.bestOf}
+              </span>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-950 text-amber-300 border border-zinc-800" title="Target Schedule Call Time">
+                ${match.scheduledTime || (SCHEDULE_TARGETS[match.id]?.time || '')}
+              </span>
+              ${match.actualStartTime ? `<span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800/80" title="Actual Start Time">▶ ${match.actualStartTime}</span>` : ''}
+            </div>
+            
+            <div class="flex items-center gap-1">
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase ${statusBadgeClass}">
+                ${statusText}
+              </span>
+              <button onclick="openMatchModal('${match.id}')" class="text-zinc-500 hover:text-zinc-300 px-1 py-0.5 rounded text-xs" title="Edit Match">
+                ⚙
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            ${renderRow(match.p1, match.score1, p1Winner, p1Loser, 1)}
+            ${renderRow(match.p2, match.score2, p2Winner, p2Loser, 2)}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderBracketColumns() {
+      document.getElementById('col-wr1').innerHTML = ['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'].map(id => createMatchCardHTML(state.matches[id])).join('');
+      document.getElementById('col-wr2').innerHTML = ['W9', 'W10', 'W11', 'W12'].map(id => createMatchCardHTML(state.matches[id])).join('');
+      document.getElementById('col-wr3').innerHTML = ['W13', 'W14'].map(id => createMatchCardHTML(state.matches[id])).join('');
+      document.getElementById('col-wr4').innerHTML = ['W15'].map(id => createMatchCardHTML(state.matches[id])).join('');
+
+      document.getElementById('col-lr1').innerHTML = ['L2', 'L3', 'L4'].map(id => createMatchCardHTML(state.matches[id])).join('');
+      document.getElementById('col-lr2').innerHTML = ['L5', 'L6', 'L7', 'L8'].map(id => createMatchCardHTML(state.matches[id])).join('');
+      document.getElementById('col-lr3').innerHTML = ['L9', 'L10'].map(id => createMatchCardHTML(state.matches[id])).join('');
+      document.getElementById('col-lr4').innerHTML = ['L11', 'L12'].map(id => createMatchCardHTML(state.matches[id])).join('');
+      document.getElementById('col-lr5').innerHTML = ['L13'].map(id => createMatchCardHTML(state.matches[id])).join('');
+      document.getElementById('col-lr6').innerHTML = ['L14'].map(id => createMatchCardHTML(state.matches[id])).join('');
+
+      let gfHTML = `
+        <div class="w-80">
+          <div class="text-xs font-mono font-bold text-amber-300 mb-2">GRAND FINALS (MATCH 1)</div>
+          ${createMatchCardHTML(state.matches['GF1'])}
+        </div>
+      `;
+
+      if (state.grandFinalsResetNeeded || state.matches['GF2'].p1) {
+        gfHTML += `
+          <div class="w-80">
+            <div class="text-xs font-mono font-bold text-amber-400 mb-2 flex items-center gap-1.5">
+              <span>⚡ GRAND FINALS RESET (MATCH 2)</span>
+            </div>
+            ${createMatchCardHTML(state.matches['GF2'])}
+          </div>
+        `;
+      }
+
+      document.getElementById('col-gf').innerHTML = gfHTML;
+    }
+
+    function renderFocusedWinners() {
+      const container = document.getElementById('winners-focused-container');
+      container.innerHTML = `
+        <div class="flex gap-8 min-w-[1200px]">
+          <div class="w-72 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-cyan-400">ROUND 1 (BO3)</div>
+            ${['W1', 'W2', 'W3', 'W4', 'W5', 'W6', 'W7', 'W8'].map(id => createMatchCardHTML(state.matches[id])).join('')}
+          </div>
+          <div class="w-72 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-cyan-400">QUARTERFINALS (BO3)</div>
+            ${['W9', 'W10', 'W11', 'W12'].map(id => createMatchCardHTML(state.matches[id])).join('')}
+          </div>
+          <div class="w-72 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-cyan-400">SEMIFINALS (BO3)</div>
+            ${['W13', 'W14'].map(id => createMatchCardHTML(state.matches[id])).join('')}
+          </div>
+          <div class="w-72 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-cyan-400">WINNERS FINALS (BO5)</div>
+            ${['W15'].map(id => createMatchCardHTML(state.matches[id])).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFocusedLosers() {
+      const container = document.getElementById('losers-focused-container');
+      container.innerHTML = `
+        <div class="flex gap-8 min-w-[1500px]">
+          <div class="w-72 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS R1 (BO3)</div>
+            ${['L2', 'L3', 'L4'].map(id => createMatchCardHTML(state.matches[id])).join('')}
+          </div>
+          <div class="w-72 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS R2 (BO3)</div>
+            ${['L5', 'L6', 'L7', 'L8'].map(id => createMatchCardHTML(state.matches[id])).join('')}
+          </div>
+          <div class="w-72 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS R3 (BO3)</div>
+            ${['L9', 'L10'].map(id => createMatchCardHTML(state.matches[id])).join('')}
+          </div>
+          <div class="w-72 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS QUARTERS (BO5)</div>
+            ${['L11', 'L12'].map(id => createMatchCardHTML(state.matches[id])).join('')}
+          </div>
+          <div class="w-72 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS SEMIS (BO5)</div>
+            ${['L13'].map(id => createMatchCardHTML(state.matches[id])).join('')}
+          </div>
+          <div class="w-72 space-y-4">
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS FINALS (BO5)</div>
+            ${['L14'].map(id => createMatchCardHTML(state.matches[id])).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFinalsSpotlight() {
+      const container = document.getElementById('finals-spotlight-container');
+      const gf1 = state.matches['GF1'];
+      const gf2 = state.matches['GF2'];
+
+      let champion = null;
+      if (gf2.completed && gf2.winner) {
+        champion = gf2.winner === 1 ? gf2.p1 : gf2.p2;
+      } else if (gf1.completed && gf1.winner === 1) {
+        champion = gf1.p1;
+      }
+
+      let championHTML = '';
+      if (champion) {
+        championHTML = `
+          <div class="w-full max-w-2xl p-8 rounded-3xl bg-gradient-to-b from-amber-500/20 via-zinc-900/95 to-zinc-950 border border-amber-500/50 text-center shadow-mishima relative overflow-hidden">
+            <div class="flex items-center justify-center gap-3 mb-2">
+              <img src="./assets/mes_logo.png" alt="MES Seal" class="w-10 h-10 rounded-full border border-amber-400/80 shadow-mishima">
+              <span class="text-3xl">👑</span>
+            </div>
+            <div class="text-xs font-mono uppercase tracking-widest text-amber-400 font-bold mb-1">
+              UPHSD • MECHANICAL ENGINEERING SOCIETY CHAMPION
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-2">
+              ${champion.name}
+            </h1>
+            <div class="flex items-center justify-center gap-3 text-sm text-zinc-300 font-mono">
+              <span class="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700">Seed #${champion.seed}</span>
+              <span class="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700">${champion.year}</span>
+              <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800/80">${champion.character}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // Hero Header Banner with Tekken 8 Key Art and MES Seal
+      const bannerHTML = `
+        <div class="relative w-full max-w-3xl rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-900/90 shadow-2xl">
+          <div class="relative h-48 sm:h-56 w-full overflow-hidden">
+            <img src="./assets/tekken8_cover.jpg" alt="Tekken 8 Grand Finals" class="w-full h-full object-cover object-center filter brightness-90">
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-zinc-950/80 via-transparent to-zinc-950/80"></div>
+            
+            <div class="absolute bottom-4 left-6 right-6 flex items-end justify-between flex-wrap gap-3">
+              <div class="flex items-center gap-3.5">
+                <img src="./assets/mes_logo.png" alt="MES Seal" class="w-13 h-13 rounded-full border-2 border-amber-400 shadow-mishima bg-white p-0.5">
+                <div>
+                  <div class="text-[11px] font-mono font-bold tracking-widest text-amber-400 uppercase">
+                    MECHANICAL ENGINEERING SOCIETY • UPHSD DALTA
+                  </div>
+                  <h1 class="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+                    TEKKEN 8 GRAND FINALS
+                  </h1>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 bg-zinc-950/80 border border-zinc-700/60 px-3 py-1 rounded-lg text-xs font-mono text-cyan-300 backdrop-blur-md">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span>CHAMPIONSHIP STAGE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = `
+        ${bannerHTML}
+        ${championHTML}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl">
+          <div class="space-y-3">
+            <div class="flex items-center gap-2 text-sm font-mono text-cyan-400 font-bold">
+              <span>⚔️ GRAND FINALS SET 1</span>
+            </div>
+            ${createMatchCardHTML(gf1)}
+            <p class="text-xs text-zinc-500 leading-relaxed">
+              Winners Bracket Champion needs 1 set win. Losers Champion must win this set to trigger a Bracket Reset.
+            </p>
+          </div>
+
+          <div class="space-y-3 ${!state.grandFinalsResetNeeded && !gf2.completed ? 'opacity-40' : ''}">
+            <div class="flex items-center gap-2 text-sm font-mono text-amber-400 font-bold">
+              <span>⚡ GRAND FINALS RESET (SET 2)</span>
+            </div>
+            ${createMatchCardHTML(gf2)}
+            <p class="text-xs text-zinc-500 leading-relaxed">
+              ${state.grandFinalsResetNeeded ? '<span class="text-amber-400 font-bold">RESET TRIGGERED!</span> Losers Champ won Set 1. Winner takes championship.' : 'Activates automatically if the Losers Bracket Champion wins Set 1.'}
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMatchList() {
+      const tbody = document.getElementById('match-list-tbody');
+      const allMatches = Object.values(state.matches);
+
+      const query = (state.matchSearch || '').trim().toLowerCase();
+      const filtered = allMatches.filter(m => {
+        const matchesSearch = !query || [m.code, m.label, m.p1?.name, m.p2?.name].filter(Boolean).some(v => String(v).toLowerCase().includes(query));
+        if (!matchesSearch) return false;
+        if (state.matchFilter === 'all') return true;
+        if (state.matchFilter === 'live') return m.isLive;
+        if (state.matchFilter === 'ready') return !m.completed && m.p1 && m.p2 && !m.p1.isBye && !m.p2.isBye;
+        if (state.matchFilter === 'completed') return m.completed;
+        return true;
+      });
+
+      tbody.innerHTML = filtered.map(m => {
+        const p1Name = m.p1 ? m.p1.name : '<span class="text-zinc-600 italic">TBD</span>';
+        const p2Name = m.p2 ? m.p2.name : '<span class="text-zinc-600 italic">TBD</span>';
+        const isReady = m.p1 && m.p2 && !m.p1.isBye && !m.p2.isBye;
+
+        let statusPill = `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700">WAITING</span>`;
+        if (m.completed) {
+          statusPill = `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-400 border border-cyan-800 font-bold">COMPLETED</span>`;
+        } else if (m.isLive) {
+          statusPill = `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950 text-emerald-400 border border-emerald-700 font-bold animate-pulse">LIVE</span>`;
+        } else if (isReady) {
+          statusPill = `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-950 text-sky-400 border border-sky-800">READY</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-zinc-800/40 transition-colors">
+            <td class="py-3 px-4 font-mono text-cyan-400 font-bold text-xs">
+              ${m.code}
+            </td>
+            <td class="py-3 px-4 text-xs font-mono text-zinc-400">
+              ${m.label}
+            </td>
+            <td class="py-3 px-4 text-xs font-mono text-zinc-400">
+              BO${m.bestOf}
+            </td>
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-3">
+                <span class="font-semibold text-xs text-zinc-200 ${m.winner === 1 ? 'text-cyan-400 font-bold' : ''}">
+                  ${p1Name}
+                </span>
+                <span class="px-2 py-0.5 rounded bg-zinc-950 font-mono text-xs font-bold ${m.completed ? 'text-cyan-300' : 'text-zinc-500'}">
+                  ${m.score1} - ${m.score2}
+                </span>
+                <span class="font-semibold text-xs text-zinc-200 ${m.winner === 2 ? 'text-cyan-400 font-bold' : ''}">
+                  ${p2Name}
+                </span>
+              </div>
+            </td>
+            <td class="py-3 px-4 text-center">
+              ${statusPill}
+            </td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="openMatchModal('${m.id}')" class="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300 hover:text-white">
+                Score / Edit
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function setMatchFilter(filter) {
+      state.matchFilter = filter;
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.remove('bg-zinc-800', 'text-white', 'font-semibold');
+        b.classList.add('text-zinc-400');
+      });
+      const activeBtn = document.getElementById(`filter-${filter}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-zinc-800', 'text-white', 'font-semibold');
+        activeBtn.classList.remove('text-zinc-400');
+      }
+      renderMatchList();
+    }
+
+    function setMatchSearch(value) { state.matchSearch = value || ''; renderMatchList(); }
+
+    function renderStandings() {
+      const tbody = document.getElementById('standings-tbody');
+      const summary = document.getElementById('standings-summary');
+      if (summary) {
+        const players = state.players.filter(p => !p.isBye);
+        const eliminated = players.filter(p => getRankForPlayerSafe(p) !== 'Active').length;
+        const live = Object.values(state.matches).filter(m => m.isLive).length;
+        const completed = Object.values(state.matches).filter(m => m.completed).length;
+        summary.innerHTML = [['Active', players.length-eliminated,'text-emerald-300'],['Eliminated',eliminated,'text-red-300'],['Live sets',live,'text-cyan-300'],['Completed',`${completed}/${Object.keys(state.matches).length}`,'text-amber-300']].map(([l,v,c])=>`<div class="enhanced-glass rounded-xl px-3 py-2.5"><div class="text-[9px] font-mono uppercase tracking-[.14em] text-zinc-500">${l}</div><div class="mt-1 text-base font-extrabold ${c}">${v}</div></div>`).join('');
+      }
+      const ranks = {};
+
+      const gf1 = state.matches['GF1'];
+      const gf2 = state.matches['GF2'];
+
+      if (gf2.completed && gf2.winner) {
+        ranks[1] = [gf2.winner === 1 ? gf2.p1 : gf2.p2];
+        ranks[2] = [gf2.winner === 1 ? gf2.p2 : gf2.p1];
+      } else if (gf1.completed && gf1.winner === 1) {
+        ranks[1] = [gf1.p1];
+        ranks[2] = [gf1.p2];
+      }
+
+      const l14 = state.matches['L14'];
+      if (l14.completed && l14.winner) {
+        ranks[3] = [l14.winner === 1 ? l14.p2 : l14.p1];
+      }
+
+      const l13 = state.matches['L13'];
+      if (l13.completed && l13.winner) {
+        ranks[4] = [l13.winner === 1 ? l13.p2 : l13.p1];
+      }
+
+      const l11 = state.matches['L11'];
+      const l12 = state.matches['L12'];
+      const fifthSixth = [];
+      if (l11.completed && l11.winner) fifthSixth.push(l11.winner === 1 ? l11.p2 : l11.p1);
+      if (l12.completed && l12.winner) fifthSixth.push(l12.winner === 1 ? l12.p2 : l12.p1);
+      if (fifthSixth.length > 0) ranks['5th-6th'] = fifthSixth;
+
+      const l9 = state.matches['L9'];
+      const l10 = state.matches['L10'];
+      const seventhEighth = [];
+      if (l9.completed && l9.winner) seventhEighth.push(l9.winner === 1 ? l9.p2 : l9.p1);
+      if (l10.completed && l10.winner) seventhEighth.push(l10.winner === 1 ? l10.p2 : l10.p1);
+      if (seventhEighth.length > 0) ranks['7th-8th'] = seventhEighth;
+
+      const ninthTwelfth = [];
+      ['L5', 'L6', 'L7', 'L8'].forEach(id => {
+        const m = state.matches[id];
+        if (m.completed && m.winner) {
+          ninthTwelfth.push(m.winner === 1 ? m.p2 : m.p1);
+        }
+      });
+      if (ninthTwelfth.length > 0) ranks['9th-12th'] = ninthTwelfth;
+
+      const thirteenthSixteenth = [];
+      ['L2', 'L3', 'L4'].forEach(id => {
+        const m = state.matches[id];
+        if (m.completed && m.winner) {
+          thirteenthSixteenth.push(m.winner === 1 ? m.p2 : m.p1);
+        }
+      });
+      if (thirteenthSixteenth.length > 0) ranks['13th-16th'] = thirteenthSixteenth;
+
+      const getRecord = (player) => {
+        if (!player || player.isBye) return '0 - 0';
+        let wins = 0;
+        let losses = 0;
+        for (const m of Object.values(state.matches)) {
+          if (m.completed && !m.p2?.isBye) {
+            if (m.p1?.id === player.id) {
+              if (m.winner === 1) wins++;
+              else if (m.winner === 2) losses++;
+            } else if (m.p2?.id === player.id) {
+              if (m.winner === 2) wins++;
+              else if (m.winner === 1) losses++;
+            }
+          }
+        }
+        return `${wins} - ${losses}`;
+      };
+
+      const getRankForPlayer = (p) => {
+        for (const [rLabel, pList] of Object.entries(ranks)) {
+          if (pList.some(item => item?.id === p.id)) {
+            return rLabel;
+          }
+        }
+        return 'Active';
+      };
+
+      const displayPlayers = [...state.players].filter(p => !p.isBye).sort((a, b) => {
+        const rankA = getRankForPlayer(a);
+        const rankB = getRankForPlayer(b);
+        const order = { '1': 1, '2': 2, '3': 3, '4': 4, '5th-6th': 5, '7th-8th': 7, '9th-12th': 9, '13th-16th': 13, 'Active': 0 };
+        return (order[rankA] || 99) - (order[rankB] || 99) || a.seed - b.seed;
+      });
+
+      tbody.innerHTML = displayPlayers.map(p => {
+        const rank = getRankForPlayer(p);
+        let rankBadge = `<span class="text-xs font-mono text-zinc-400 font-bold">${rank}</span>`;
+        let statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400">In Contention</span>`;
+
+        if (rank === '1') {
+          rankBadge = `<span class="px-2.5 py-1 rounded bg-amber-500/20 border border-amber-500/50 text-amber-300 font-bold font-mono">1st</span>`;
+          statusBadge = `<span class="px-2.5 py-1 rounded text-[10px] font-mono bg-amber-950 text-amber-300 border border-amber-700 font-bold">CHAMPION</span>`;
+        } else if (rank === '2') {
+          rankBadge = `<span class="px-2.5 py-1 rounded bg-zinc-400/20 border border-zinc-400/50 text-zinc-200 font-bold font-mono">2nd</span>`;
+          statusBadge = `<span class="px-2.5 py-1 rounded text-[10px] font-mono bg-zinc-800 text-zinc-200 border border-zinc-600 font-bold">RUNNER-UP</span>`;
+        } else if (rank === '3') {
+          rankBadge = `<span class="px-2.5 py-1 rounded bg-amber-800/30 border border-amber-700/50 text-amber-400 font-bold font-mono">3rd</span>`;
+          statusBadge = `<span class="px-2.5 py-1 rounded text-[10px] font-mono bg-amber-950/60 text-amber-400 border border-amber-800">3RD PLACE</span>`;
+        } else if (rank !== 'Active') {
+          statusBadge = `<span class="px-2.5 py-1 rounded text-[10px] font-mono bg-red-950/40 text-red-400 border border-red-900/60">Eliminated</span>`;
+        }
+
+        return `
+          <tr class="hover:bg-zinc-800/40 transition-colors">
+            <td class="py-3 px-4 text-center">
+              ${rankBadge}
+            </td>
+            <td class="py-3 px-4 font-mono text-xs text-zinc-400">
+              #${p.seed}
+            </td>
+            <td class="py-3 px-4 font-bold text-sm text-zinc-100">
+              ${p.name}
+            </td>
+            <td class="py-3 px-4 font-mono text-xs text-zinc-400">
+              ${p.year}
+            </td>
+            <td class="py-3 px-4 text-xs text-sky-400 font-medium">
+              ${p.character}
+            </td>
+            <td class="py-3 px-4 text-center font-mono text-xs font-bold text-zinc-300">
+              ${getRecord(p)}
+            </td>
+            <td class="py-3 px-4 text-right">
+              ${statusBadge}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updateMetrics() {
+      const allMatches = Object.values(state.matches);
+      const completedCount = allMatches.filter(m => m.completed).length;
+      const liveCount = allMatches.filter(m => m.isLive).length;
+      const totalCount = allMatches.length;
+
+      document.getElementById('metric-completed').innerText = `${completedCount}/${totalCount}`;
+      document.getElementById('metric-live').innerText = liveCount;
+      document.getElementById('metric-total').innerText = totalCount;
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. SVG CONNECTORS
+    // -------------------------------------------------------------------------
+    function drawConnectors() {
+      const svg = document.getElementById('bracket-svg');
+      if (!svg) return;
+
+      const canvas = document.getElementById('bracket-canvas');
+      if (!canvas) return;
+      const canvasRect = canvas.getBoundingClientRect();
+
+      const links = [
+        { from: 'W1', to: 'W9', slot: 1 },
+        { from: 'W2', to: 'W9', slot: 2 },
+        { from: 'W3', to: 'W10', slot: 1 },
+        { from: 'W4', to: 'W10', slot: 2 },
+        { from: 'W5', to: 'W11', slot: 1 },
+        { from: 'W6', to: 'W11', slot: 2 },
+        { from: 'W7', to: 'W12', slot: 1 },
+        { from: 'W8', to: 'W12', slot: 2 },
+
+        { from: 'W9', to: 'W13', slot: 1 },
+        { from: 'W10', to: 'W13', slot: 2 },
+        { from: 'W11', to: 'W14', slot: 1 },
+        { from: 'W12', to: 'W14', slot: 2 },
+
+        { from: 'W13', to: 'W15', slot: 1 },
+        { from: 'W14', to: 'W15', slot: 2 },
+
+        { from: 'L2', to: 'L6', slot: 2 },
+        { from: 'L3', to: 'L7', slot: 2 },
+        { from: 'L4', to: 'L8', slot: 2 },
+
+        { from: 'L5', to: 'L9', slot: 1 },
+        { from: 'L6', to: 'L9', slot: 2 },
+        { from: 'L7', to: 'L10', slot: 1 },
+        { from: 'L8', to: 'L10', slot: 2 },
+
+        { from: 'L9', to: 'L11', slot: 1 },
+        { from: 'L10', to: 'L12', slot: 1 },
+
+        { from: 'L11', to: 'L13', slot: 1 },
+        { from: 'L12', to: 'L13', slot: 2 },
+
+        { from: 'L13', to: 'L14', slot: 1 }
+      ];
+
+      let svgContent = `
+        <defs>
+          <linearGradient id="cyan-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#38bdf8" stop-opacity="1"/>
+          </linearGradient>
+        </defs>
+      `;
+
+      links.forEach(link => {
+        const fromEl = document.getElementById(`card-${link.from}`);
+        const toEl = document.getElementById(`card-${link.to}`);
+
+        if (!fromEl || !toEl) return;
+
+        const fromRect = fromEl.getBoundingClientRect();
+        const toRect = toEl.getBoundingClientRect();
+
+        const x1 = (fromRect.right - canvasRect.left) / state.zoom;
+        const y1 = (fromRect.top + fromRect.height / 2 - canvasRect.top) / state.zoom;
+
+        const x2 = (toRect.left - canvasRect.left) / state.zoom;
+        const slotOffset = link.slot === 1 ? toRect.height * 0.35 : toRect.height * 0.70;
+        const y2 = (toRect.top + slotOffset - canvasRect.top) / state.zoom;
+
+        const fromMatch = state.matches[link.from];
+        const isActive = fromMatch && fromMatch.completed;
+        const strokeClass = isActive ? 'connector-active' : 'connector-inactive';
+
+        const dx = (x2 - x1) * 0.55;
+        const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+
+        svgContent += `<path d="${d}" class="connector-line ${strokeClass}" fill="none" />`;
+      });
+
+      svg.innerHTML = svgContent;
+    }
+
+    function zoomBracket(delta) {
+      state.zoom = Math.max(0.5, Math.min(1.5, state.zoom + delta));
+      document.getElementById('zoom-level-text').innerText = `${Math.round(state.zoom * 100)}%`;
+      const canvas = document.getElementById('bracket-canvas');
+      if (canvas) {
+        canvas.style.transform = `scale(${state.zoom})`;
+      }
+      drawConnectors();
+    }
+
+    function resetZoomBracket() {
+      state.zoom = 1.0;
+      document.getElementById('zoom-level-text').innerText = `100%`;
+      const canvas = document.getElementById('bracket-canvas');
+      if (canvas) {
+        canvas.style.transform = `scale(1)`;
+      }
+      drawConnectors();
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. TAB NAVIGATION & VIEW SWITCHING
+    // -------------------------------------------------------------------------
+    function switchView(viewName) {
+      state.activeView = viewName;
+      
+      document.querySelectorAll('.view-panel').forEach(panel => {
+        panel.classList.add('hidden');
+      });
+
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.classList.remove('bg-zinc-800', 'text-cyan-400', 'shadow-sm', 'font-semibold');
+        tab.classList.add('text-zinc-400');
+      });
+
+      const targetView = document.getElementById(`view-${viewName}`);
+      if (targetView) targetView.classList.remove('hidden');
+
+      const targetTab = document.getElementById(`tab-${viewName}`);
+      if (targetTab) {
+        targetTab.classList.add('bg-zinc-800', 'text-cyan-400', 'shadow-sm', 'font-semibold');
+        targetTab.classList.remove('text-zinc-400');
+      }
+
+      const zoomControls = document.getElementById('bracket-zoom-controls');
+      if (viewName === 'full') {
+        zoomControls.classList.remove('hidden');
+        setTimeout(() => drawConnectors(), 100);
+      } else {
+        zoomControls.classList.add('hidden');
+      }
+
+      if (viewName === 'winners') renderFocusedWinners();
+      if (viewName === 'losers') renderFocusedLosers();
+      if (viewName === 'finals') renderFinalsSpotlight();
+      if (viewName === 'matches') renderMatchList();
+      if (viewName === 'schedule') renderScheduleView();
+      if (viewName === 'standings') renderStandings();
+      if (viewName === 'control' && typeof renderControlRoom === 'function') renderControlRoom();
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. MATCH MODAL / QUICK EDIT
+    // -------------------------------------------------------------------------
+    function openMatchModal(matchId) {
+      activeModalMatchId = matchId;
+      if (typeof activeControlMatchId !== 'undefined') activeControlMatchId = matchId;
+      const match = state.matches[matchId];
+      if (!match) return;
+
+      document.getElementById('modal-match-code').innerText = match.code;
+      document.getElementById('modal-match-format').innerText = `Best of ${match.bestOf} (First to ${match.targetWins})`;
+      document.getElementById('modal-match-title').innerText = `${match.label} - Score & Settings`;
+
+      const container = document.getElementById('modal-competitors-box');
+      
+      const renderModalPlayer = (player, score, slotNum) => {
+        if (!player) {
+          return `
+            <div class="p-4 rounded-xl border border-dashed border-zinc-800 bg-zinc-950/50 text-center text-zinc-500 font-mono text-sm">
+              Competitor Awaiting Progression (TBD)
+            </div>
+          `;
+        }
+
+        const charOptions = TEKKEN_CHARACTERS.map(c => `
+          <option value="${c}" ${player.character === c ? 'selected' : ''}>${c}</option>
+        `).join('');
+
+        return `
+          <div class="p-4 rounded-xl border border-zinc-800 bg-zinc-950/70 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">#${player.seed}</span>
+                <span class="font-bold text-sm text-white">${player.name}</span>
+                <span class="text-xs text-zinc-400 font-mono">(${player.year})</span>
+              </div>
+              <button onclick="selectMatchWinner('${match.id}', ${slotNum}); closeMatchModal();" class="px-2.5 py-1 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-800 text-xs font-mono font-bold text-cyan-400">
+                Win Set
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 pt-1">
+              <div class="flex items-center gap-2 text-xs">
+                <span class="text-zinc-400">Tekken 8 Main:</span>
+                <select onchange="updatePlayerCharacter('${player.id}', this.value)" class="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs text-cyan-300 font-mono focus:outline-none">
+                  ${charOptions}
+                </select>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-zinc-400">Score:</span>
+                <div class="flex items-center gap-1">
+                  <button onclick="adjustScore('${match.id}', ${slotNum}, -1); openMatchModal('${match.id}')" class="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-sm font-mono font-bold text-zinc-200">-</button>
+                  <span class="w-8 text-center font-mono font-bold text-base text-cyan-400">${score}</span>
+                  <button onclick="adjustScore('${match.id}', ${slotNum}, 1); openMatchModal('${match.id}')" class="w-6 h-6 rounded bg-zinc-800 hover:bg-zinc-700 text-sm font-mono font-bold text-zinc-200">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      };
+
+      container.innerHTML = `
+        ${renderModalPlayer(match.p1, match.score1, 1)}
+        <div class="text-center font-mono text-xs text-zinc-500 font-bold">VS</div>
+        ${renderModalPlayer(match.p2, match.score2, 2)}
+      `;
+
+      document.getElementById('match-modal').classList.remove('hidden');
+    }
+
+    function closeMatchModal() {
+      document.getElementById('match-modal').classList.add('hidden');
+      activeModalMatchId = null;
+      renderAllViews();
+    }
+
+    function resetCurrentMatchScore() {
+      if (!activeModalMatchId) return;
+      const match = state.matches[activeModalMatchId];
+      if (match) {
+        match.score1 = 0;
+        match.score2 = 0;
+        match.completed = false;
+        match.winner = null;
+        propagateBracket();
+        openMatchModal(activeModalMatchId);
+        showToast(`Reset score for ${match.code}`);
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. SIMULATION, EXPORT & TOURNAMENT RESET
+    // -------------------------------------------------------------------------
+    function simulateNextMatch() {
+      const readyMatch = Object.values(state.matches).find(m => 
+        !m.completed && m.p1 && m.p2 && !m.p1.isBye && !m.p2.isBye
+      );
+
+      if (!readyMatch) {
+        showToast('All playable matches are already completed!');
+        return;
+      }
+
+      const winnerSlot = Math.random() > 0.5 ? 1 : 2;
+      const targetWins = readyMatch.targetWins;
+      const loserScore = Math.floor(Math.random() * targetWins);
+
+      const simStart = getTourneyTimeNow();
+      if (!readyMatch.actualStartTime) {
+        readyMatch.actualStartMins = simStart;
+        readyMatch.actualStartTime = minsToTimeString(simStart);
+      }
+
+      if (winnerSlot === 1) {
+        readyMatch.score1 = targetWins;
+        readyMatch.score2 = loserScore;
+        readyMatch.winner = 1;
+      } else {
+        readyMatch.score1 = loserScore;
+        readyMatch.score2 = targetWins;
+        readyMatch.winner = 2;
+      }
+      readyMatch.completed = true;
+
+      const dur = readyMatch.bestOf === 5 ? 12 : 8;
+      readyMatch.durationMins = dur;
+
+      if (state.clockMode === 'sim' || (state.clockMode === 'auto' && !isVenueHoursNow())) {
+        state.simClockMins = (state.simClockMins || 0) + dur;
+      }
+      readyMatch.actualEndTime = minsToTimeString(getTourneyTimeNow());
+
+      playElectricSound();
+      propagateBracket();
+      renderAllViews();
+      showToast(`${readyMatch.code}: ${winnerSlot === 1 ? readyMatch.p1.name : readyMatch.p2.name} won!`);
+    }
+
+    function confirmResetTournament() {
+      document.getElementById('reset-modal').classList.remove('hidden');
+    }
+
+    function closeResetModal() {
+      document.getElementById('reset-modal').classList.add('hidden');
+    }
+
+    function executeResetTournament() {
+      safeRemoveStorage(STORAGE_KEY);
+      initializeTournamentState();
+      renderAllViews();
+      closeResetModal();
+      showToast('Tournament bracket reset to initial seed state');
+    }
+
+    function exportBracketJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `MEODL_Tekken_Bracket_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      toggleExportDropdown();
+      showToast('Exported tournament JSON file');
+    }
+
+    function triggerJSONImport() {
+      document.getElementById('json-file-input').click();
+      toggleExportDropdown();
+    }
+
+    function handleJSONUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (imported.matches && imported.players) {
+            state = imported;
+            propagateBracket();
+            renderAllViews();
+            showToast('Tournament state imported successfully!');
+          } else {
+            showToast('Invalid JSON tournament structure');
+          }
+        } catch (err) {
+          showToast('Failed to parse JSON file');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function toggleExportDropdown() {
+      const dd = document.getElementById('export-dropdown');
+      if (dd) dd.classList.toggle('hidden');
+    }
+
+    function copyStandingsClipboard() {
+      let text = "=== MEODL ESPORTS // TEKKEN 8 TOURNAMENT STANDINGS (MES UPHSD) ===\n\n";
+      const rows = document.querySelectorAll('#standings-tbody tr');
+      rows.forEach(r => {
+        const cols = r.querySelectorAll('td');
+        if (cols.length >= 6) {
+          text += `${cols[0].innerText.trim().padEnd(10)} | ${cols[2].innerText.trim().padEnd(25)} | ${cols[3].innerText.trim().padEnd(10)} | Main: ${cols[4].innerText.trim().padEnd(12)} | ${cols[5].innerText.trim()}\n`;
+        }
+      });
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Standings copied to clipboard!');
+      }).catch(() => {
+        showToast('Standings copied!');
+      });
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = "bg-zinc-900 border border-cyan-800/60 shadow-electric text-cyan-200 px-4 py-2.5 rounded-xl text-xs font-mono flex items-center gap-2 pointer-events-auto transition-opacity duration-300";
+      toast.innerHTML = `<span>⚡</span> <span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 350);
+      }, 3000);
+    }
+
+    // -------------------------------------------------------------------------
+    // 9. APP BOOTSTRAP
+    // -------------------------------------------------------------------------
+    function initApp() {
+      const saved = safeGetStorage(STORAGE_KEY);
+      let loaded = false;
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.matches && parsed.players) {
+            state = parsed;
+            propagateBracket();
+            loaded = true;
+          }
+        } catch(e) {}
+      }
+
+      if (!loaded) {
+        initializeTournamentState();
+      }
+
+      renderAllViews();
+      switchView('full');
+
+      window.addEventListener('resize', () => {
+        drawConnectors();
+      });
+
+      window.addEventListener('click', (e) => {
+        const exportBtn = e.target.closest('#export-dropdown') || e.target.closest('button[onclick="toggleExportDropdown()"]');
+        if (!exportBtn) {
+          const dd = document.getElementById('export-dropdown');
+          if (dd && !dd.classList.contains('hidden')) dd.classList.add('hidden');
+        }
+      });
+    }
+
+
+    // -------------------------------------------------------------------------
+    // 10. ENHANCED OPERATOR LAYER
+    // -------------------------------------------------------------------------
+// Enhanced base wiring
+    const MATCH_PRIORITY = ['W1','W2','W3','W4','W5','W6','W7','W8','L2','L3','L4','W9','W10','W11','W12','L5','L6','L7','L8','L9','L10','W13','W14','L11','L12','L13','W15','L14','GF1','GF2'];
+    let activeControlMatchId = null;
+
+    function getRankForPlayerSafe(p) {
+      if (!p || p.isBye) return 'Eliminated';
+      const eliminated = Object.values(state.matches).some(m => {
+        if (!m.completed || !m.winner) return false;
+        const loser = m.winner === 1 ? m.p2 : m.p1;
+        return loser?.id === p.id && MATCH_DEFINITIONS[m.id]?.lossDest === null;
+      });
+      return eliminated ? 'Eliminated' : 'Active';
+    }
+    function isPlayableMatch(m){return !!(m&&!m.completed&&m.p1&&m.p2&&!m.p1.isBye&&!m.p2.isBye)}
+    function getReadyMatches(){return MATCH_PRIORITY.map(id=>state.matches[id]).filter(isPlayableMatch)}
+    function getNextReadyMatch(){const live=MATCH_PRIORITY.map(id=>state.matches[id]).find(m=>m?.isLive&&!m.completed);return live||getReadyMatches()[0]||null}
+    function openNextReadyMatch(){const next=getNextReadyMatch();if(!next){switchView('control');showToast('No ready set is currently available.');return}activeControlMatchId=next.id;switchView('control');renderControlRoom();openMatchModal(next.id)}
+    function toggleMatchLive(matchId){const m=state.matches[matchId];if(!m||!isPlayableMatch(m))return;if(!m.isLive){Object.values(state.matches).forEach(x=>{if(x.id!==matchId)x.isLive=false});m.isLive=true;const nowM=getTourneyTimeNow();if(!m.actualStartTime){m.actualStartMins=nowM;m.actualStartTime=minsToTimeString(nowM);}showToast(`${m.code} is now LIVE.`)}else{m.isLive=false;showToast(`${m.code} removed from LIVE.`)}safeSetStorage(STORAGE_KEY,JSON.stringify(state));renderAllViews();if(activeModalMatchId===matchId)openMatchModal(matchId)}
+    function toggleActiveMatchLive(){if(activeControlMatchId)toggleMatchLive(activeControlMatchId);renderControlRoom()}
+    function openActiveControlMatch(){if(activeControlMatchId)openMatchModal(activeControlMatchId)}
+    function resetActiveControlMatch(){if(!activeControlMatchId)return;const m=state.matches[activeControlMatchId];if(!m)return;m.score1=0;m.score2=0;m.winner=null;m.completed=false;m.isLive=false;propagateBracket();renderAllViews();renderControlRoom();showToast(`${m.code} reset.`)}
+    function renderControlConsole(){
+      const c=document.getElementById('control-console'),t=document.getElementById('control-match-title'),b=document.getElementById('control-live-btn'),s=document.getElementById('control-match-status');if(!c||!t||!b||!s)return;
+      let m=activeControlMatchId?state.matches[activeControlMatchId]:null;if(!m||(!m.p1&&!m.p2))m=getNextReadyMatch();if(!m){t.textContent='No playable match available';s.textContent='STANDBY';c.innerHTML='<div class="md:col-span-3 rounded-2xl border border-dashed border-zinc-800 p-10 text-center text-sm text-zinc-500">Complete the current progression to unlock the next set.</div>';b.textContent='Start Live';return}
+      activeControlMatchId=m.id;t.textContent=`${m.code} • ${m.label}`;s.textContent=m.completed?'COMPLETED':(m.isLive?'LIVE':(isPlayableMatch(m)?'READY':'WAITING'));s.className=`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold border ${m.completed?'bg-cyan-950 text-cyan-300 border-cyan-800':m.isLive?'bg-emerald-950 text-emerald-300 border-emerald-800 live-pulse':isPlayableMatch(m)?'bg-sky-950 text-sky-300 border-sky-800':'bg-zinc-800 text-zinc-400 border-zinc-700'}`;b.textContent=m.isLive?'Stop Live':'Start Live';
+      const card=(p,slot)=>{if(!p)return '<div class="player-versus-card p-5 flex items-center justify-center text-zinc-600 font-mono text-xs">TBD</div>';const w=m.winner===slot;const score=slot===1?m.score1:m.score2;return `<div class="player-versus-card p-5 flex flex-col justify-between ${w?'border-cyan-500/35 bg-cyan-950/10':''}"><div class="flex items-center justify-between"><span class="text-[9px] font-mono uppercase tracking-[.15em] text-zinc-500">Player ${slot}</span><span class="px-2 py-0.5 rounded-full text-[9px] font-mono bg-zinc-900 border border-zinc-800 text-zinc-500">#${p.seed}</span></div><div class="mt-3 min-w-0"><div class="text-lg sm:text-xl font-extrabold text-white truncate ${w?'text-cyan-300':''}">${p.name}</div><div class="mt-1 flex items-center gap-2 text-[10px] text-zinc-500 font-mono"><span>${p.year}</span><span>•</span><span class="text-sky-400">${p.character||'No Pick'}</span></div></div><div class="mt-4 flex items-end justify-between gap-3"><div class="text-5xl font-black num-mono ${w?'text-cyan-300':'text-zinc-100'}">${score}</div>${!m.completed?`<div class="flex gap-1.5"><button class="score-button" onclick="adjustScore('${m.id}',${slot},-1)">−</button><button class="score-button" onclick="adjustScore('${m.id}',${slot},1)">+</button></div>`:'<span class="text-[10px] font-mono text-zinc-600">SET COMPLETE</span>'}</div></div>`};
+      c.innerHTML=`${card(m.p1,1)}<div class="flex md:flex-col items-center justify-center gap-2 py-2"><div class="text-[9px] font-mono uppercase tracking-[.18em] text-zinc-600">Best of ${m.bestOf}</div><div class="w-10 h-10 rounded-full border border-zinc-800 bg-zinc-950 flex items-center justify-center text-[10px] font-black text-zinc-500">VS</div><button class="command-button px-3 py-2 rounded-lg text-[10px] font-bold ${m.completed?'opacity-50 pointer-events-none':''}" onclick="selectMatchWinner('${m.id}',1)">P1 Wins</button><button class="command-button px-3 py-2 rounded-lg text-[10px] font-bold ${m.completed?'opacity-50 pointer-events-none':''}" onclick="selectMatchWinner('${m.id}',2)">P2 Wins</button></div>${card(m.p2,2)}`;
+    }
+    function renderControlQueue(){const c=document.getElementById('control-queue'),count=document.getElementById('queue-count');if(!c)return;const q=getReadyMatches();if(count)count.textContent=`${q.length} ready`;c.innerHTML=q.length?q.slice(0,6).map((m,i)=>`<button class="queue-item w-full text-left rounded-xl border border-zinc-800/80 bg-zinc-950/50 p-3" onclick="activeControlMatchId='${m.id}';renderControlRoom()"><div class="flex items-center justify-between gap-2"><span class="text-[10px] font-mono font-bold text-cyan-400">${String(i+1).padStart(2,'0')} • ${m.code}</span><span class="text-[9px] font-mono text-zinc-600">BO${m.bestOf}</span></div><div class="mt-1 text-xs font-semibold text-zinc-200 truncate">${m.p1.name} <span class="text-zinc-600">vs</span> ${m.p2.name}</div><div class="mt-1 text-[9px] font-mono text-zinc-500">${m.label}</div></button>`).join(''):'<div class="rounded-xl border border-dashed border-zinc-800 p-8 text-center text-xs text-zinc-600">No sets are ready.</div>'}
+    function renderControlRoom(){renderControlConsole();renderControlQueue();const g=document.getElementById('control-state-grid');if(g){const a=Object.values(state.matches),r=a.filter(isPlayableMatch).length,l=a.filter(m=>m.isLive).length,d=a.filter(m=>m.completed).length;g.innerHTML=[['READY',r,'text-sky-300'],['LIVE',l,'text-emerald-300'],['DONE',d,'text-cyan-300'],['GF RESET',state.grandFinalsResetNeeded?'YES':'NO',state.grandFinalsResetNeeded?'text-amber-300':'text-zinc-500']].map(x=>`<div class="rounded-xl border border-zinc-800/80 bg-zinc-950/45 p-3"><div class="text-[9px] font-mono tracking-[.15em] text-zinc-600">${x[0]}</div><div class="mt-1 text-base font-extrabold ${x[2]}">${x[1]}</div></div>`).join('')}const route=document.getElementById('control-route');if(route){const m=activeControlMatchId?state.matches[activeControlMatchId]:getNextReadyMatch();route.innerHTML=m?`<div class="flex items-center gap-2 flex-wrap"><span class="px-2 py-1 rounded bg-cyan-950/50 text-cyan-300 border border-cyan-900/60 font-mono">${m.code}</span><span class="text-zinc-600">→</span><span class="text-zinc-300">Winner advances automatically</span></div><div class="mt-2 text-[11px] text-zinc-500">${m.p1?.name||'TBD'} vs ${m.p2?.name||'TBD'} • ${m.label} • Best of ${m.bestOf}</div>`:'No active route.'}}
+    // switchView enhanced handled in main function
+    // openMatchModal enhanced handled in main function
+    function togglePresentationMode(){document.body.classList.toggle('presentation-mode');const on=document.body.classList.contains('presentation-mode');showToast(on?'Presentation mode enabled.':'Presentation mode disabled.');if(on)switchView('full')}
+    async function toggleFullscreen(){try{if(!document.fullscreenElement)await document.documentElement.requestFullscreen();else await document.exitFullscreen()}catch(e){showToast('Fullscreen is unavailable in this browser context.')}}
+    function updateEnhancedMetrics(){const a=Object.values(state.matches),r=a.filter(isPlayableMatch).length,l=a.filter(m=>m.isLive).length,d=a.filter(m=>m.completed).length,t=a.length,n=getNextReadyMatch(),set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set('hud-live',l);set('hud-completed',d);set('hud-ready',r);set('hud-total',t);set('hud-next',n?`${n.code} • ${n.p1.name} vs ${n.p2.name}`:'No match currently ready')}
+    // renderAllViews enhanced handled in main function
+    document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;const k=e.key.toLowerCase();if(k==='n'){e.preventDefault();openNextReadyMatch()}else if(k==='p'){e.preventDefault();togglePresentationMode()}else if(k==='f'){e.preventDefault();toggleFullscreen()}else if(e.key==='/'){e.preventDefault();switchView('matches');setTimeout(()=>document.getElementById('match-search')?.focus(),40)}else if(e.key==='Escape'){document.getElementById('match-modal')?.classList.add('hidden');document.getElementById('reset-modal')?.classList.add('hidden')}});
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+
+
+// -------------------------------------------------------------------------
+    // 11. SCHEDULE DASHBOARD & REAL-TIME PACING SYSTEM
+    // -------------------------------------------------------------------------
+    function updateScheduleMetrics() {
+      const data = calculateScheduleMetrics();
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      const setHTML = (id, v) => { const el = document.getElementById(id); if (el) el.innerHTML = v; };
+
+      // 1. Sub-header HUD strip
+      set('sched-hud-clock', data.currentTimeStr);
+      setHTML('sched-hud-status', `<span class="px-2 py-0.5 rounded ${data.statusColorClass}">${data.status}</span>`);
+      set('sched-hud-pace', `${data.paceDiff >= 0 ? '+' : ''}${data.paceDiff}m`);
+      set('sched-hud-finish', data.estFinishTimeStr);
+
+      if (data.activeMatch) {
+        set('sched-hud-curr-code', data.activeMatch.code);
+        set('sched-hud-target-time', `(Call: ${data.activeSchedTime}${data.actualStartTime !== '--' ? ' • Start: ' + data.actualStartTime : ''})`);
+        set('sched-hud-curr-names', `${data.activeMatch.p1?.name || 'TBD'} vs ${data.activeMatch.p2?.name || 'TBD'}`);
+      } else {
+        set('sched-hud-curr-code', '--');
+        set('sched-hud-target-time', '');
+        set('sched-hud-curr-names', 'Tournament Concluded');
+      }
+
+      if (data.nextMatch) {
+        const nextSched = SCHEDULE_TARGETS[data.nextMatch.id] || {};
+        set('sched-hud-next-code', data.nextMatch.code);
+        set('sched-hud-next-target', `(${nextSched.time || '--'})`);
+        set('sched-hud-next-names', `${data.nextMatch.p1?.name || 'TBD'} vs ${data.nextMatch.p2?.name || 'TBD'}`);
+      } else {
+        set('sched-hud-next-code', '--');
+        set('sched-hud-next-target', '');
+        set('sched-hud-next-names', 'No matches remaining');
+      }
+
+
+      // 3. Schedule View KPI Cards
+      set('sched-card-clock', data.currentTimeStr);
+      set('sched-card-clock-mode', (state.clockMode === 'live' || (state.clockMode === 'auto' && isVenueHoursNow())) ? '● Live System Time' : '⚡ Tourney Sim Clock');
+      setHTML('sched-card-status-pill', `<span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold ${data.statusColorClass}">${data.status}</span>`);
+      set('sched-card-pace-delta', `${data.paceDiff >= 0 ? '+' : ''}${data.paceDiff}m ${data.paceDiff >= 0 ? 'ahead of schedule' : 'behind target'}`);
+
+      if (data.activeMatch) {
+        set('sched-card-current', `${data.activeMatch.code} (${data.activeMatch.p1?.name?.split(',')[0] || 'TBD'} vs ${data.activeMatch.p2?.name?.split(',')[0] || 'TBD'})`);
+        set('sched-card-current-time', `Target: ${data.activeSchedTime}${data.actualStartTime !== '--' ? ' • Started: ' + data.actualStartTime : ''}`);
+      } else {
+        set('sched-card-current', 'All Matches Complete');
+        set('sched-card-current-time', 'Champion Crowned');
+      }
+
+      if (data.nextMatch) {
+        const nextSched = SCHEDULE_TARGETS[data.nextMatch.id] || {};
+        set('sched-card-next', `${data.nextMatch.code} (${data.nextMatch.p1?.name?.split(',')[0] || 'TBD'} vs ${data.nextMatch.p2?.name?.split(',')[0] || 'TBD'})`);
+        set('sched-card-next-time', `Target: ${nextSched.time || '--'}`);
+      } else {
+        set('sched-card-next', 'None');
+        set('sched-card-next-time', '--');
+      }
+
+      set('sched-card-est-finish', data.estFinishTimeStr);
+      set('sched-card-buffer', data.minutesBufferToCutoff >= 0 ? `+${data.minutesBufferToCutoff}m buffer to 5:00 PM cutoff` : `${Math.abs(data.minutesBufferToCutoff)}m PAST 5:00 PM CUTOFF!`);
+      const bufferEl = document.getElementById('sched-card-buffer');
+      if (bufferEl) {
+        bufferEl.className = `mt-1 text-[10px] font-mono ${data.minutesBufferToCutoff >= 15 ? 'text-emerald-400' : (data.minutesBufferToCutoff >= 0 ? 'text-amber-400 font-bold' : 'text-red-400 font-black animate-pulse')}`;
+      }
+
+      const clockModeBtn = document.getElementById('clock-mode-btn');
+      if (clockModeBtn) {
+        clockModeBtn.textContent = (state.clockMode === 'live' || (state.clockMode === 'auto' && isVenueHoursNow())) ? '● Real Time' : '⚡ Tourney Sim';
+      }
+
+      // 4. Presentation Mode Overlay
+      set('pres-sched-clock', data.currentTimeStr);
+      setHTML('pres-sched-status', `<span class="${data.paceDiff >= 0 ? 'text-emerald-300' : 'text-amber-300'} font-bold">${data.status} (${data.paceDiff >= 0 ? '+' : ''}${data.paceDiff}m)</span>`);
+      set('pres-sched-finish', `Est: ${data.estFinishTimeStr}`);
+    }
+
+    function renderScheduleView() {
+      const tbody = document.getElementById('schedule-table-tbody');
+      if (!tbody) return;
+
+      const scheduleKeys = Object.keys(SCHEDULE_TARGETS);
+      const rowsHTML = scheduleKeys.map((key, index) => {
+        const item = SCHEDULE_TARGETS[key];
+        const match = state.matches[key];
+
+        if (item.isSetup) {
+          return `
+            <tr class="bg-amber-950/20 text-amber-300/90 font-mono text-xs border-y border-amber-800/40">
+              <td class="py-3 px-4 text-center font-bold">${item.order}</td>
+              <td class="py-3 px-4 font-bold">${item.time}</td>
+              <td class="py-3 px-4 font-bold">${item.code}</td>
+              <td class="py-3 px-4">4 mins</td>
+              <td class="py-3 px-4 font-bold" colspan="2">GRAND FINALS SETUP & COMPETITOR INTRODUCTIONS</td>
+              <td class="py-3 px-4 text-center"><span class="px-2 py-0.5 rounded bg-amber-900/60 border border-amber-700/80 text-[10px]">TRANSITION</span></td>
+              <td class="py-3 px-4 text-right"><span class="text-zinc-500 text-[10px]">STAGE READY</span></td>
+            </tr>
+          `;
+        }
+
+        if (!match) return '';
+
+        const isLive = match.isLive;
+        const isCompleted = match.completed;
+        const isReady = !isCompleted && match.p1 && match.p2 && !match.p1.isBye && !match.p2.isBye;
+
+        let statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700">SCHEDULED</span>';
+        let rowHighlight = '';
+
+        if (isCompleted) {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold">DONE</span>';
+          rowHighlight = 'bg-cyan-950/10';
+        } else if (isLive) {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold live-pulse">LIVE NOW</span>';
+          rowHighlight = 'bg-emerald-950/20 border-l-2 border-emerald-500';
+        } else if (isReady) {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-950 text-sky-300 border border-sky-800 font-bold">READY ON DECK</span>';
+          rowHighlight = 'bg-sky-950/10';
+        }
+
+        const p1Name = match.p1 ? `${match.p1.name} (${match.p1.character || 'No Pick'})` : 'TBD';
+        const p2Name = match.p2 ? `${match.p2.name} (${match.p2.character || 'No Pick'})` : 'TBD';
+        const matchupStr = match.p1?.isBye ? `${match.p1.name} (Auto-Advance BYE)` : `${p1Name} <span class="text-zinc-600 font-mono">vs</span> ${p2Name}`;
+
+        const actualStartDisplay = match.actualStartTime 
+          ? `<span class="text-emerald-400 font-mono font-bold">${match.actualStartTime}</span>${match.actualEndTime ? ' - ' + match.actualEndTime : ''}`
+          : `<span class="text-zinc-600 font-mono">Not started</span>`;
+
+        return `
+          <tr class="hover:bg-zinc-800/40 transition-colors ${rowHighlight}">
+            <td class="py-3 px-4 text-center font-mono text-zinc-500 text-xs">${item.order}</td>
+            <td class="py-3 px-4 font-mono font-bold text-amber-300 text-xs">${item.time}</td>
+            <td class="py-3 px-4 font-mono font-bold text-cyan-300 text-xs cursor-pointer hover:underline" onclick="openMatchModal('${match.id}')">
+              ${match.code} <span class="text-zinc-500 font-normal">(${match.label})</span>
+            </td>
+            <td class="py-3 px-4 font-mono text-xs text-zinc-400">BO${match.bestOf} (${item.duration}m)</td>
+            <td class="py-3 px-4 text-xs font-medium text-zinc-200">${matchupStr}</td>
+            <td class="py-3 px-4 text-xs">${actualStartDisplay}</td>
+            <td class="py-3 px-4 text-center">${statusBadge}</td>
+            <td class="py-3 px-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <button onclick="activeControlMatchId='${match.id}';switchView('control');renderControlRoom()" class="command-button px-2.5 py-1 rounded text-[10px] font-semibold" title="Load into Control Console">
+                  Console
+                </button>
+                <button onclick="openMatchModal('${match.id}')" class="command-button primary px-2.5 py-1 rounded text-[10px] font-semibold" title="Open Scoreboard">
+                  Score
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      tbody.innerHTML = rowsHTML;
+    }
+
+    // Auto-tick schedule metrics every second
+    setInterval(() => {
+      try {
+        updateScheduleMetrics();
+      } catch(e) {}
+    }, 1000);
+  </script>
+</body>
+</html>

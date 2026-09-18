@@ -1,0 +1,21 @@
+{
+  "name": "meodl-esports-tekken8-bracket",
+  "version": "1.0.0",
+  "description": "MEODL Esports - Tekken 8 Double Elimination Tournament Bracket & Control Room System",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "serve": "node server.js"
+  },
+  "keywords": [
+    "tekken8",
+    "tournament-bracket",
+    "double-elimination",
+    "esports",
+    "meodl",
+    "uphsd"
+  ],
+  "author": "MEODL Committee",
+  "license": "MIT"
+}
