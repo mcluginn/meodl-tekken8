@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MEODL — Mechanical Engineering One Day League Tournament Hub</title>
+  <title>MEODL Esports • Tekken 8 Double Elimination (MES UPHSD)</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -44,7 +44,6 @@
               'electric-lg': '0 0 35px -4px rgba(0, 240, 255, 0.5)',
               'mishima': '0 0 25px -3px rgba(250, 204, 21, 0.45)',
               'card': '0 10px 25px -5px rgba(0,0,0,0.6), 0 8px 10px -6px rgba(0,0,0,0.6)',
-              'tactical': '0 0 20px -3px rgba(245, 158, 11, 0.45)'
             }
           }
         }
@@ -52,508 +51,379 @@
     }
   </script>
 
-  <!-- External Data and Engine Modules -->
-  <script src="./assets/meodl_data.js"></script>
-  <script src="./assets/meodl_engine.js"></script>
-
   <!-- Complete Standalone Styling & Fallbacks -->
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background-color: #09090b; color: #f4f4f5; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; overflow-x: hidden; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #09090b; }
-    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; border: 2px solid #09090b; }
-    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
-    .bg-grid-pattern { background-size: 36px 36px; background-image: linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px); }
-    .bracket-viewport { overflow: auto !important; scroll-behavior: smooth; }
-    .connector-line { transition: stroke 0.3s ease, stroke-width 0.3s ease; stroke-linecap: round; }
-    .connector-active { stroke: #00f0ff; stroke-width: 2.2; filter: drop-shadow(0 0 5px rgba(0, 240, 255, 0.7)); }
-    .connector-inactive { stroke: #27272a; stroke-width: 1.5; opacity: 0.6; }
-    .live-pulse { animation: livePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-    @keyframes livePulse { 0%, 100% { opacity: 1; filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.6)); } 50% { opacity: .75; filter: drop-shadow(0 0 3px rgba(6, 182, 212, 0.2)); } }
-    .score-button { width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: #27272a; color: #d4d4d8; font-weight: bold; font-size: 13px; transition: all 0.15s; user-select: none; }
-    .score-button:hover { background: #3f3f46; color: #ffffff; }
-    .score-button:active { transform: scale(0.92); }
-    .hero-art-mask { -webkit-mask-image: radial-gradient(circle at 85% 25%, black 25%, transparent 75%); mask-image: radial-gradient(circle at 85% 25%, black 25%, transparent 75%); }
-    .nav-tab { user-select: none; }
-    .nav-tab.active-tab { background-color: #27272a; color: #00f0ff; font-weight: 600; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #09090b;
+      color: #f4f4f5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Custom Sleek Dark Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #09090b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 9999px;
+      border: 2px solid #09090b;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+
+    /* Grid pattern background */
+    .bg-grid-pattern {
+      background-size: 36px 36px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    }
+
+    /* Viewport with smooth scroll */
+    .bracket-viewport {
+      overflow: auto !important;
+      scroll-behavior: smooth;
+    }
+
+    /* SVG Connector Transitions */
+    .connector-line {
+      transition: stroke 0.3s ease, stroke-width 0.3s ease, filter 0.3s ease;
+    }
+    .connector-active {
+      stroke: #38bdf8;
+      stroke-width: 2.2px;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.8));
+    }
+    .connector-inactive {
+      stroke: #27272a;
+      stroke-width: 1.5px;
+    }
+
+    .num-mono {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Subtle image blend mask */
+    .hero-art-mask {
+      -webkit-mask-image: radial-gradient(circle at 85% 25%, black 25%, transparent 75%);
+      mask-image: radial-gradient(circle at 85% 25%, black 25%, transparent 75%);
+    }
   </style>
+
+<style id="enhancement-layer">
+:root{--accent:#22d3ee;--gold:#f5c451;--success:#34d399;--danger:#fb7185}
+html{background:#07090d}
+body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transparent 26%),radial-gradient(circle at 96% 10%,rgba(245,196,81,.06),transparent 23%),linear-gradient(180deg,#07090d 0%,#090b10 42%,#080a0e 100%)}
+.enhanced-glass{background:linear-gradient(180deg,rgba(18,22,29,.9),rgba(10,12,16,.88));border:1px solid rgba(148,163,184,.13);box-shadow:0 14px 40px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.035);backdrop-filter:blur(16px)}
+.hud-strip{border:1px solid rgba(148,163,184,.12);background:linear-gradient(180deg,rgba(10,13,18,.94),rgba(10,12,16,.8));box-shadow:0 10px 35px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.03);backdrop-filter:blur(18px)}
+.hud-metric{min-width:100px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05)}
+.hud-metric .value{font-size:15px;font-weight:800}.hud-metric .label{color:#71717a;font-size:9px;text-transform:uppercase;letter-spacing:.11em;font-family:'JetBrains Mono',monospace}
+.control-hero{position:relative;overflow:hidden;border:1px solid rgba(34,211,238,.16);background:radial-gradient(circle at 82% 18%,rgba(34,211,238,.12),transparent 25%),radial-gradient(circle at 10% 100%,rgba(245,196,81,.06),transparent 30%),linear-gradient(180deg,rgba(17,21,28,.96),rgba(8,11,15,.96));box-shadow:0 18px 60px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.035)}
+.next-match-card{border:1px solid rgba(34,211,238,.18);background:linear-gradient(180deg,rgba(13,20,27,.96),rgba(9,13,18,.92));box-shadow:0 14px 35px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.03)}
+.player-versus-card{min-height:156px;border-radius:18px;border:1px solid rgba(148,163,184,.11);background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.012));box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+.queue-item{transition:transform .16s ease,border-color .16s ease,background .16s ease}.queue-item:hover{transform:translateX(2px);border-color:rgba(34,211,238,.22);background:rgba(34,211,238,.035)}
+.shortcut-key{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 7px;border-radius:6px;border:1px solid rgba(148,163,184,.18);background:rgba(255,255,255,.04);color:#cbd5e1;font:600 10px 'JetBrains Mono',monospace;box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}
+.live-pulse{box-shadow:0 0 0 0 rgba(52,211,153,.55);animation:livePulse 1.8s infinite}@keyframes livePulse{0%{box-shadow:0 0 0 0 rgba(52,211,153,.5)}70%{box-shadow:0 0 0 9px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+.match-node{transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.match-node:hover{transform:translateY(-2px);border-color:rgba(71,85,105,.9)}.match-node.match-live{border-color:rgba(52,211,153,.46)!important;box-shadow:0 0 28px rgba(52,211,153,.08),0 14px 30px rgba(0,0,0,.28)}.match-node.match-ready{border-color:rgba(56,189,248,.23)}.match-node.match-complete{border-color:rgba(34,211,238,.18)}
+.score-button{width:28px;height:28px;border-radius:8px;border:1px solid rgba(148,163,184,.12);background:rgba(255,255,255,.04);color:#cbd5e1;font:700 13px 'JetBrains Mono',monospace;transition:all .12s ease}.score-button:hover{border-color:rgba(34,211,238,.32);color:#67e8f9;background:rgba(34,211,238,.08);transform:translateY(-1px)}.score-button:active{transform:translateY(0) scale(.96)}
+.nav-tab{position:relative}.nav-tab.active-tab::after{content:'';position:absolute;left:18%;right:18%;bottom:-1px;height:2px;border-radius:99px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.9}
+.command-button{border:1px solid rgba(148,163,184,.13);background:rgba(255,255,255,.035);color:#cbd5e1;transition:all .16s ease}.command-button:hover{border-color:rgba(34,211,238,.28);background:rgba(34,211,238,.055);color:#e2e8f0}.command-button.primary{border-color:rgba(34,211,238,.28);background:linear-gradient(180deg,rgba(8,145,178,.32),rgba(8,145,178,.16));color:#a5f3fc}
+.presentation-mode header, .presentation-mode #global-game-nav{transform:translateY(-100%);display:none!important;transition:transform .3s ease}.presentation-mode #view-full{height:100vh!important}.presentation-mode .bracket-viewport{cursor:grab}
+#toast-container{bottom:22px;left:50%;right:auto;transform:translateX(-50%);align-items:center}
+</style>
+
 </head>
-<body class="bg-obsidian text-zinc-100 flex flex-col min-h-screen">
+
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col font-sans selection:bg-cyan-500/20 selection:text-cyan-300">
 
   <!-- ======================================================== -->
-  <!-- MASTER TOP HEADER WITH BACK BUTTON, UNDO, SETTINGS, RULES -->
+  <!-- 0. MULTI-GAME TOURNAMENT HUB SWITCHER                    -->
   <!-- ======================================================== -->
-  <header class="sticky top-0 z-40 bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-800/80 px-4 lg:px-8 py-2.5 transition-all shadow-md">
+  <nav id="global-game-nav" class="bg-black/90 border-b border-zinc-800/80 px-4 lg:px-8 py-1.5 flex items-center justify-between text-xs font-mono relative z-50">
+    <div class="flex items-center gap-2 overflow-x-auto py-0.5">
+      <span class="text-zinc-500 uppercase tracking-widest text-[10px] font-bold hidden sm:inline">Tournaments:</span>
+      <a href="index.html" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 font-bold transition-all shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+        <span>TEKKEN 8</span>
+        <span class="text-[10px] px-1 rounded bg-cyan-900/60 text-cyan-200">16P</span>
+      </a>
+      <a href="codm.html" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-900/90 text-zinc-400 hover:text-amber-300 hover:bg-amber-950/40 border border-zinc-800 hover:border-amber-500/40 font-medium transition-all">
+        <span class="w-2 h-2 rounded-full bg-amber-500/50"></span>
+        <span>COD: MOBILE</span>
+        <span class="text-[10px] px-1 rounded bg-zinc-800 text-zinc-300">4 Teams</span>
+      </a>
+      <a href="ml.html" class="flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-900/90 text-zinc-400 hover:text-sky-300 hover:bg-sky-950/40 border border-zinc-800 hover:border-sky-500/40 font-medium transition-all">
+        <span class="w-2 h-2 rounded-full bg-sky-500/50"></span>
+        <span>MOBILE LEGENDS</span>
+        <span class="text-[10px] px-1 rounded bg-zinc-800 text-zinc-300">4 Teams</span>
+      </a>
+    </div>
+    <div class="flex items-center gap-3 text-zinc-400 text-[11px] hidden md:flex">
+      <span class="flex items-center gap-1"><span class="text-amber-400 font-bold">MES</span> UPHSD DALTA Esports</span>
+    </div>
+  </nav>
+
+  <!-- ======================================================== -->
+  <!-- TOP NAVIGATION / EWGF SYSTEM HEADER                      -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800/80 px-4 lg:px-8 py-2.5 transition-all shadow-md">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
-      <!-- Brand, Society Seal & Back Button -->
+      <!-- Brand, MES Logo & Tekken Emblem -->
       <div class="flex items-center gap-3.5">
-        <!-- Back to Dashboard Button (Visible when inside any sport) -->
-        <button id="btn-back-dashboard" onclick="navigateTo('dashboard')" class="hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-600/60 text-xs font-bold text-cyan-300 transition-all shadow-sm hover:scale-105" title="Back to Master Dashboard">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-          <span class="hidden sm:inline">DASHBOARD</span>
-        </button>
-
         <!-- MES Society Seal -->
-        <div class="relative group cursor-pointer" onclick="navigateTo('dashboard')" title="Mechanical Engineering Society • UPHSD">
-          <div class="w-10 h-10 rounded-full p-0.5 bg-gradient-to-tr from-cyan-500 via-zinc-700 to-amber-400 shadow-electric hover:scale-105 transition-transform">
+        <div class="relative group cursor-pointer" onclick="switchView('full')" title="Mechanical Engineering Society • UPHSD">
+          <div class="w-11 h-11 rounded-full p-0.5 bg-gradient-to-tr from-amber-500 via-zinc-700 to-cyan-400 shadow-mishima hover:scale-105 transition-transform">
             <img src="./assets/mes_logo.png" alt="MES UPHSD Seal" class="w-full h-full object-cover rounded-full bg-white/95 p-0.5">
           </div>
           <span class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-amber-400 border-2 border-zinc-950 flex items-center justify-center text-[7px] font-bold text-zinc-950">⚙</span>
         </div>
 
+        <!-- Electric Emblem -->
+        <div class="hidden sm:flex items-center justify-center w-10 h-10 rounded-lg bg-zinc-900 border border-cyan-500/50 shadow-electric group cursor-pointer" onclick="switchView('full')">
+          <svg class="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+
         <div>
           <div class="flex items-center gap-2">
-            <span class="text-sm font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-amber-300 font-mono cursor-pointer" onclick="navigateTo('dashboard')">
-              MEODL TOURNAMENT HUB
+            <span class="text-sm font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-amber-300 font-mono">
+              MEODL Esports
             </span>
-            <span id="active-event-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/60 font-bold">
-              DASHBOARD
-            </span>
+            <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-0.5 gap-1">
+              <a href="index.html" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-700/60 font-bold shadow-sm">TEKKEN 8</a>
+              <a href="codm.html" class="text-[10px] font-mono px-1.5 py-0.5 rounded text-zinc-400 hover:text-amber-300 hover:bg-zinc-800 font-semibold transition-colors">CODM</a>
+              <a href="ml.html" class="text-[10px] font-mono px-1.5 py-0.5 rounded text-zinc-400 hover:text-sky-300 hover:bg-zinc-800 font-semibold transition-colors">MLBB</a>
+            </div>
           </div>
-          <div class="text-[11px] text-zinc-400 flex items-center gap-1.5 flex-wrap">
-            <span class="text-amber-400 font-semibold font-mono">MES • UPHSD CALAMBA</span>
+          <div class="text-xs text-zinc-400 flex items-center gap-2 flex-wrap">
+            <span class="text-amber-400 font-semibold font-mono text-[11px]">MES • UPHSD DALTA</span>
             <span class="text-zinc-600">•</span>
-            <span id="header-subtitle">Mechanical Engineering One Day League</span>
+            <span>16-Player Double Elimination</span>
+            <span class="text-zinc-600">•</span>
+            <span class="text-zinc-400">15 Players + 1 BYE</span>
           </div>
         </div>
       </div>
 
-      <!-- Quick Actions Toolbar: Undo, Settings, Rules, Export -->
+      <!-- Quick Metrics Counters -->
+      <div class="hidden md:flex items-center gap-4 text-xs font-mono bg-zinc-900/90 border border-zinc-800/80 rounded-lg px-3 py-1.5 shadow-inner">
+        <!-- Room Cutoff Badge -->
+        <div class="flex items-center gap-2 px-2.5 py-0.5 rounded-md bg-red-950/80 border border-red-700/80 text-[11px] font-mono font-bold text-red-300 shadow-sm" title="Hard venue closing time: 5:00 PM">
+          <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+          <span></span>
+        </div>
+        <div class="h-3 w-px bg-zinc-800"></div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-zinc-400">Live:</span>
+          <span id="metric-live" class="text-emerald-400 font-bold">0</span>
+        </div>
+        <div class="h-3 w-px bg-zinc-800"></div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-zinc-400">Completed:</span>
+          <span id="metric-completed" class="text-cyan-400 font-bold">1/30</span>
+        </div>
+        <div class="h-3 w-px bg-zinc-800"></div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-zinc-400">Total Sets:</span>
+          <span id="metric-total" class="text-zinc-200 font-semibold">30</span>
+        </div>
+      </div>
+
+      <!-- Quick Utility Actions -->
       <div class="flex items-center gap-2">
-        <!-- Undo Button with Counter Badge -->
-        <button id="btn-undo" onclick="performUndo()" disabled class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none border border-zinc-800 text-xs font-semibold text-amber-300 transition-all shadow-sm" title="Undo last action">
-          <span class="text-sm font-bold">↶</span>
-          <span>Undo</span>
-          <span id="undo-badge" class="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40">0</span>
+        <!-- Sound FX toggle -->
+        <button id="btn-sound" onclick="toggleSound()" class="p-2 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-cyan-400 transition-colors" title="Toggle Sound FX">
+          <svg id="sound-icon-svg" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
         </button>
 
-        <!-- Sport Bracket Settings Button -->
-        <button id="btn-sport-settings" onclick="openSettingsModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-all shadow-sm" title="Tournament Bracket & Team Settings">
-          <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-          <span class="hidden sm:inline">Settings</span>
+        <!-- Auto-Simulate Next Match -->
+        <button onclick="simulateNextMatch()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-all hover:border-cyan-500/50 shadow-sm" title="Simulate 1 Match Result">
+          <svg class="w-3.5 h-3.5 text-cyan-400" fill="currentColor" viewBox="0 0 24 24">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>Sim Next</span>
         </button>
 
-        <!-- Official Guidelines Modal Button -->
-        <button onclick="openGuidelinesModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-all shadow-sm" title="View Official Event Rules & Guidelines">
-          <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-          <span class="hidden sm:inline">Rules</span>
-        </button>
-
-        <!-- Export Dropdown -->
+        <!-- Export Menu -->
         <div class="relative inline-block text-left">
-          <button onclick="toggleExportMenu()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-all shadow-sm">
-            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <button onclick="toggleExportDropdown()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 hover:text-white transition-all shadow-sm">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
             <span class="hidden sm:inline">Export</span>
-            <svg class="w-3 h-3 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <svg class="w-3 h-3 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
           </button>
-          <div id="export-menu-dropdown" class="hidden absolute right-0 mt-2 w-52 rounded-xl bg-zinc-900 border border-zinc-800 shadow-card py-1.5 z-50 text-xs">
-            <a href="javascript:void(0)" onclick="exportMasterJSON()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
+          <div id="export-dropdown" class="hidden absolute right-0 mt-2 w-48 rounded-xl bg-zinc-900 border border-zinc-800 shadow-card py-1.5 z-50 text-xs">
+            <a href="javascript:void(0)" onclick="exportBracketJSON()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
               <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-              <span>Export Full League Backup</span>
+              <span>Export JSON State</span>
             </a>
             <a href="javascript:void(0)" onclick="triggerJSONImport()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
               <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-              <span>Import League Backup</span>
+              <span>Import JSON State</span>
+            </a>
+            <a href="javascript:void(0)" onclick="copyStandingsClipboard()" class="flex items-center gap-2 px-3 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-cyan-400">
+              <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>Copy Standings Text</span>
             </a>
             <a href="backup.html" class="flex items-center gap-2 px-3 py-2 text-amber-300 hover:bg-zinc-800 border-t border-zinc-800/80 mt-1 font-semibold">
               <span>🛡️</span>
-              <span>Open Standalone Backup</span>
+              <span>Open Backup HTML</span>
             </a>
-            <input type="file" id="master-file-input" class="hidden" accept=".json" onchange="handleMasterJSONUpload(event)">
+            <input type="file" id="json-file-input" class="hidden" accept=".json" onchange="handleJSONUpload(event)">
           </div>
         </div>
 
+        <button id="btn-presentation" onclick="togglePresentationMode()" class="command-button hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium" title="Toggle presentation mode (P)"><span>◉</span><span>Stage</span></button>
+        <button onclick="toggleFullscreen()" class="command-button p-2 rounded-lg" title="Fullscreen"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"></path></svg></button>
+
         <!-- Reset Button -->
-        <button onclick="confirmResetCurrentEvent()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 text-xs font-medium text-red-400 hover:text-red-200 transition-all shadow-sm" title="Reset Current Event or Bracket">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+        <button onclick="confirmResetTournament()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 text-xs font-medium text-red-400 hover:text-red-200 transition-all shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
           <span class="hidden sm:inline">Reset</span>
         </button>
       </div>
 
     </div>
 
-    <!-- Master Category Switcher Pills -->
+    <!-- Segmented Tab Switcher (shadcn pill aesthetic) -->
     <div class="max-w-7xl mx-auto mt-2.5 pt-2 border-t border-zinc-900 flex items-center justify-between overflow-x-auto pb-1 gap-2">
       <div class="flex items-center p-1 rounded-xl bg-zinc-900/90 border border-zinc-800/80 text-xs font-medium space-x-1 shrink-0">
-        <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="nav-tab active-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-cyan-400 bg-zinc-800 shadow-sm font-semibold">
-          <span>🏆 Dashboard & Groupings</span>
+        <button onclick="switchView('full')" id="tab-full" class="nav-tab active-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-cyan-400 bg-zinc-800 shadow-sm font-semibold">
+          <span>Full Bracket</span>
         </button>
-        <button onclick="navigateTo('basketball')" id="nav-basketball" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🏀 Basketball</span>
+        <button onclick="switchView('winners')" id="tab-winners" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+          <span>Winners Bracket</span>
         </button>
-        <button onclick="navigateTo('volleyball')" id="nav-volleyball" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🏐 Volleyball</span>
+        <button onclick="switchView('losers')" id="tab-losers" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span>Losers Bracket</span>
         </button>
-        <button onclick="navigateTo('badmintonSingles')" id="nav-badmintonSingles" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🏸 Badminton (1v1)</span>
+        <button onclick="switchView('finals')" id="tab-finals" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+          <span>Grand Finals</span>
         </button>
-        <button onclick="navigateTo('badmintonDoubles')" id="nav-badmintonDoubles" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🏸 Badminton (2v2)</span>
+        <button onclick="switchView('control')" id="tab-control" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200"><span class="w-2 h-2 rounded-full bg-emerald-400"></span><span>Control Room</span></button>
+        <button onclick="switchView('schedule')" id="tab-schedule" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span>Schedule</span>
         </button>
-        <button onclick="navigateTo('chess')" id="nav-chess" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>♟️ Chess</span>
+        <button onclick="switchView('matches')" id="tab-matches" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span>Match List</span>
         </button>
-        <button onclick="navigateTo('scrabble')" id="nav-scrabble" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🔤 Scrabble</span>
-        </button>
-        <button onclick="navigateTo('generals')" id="nav-generals" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🎖️ Generals</span>
-        </button>
-        <button onclick="navigateTo('swimming')" id="nav-swimming" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🏊 Swimming</span>
-        </button>
-        <button onclick="navigateTo('amazingRace')" id="nav-amazingRace" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🏃 Amazing Race</span>
-        </button>
-        <button onclick="navigateTo('eggHunt')" id="nav-eggHunt" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🥚 Egg Hunt</span>
-        </button>
-        <button onclick="navigateTo('tekken8')" id="nav-tekken8" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🥊 Tekken 8</span>
-        </button>
-        <button onclick="navigateTo('codm')" id="nav-codm" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>🎯 CODM</span>
-        </button>
-        <button onclick="navigateTo('ml')" id="nav-ml" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
-          <span>⚔️ MLBB</span>
+        <button onclick="switchView('standings')" id="tab-standings" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-zinc-400 hover:text-zinc-200">
+          <span>Standings</span>
         </button>
       </div>
+
+      <!-- Quick Canvas Zoom Controls -->
+      <div id="bracket-zoom-controls" class="flex items-center gap-1 bg-zinc-900/90 border border-zinc-800/80 rounded-lg p-1 text-xs text-zinc-400 shrink-0">
+        <button onclick="zoomBracket(-0.1)" class="p-1.5 hover:text-white rounded hover:bg-zinc-800" title="Zoom Out">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+        </button>
+        <span id="zoom-level-text" class="font-mono text-[11px] px-1.5 text-zinc-300 font-semibold">100%</span>
+        <button onclick="zoomBracket(0.1)" class="p-1.5 hover:text-white rounded hover:bg-zinc-800" title="Zoom In">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+        </button>
+        <button onclick="resetZoomBracket()" class="p-1.5 hover:text-white rounded hover:bg-zinc-800 ml-0.5" title="Reset View">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+        </button>
+      </div>
+      <div class="max-w-7xl mx-auto mt-2 flex items-center gap-2 overflow-x-auto pb-1 presentation-hide">
+        <!-- Venue Cutoff Pill -->
+        <div class="hud-strip rounded-xl px-2.5 py-1.5 flex items-center gap-2 shrink-0 border-red-900/80 bg-red-950/50">
+          <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+          <span class="text-[10px] font-mono uppercase tracking-wider text-red-300 font-extrabold"></span>
+        </div>
+
+        <!-- Clock, Status & Pace Strip -->
+        <div class="hud-strip rounded-xl px-3 py-1.5 flex items-center gap-3 shrink-0">
+          <div class="hud-metric">
+            <div class="label">Clock</div>
+            <div id="sched-hud-clock" class="value text-zinc-100 font-bold">12:00 PM</div>
+          </div>
+          <div class="h-4 w-px bg-zinc-800"></div>
+          <div class="hud-metric">
+            <div class="label">Status</div>
+            <div id="sched-hud-status" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">ON SCHEDULE</div>
+          </div>
+          <div class="h-4 w-px bg-zinc-800"></div>
+          <div class="hud-metric">
+            <div class="label">Pace</div>
+            <div id="sched-hud-pace" class="value text-zinc-300 font-bold">+0m</div>
+          </div>
+          <div class="h-4 w-px bg-zinc-800"></div>
+          <div class="hud-metric">
+            <div class="label">Est. Finish</div>
+            <div id="sched-hud-finish" class="value text-cyan-300 font-bold">4:12 PM</div>
+          </div>
+        </div>
+
+        <!-- Current Active Set Strip -->
+        <div class="hud-strip rounded-xl px-3 py-1.5 min-w-[240px] flex-1 flex items-center justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-[9px] font-mono uppercase tracking-[.16em] text-zinc-500">Current</span>
+              <span id="sched-hud-curr-code" class="text-[10px] font-mono text-cyan-400 font-bold">W2</span>
+              <span id="sched-hud-target-time" class="text-[9px] font-mono text-zinc-400">(Call: 12:00 PM)</span>
+            </div>
+            <div id="sched-hud-curr-names" class="text-xs font-semibold text-zinc-200 truncate">Almoro vs Limbo</div>
+          </div>
+          <button onclick="openNextReadyMatch()" class="command-button shrink-0 px-3 py-1.5 rounded-lg text-[10px] font-semibold">Open Next</button>
+        </div>
+
+        <!-- Next On Deck Strip -->
+        <div class="hud-strip rounded-xl px-3 py-1.5 min-w-[190px] shrink-0 hidden lg:flex flex-col justify-center">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[9px] font-mono uppercase tracking-[.16em] text-amber-500 font-bold">Next</span>
+            <span id="sched-hud-next-code" class="text-[10px] font-mono text-amber-400 font-bold">W3</span>
+            <span id="sched-hud-next-target" class="text-[9px] font-mono text-zinc-500">(12:08 PM)</span>
+          </div>
+          <div id="sched-hud-next-names" class="text-xs text-zinc-300 truncate">Quilitis vs Lacorte</div>
+        </div>
+
+        <div class="hud-strip rounded-xl px-3 py-2 flex items-center gap-2 shrink-0">
+          <span class="text-[9px] font-mono uppercase tracking-[.16em] text-zinc-500">Keys</span>
+          <span class="shortcut-key">N</span>
+          <span class="shortcut-key">P</span>
+          <span class="shortcut-key">F</span>
+        </div>
+      </div></div>
     </div>
   </header>
 
+
+
   <!-- ======================================================== -->
-  <!-- MAIN APPLICATION VIEWS CONTAINER                          -->
+  <!-- MAIN CONTENT CONTAINER                                   -->
   <!-- ======================================================== -->
   <main class="flex-1 relative bg-grid-pattern flex flex-col">
-
-    <!-- VIEW 1: MASTER DASHBOARD & GROUPINGS (#view-dashboard) -->
-    <div id="view-dashboard" class="flex-1 p-4 lg:p-8 max-w-7xl mx-auto w-full z-10 space-y-8">
-      
-      <!-- Hero Banner -->
-      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-950 border border-zinc-800/80 p-6 md:p-8 shadow-2xl">
-        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div>
-            <div class="flex items-center gap-2 mb-2">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-800/60 uppercase tracking-wider">OFFICIAL TOURNAMENT HUB</span>
-              <span class="text-zinc-500 text-xs">•</span>
-              <span class="text-amber-400 text-xs font-mono font-bold">13 EVENTS • 175 STUDENTS</span>
-            </div>
-            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400 font-mono tracking-tight">
-              MECHANICAL ENGINEERING ONE DAY LEAGUE
-            </h1>
-            <p class="text-xs sm:text-sm text-zinc-400 mt-2 max-w-2xl leading-relaxed">
-              University of Perpetual Help System DALTA — Mechanical Engineering Society. Live bracket advancement, round-robin matrix, station tracking, and real-time team standings.
-            </p>
-          </div>
-
-          <!-- Quick Stat Counters -->
-          <div class="flex items-center gap-3 shrink-0">
-            <div class="bg-zinc-950/80 border border-zinc-800 rounded-xl px-4 py-3 text-center min-w-[90px]">
-              <div class="text-2xl font-black text-cyan-400 font-mono">4</div>
-              <div class="text-[10px] text-zinc-400 uppercase font-mono mt-0.5">Teams</div>
-            </div>
-            <div class="bg-zinc-950/80 border border-zinc-800 rounded-xl px-4 py-3 text-center min-w-[90px]">
-              <div class="text-2xl font-black text-amber-400 font-mono">13</div>
-              <div class="text-[10px] text-zinc-400 uppercase font-mono mt-0.5">Events</div>
-            </div>
-            <div class="bg-zinc-950/80 border border-zinc-800 rounded-xl px-4 py-3 text-center min-w-[90px]">
-              <div class="text-2xl font-black text-emerald-400 font-mono">175</div>
-              <div class="text-[10px] text-zinc-400 uppercase font-mono mt-0.5">Athletes</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SECTION A: THE 4 OFFICIAL TEAMS -->
-      <div>
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2.5">
-            <span class="w-3 h-3 rounded-full bg-cyan-400 shadow-electric"></span>
-            <h2 class="text-lg font-bold text-white font-mono uppercase tracking-wide">
-              Official League Groupings
-            </h2>
-            <span class="text-xs text-zinc-500 font-mono">(Thermodynamic Cycles)</span>
-          </div>
-          <span class="text-xs text-zinc-400 font-mono">Click a team to view full student roster</span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="team-cards-grid">
-          <!-- Will render 4 team cards: Rankine, Otto, Brayton, Diesel -->
-        </div>
-      </div>
-
-      <!-- SECTION B: OVERALL LEADERBOARD / MEDAL TALLY -->
-      <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 p-5 shadow-card">
-        <div class="flex items-center justify-between mb-4 pb-3 border-b border-zinc-800">
-          <div class="flex items-center gap-2.5">
-            <span class="text-xl">🏆</span>
-            <div>
-              <h3 class="text-sm font-bold text-white font-mono uppercase">Overall League Leaderboard & Medal Tally</h3>
-              <p class="text-[11px] text-zinc-400">Gold (10 pts) • Silver (5 pts) • Bronze (3 pts)</p>
-            </div>
-          </div>
-          <button onclick="recalculateLeaderboard()" class="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-cyan-300 transition-colors">
-            ↻ Refresh Tally
-          </button>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs font-mono">
-            <thead>
-              <tr class="text-zinc-500 border-b border-zinc-800">
-                <th class="py-2.5 px-3">RANK</th>
-                <th class="py-2.5 px-3">TEAM</th>
-                <th class="py-2.5 px-3 text-center">GOLD 🥇</th>
-                <th class="py-2.5 px-3 text-center">SILVER 🥈</th>
-                <th class="py-2.5 px-3 text-center">BRONZE 🥉</th>
-                <th class="py-2.5 px-3 text-center font-bold text-cyan-400">LEAGUE POINTS</th>
-              </tr>
-            </thead>
-            <tbody id="leaderboard-table-body" class="divide-y divide-zinc-800/60">
-              <!-- Rendered dynamically -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- SECTION C: ROSTER SEARCH & EXPLORER -->
-      <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/80 p-5 shadow-card">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4 pb-3 border-b border-zinc-800">
-          <div class="flex items-center gap-2.5">
-            <span class="text-xl">👥</span>
-            <div>
-              <h3 class="text-sm font-bold text-white font-mono uppercase">Student Roster Explorer</h3>
-              <p class="text-[11px] text-zinc-400">All 175 registered students from official MEODL Sheet1</p>
-            </div>
-          </div>
-
-          <!-- Search Input & Filters -->
-          <div class="flex items-center gap-2 w-full md:w-auto">
-            <div class="relative flex-1 md:w-72">
-              <input type="text" id="roster-search-input" oninput="handleRosterSearch()" placeholder="Search student name (e.g. Paduga, Almoro)..." class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-cyan-500">
-              <span class="absolute right-2.5 top-2 text-zinc-500 text-xs">🔍</span>
-            </div>
-            
-            <select id="roster-team-filter" onchange="handleRosterSearch()" class="bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-cyan-500 font-mono">
-              <option value="ALL">All Teams (175)</option>
-              <option value="RANKINE">Team Rankine (55)</option>
-              <option value="OTTO">Team Otto (36)</option>
-              <option value="BRAYTON">Team Brayton (33)</option>
-              <option value="DIESEL">Team Diesel (51)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="max-h-72 overflow-y-auto rounded-xl border border-zinc-800/60 bg-zinc-950/60">
-          <table class="w-full text-left text-xs font-mono">
-            <thead class="sticky top-0 bg-zinc-900 border-b border-zinc-800">
-              <tr class="text-zinc-400">
-                <th class="py-2 px-3">#</th>
-                <th class="py-2 px-3">STUDENT NAME</th>
-                <th class="py-2 px-3">TEAM ASSIGNMENT</th>
-              </tr>
-            </thead>
-            <tbody id="roster-search-results" class="divide-y divide-zinc-900">
-              <!-- Rendered dynamically -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- SECTION D: SPORTS & EVENTS DIRECTORY -->
-      <div>
-        <div class="flex items-center gap-2.5 mb-4">
-          <span class="w-3 h-3 rounded-full bg-amber-400 shadow-tactical"></span>
-          <h2 class="text-lg font-bold text-white font-mono uppercase tracking-wide">
-            Sports & Events Directory
-          </h2>
-          <span class="text-xs text-zinc-500 font-mono">(13 Featured Competitions)</span>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="events-grid-cards">
-          <!-- Rendered dynamically for all 13 events -->
-        </div>
-      </div>
-
-    </div>
-
-    <!-- VIEW 2: UNIVERSAL SPORT BRACKET VIEW (#view-universal-sport) -->
-    <div id="view-universal-sport" class="hidden flex-1 relative w-full h-[calc(100vh-125px)] overflow-hidden z-10 flex flex-col">
-      <!-- Universal Sport Header Strip -->
-      <div class="bg-zinc-950/95 border-b border-zinc-800 px-6 py-2.5 flex items-center justify-between gap-4 z-20 shrink-0">
-        <div class="flex items-center gap-3">
-          <span id="uni-sport-icon" class="text-2xl">🏀</span>
-          <div>
-            <div class="flex items-center gap-2">
-              <h2 id="uni-sport-title" class="text-base font-black text-white font-mono uppercase">BASKETBALL</h2>
-              <span id="uni-sport-bracket-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800/60 font-bold uppercase">
-                Single Elimination
-              </span>
-              <span id="uni-sport-format-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">
-                BO3
-              </span>
-            </div>
-            <p id="uni-sport-subtitle" class="text-[11px] text-zinc-400">Official tournament bracket & scorekeeper</p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button onclick="openSettingsModal()" class="px-3 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono text-zinc-300 hover:text-white flex items-center gap-1.5">
-            <span>⚙ Format & Names</span>
-          </button>
-          <button onclick="openGuidelinesForCurrentSport()" class="px-3 py-1 rounded-lg bg-amber-950/60 hover:bg-amber-900/60 border border-amber-700/60 text-xs font-mono text-amber-300 flex items-center gap-1.5">
-            <span>📖 Rules</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Scrollable Bracket Viewport -->
-      <div class="bracket-viewport w-full flex-1 overflow-auto relative p-6">
-        <div id="uni-bracket-canvas" class="relative origin-top-left transition-transform p-4" style="min-width: 1100px;">
-          <!-- SVG for Single / Double Elim -->
-          <svg id="uni-bracket-svg" class="absolute top-0 left-0 pointer-events-none z-10 w-full h-full" style="min-width: 1100px; min-height: 800px;"></svg>
-          
-          <!-- Universal Bracket Content Layer -->
-          <div id="uni-bracket-content" class="relative z-20">
-            <!-- Dynamic content (Single elim, Double elim, or Round Robin) -->
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- VIEW 3: SWIMMING VIEW (#view-swimming) -->
-    <div id="view-swimming" class="hidden flex-1 p-6 max-w-7xl mx-auto w-full z-10 space-y-6">
-      <div class="flex items-center justify-between bg-zinc-900/90 rounded-2xl border border-zinc-800 p-6">
-        <div class="flex items-center gap-3">
-          <span class="text-3xl">🏊</span>
-          <div>
-            <h2 class="text-xl font-bold text-white font-mono uppercase">Swimming Tournament Manager</h2>
-            <p class="text-xs text-zinc-400">Freestyle, Backstroke & Breaststroke Heats • Single False Start Rule</p>
-          </div>
-        </div>
-
-        <!-- Interactive Stopwatch Timer -->
-        <div class="flex items-center gap-3 bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2">
-          <div id="swim-stopwatch-display" class="font-mono text-xl font-black text-cyan-400 min-w-[90px] text-center">00:00.0</div>
-          <button id="btn-swim-timer-toggle" onclick="toggleSwimTimer()" class="px-3 py-1 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-xs font-mono font-bold text-cyan-300">
-            START
-          </button>
-          <button onclick="resetSwimTimer()" class="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-400">
-            RESET
-          </button>
-        </div>
-      </div>
-
-      <!-- Add Swimmer Entry Form -->
-      <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800 p-5 space-y-4">
-        <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-          <h3 class="text-xs font-bold text-cyan-400 font-mono uppercase">Record Swimmer Heat Time</h3>
-          <span class="text-[10px] text-zinc-500 font-mono">Fastest times rank for Gold, Silver, Bronze</span>
-        </div>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
-          <div>
-            <label class="text-[10px] font-mono text-zinc-400">Heat #</label>
-            <input type="number" id="swim-input-heat" value="1" min="1" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-200">
-          </div>
-          <div>
-            <label class="text-[10px] font-mono text-zinc-400">Lane #</label>
-            <input type="number" id="swim-input-lane" value="1" min="1" max="8" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-200">
-          </div>
-          <div>
-            <label class="text-[10px] font-mono text-zinc-400">Swimmer Name</label>
-            <input type="text" id="swim-input-name" placeholder="Student name..." class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-200">
-          </div>
-          <div>
-            <label class="text-[10px] font-mono text-zinc-400">Team</label>
-            <select id="swim-input-team" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 font-mono">
-              <option value="TEAM RANKINE">Team Rankine</option>
-              <option value="TEAM OTTO">Team Otto</option>
-              <option value="TEAM BRAYTON">Team Brayton</option>
-              <option value="TEAM DIESEL">Team Diesel</option>
-            </select>
-          </div>
-          <div class="flex items-end">
-            <button onclick="addSwimEntry()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs py-2 rounded-lg transition-colors font-mono">
-              + Record Time
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Heats Table -->
-      <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800 p-5 shadow-card">
-        <h3 class="text-xs font-bold text-zinc-300 font-mono uppercase mb-3">Swimming Standings & Recorded Heats</h3>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs font-mono">
-            <thead>
-              <tr class="text-zinc-500 border-b border-zinc-800">
-                <th class="py-2 px-3">RANK</th>
-                <th class="py-2 px-3">HEAT</th>
-                <th class="py-2 px-3">LANE</th>
-                <th class="py-2 px-3">SWIMMER</th>
-                <th class="py-2 px-3">TEAM</th>
-                <th class="py-2 px-3">TIME (SEC)</th>
-                <th class="py-2 px-3 text-right">ACTION</th>
-              </tr>
-            </thead>
-            <tbody id="swim-table-body" class="divide-y divide-zinc-800/60">
-              <!-- Rendered dynamically -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- VIEW 4: AMAZING RACE VIEW (#view-amazing-race) -->
-    <div id="view-amazing-race" class="hidden flex-1 p-6 max-w-7xl mx-auto w-full z-10 space-y-6">
-      <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <span class="text-3xl">🏃</span>
-          <div>
-            <h2 class="text-xl font-bold text-white font-mono uppercase">Amazing Race Station Tracker</h2>
-            <p class="text-xs text-zinc-400">4 Main Stations + Final Escape Room in ME LAB (Rm120) • 10 Members per Team</p>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button onclick="openGuidelinesModal()" class="px-3 py-1.5 rounded-lg bg-orange-950/80 hover:bg-orange-900 border border-orange-700/60 text-xs font-mono font-bold text-orange-300">
-            📖 View Rotation Sequence
-          </button>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="amazing-race-cards">
-        <!-- Rendered dynamically for Rankine, Otto, Brayton, Diesel -->
-      </div>
-    </div>
-
-    <!-- VIEW 5: EGG HUNT VIEW (#view-egg-hunt) -->
-    <div id="view-egg-hunt" class="hidden flex-1 p-6 max-w-7xl mx-auto w-full z-10 space-y-6">
-      <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800 p-6 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-3xl">🥚</span>
-          <div>
-            <h2 class="text-xl font-bold text-white font-mono uppercase">Egg Hunt Point Calculator</h2>
-            <p class="text-xs text-zinc-400">Bronze Egg = 10 pts • Silver Egg = 25 pts • Gold Egg = 50 pts</p>
-          </div>
-        </div>
-        <button onclick="resetEggHunt()" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300">
-          Reset Counts
-        </button>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="egg-hunt-cards">
-        <!-- Rendered dynamically for Rankine, Otto, Brayton, Diesel -->
-      </div>
-    </div>
-
-    <!-- VIEW 6: TEKKEN 8 CHAMPIONSHIP VIEW (#view-tekken8) -->
-    <div id="view-tekken8" class="hidden flex-1 flex flex-col relative w-full">
-      <!-- Embedded preserved Tekken 8 bracket views -->
-      
     
     <!-- Ambient Tekken 8 Hero Art Watermark (Fixed Background Glow) -->
     <div class="pointer-events-none fixed right-0 top-16 w-full max-w-4xl h-full opacity-10 overflow-hidden mix-blend-screen select-none z-0 hero-art-mask">
@@ -977,150 +847,12 @@
     <span id="pres-sched-finish">Est: 4:12 PM</span>
   </div>
 
-  
-    </div>
-
   </main>
 
   <!-- ======================================================== -->
-  <!-- MODALS: SETTINGS, GUIDELINES, ROSTER, MATCH EDITOR        -->
+  <!-- MODALS & DRAWERS                                         -->
   <!-- ======================================================== -->
 
-  <!-- 1. TOURNAMENT SETTINGS MODAL -->
-  <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5">
-      <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
-        <div class="flex items-center gap-2">
-          <span class="text-lg">⚙</span>
-          <h3 class="text-sm font-bold text-white font-mono uppercase" id="settings-modal-title">Tournament Settings</h3>
-        </div>
-        <button onclick="closeSettingsModal()" class="text-zinc-500 hover:text-white text-lg">✕</button>
-      </div>
-
-      <div class="space-y-4">
-        <div>
-          <label class="text-xs font-mono text-zinc-300 block mb-1">Bracket Type</label>
-          <select id="settings-bracket-type" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 font-mono focus:border-cyan-500">
-            <option value="single">Single Elimination (SF1, SF2 -> Finals + 3rd Place)</option>
-            <option value="double">Double Elimination (Upper & Lower Brackets + Grand Finals)</option>
-            <option value="roundRobin">Round Robin (All Teams play each other + Standings Table)</option>
-          </select>
-          <p class="text-[10px] text-zinc-500 mt-1">Changing format generates a clean new bracket structure (recorded in Undo history).</p>
-        </div>
-
-        <div>
-          <label class="text-xs font-mono text-zinc-300 block mb-1">Match Win Target / Format</label>
-          <select id="settings-best-of" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 font-mono focus:border-cyan-500">
-            <option value="1">Best of 1 (First to 1 win)</option>
-            <option value="3" selected>Best of 3 (First to 2 wins)</option>
-            <option value="5">Best of 5 (First to 3 wins)</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="text-xs font-mono text-zinc-300 block mb-1.5">Participant / Team Names on Bracket</label>
-          <div class="space-y-2" id="settings-participants-inputs">
-            <div>
-              <span class="text-[10px] font-mono text-zinc-500">Seed 1:</span>
-              <input type="text" id="settings-seed-1" class="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1 text-xs text-zinc-200 font-mono">
-            </div>
-            <div>
-              <span class="text-[10px] font-mono text-zinc-500">Seed 2:</span>
-              <input type="text" id="settings-seed-2" class="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1 text-xs text-zinc-200 font-mono">
-            </div>
-            <div>
-              <span class="text-[10px] font-mono text-zinc-500">Seed 3:</span>
-              <input type="text" id="settings-seed-3" class="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1 text-xs text-zinc-200 font-mono">
-            </div>
-            <div>
-              <span class="text-[10px] font-mono text-zinc-500">Seed 4:</span>
-              <input type="text" id="settings-seed-4" class="w-full bg-zinc-950 border border-zinc-800 rounded px-2.5 py-1 text-xs text-zinc-200 font-mono">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
-        <button onclick="closeSettingsModal()" class="px-4 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300">
-          Cancel
-        </button>
-        <button onclick="saveSportSettings()" class="px-4 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs font-mono">
-          Save Settings
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 2. OFFICIAL GUIDELINES MODAL -->
-  <div id="guidelines-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col p-6 shadow-2xl">
-      <div class="flex items-center justify-between pb-3 border-b border-zinc-800 shrink-0">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">📖</span>
-          <div>
-            <h3 class="text-sm font-bold text-white font-mono uppercase">Official MEODL Rules & Guidelines</h3>
-            <p class="text-[10px] text-zinc-400">Authoritative content from MEODL GUIDELINES.docx</p>
-          </div>
-        </div>
-        <button onclick="closeGuidelinesModal()" class="text-zinc-500 hover:text-white text-lg">✕</button>
-      </div>
-
-      <div class="flex-1 overflow-y-auto py-4 space-y-4 pr-1" id="guidelines-accordion-container">
-        <!-- Rendered dynamically for all sports -->
-      </div>
-
-      <div class="pt-3 border-t border-zinc-800 shrink-0 text-right">
-        <button onclick="closeGuidelinesModal()" class="px-4 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300">
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 3. TEAM ROSTER MODAL -->
-  <div id="roster-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full max-h-[85vh] flex flex-col p-6 shadow-2xl">
-      <div class="flex items-center justify-between pb-3 border-b border-zinc-800 shrink-0">
-        <div class="flex items-center gap-2">
-          <span id="roster-modal-icon" class="text-xl">🔥</span>
-          <div>
-            <h3 id="roster-modal-title" class="text-sm font-bold text-white font-mono uppercase">TEAM RANKINE</h3>
-            <p id="roster-modal-count" class="text-[10px] text-zinc-400 font-mono">55 Members Registered</p>
-          </div>
-        </div>
-        <button onclick="closeRosterModal()" class="text-zinc-500 hover:text-white text-lg">✕</button>
-      </div>
-
-      <div class="flex-1 overflow-y-auto py-3 space-y-1.5 pr-1 font-mono text-xs" id="roster-modal-list">
-        <!-- Rendered dynamically -->
-      </div>
-
-      <div class="pt-3 border-t border-zinc-800 shrink-0 text-right">
-        <button onclick="closeRosterModal()" class="px-4 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300">
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 4. UNIVERSAL MATCH EDITOR MODAL -->
-  <div id="uni-match-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-        <div>
-          <h3 id="uni-modal-match-code" class="text-xs font-bold text-cyan-400 font-mono">MATCH</h3>
-          <p id="uni-modal-match-label" class="text-[11px] text-zinc-400">Match Details & Score</p>
-        </div>
-        <button onclick="closeUniMatchModal()" class="text-zinc-500 hover:text-white text-lg">✕</button>
-      </div>
-
-      <div class="space-y-3" id="uni-modal-content">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Preserved Tekken Modals (Match Edit, JSON, Presentation) -->
   <!-- Match Quick Edit / Score Modal -->
   <div id="match-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative overflow-hidden">
@@ -1194,1203 +926,7 @@
   <!-- ======================================================== -->
   <!-- JAVASCRIPT: BRACKET ENGINE & CONTROLLER                  -->
   <!-- ======================================================== -->
-  
-
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-  <!-- ======================================================== -->
-  <!-- JAVASCRIPT MASTER HUB ENGINE & ROUTER                     -->
-  <!-- ======================================================== -->
   <script>
-    // -------------------------------------------------------------------------
-    // MASTER APPLICATION STATE MODEL
-    // -------------------------------------------------------------------------
-    const HUB_STORAGE_KEY = 'MEODL_TOURNAMENT_HUB_V1';
-
-    let appState = {
-      activeView: 'dashboard',
-      activeSport: null,
-      events: {},
-      history: [],
-      settings: {
-        sound: true,
-        autosave: true
-      }
-    };
-
-    // Initialize events from MEODL_ENGINE
-    function initDefaultEvents() {
-      const events = {};
-      const defs = window.MEODL_ENGINE ? window.MEODL_ENGINE.EVENT_DEFINITIONS : {};
-      
-      for (const [key, def] of Object.entries(defs)) {
-        const p = def.defaultParticipants || ['TEAM RANKINE', 'TEAM OTTO', 'TEAM BRAYTON', 'TEAM DIESEL'];
-        
-        if (def.customModule === 'swimming') {
-          events[key] = {
-            id: key,
-            name: def.name,
-            customModule: 'swimming',
-            entries: []
-          };
-        } else if (def.customModule === 'amazingRace') {
-          events[key] = {
-            id: key,
-            name: def.name,
-            customModule: 'amazingRace',
-            teams: {
-              'RANKINE': { name: 'TEAM RANKINE', stations: [false, false, false, false], escaped: false, totalSeconds: 0, penaltyMins: 0 },
-              'OTTO': { name: 'TEAM OTTO', stations: [false, false, false, false], escaped: false, totalSeconds: 0, penaltyMins: 0 },
-              'BRAYTON': { name: 'TEAM BRAYTON', stations: [false, false, false, false], escaped: false, totalSeconds: 0, penaltyMins: 0 },
-              'DIESEL': { name: 'TEAM DIESEL', stations: [false, false, false, false], escaped: false, totalSeconds: 0, penaltyMins: 0 }
-            }
-          };
-        } else if (def.customModule === 'eggHunt') {
-          events[key] = {
-            id: key,
-            name: def.name,
-            customModule: 'eggHunt',
-            scores: {
-              'TEAM RANKINE': { bronze: 0, silver: 0, gold: 0, total: 0 },
-              'TEAM OTTO': { bronze: 0, silver: 0, gold: 0, total: 0 },
-              'TEAM BRAYTON': { bronze: 0, silver: 0, gold: 0, total: 0 },
-              'TEAM DIESEL': { bronze: 0, silver: 0, gold: 0, total: 0 }
-            }
-          };
-        } else if (def.customModule === 'tekken8') {
-          events[key] = {
-            id: key,
-            name: def.name,
-            customModule: 'tekken8'
-          };
-        } else {
-          // Standard bracket event
-          const bType = def.defaultBracketType || 'single';
-          let bracket;
-          if (bType === 'single') bracket = window.MEODL_ENGINE.initSingleElimination(p, 3);
-          else if (bType === 'double') bracket = window.MEODL_ENGINE.initDoubleElimination(p, 3);
-          else bracket = window.MEODL_ENGINE.initRoundRobin(p, 3);
-
-          events[key] = {
-            id: key,
-            name: def.name,
-            participants: [...p],
-            bracket: bracket
-          };
-        }
-      }
-      return events;
-    }
-
-    // Load State from LocalStorage with legacy migration
-    function loadAppState() {
-      try {
-        const saved = localStorage.getItem(HUB_STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          appState.events = parsed.events || initDefaultEvents();
-          appState.history = parsed.history || [];
-          appState.settings = parsed.settings || { sound: true, autosave: true };
-        } else {
-          appState.events = initDefaultEvents();
-          migrateLegacyTekkenState();
-        }
-      } catch(e) {
-        console.error('Error loading appState:', e);
-        appState.events = initDefaultEvents();
-      }
-    }
-
-    function saveAppState() {
-      try {
-        localStorage.setItem(HUB_STORAGE_KEY, JSON.stringify({
-          events: appState.events,
-          settings: appState.settings
-        }));
-      } catch(e) {
-        console.error('Error saving appState:', e);
-      }
-    }
-
-    // Migrate existing Tekken state if found
-    function migrateLegacyTekkenState() {
-      try {
-        const legacyTekken = localStorage.getItem('ewgf_tekken_bracket_v1');
-        if (legacyTekken) {
-          const parsed = JSON.parse(legacyTekken);
-          if (parsed.matches && Object.keys(parsed.matches).length > 0) {
-            console.log('Successfully migrated existing Tekken 8 state to master hub.');
-          }
-        }
-      } catch(e) {}
-    }
-
-    // -------------------------------------------------------------------------
-    // UNDO ENGINE
-    // -------------------------------------------------------------------------
-    function pushUndoSnapshot() {
-      try {
-        if (!appState.history) appState.history = [];
-        // Deep clone current event state
-        const snapshot = {
-          sport: appState.activeSport,
-          data: JSON.parse(JSON.stringify(appState.events[appState.activeSport] || {}))
-        };
-        appState.history.push(snapshot);
-        if (appState.history.length > 100) appState.history.shift();
-        updateUndoBadge();
-      } catch(e) {
-        console.error('Failed to push undo snapshot', e);
-      }
-    }
-
-    function performUndo() {
-      if (!appState.history || appState.history.length === 0) return;
-      const last = appState.history.pop();
-      if (!last || !last.sport || !last.data) return;
-
-      appState.events[last.sport] = last.data;
-      saveAppState();
-      updateUndoBadge();
-      showToast('Undo successful: Restored previous state.');
-
-      if (appState.activeView === last.sport) {
-        renderCurrentSportView();
-      } else {
-        navigateTo(last.sport);
-      }
-    }
-
-    function updateUndoBadge() {
-      const btn = document.getElementById('btn-undo');
-      const badge = document.getElementById('undo-badge');
-      const count = (appState.history && appState.history.length) || 0;
-      if (badge) badge.textContent = count;
-      if (btn) btn.disabled = (count === 0);
-    }
-
-    // -------------------------------------------------------------------------
-    // ROUTING & VIEW NAVIGATION
-    // -------------------------------------------------------------------------
-    function navigateTo(viewId) {
-      appState.activeView = viewId;
-      window.location.hash = viewId;
-
-      // Update Nav Pills
-      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active-tab', 'text-cyan-400', 'bg-zinc-800', 'shadow-sm', 'font-semibold'));
-      const activeNav = document.getElementById('nav-' + viewId);
-      if (activeNav) {
-        activeNav.classList.add('active-tab', 'text-cyan-400', 'bg-zinc-800', 'shadow-sm', 'font-semibold');
-      }
-
-      // Show / Hide Back to Dashboard button
-      const backBtn = document.getElementById('btn-back-dashboard');
-      if (backBtn) {
-        if (viewId === 'dashboard') backBtn.classList.add('hidden');
-        else backBtn.classList.remove('hidden');
-      }
-
-      // Hide all views
-      ['view-dashboard', 'view-universal-sport', 'view-swimming', 'view-amazing-race', 'view-egg-hunt', 'view-tekken8'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-      });
-
-      const badge = document.getElementById('active-event-badge');
-      const defs = window.MEODL_ENGINE ? window.MEODL_ENGINE.EVENT_DEFINITIONS : {};
-
-      if (viewId === 'dashboard') {
-        appState.activeSport = null;
-        document.getElementById('view-dashboard').classList.remove('hidden');
-        if (badge) badge.textContent = 'DASHBOARD';
-        renderDashboard();
-      } else if (viewId === 'tekken8') {
-        appState.activeSport = 'tekken8';
-        document.getElementById('view-tekken8').classList.remove('hidden');
-        if (badge) badge.textContent = 'TEKKEN 8';
-        if (typeof renderAll === 'function') renderAll();
-      } else if (viewId === 'swimming') {
-        appState.activeSport = 'swimming';
-        document.getElementById('view-swimming').classList.remove('hidden');
-        if (badge) badge.textContent = 'SWIMMING';
-        renderSwimmingView();
-      } else if (viewId === 'amazingRace') {
-        appState.activeSport = 'amazingRace';
-        document.getElementById('view-amazing-race').classList.remove('hidden');
-        if (badge) badge.textContent = 'AMAZING RACE';
-        renderAmazingRaceView();
-      } else if (viewId === 'eggHunt') {
-        appState.activeSport = 'eggHunt';
-        document.getElementById('view-egg-hunt').classList.remove('hidden');
-        if (badge) badge.textContent = 'EGG HUNT';
-        renderEggHuntView();
-      } else {
-        // Universal Sport Bracket view
-        appState.activeSport = viewId;
-        document.getElementById('view-universal-sport').classList.remove('hidden');
-        const def = defs[viewId];
-        if (badge && def) badge.textContent = def.name.toUpperCase();
-        renderCurrentSportView();
-      }
-    }
-
-    // -------------------------------------------------------------------------
-    // DASHBOARD RENDERING
-    // -------------------------------------------------------------------------
-    function renderDashboard() {
-      renderTeamCards();
-      recalculateLeaderboard();
-      renderEventsGrid();
-      handleRosterSearch();
-    }
-
-    function renderTeamCards() {
-      const grid = document.getElementById('team-cards-grid');
-      if (!grid) return;
-      const data = window.MEODL_DATA;
-      if (!data) return;
-
-      const leaderboard = window.MEODL_ENGINE.calculateOverallLeaderboard(appState.events);
-      const pointsMap = {};
-      leaderboard.forEach(l => { pointsMap[l.id] = l; });
-
-      grid.innerHTML = data.teams.map(t => {
-        const stats = pointsMap[t.id] || { points: 0, gold: 0, silver: 0, bronze: 0 };
-        return `
-          <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800/90 p-5 hover:border-zinc-700 transition-all shadow-card cursor-pointer group" onclick="openRosterModal('${t.id}')">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-2">
-                <span class="text-xl">${t.icon}</span>
-                <h3 class="font-mono font-bold text-sm text-white group-hover:text-cyan-400 transition-colors">${t.name}</h3>
-              </div>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded ${t.badgeBg} ${t.badgeText} ${t.badgeBorder} border font-bold">
-                ${t.count} Ath.
-              </span>
-            </div>
-            
-            <div class="flex items-baseline justify-between py-2 border-t border-zinc-800/80">
-              <div class="text-[10px] font-mono text-zinc-400">Total Points</div>
-              <div class="text-lg font-black font-mono" style="color: ${t.hex}">${stats.points} pts</div>
-            </div>
-
-            <div class="flex items-center justify-between text-xs font-mono pt-1 text-zinc-300">
-              <span>🥇 ${stats.gold}</span>
-              <span>🥈 ${stats.silver}</span>
-              <span>🥉 ${stats.bronze}</span>
-            </div>
-
-            <button onclick="openRosterModal('${t.id}'); event.stopPropagation();" class="mt-3 w-full py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-[11px] font-mono text-zinc-300 transition-colors flex items-center justify-center gap-1">
-              <span>👥 View Full Roster</span>
-            </button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function recalculateLeaderboard() {
-      const tbody = document.getElementById('leaderboard-table-body');
-      if (!tbody) return;
-
-      const board = window.MEODL_ENGINE.calculateOverallLeaderboard(appState.events);
-      tbody.innerHTML = board.map((team, idx) => {
-        const medalRank = idx === 0 ? '🥇 1st' : idx === 1 ? '🥈 2nd' : idx === 2 ? '🥉 3rd' : '4th';
-        return `
-          <tr class="hover:bg-zinc-900/50 transition-colors">
-            <td class="py-3 px-3 font-bold text-zinc-300">${medalRank}</td>
-            <td class="py-3 px-3 flex items-center gap-2 font-bold" style="color: ${team.color}">
-              <span>${team.icon}</span>
-              <span>${team.name}</span>
-            </td>
-            <td class="py-3 px-3 text-center text-amber-300 font-bold">${team.gold}</td>
-            <td class="py-3 px-3 text-center text-zinc-300 font-bold">${team.silver}</td>
-            <td class="py-3 px-3 text-center text-amber-600 font-bold">${team.bronze}</td>
-            <td class="py-3 px-3 text-center font-black text-cyan-400 text-sm">${team.points}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function renderEventsGrid() {
-      const container = document.getElementById('events-grid-cards');
-      if (!container) return;
-      const defs = window.MEODL_ENGINE.EVENT_DEFINITIONS;
-
-      container.innerHTML = Object.values(defs).map(def => {
-        const evState = appState.events[def.id];
-        let status = 'Not Started';
-        let statusClass = 'bg-zinc-800 text-zinc-400 border-zinc-700';
-
-        if (evState) {
-          if (evState.bracket) {
-            const matches = Object.values(evState.bracket.matches || {});
-            const done = matches.filter(m => m.completed).length;
-            const live = matches.filter(m => m.isLive && !m.completed).length;
-            if (live > 0) { status = 'LIVE'; statusClass = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 live-pulse font-bold'; }
-            else if (done === matches.length && matches.length > 0) { status = 'FINAL'; statusClass = 'bg-amber-950 text-amber-400 border-amber-800/60 font-bold'; }
-            else if (done > 0) { status = 'IN PROGRESS'; statusClass = 'bg-zinc-800 text-zinc-300 border-zinc-700'; }
-          }
-        }
-
-        return `
-          <div class="bg-zinc-900/90 rounded-xl border border-zinc-800/80 p-4 hover:border-zinc-700 transition-all flex flex-col justify-between">
-            <div>
-              <div class="flex items-center justify-between gap-2 mb-2">
-                <span class="text-xl">${def.icon}</span>
-                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase ${statusClass}">${status}</span>
-              </div>
-              <h3 class="font-mono font-bold text-xs text-white truncate">${def.name}</h3>
-              <p class="text-[10px] text-zinc-400 font-mono mt-0.5">${def.category}</p>
-            </div>
-
-            <div class="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between gap-2">
-              <button onclick="navigateTo('${def.id}')" class="flex-1 py-1.5 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-700/60 text-[11px] font-mono font-bold text-cyan-300 transition-colors">
-                OPEN EVENT
-              </button>
-              <button onclick="openGuidelinesModalFor('${def.rulesKey}')" class="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-amber-400" title="Rules">
-                📖
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // Roster Search Handler
-    function handleRosterSearch() {
-      const input = document.getElementById('roster-search-input');
-      const select = document.getElementById('roster-team-filter');
-      const resultsBody = document.getElementById('roster-search-results');
-      if (!input || !resultsBody) return;
-
-      const q = (input.value || '').trim().toLowerCase();
-      const teamFilter = select ? select.value : 'ALL';
-      const rosters = window.MEODL_DATA ? window.MEODL_DATA.rosters : {};
-
-      const allList = [];
-      Object.entries(rosters).forEach(([teamKey, members]) => {
-        if (teamFilter === 'ALL' || teamFilter === teamKey) {
-          members.forEach(name => {
-            allList.push({ name: name, team: 'TEAM ' + teamKey });
-          });
-        }
-      });
-
-      const filtered = allList.filter(item => {
-        if (!q) return true;
-        return item.name.toLowerCase().includes(q) || item.team.toLowerCase().includes(q);
-      });
-
-      resultsBody.innerHTML = filtered.slice(0, 100).map((item, idx) => `
-        <tr class="hover:bg-zinc-900">
-          <td class="py-1.5 px-3 text-zinc-500">${idx + 1}</td>
-          <td class="py-1.5 px-3 font-semibold text-zinc-200">${item.name}</td>
-          <td class="py-1.5 px-3">
-            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
-              item.team.includes('RANKINE') ? 'bg-red-950 text-red-400 border border-red-800/50' :
-              item.team.includes('OTTO') ? 'bg-amber-950 text-amber-400 border border-amber-800/50' :
-              item.team.includes('BRAYTON') ? 'bg-cyan-950 text-cyan-400 border border-cyan-800/50' :
-              'bg-emerald-950 text-emerald-400 border border-emerald-800/50'
-            }">${item.team}</span>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    // -------------------------------------------------------------------------
-    // UNIVERSAL SPORT BRACKET VIEW RENDERING
-    // -------------------------------------------------------------------------
-    function renderCurrentSportView() {
-      const sportId = appState.activeSport;
-      const def = window.MEODL_ENGINE.EVENT_DEFINITIONS[sportId];
-      const ev = appState.events[sportId];
-      if (!def || !ev) return;
-
-      document.getElementById('uni-sport-icon').textContent = def.icon;
-      document.getElementById('uni-sport-title').textContent = def.name;
-      document.getElementById('uni-sport-subtitle').textContent = def.category + ' • ' + (ev.bracket ? ev.bracket.bestOf + ' Games Target' : '');
-
-      const bracketBadge = document.getElementById('uni-sport-bracket-badge');
-      if (bracketBadge && ev.bracket) {
-        bracketBadge.textContent = ev.bracket.type === 'single' ? 'Single Elimination' : ev.bracket.type === 'double' ? 'Double Elimination' : 'Round Robin';
-      }
-
-      const formatBadge = document.getElementById('uni-sport-format-badge');
-      if (formatBadge && ev.bracket) {
-        formatBadge.textContent = 'BO' + ev.bracket.bestOf;
-      }
-
-      const content = document.getElementById('uni-bracket-content');
-      if (!content) return;
-
-      if (!ev.bracket) {
-        content.innerHTML = '<div class="p-8 text-center text-zinc-500 font-mono">No active bracket. Use Settings to initialize.</div>';
-        return;
-      }
-
-      if (ev.bracket.type === 'single') {
-        renderUniSingleElimination(ev.bracket, sportId);
-      } else if (ev.bracket.type === 'double') {
-        renderUniDoubleElimination(ev.bracket, sportId);
-      } else if (ev.bracket.type === 'roundRobin') {
-        renderUniRoundRobin(ev.bracket, sportId);
-      }
-    }
-
-    function createUniCardHTML(match, sportId) {
-      if (!match) return '';
-      const isCompleted = match.completed;
-      const isLive = match.isLive;
-      const hasBoth = match.p1 && match.p2;
-
-      let statusBadge = 'bg-zinc-800 text-zinc-400 border-zinc-700';
-      let statusText = 'Ready';
-      if (isCompleted) { statusBadge = 'bg-amber-950 text-amber-300 border-amber-800'; statusText = 'Final'; }
-      else if (isLive) { statusBadge = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 live-pulse font-bold'; statusText = 'Live'; }
-      else if (!hasBoth) { statusBadge = 'bg-zinc-900 text-zinc-600 border-zinc-800'; statusText = 'Waiting'; }
-
-      const renderPlayer = (p, score, isWin, slot) => {
-        const name = p ? p.name : '<span class="text-zinc-600 italic">Waiting...</span>';
-        const seed = p ? '#' + p.seed : '-';
-        return `
-          <div class="flex items-center justify-between p-2 rounded-lg transition-all ${isWin ? 'bg-cyan-950/40 border border-cyan-500/50 text-cyan-300 font-bold' : 'bg-zinc-900/60 text-zinc-200'}">
-            <div class="flex items-center gap-2 truncate pr-2">
-              <span class="text-[10px] font-mono px-1 rounded bg-zinc-800 text-zinc-400 font-semibold">${seed}</span>
-              <span class="truncate text-xs ${isWin ? 'text-cyan-300 font-bold' : ''}">${name}</span>
-            </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-              ${hasBoth && !isCompleted ? `
-                <button onclick="adjustUniScore('${sportId}', '${match.id}', ${slot}, -1); event.stopPropagation();" class="score-button">-</button>
-                <button onclick="adjustUniScore('${sportId}', '${match.id}', ${slot}, 1); event.stopPropagation();" class="score-button">+</button>
-              ` : ''}
-              <span class="font-mono text-sm font-bold min-w-[20px] text-center ${isWin ? 'text-cyan-400' : 'text-zinc-400'}">${score}</span>
-              ${isWin ? '<span class="text-cyan-400 text-xs">✓</span>' : ''}
-            </div>
-          </div>
-        `;
-      };
-
-      return `
-        <div id="card-${sportId}-${match.id}" class="match-node relative bg-zinc-900/90 backdrop-blur-md rounded-xl border border-zinc-800 p-2.5 shadow-card w-72">
-          <div class="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-zinc-800/80">
-            <div class="flex items-center gap-1.5 cursor-pointer" onclick="openUniMatchModal('${sportId}', '${match.id}')">
-              <span class="font-mono font-bold text-[11px] text-cyan-400 hover:underline">${match.code}</span>
-              <span class="text-[10px] font-mono px-1.5 rounded bg-zinc-800 text-zinc-400">${match.label}</span>
-            </div>
-            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase ${statusBadge}">${statusText}</span>
-          </div>
-          <div class="space-y-1.5">
-            ${renderPlayer(match.p1, match.score1, isCompleted && match.winner === 1, 1)}
-            ${renderPlayer(match.p2, match.score2, isCompleted && match.winner === 2, 2)}
-          </div>
-        </div>
-      `;
-    }
-
-    function renderUniSingleElimination(bracket, sportId) {
-      const content = document.getElementById('uni-bracket-content');
-      content.innerHTML = `
-        <div class="flex gap-16 items-start pt-6">
-          <div class="flex flex-col gap-8 w-72">
-            <div class="pb-2 border-b border-zinc-800 text-xs font-mono font-bold text-cyan-300 uppercase">SEMIFINALS (ROUND 1)</div>
-            <div class="flex flex-col gap-6">
-              ${createUniCardHTML(bracket.matches.SF1, sportId)}
-              ${createUniCardHTML(bracket.matches.SF2, sportId)}
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-8 w-72">
-            <div class="pb-2 border-b border-zinc-800 text-xs font-mono font-bold text-amber-300 uppercase">CHAMPIONSHIP & 3RD PLACE</div>
-            <div class="flex flex-col gap-6">
-              <div>
-                <div class="text-[10px] font-mono font-bold text-yellow-400 mb-1">🥇 GOLD MEDAL FINAL</div>
-                ${createUniCardHTML(bracket.matches.FINAL, sportId)}
-              </div>
-              <div class="pt-4 border-t border-zinc-900">
-                <div class="text-[10px] font-mono font-bold text-amber-600 mb-1">🥉 BRONZE MEDAL MATCH</div>
-                ${createUniCardHTML(bracket.matches.BRONZE, sportId)}
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      setTimeout(() => drawUniConnectors(sportId, [
-        { from: 'SF1', to: 'FINAL', slot: 1 },
-        { from: 'SF2', to: 'FINAL', slot: 2 },
-        { from: 'SF1', to: 'BRONZE', slot: 1 },
-        { from: 'SF2', to: 'BRONZE', slot: 2 }
-      ]), 50);
-    }
-
-    function renderUniDoubleElimination(bracket, sportId) {
-      const content = document.getElementById('uni-bracket-content');
-      content.innerHTML = `
-        <div class="flex gap-14 items-start pt-6">
-          <!-- Col 1: Round 1 -->
-          <div class="flex flex-col gap-10 w-72">
-            <div>
-              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-cyan-300 uppercase">UPPER SEMIS</div>
-              <div class="flex flex-col gap-5">
-                ${createUniCardHTML(bracket.matches.W1, sportId)}
-                ${createUniCardHTML(bracket.matches.W2, sportId)}
-              </div>
-            </div>
-            <div class="pt-4 border-t border-zinc-900">
-              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-red-300 uppercase">LOWER SEMIS (LOSER = 4TH)</div>
-              ${createUniCardHTML(bracket.matches.L1, sportId)}
-            </div>
-          </div>
-
-          <!-- Col 2: Round 2 -->
-          <div class="flex flex-col gap-10 w-72">
-            <div>
-              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-cyan-300 uppercase">UPPER FINALS (TO GF)</div>
-              ${createUniCardHTML(bracket.matches.W3, sportId)}
-            </div>
-            <div class="pt-4 border-t border-zinc-900">
-              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-red-300 uppercase">LOWER FINALS (LOSER = 3RD)</div>
-              ${createUniCardHTML(bracket.matches.L2, sportId)}
-            </div>
-          </div>
-
-          <!-- Col 3: Championship -->
-          <div class="flex flex-col gap-6 w-80">
-            <div>
-              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-yellow-300 uppercase">GRAND FINALS CHAMPIONSHIP</div>
-              <div class="flex flex-col gap-6">
-                ${createUniCardHTML(bracket.matches.GF1, sportId)}
-                ${(bracket.grandFinalsResetNeeded || (bracket.matches.GF2 && bracket.matches.GF2.p1)) ? `
-                  <div>
-                    <div class="text-[10px] font-mono font-bold text-yellow-400 mb-1">⚡ RESET MATCH</div>
-                    ${createUniCardHTML(bracket.matches.GF2, sportId)}
-                  </div>
-                ` : ''}
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      setTimeout(() => drawUniConnectors(sportId, [
-        { from: 'W1', to: 'W3', slot: 1 },
-        { from: 'W2', to: 'W3', slot: 2 },
-        { from: 'W3', to: 'GF1', slot: 1 },
-        { from: 'L1', to: 'L2', slot: 2 },
-        { from: 'L2', to: 'GF1', slot: 2 }
-      ]), 50);
-    }
-
-    function renderUniRoundRobin(bracket, sportId) {
-      const content = document.getElementById('uni-bracket-content');
-      const ev = appState.events[sportId];
-      const standings = window.MEODL_ENGINE.calculateRoundRobinStandings(bracket, ev.participants);
-
-      content.innerHTML = `
-        <div class="space-y-8 max-w-5xl">
-          <!-- Standings Table -->
-          <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800 p-5 shadow-card">
-            <h3 class="text-xs font-bold text-cyan-400 font-mono uppercase mb-3">Round Robin League Table</h3>
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs font-mono">
-                <thead>
-                  <tr class="text-zinc-500 border-b border-zinc-800">
-                    <th class="py-2 px-3">RANK</th>
-                    <th class="py-2 px-3">PARTICIPANT / TEAM</th>
-                    <th class="py-2 px-3 text-center">PLAYED</th>
-                    <th class="py-2 px-3 text-center">WON</th>
-                    <th class="py-2 px-3 text-center">LOST</th>
-                    <th class="py-2 px-3 text-center">DRAW</th>
-                    <th class="py-2 px-3 text-center">PF</th>
-                    <th class="py-2 px-3 text-center">PA</th>
-                    <th class="py-2 px-3 text-center">DIFF</th>
-                    <th class="py-2 px-3 text-center font-bold text-cyan-400">PTS</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-zinc-800/60">
-                  ${standings.map((s, idx) => `
-                    <tr class="hover:bg-zinc-900">
-                      <td class="py-2.5 px-3 font-bold text-zinc-400">#${idx + 1}</td>
-                      <td class="py-2.5 px-3 font-bold text-zinc-200">${s.name}</td>
-                      <td class="py-2.5 px-3 text-center">${s.played}</td>
-                      <td class="py-2.5 px-3 text-center text-emerald-400">${s.won}</td>
-                      <td class="py-2.5 px-3 text-center text-red-400">${s.lost}</td>
-                      <td class="py-2.5 px-3 text-center text-zinc-400">${s.draw}</td>
-                      <td class="py-2.5 px-3 text-center">${s.pointsFor}</td>
-                      <td class="py-2.5 px-3 text-center">${s.pointsAgainst}</td>
-                      <td class="py-2.5 px-3 text-center font-bold ${s.pointDiff >= 0 ? 'text-emerald-400' : 'text-red-400'}">${s.pointDiff >= 0 ? '+' : ''}${s.pointDiff}</td>
-                      <td class="py-2.5 px-3 text-center font-black text-cyan-400 text-sm">${s.pts}</td>
-                    </tr>
-                  `).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Matches Matrix -->
-          <div>
-            <h3 class="text-xs font-bold text-white font-mono uppercase mb-3">Round Robin Match Matrix (6 Games)</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              ${Object.values(bracket.matches || {}).map(m => createUniCardHTML(m, sportId)).join('')}
-            </div>
-          </div>
-        </div>
-      `;
-
-      const svg = document.getElementById('uni-bracket-svg');
-      if (svg) svg.innerHTML = '';
-    }
-
-    function drawUniConnectors(sportId, links) {
-      const svg = document.getElementById('uni-bracket-svg');
-      if (!svg) return;
-      const canvas = document.getElementById('uni-bracket-canvas');
-      if (!canvas) return;
-      const canvasRect = canvas.getBoundingClientRect();
-      const ev = appState.events[sportId];
-      if (!ev || !ev.bracket) return;
-
-      let svgHTML = '';
-      links.forEach(l => {
-        const fromEl = document.getElementById('card-' + sportId + '-' + l.from);
-        const toEl = document.getElementById('card-' + sportId + '-' + l.to);
-        if (!fromEl || !toEl) return;
-
-        const fRect = fromEl.getBoundingClientRect();
-        const tRect = toEl.getBoundingClientRect();
-
-        const x1 = fRect.right - canvasRect.left;
-        const y1 = fRect.top + fRect.height / 2 - canvasRect.top;
-        const x2 = tRect.left - canvasRect.left;
-        const targetOffset = l.slot === 1 ? tRect.height * 0.35 : tRect.height * 0.65;
-        const y2 = tRect.top + targetOffset - canvasRect.top;
-
-        const fromMatch = ev.bracket.matches[l.from];
-        const isActive = fromMatch && fromMatch.completed && fromMatch.winner;
-        const strokeClass = isActive ? 'connector-active' : 'connector-inactive';
-
-        const midX = x1 + (x2 - x1) / 2;
-        const pathData = `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`;
-        svgHTML += `<path d="${pathData}" fill="none" class="connector-line ${strokeClass}" />`;
-      });
-      svg.innerHTML = svgHTML;
-    }
-
-    // Score Adjuster for Universal Matches
-    function adjustUniScore(sportId, matchId, slot, delta) {
-      pushUndoSnapshot();
-      const ev = appState.events[sportId];
-      if (!ev || !ev.bracket || !ev.bracket.matches[matchId]) return;
-      const m = ev.bracket.matches[matchId];
-      if (!m.p1 || !m.p2) return;
-
-      m.isLive = true;
-      if (slot === 1) m.score1 = Math.max(0, m.score1 + delta);
-      else if (slot === 2) m.score2 = Math.max(0, m.score2 + delta);
-
-      const target = ev.bracket.targetWins || 2;
-      if (m.score1 >= target && m.score1 > m.score2) {
-        m.winner = 1;
-        m.completed = true;
-        m.isLive = false;
-      } else if (m.score2 >= target && m.score2 > m.score1) {
-        m.winner = 2;
-        m.completed = true;
-        m.isLive = false;
-      } else {
-        m.winner = null;
-        m.completed = false;
-      }
-
-      if (ev.bracket.type === 'single') window.MEODL_ENGINE.propagateSingleElim(ev.bracket);
-      else if (ev.bracket.type === 'double') window.MEODL_ENGINE.propagateDoubleElim(ev.bracket);
-
-      saveAppState();
-      renderCurrentSportView();
-    }
-
-    // -------------------------------------------------------------------------
-    // SWIMMING EVENT LOGIC
-    // -------------------------------------------------------------------------
-    let swimTimerInterval = null;
-    let swimTimerElapsed = 0;
-    let swimTimerRunning = false;
-
-    function toggleSwimTimer() {
-      const btn = document.getElementById('btn-swim-timer-toggle');
-      if (swimTimerRunning) {
-        clearInterval(swimTimerInterval);
-        swimTimerRunning = false;
-        if (btn) { btn.textContent = 'START'; btn.className = 'px-3 py-1 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-xs font-mono font-bold text-cyan-300'; }
-      } else {
-        const startTime = Date.now() - swimTimerElapsed;
-        swimTimerInterval = setInterval(() => {
-          swimTimerElapsed = Date.now() - startTime;
-          updateSwimDisplay();
-        }, 100);
-        swimTimerRunning = true;
-        if (btn) { btn.textContent = 'STOP'; btn.className = 'px-3 py-1 rounded-lg bg-red-950 hover:bg-red-900 border border-red-700 text-xs font-mono font-bold text-red-300'; }
-      }
-    }
-
-    function resetSwimTimer() {
-      if (swimTimerRunning) toggleSwimTimer();
-      swimTimerElapsed = 0;
-      updateSwimDisplay();
-    }
-
-    function updateSwimDisplay() {
-      const el = document.getElementById('swim-stopwatch-display');
-      if (!el) return;
-      const totalSec = swimTimerElapsed / 1000;
-      const mins = Math.floor(totalSec / 60);
-      const secs = (totalSec % 60).toFixed(1);
-      el.textContent = String(mins).padStart(2, '0') + ':' + (secs < 10 ? '0' : '') + secs;
-    }
-
-    function addSwimEntry() {
-      const name = (document.getElementById('swim-input-name').value || '').trim();
-      const team = document.getElementById('swim-input-team').value;
-      const heat = parseInt(document.getElementById('swim-input-heat').value) || 1;
-      const lane = parseInt(document.getElementById('swim-input-lane').value) || 1;
-      if (!name) { showToast('Please enter swimmer name.'); return; }
-
-      pushUndoSnapshot();
-      const ev = appState.events.swimming;
-      if (!ev.entries) ev.entries = [];
-
-      const sec = parseFloat((swimTimerElapsed / 1000).toFixed(2));
-      ev.entries.push({
-        id: 'swim_' + Date.now(),
-        name: name,
-        team: team,
-        heat: heat,
-        lane: lane,
-        timeSeconds: sec > 0 ? sec : 30.0
-      });
-
-      saveAppState();
-      renderSwimmingView();
-      showToast('Recorded swimming heat entry for ' + name);
-    }
-
-    function renderSwimmingView() {
-      const tbody = document.getElementById('swim-table-body');
-      if (!tbody) return;
-      const ev = appState.events.swimming;
-      const entries = (ev && ev.entries) ? [...ev.entries].sort((a, b) => a.timeSeconds - b.timeSeconds) : [];
-
-      tbody.innerHTML = entries.map((e, idx) => `
-        <tr class="hover:bg-zinc-900">
-          <td class="py-2.5 px-3 font-bold ${idx === 0 ? 'text-yellow-400' : idx === 1 ? 'text-zinc-300' : idx === 2 ? 'text-amber-600' : 'text-zinc-500'}">
-            ${idx === 0 ? '🥇 1st' : idx === 1 ? '🥈 2nd' : idx === 2 ? '🥉 3rd' : '#' + (idx + 1)}
-          </td>
-          <td class="py-2.5 px-3">Heat ${e.heat}</td>
-          <td class="py-2.5 px-3">Lane ${e.lane}</td>
-          <td class="py-2.5 px-3 font-bold text-zinc-200">${e.name}</td>
-          <td class="py-2.5 px-3 font-semibold">${e.team}</td>
-          <td class="py-2.5 px-3 font-mono font-bold text-cyan-400">${e.timeSeconds.toFixed(2)}s</td>
-          <td class="py-2.5 px-3 text-right">
-            <button onclick="removeSwimEntry('${e.id}')" class="text-zinc-500 hover:text-red-400">✕</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function removeSwimEntry(id) {
-      pushUndoSnapshot();
-      const ev = appState.events.swimming;
-      if (!ev || !ev.entries) return;
-      ev.entries = ev.entries.filter(e => e.id !== id);
-      saveAppState();
-      renderSwimmingView();
-    }
-
-    // -------------------------------------------------------------------------
-    // AMAZING RACE EVENT LOGIC
-    // -------------------------------------------------------------------------
-    function renderAmazingRaceView() {
-      const container = document.getElementById('amazing-race-cards');
-      if (!container) return;
-      const ev = appState.events.amazingRace;
-      if (!ev || !ev.teams) return;
-
-      container.innerHTML = Object.entries(ev.teams).map(([teamKey, t]) => {
-        return `
-          <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800 p-5 shadow-card space-y-4">
-            <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
-              <h3 class="font-mono font-bold text-sm text-white">${t.name}</h3>
-              <span class="text-[10px] font-mono px-2 py-0.5 rounded ${t.escaped ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-zinc-800 text-zinc-400'}">
-                ${t.escaped ? 'ESCAPED 🏆' : 'IN RACE'}
-              </span>
-            </div>
-
-            <!-- Stations Checkboxes -->
-            <div class="space-y-2 text-xs font-mono">
-              <div class="text-[10px] text-zinc-400 uppercase">Station Progress:</div>
-              ${[1, 2, 3, 4].map(stNum => `
-                <label class="flex items-center gap-2 p-1.5 rounded bg-zinc-950/60 border border-zinc-800/60 cursor-pointer hover:border-zinc-700">
-                  <input type="checkbox" ${t.stations[stNum - 1] ? 'checked' : ''} onchange="toggleAmazingRaceStation('${teamKey}', ${stNum - 1})" class="rounded border-zinc-700 text-orange-500">
-                  <span>Station ${stNum} Completed</span>
-                </label>
-              `).join('')}
-
-              <label class="flex items-center gap-2 p-2 rounded bg-amber-950/40 border border-amber-800/60 cursor-pointer mt-2 text-amber-300 font-bold">
-                <input type="checkbox" ${t.escaped ? 'checked' : ''} onchange="toggleAmazingRaceEscape('${teamKey}')" class="rounded border-amber-700 text-amber-500">
-                <span>Escape Room Solved (Rm120)</span>
-              </label>
-            </div>
-
-            <!-- Total Elapsed Time and Penalty -->
-            <div class="pt-3 border-t border-zinc-800/80 space-y-2">
-              <div class="flex items-center justify-between text-xs font-mono">
-                <span class="text-zinc-400">Total Time:</span>
-                <div class="flex items-center gap-1">
-                  <input type="number" value="${t.totalSeconds || 0}" onchange="updateAmazingRaceTime('${teamKey}', this.value)" class="w-20 bg-zinc-950 border border-zinc-800 rounded px-2 py-1 text-right text-cyan-400 font-bold">
-                  <span class="text-zinc-500">s</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function toggleAmazingRaceStation(teamKey, idx) {
-      pushUndoSnapshot();
-      const t = appState.events.amazingRace.teams[teamKey];
-      t.stations[idx] = !t.stations[idx];
-      saveAppState();
-      renderAmazingRaceView();
-    }
-
-    function toggleAmazingRaceEscape(teamKey) {
-      pushUndoSnapshot();
-      const t = appState.events.amazingRace.teams[teamKey];
-      t.escaped = !t.escaped;
-      saveAppState();
-      renderAmazingRaceView();
-    }
-
-    function updateAmazingRaceTime(teamKey, val) {
-      pushUndoSnapshot();
-      const t = appState.events.amazingRace.teams[teamKey];
-      t.totalSeconds = Math.max(0, parseInt(val) || 0);
-      saveAppState();
-      renderAmazingRaceView();
-    }
-
-    // -------------------------------------------------------------------------
-    // EGG HUNT EVENT LOGIC
-    // -------------------------------------------------------------------------
-    function renderEggHuntView() {
-      const container = document.getElementById('egg-hunt-cards');
-      if (!container) return;
-      const ev = appState.events.eggHunt;
-      if (!ev || !ev.scores) return;
-
-      container.innerHTML = Object.entries(ev.scores).map(([teamName, s]) => {
-        const total = (s.bronze * 10) + (s.silver * 25) + (s.gold * 50);
-        s.total = total;
-        return `
-          <div class="bg-zinc-900/90 rounded-2xl border border-zinc-800 p-5 shadow-card space-y-4">
-            <div class="pb-2 border-b border-zinc-800">
-              <h3 class="font-mono font-bold text-sm text-white">${teamName}</h3>
-              <div class="text-xl font-black font-mono text-yellow-400 mt-1">${total} pts</div>
-            </div>
-
-            <div class="space-y-2 font-mono text-xs">
-              <div class="flex items-center justify-between bg-zinc-950 p-2 rounded-lg">
-                <span class="text-amber-600 font-bold">🥉 Bronze (10 pts)</span>
-                <div class="flex items-center gap-1.5">
-                  <button onclick="adjustEggScore('${teamName}', 'bronze', -1)" class="score-button">-</button>
-                  <span class="w-6 text-center font-bold text-zinc-200">${s.bronze}</span>
-                  <button onclick="adjustEggScore('${teamName}', 'bronze', 1)" class="score-button">+</button>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between bg-zinc-950 p-2 rounded-lg">
-                <span class="text-zinc-300 font-bold">🥈 Silver (25 pts)</span>
-                <div class="flex items-center gap-1.5">
-                  <button onclick="adjustEggScore('${teamName}', 'silver', -1)" class="score-button">-</button>
-                  <span class="w-6 text-center font-bold text-zinc-200">${s.silver}</span>
-                  <button onclick="adjustEggScore('${teamName}', 'silver', 1)" class="score-button">+</button>
-                </div>
-              </div>
-
-              <div class="flex items-center justify-between bg-zinc-950 p-2 rounded-lg">
-                <span class="text-yellow-400 font-bold">🥇 Gold (50 pts)</span>
-                <div class="flex items-center gap-1.5">
-                  <button onclick="adjustEggScore('${teamName}', 'gold', -1)" class="score-button">-</button>
-                  <span class="w-6 text-center font-bold text-zinc-200">${s.gold}</span>
-                  <button onclick="adjustEggScore('${teamName}', 'gold', 1)" class="score-button">+</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function adjustEggScore(teamName, type, delta) {
-      pushUndoSnapshot();
-      const s = appState.events.eggHunt.scores[teamName];
-      s[type] = Math.max(0, s[type] + delta);
-      s.total = (s.bronze * 10) + (s.silver * 25) + (s.gold * 50);
-      saveAppState();
-      renderEggHuntView();
-    }
-
-    function resetEggHunt() {
-      if (!confirm('Reset all Egg Hunt scores to zero?')) return;
-      pushUndoSnapshot();
-      Object.values(appState.events.eggHunt.scores).forEach(s => {
-        s.bronze = 0; s.silver = 0; s.gold = 0; s.total = 0;
-      });
-      saveAppState();
-      renderEggHuntView();
-      showToast('Egg Hunt scores reset.');
-    }
-
-    // -------------------------------------------------------------------------
-    // SETTINGS MODAL (BRACKET TYPE & NAMES)
-    // -------------------------------------------------------------------------
-    function openSettingsModal() {
-      const modal = document.getElementById('settings-modal');
-      const sportId = appState.activeSport;
-      const ev = appState.events[sportId];
-      if (!modal || !sportId || !ev) return;
-
-      document.getElementById('settings-modal-title').textContent = (ev.name || sportId) + ' Tournament Settings';
-
-      if (ev.bracket) {
-        document.getElementById('settings-bracket-type').value = ev.bracket.type;
-        document.getElementById('settings-best-of').value = ev.bracket.bestOf || 3;
-        
-        const p = ev.participants || ['TEAM RANKINE', 'TEAM OTTO', 'TEAM BRAYTON', 'TEAM DIESEL'];
-        for (let i = 1; i <= 4; i++) {
-          const inp = document.getElementById('settings-seed-' + i);
-          if (inp) inp.value = p[i - 1] || '';
-        }
-      }
-      modal.classList.remove('hidden');
-    }
-
-    function closeSettingsModal() {
-      const modal = document.getElementById('settings-modal');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    function saveSportSettings() {
-      const sportId = appState.activeSport;
-      const ev = appState.events[sportId];
-      if (!ev) return;
-
-      pushUndoSnapshot();
-
-      const newType = document.getElementById('settings-bracket-type').value;
-      const newBestOf = parseInt(document.getElementById('settings-best-of').value) || 3;
-      const newP = [
-        document.getElementById('settings-seed-1').value.trim() || 'TEAM RANKINE',
-        document.getElementById('settings-seed-2').value.trim() || 'TEAM OTTO',
-        document.getElementById('settings-seed-3').value.trim() || 'TEAM BRAYTON',
-        document.getElementById('settings-seed-4').value.trim() || 'TEAM DIESEL'
-      ];
-
-      ev.participants = newP;
-
-      // Re-initialize bracket
-      if (newType === 'single') ev.bracket = window.MEODL_ENGINE.initSingleElimination(newP, newBestOf);
-      else if (newType === 'double') ev.bracket = window.MEODL_ENGINE.initDoubleElimination(newP, newBestOf);
-      else if (newType === 'roundRobin') ev.bracket = window.MEODL_ENGINE.initRoundRobin(newP, newBestOf);
-
-      saveAppState();
-      closeSettingsModal();
-      renderCurrentSportView();
-      showToast('Settings saved & bracket updated.');
-    }
-
-    // -------------------------------------------------------------------------
-    // GUIDELINES & RULES MODAL
-    // -------------------------------------------------------------------------
-    function openGuidelinesModal() {
-      const modal = document.getElementById('guidelines-modal');
-      const container = document.getElementById('guidelines-accordion-container');
-      if (!modal || !container) return;
-
-      const guidelines = window.MEODL_DATA ? window.MEODL_DATA.guidelines : {};
-      container.innerHTML = Object.entries(guidelines).map(([key, g]) => `
-        <div id="rule-section-${key}" class="bg-zinc-950/80 rounded-xl border border-zinc-800 p-4 space-y-2">
-          <h4 class="font-mono font-bold text-xs text-amber-300 uppercase">${g.title}</h4>
-          ${g.eligibility ? `<p class="text-[11px] text-zinc-400"><strong>Eligibility:</strong> ${g.eligibility}</p>` : ''}
-          ${g.roster ? `<p class="text-[11px] text-zinc-400"><strong>Roster:</strong> ${g.roster}</p>` : ''}
-          ${g.settings ? `<p class="text-[11px] text-zinc-400"><strong>Match Settings:</strong> ${g.settings}</p>` : ''}
-          ${g.scoring ? `<p class="text-[11px] text-zinc-400"><strong>Scoring:</strong> ${g.scoring}</p>` : ''}
-          ${g.rules ? `<p class="text-[11px] text-zinc-400"><strong>Rules:</strong> ${g.rules}</p>` : ''}
-          ${g.bracket ? `<p class="text-[11px] text-zinc-400"><strong>Bracket:</strong> ${g.bracket}</p>` : ''}
-        </div>
-      `).join('');
-
-      modal.classList.remove('hidden');
-    }
-
-    function openGuidelinesModalFor(rulesKey) {
-      openGuidelinesModal();
-      setTimeout(() => {
-        const sec = document.getElementById('rule-section-' + rulesKey);
-        if (sec) {
-          sec.scrollIntoView({ behavior: 'smooth' });
-          sec.classList.add('border-amber-500');
-        }
-      }, 100);
-    }
-
-    function openGuidelinesForCurrentSport() {
-      const sportId = appState.activeSport;
-      const def = window.MEODL_ENGINE.EVENT_DEFINITIONS[sportId];
-      if (def && def.rulesKey) openGuidelinesModalFor(def.rulesKey);
-      else openGuidelinesModal();
-    }
-
-    function closeGuidelinesModal() {
-      const modal = document.getElementById('guidelines-modal');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    // -------------------------------------------------------------------------
-    // ROSTER MODAL
-    // -------------------------------------------------------------------------
-    function openRosterModal(teamId) {
-      const modal = document.getElementById('roster-modal');
-      const data = window.MEODL_DATA;
-      if (!modal || !data) return;
-
-      const normalized = String(teamId || '').trim().toLowerCase();
-      const team = (data.teams || []).find(t => t.id.toLowerCase() === normalized || t.name.toLowerCase().includes(normalized));
-      const rosterKey = normalized.toUpperCase();
-      const members = data.rosters[rosterKey] || (team ? data.rosters[team.id.toUpperCase()] : []) || [];
-
-      const badgeBg = team ? team.badgeBg : 'bg-zinc-800';
-      const badgeText = team ? team.badgeText : 'text-zinc-300';
-
-      document.getElementById('roster-modal-icon').textContent = team ? team.icon : '👥';
-      document.getElementById('roster-modal-title').textContent = team ? team.name : 'TEAM ROSTER';
-      document.getElementById('roster-modal-count').textContent = members.length + ' Registered Student Athletes';
-
-      const listEl = document.getElementById('roster-modal-list');
-      listEl.innerHTML = members.map((name, i) => `
-        <div class="flex items-center justify-between p-2 rounded bg-zinc-950 border border-zinc-800/80">
-          <div class="flex items-center gap-2">
-            <span class="text-zinc-500 text-[10px]">#${i + 1}</span>
-            <span class="text-zinc-200">${name}</span>
-          </div>
-          <span class="text-[9px] px-1.5 py-0.2 rounded ${badgeBg} ${badgeText}">Active</span>
-        </div>
-      `).join('');
-
-      modal.classList.remove('hidden');
-    }
-
-    function closeRosterModal() {
-      const modal = document.getElementById('roster-modal');
-      if (modal) modal.classList.add('hidden');
-    }
-
-    // -------------------------------------------------------------------------
-    // TOAST NOTIFICATIONS
-    // -------------------------------------------------------------------------
-    function showToast(msg) {
-      const container = document.getElementById('toast-container');
-      if (!container) return;
-      const toast = document.createElement('div');
-      toast.className = 'bg-zinc-900 border border-cyan-500/50 text-cyan-300 px-4 py-2 rounded-xl text-xs font-mono shadow-2xl transition-all duration-300 pointer-events-auto flex items-center gap-2';
-      toast.innerHTML = '<span>⚡</span><span>' + msg + '</span>';
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
-        setTimeout(() => toast.remove(), 300);
-      }, 2500);
-    }
-
-    // -------------------------------------------------------------------------
-    // EXPORT & RESET ACTIONS
-    // -------------------------------------------------------------------------
-    function toggleExportMenu() {
-      const menu = document.getElementById('export-menu-dropdown');
-      if (menu) menu.classList.toggle('hidden');
-    }
-
-    function exportMasterJSON() {
-      const fullBackup = {
-        timestamp: new Date().toISOString(),
-        system: 'MEODL Tournament Hub Master Backup',
-        appState: appState,
-        tekkenState: (typeof state !== 'undefined') ? state : null
-      };
-      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(fullBackup, null, 2));
-      const a = document.createElement('a');
-      a.setAttribute('href', dataStr);
-      a.setAttribute('download', 'MEODL_Hub_Master_' + Date.now() + '.json');
-      a.click();
-      showToast('Downloaded Complete MEODL Tournament Hub Backup JSON');
-    }
-
-    function triggerJSONImport() {
-      const inp = document.getElementById('master-file-input');
-      if (inp) inp.click();
-    }
-
-    function handleMasterJSONUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const parsed = JSON.parse(e.target.result);
-          if (parsed.appState && parsed.appState.events) {
-            pushUndoSnapshot();
-            appState = parsed.appState;
-            saveAppState();
-            showToast('Master backup restored successfully.');
-            renderDashboard();
-          } else {
-            alert('Invalid backup file schema.');
-          }
-        } catch(err) {
-          alert('Error parsing JSON backup file.');
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function confirmResetCurrentEvent() {
-      const sportId = appState.activeSport;
-      if (!sportId) {
-        if (confirm('Reset all sports and leaderboard across the entire league?')) {
-          pushUndoSnapshot();
-          appState.events = initDefaultEvents();
-          saveAppState();
-          renderDashboard();
-          showToast('League reset to default state.');
-        }
-        return;
-      }
-      if (confirm('Reset ' + sportId.toUpperCase() + ' bracket results?')) {
-        pushUndoSnapshot();
-        const defs = window.MEODL_ENGINE.EVENT_DEFINITIONS;
-        const def = defs[sportId];
-        const p = appState.events[sportId].participants || def.defaultParticipants;
-        appState.events[sportId].bracket = window.MEODL_ENGINE.initSingleElimination(p, 3);
-        saveAppState();
-        renderCurrentSportView();
-        showToast(sportId.toUpperCase() + ' bracket reset.');
-      }
-    }
-
-    // -------------------------------------------------------------------------
-    // PRESERVED TEKKEN 8 LOGIC
-    // -------------------------------------------------------------------------
-    
     // -------------------------------------------------------------------------
     // 1. CONSTANTS & INITIAL DATA (15 PLAYERS + 1 BYE)
     // -------------------------------------------------------------------------
@@ -4195,27 +2731,6 @@
         updateScheduleMetrics();
       } catch(e) {}
     }, 1000);
-  
-
-    // -------------------------------------------------------------------------
-    // MASTER INITIALIZATION ON DOM READY
-    // -------------------------------------------------------------------------
-    window.addEventListener('DOMContentLoaded', () => {
-      loadAppState();
-      updateUndoBadge();
-      
-      // Hash-based routing
-      const hash = (window.location.hash || '#dashboard').replace('#', '');
-      navigateTo(hash || 'dashboard');
-    });
-
-    window.addEventListener('hashchange', () => {
-      const hash = (window.location.hash || '#dashboard').replace('#', '');
-      if (appState.activeView !== hash) {
-        navigateTo(hash);
-      }
-    });
-
   </script>
 </body>
 </html>
