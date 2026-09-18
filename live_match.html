@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEODL — Dedicated Live Match Control & Scoreboard</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Core MEODL Dependencies -->
+  <script src="./assets/meodl_data.js"></script>
+  <script src="./assets/meodl_engine.js"></script>
+  <script src="./assets/meodl_attendance.js"></script>
+  <script src="./assets/meodl_live_match.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: #09090b; color: #f4f4f5; font-family: 'Inter', sans-serif; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+    .font-teko { font-family: 'Teko', sans-serif; line-height: 0.9; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .scoreboard-digit { font-family: 'Teko', sans-serif; letter-spacing: 2px; }
+    .live-pulse { animation: livePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes livePulse { 0%, 100% { opacity: 1; filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.7)); } 50% { opacity: .7; filter: drop-shadow(0 0 4px rgba(6, 182, 212, 0.2)); } }
+    .action-btn { transition: all 0.12s ease; user-select: none; }
+    .action-btn:active { transform: scale(0.95); }
+    .timeout-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; transition: all 0.2s; }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 flex flex-col min-h-screen select-none">
+
+  <!-- ======================================================== -->
+  <!-- PUBLIC SCOREBOARD BROADCAST VIEW (PROJECTOR / TV MODE) -->
+  <!-- ======================================================== -->
+  <div id="public-scoreboard-container" class="hidden min-h-screen bg-black text-white p-6 lg:p-12 flex flex-col justify-between">
+    <!-- Top Broadcast Header -->
+    <div class="flex items-center justify-between border-b-2 border-zinc-800 pb-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-cyan-950 border border-cyan-500 flex items-center justify-center text-2xl" id="pub-sport-icon">🏀</div>
+        <div>
+          <h1 class="font-teko text-4xl lg:text-5xl font-black tracking-wider text-cyan-400 uppercase" id="pub-match-title">MEODL BASKETBALL CHAMPIONSHIP</h1>
+          <p class="font-mono text-sm text-zinc-400 uppercase tracking-widest" id="pub-match-subtitle">SEMIFINAL 1 • UPHSD ME GYMNASIUM</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="bg-zinc-900 border border-zinc-700 px-6 py-2 rounded-2xl flex items-center gap-3">
+          <span class="w-3 h-3 rounded-full bg-red-500 live-pulse"></span>
+          <span class="font-mono font-bold text-sm tracking-widest text-red-400">LIVE BROADCAST</span>
+        </div>
+        <button onclick="togglePublicScoreboard(false)" class="text-zinc-600 hover:text-white text-xs font-mono px-3 py-1 bg-zinc-900 rounded border border-zinc-800">
+          Operator Console ↗
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Giant Score Display -->
+    <div class="grid grid-cols-11 gap-6 items-center my-auto py-8">
+      <!-- Team 1 Card -->
+      <div class="col-span-4 bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border-2 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl relative overflow-hidden" id="pub-team1-card">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="text-4xl" id="pub-team1-icon">🔥</span>
+          <h2 class="font-teko text-4xl lg:text-6xl font-bold tracking-wide" id="pub-team1-name">TEAM RANKINE</h2>
+        </div>
+        
+        <!-- Big Score -->
+        <div class="scoreboard-digit text-[120px] lg:text-[180px] font-black my-[-15px]" id="pub-team1-score">0</div>
+
+        <!-- Timeouts & Fouls Indicator -->
+        <div class="flex items-center justify-between w-full pt-4 border-t border-zinc-800 font-mono text-sm text-zinc-400">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs uppercase font-bold text-zinc-500 mr-1">T.O.</span>
+            <div id="pub-team1-timeouts" class="flex gap-1"></div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs uppercase font-bold text-zinc-500">FOULS</span>
+            <span id="pub-team1-fouls" class="font-bold text-base px-2 py-0.5 rounded bg-zinc-800 text-white">0</span>
+          </div>
+          <div id="pub-team1-possession" class="text-xs font-bold px-2.5 py-1 rounded bg-cyan-950 text-cyan-300 border border-cyan-600 hidden">
+            POSSESSION ◀
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Clock & Period Column -->
+      <div class="col-span-3 flex flex-col items-center justify-center text-center space-y-6">
+        <div class="bg-zinc-900/90 border border-zinc-700 px-6 py-2 rounded-full">
+          <span class="font-mono text-xl lg:text-2xl font-black text-amber-400 uppercase tracking-wider" id="pub-period-badge">QUARTER 1</span>
+        </div>
+
+        <div class="bg-black/90 border-4 border-cyan-500/70 rounded-3xl px-8 py-4 shadow-[0_0_50px_rgba(6,182,212,0.3)]">
+          <div class="font-teko text-[90px] lg:text-[130px] font-black text-cyan-400 tracking-widest" id="pub-clock-display">08:00</div>
+        </div>
+
+        <!-- Quarter / Set Breakdown Table -->
+        <div class="w-full max-w-sm bg-zinc-900/80 border border-zinc-800 rounded-2xl p-3 font-mono text-xs" id="pub-breakdown-container">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Team 2 Card -->
+      <div class="col-span-4 bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 border-2 rounded-3xl p-8 text-center flex flex-col items-center justify-center shadow-2xl relative overflow-hidden" id="pub-team2-card">
+        <div class="flex items-center gap-3 mb-2">
+          <span class="text-4xl" id="pub-team2-icon">⚡</span>
+          <h2 class="font-teko text-4xl lg:text-6xl font-bold tracking-wide" id="pub-team2-name">TEAM OTTO</h2>
+        </div>
+        
+        <!-- Big Score -->
+        <div class="scoreboard-digit text-[120px] lg:text-[180px] font-black my-[-15px]" id="pub-team2-score">0</div>
+
+        <!-- Timeouts & Fouls Indicator -->
+        <div class="flex items-center justify-between w-full pt-4 border-t border-zinc-800 font-mono text-sm text-zinc-400">
+          <div id="pub-team2-possession" class="text-xs font-bold px-2.5 py-1 rounded bg-cyan-950 text-cyan-300 border border-cyan-600 hidden">
+            ▶ POSSESSION
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs uppercase font-bold text-zinc-500">FOULS</span>
+            <span id="pub-team2-fouls" class="font-bold text-base px-2 py-0.5 rounded bg-zinc-800 text-white">0</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs uppercase font-bold text-zinc-500 mr-1">T.O.</span>
+            <div id="pub-team2-timeouts" class="flex gap-1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Footer Strip -->
+    <div class="flex items-center justify-between border-t-2 border-zinc-800 pt-4 font-mono text-xs text-zinc-400">
+      <div class="flex items-center gap-4">
+        <span>📍 University of Perpetual Help System DALTA — Calamba Campus</span>
+        <span>•</span>
+        <span>Mechanical Engineering One Day League</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-cyan-400 font-bold">MEODL LIVE MATCH SYSTEM</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ======================================================== -->
+  <!-- OPERATOR SCOREKEEPER CONSOLE (MAIN CONTROLLER) -->
+  <!-- ======================================================== -->
+  <div id="operator-console-container" class="flex flex-col min-h-screen">
+    
+    <!-- Top Navigation & Action Header -->
+    <header class="bg-zinc-950 border-b border-zinc-800 px-4 py-3 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <!-- Back Button & Match Title -->
+        <div class="flex items-center gap-3">
+          <button onclick="goBackToHub()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono font-bold text-zinc-300 hover:text-white transition-all">
+            <span>← Event Hub</span>
+          </button>
+          
+          <div class="h-5 w-[1px] bg-zinc-800"></div>
+
+          <div class="flex items-center gap-2">
+            <span id="header-sport-icon" class="text-2xl">🏀</span>
+            <div>
+              <div class="flex items-center gap-2">
+                <h1 id="header-sport-title" class="font-mono font-black text-sm uppercase text-white tracking-wide">BASKETBALL LIVE SCOREBOARD</h1>
+                <span id="header-match-badge" class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 font-bold uppercase">SF-1</span>
+                <span id="header-status-badge" class="font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold uppercase">LIVE</span>
+              </div>
+              <p id="header-match-label" class="text-[11px] text-zinc-400 font-mono">Semifinal 1 • Official MEODL Match Controller</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Right Action Controls: Undo, TV Mode, Sound & Bracket Sync -->
+        <div class="flex items-center gap-2.5">
+          <!-- Undo Button -->
+          <button onclick="performUndo()" id="btn-undo" class="action-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono font-bold text-zinc-300 hover:text-white" title="Undo last scoring action (Ctrl+Z)">
+            <span>↶ Undo</span>
+          </button>
+
+          <!-- Audio Buzzer / Whistle Button -->
+          <button onclick="window.SoundFX.whistle()" class="action-btn p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-cyan-400" title="Sound Referee Whistle">
+            📢
+          </button>
+
+          <!-- Open Public Projector Scoreboard -->
+          <button onclick="openPublicScoreboardWindow()" class="action-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-600 text-xs font-mono font-bold text-cyan-300 transition-all shadow-sm">
+            <span>📺 Public TV View</span>
+          </button>
+
+          <!-- Confirm Final Result & Sync Bracket Button -->
+          <button onclick="confirmAndFinalizeMatch()" class="action-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-zinc-950 text-xs font-mono font-black uppercase transition-all shadow-md">
+            <span>🏆 Finalize Result & Return</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Scorekeeper Console Body -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 space-y-6">
+
+      <!-- ======================================================== -->
+      <!-- THE LIVE SCOREBOARD HERO PANEL -->
+      <!-- ======================================================== -->
+      <section class="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-5 lg:p-6 shadow-2xl relative overflow-hidden">
+        
+        <!-- Active Timeout Overlay Alert (shows when timeout is running) -->
+        <div id="timeout-banner" class="hidden mb-4 p-3 rounded-2xl bg-amber-950/90 border-2 border-amber-500 text-amber-200 flex items-center justify-between font-mono text-xs">
+          <div class="flex items-center gap-2">
+            <span class="text-xl animate-spin">⏱</span>
+            <span id="timeout-banner-text" class="font-bold text-sm">TIMEOUT IN PROGRESS: TEAM RANKINE (45s remaining)</span>
+          </div>
+          <button onclick="cancelActiveTimeout()" class="px-3 py-1 rounded bg-amber-600 hover:bg-amber-500 text-zinc-950 font-bold">
+            Resume Match ✕
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          
+          <!-- Team 1 Live Card (Left) -->
+          <div class="lg:col-span-4 bg-zinc-950/90 rounded-2xl border border-zinc-800 p-5 flex flex-col items-center text-center relative" id="console-team1-box">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-2xl" id="team1-icon">🔥</span>
+              <h2 class="font-teko text-3xl lg:text-4xl font-bold tracking-wide" id="team1-name">TEAM RANKINE</h2>
+            </div>
+            
+            <!-- Big Score -->
+            <div class="scoreboard-digit text-[95px] lg:text-[120px] font-black text-white leading-none my-1" id="team1-score-display">0</div>
+
+            <!-- Fast Score Buttons (Basketball: +1, +2, +3, -1) -->
+            <div class="grid grid-cols-4 gap-1.5 w-full mt-2" id="team1-fast-score-buttons">
+              <button onclick="addScore(1, 1, 'FT')" class="action-btn py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-mono font-bold text-cyan-300 border border-zinc-700">+1 FT</button>
+              <button onclick="addScore(1, 2, '2PT')" class="action-btn py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-mono font-bold text-cyan-300 border border-zinc-700">+2 FG</button>
+              <button onclick="addScore(1, 3, '3PT')" class="action-btn py-2 rounded-xl bg-cyan-950 hover:bg-cyan-900 text-xs font-mono font-bold text-cyan-200 border border-cyan-700">+3 3PT</button>
+              <button onclick="addScore(1, -1, 'CORRECTION')" class="action-btn py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-mono font-bold text-zinc-400 border border-zinc-800">-1 Pt</button>
+            </div>
+
+            <!-- Volleyball Point Buttons (Shown in Volleyball mode) -->
+            <div class="hidden grid-cols-3 gap-1.5 w-full mt-2" id="team1-vb-score-buttons">
+              <button onclick="addVbPoint(1, 'Kill')" class="action-btn py-2 rounded-xl bg-cyan-950 hover:bg-cyan-900 text-xs font-mono font-bold text-cyan-200 border border-cyan-700">+ Kill</button>
+              <button onclick="addVbPoint(1, 'Ace')" class="action-btn py-2 rounded-xl bg-amber-950 hover:bg-amber-900 text-xs font-mono font-bold text-amber-200 border border-amber-700">+ Ace</button>
+              <button onclick="subtractVbPoint(1)" class="action-btn py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-mono font-bold text-zinc-400 border border-zinc-800">-1 Pt</button>
+            </div>
+
+            <!-- Timeouts, Fouls & Possession row -->
+            <div class="flex items-center justify-between w-full pt-3 mt-3 border-t border-zinc-800/80 font-mono text-xs">
+              <div class="flex items-center gap-1" title="Timeouts Remaining">
+                <span class="text-[10px] text-zinc-500 uppercase font-bold">TO:</span>
+                <div id="team1-timeouts-display" class="flex gap-1 items-center"></div>
+                <button onclick="callTeamTimeout(1)" class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-950/80 hover:bg-amber-900 text-amber-300 border border-amber-800 font-bold">CALL</button>
+              </div>
+
+              <div class="flex items-center gap-1.5" id="team1-fouls-container">
+                <span class="text-[10px] text-zinc-500 uppercase font-bold">FOULS:</span>
+                <span id="team1-fouls-display" class="font-bold px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200">0</span>
+                <button onclick="recordFoul(1)" class="text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 font-bold">+ FOUL</button>
+              </div>
+
+              <button onclick="togglePossession()" id="team1-possession-badge" class="px-2 py-0.5 rounded font-bold text-[10px] border transition-all">
+                POSS ◀
+              </button>
+            </div>
+          </div>
+
+          <!-- Center Game Clock, Period & Controls (Center) -->
+          <div class="lg:col-span-4 flex flex-col items-center justify-center text-center space-y-4">
+            
+            <!-- Period Badge / Selector -->
+            <div class="flex items-center gap-2">
+              <span id="period-badge" class="font-mono text-sm font-black px-4 py-1 rounded-full bg-amber-950 text-amber-300 border border-amber-700/80 uppercase">
+                QUARTER 1
+              </span>
+              <button onclick="advancePeriod()" class="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-xs font-mono text-zinc-300" title="Advance to Next Quarter / Set">
+                Next ⏩
+              </button>
+            </div>
+
+            <!-- Master Drift-Free Digital Clock -->
+            <div class="bg-zinc-950 border-2 border-cyan-500/80 rounded-3xl px-6 py-2 shadow-lg w-full max-w-[280px]">
+              <div class="font-teko text-[80px] lg:text-[95px] font-black text-cyan-400 tracking-wider leading-none" id="game-clock-display">
+                08:00
+              </div>
+            </div>
+
+            <!-- Clock Buttons: Start / Pause / Reset / +/- 10s -->
+            <div class="flex items-center gap-2 font-mono">
+              <button onclick="toggleClock()" id="btn-clock-toggle" class="action-btn px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-black text-xs uppercase tracking-wider transition-all shadow-md">
+                START CLOCK
+              </button>
+              <button onclick="resetClockPrompt()" class="action-btn px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold">
+                RESET
+              </button>
+              <button onclick="adjustClockSec(-10)" class="action-btn px-2.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 text-xs font-bold border border-zinc-800">
+                -10s
+              </button>
+              <button onclick="adjustClockSec(10)" class="action-btn px-2.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 text-xs font-bold border border-zinc-800">
+                +10s
+              </button>
+            </div>
+
+            <!-- Quarter-by-Quarter / Set-by-Set Mini Matrix -->
+            <div class="w-full bg-zinc-950 border border-zinc-800/80 rounded-xl p-2.5 font-mono text-[11px]" id="period-history-box">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Team 2 Live Card (Right) -->
+          <div class="lg:col-span-4 bg-zinc-950/90 rounded-2xl border border-zinc-800 p-5 flex flex-col items-center text-center relative" id="console-team2-box">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-2xl" id="team2-icon">⚡</span>
+              <h2 class="font-teko text-3xl lg:text-4xl font-bold tracking-wide" id="team2-name">TEAM OTTO</h2>
+            </div>
+            
+            <!-- Big Score -->
+            <div class="scoreboard-digit text-[95px] lg:text-[120px] font-black text-white leading-none my-1" id="team2-score-display">0</div>
+
+            <!-- Fast Score Buttons (Basketball: +1, +2, +3, -1) -->
+            <div class="grid grid-cols-4 gap-1.5 w-full mt-2" id="team2-fast-score-buttons">
+              <button onclick="addScore(2, 1, 'FT')" class="action-btn py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-mono font-bold text-cyan-300 border border-zinc-700">+1 FT</button>
+              <button onclick="addScore(2, 2, '2PT')" class="action-btn py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-mono font-bold text-cyan-300 border border-zinc-700">+2 FG</button>
+              <button onclick="addScore(2, 3, '3PT')" class="action-btn py-2 rounded-xl bg-cyan-950 hover:bg-cyan-900 text-xs font-mono font-bold text-cyan-200 border border-cyan-700">+3 3PT</button>
+              <button onclick="addScore(2, -1, 'CORRECTION')" class="action-btn py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-mono font-bold text-zinc-400 border border-zinc-800">-1 Pt</button>
+            </div>
+
+            <!-- Volleyball Point Buttons (Shown in Volleyball mode) -->
+            <div class="hidden grid-cols-3 gap-1.5 w-full mt-2" id="team2-vb-score-buttons">
+              <button onclick="addVbPoint(2, 'Kill')" class="action-btn py-2 rounded-xl bg-cyan-950 hover:bg-cyan-900 text-xs font-mono font-bold text-cyan-200 border border-cyan-700">+ Kill</button>
+              <button onclick="addVbPoint(2, 'Ace')" class="action-btn py-2 rounded-xl bg-amber-950 hover:bg-amber-900 text-xs font-mono font-bold text-amber-200 border border-amber-700">+ Ace</button>
+              <button onclick="subtractVbPoint(2)" class="action-btn py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-mono font-bold text-zinc-400 border border-zinc-800">-1 Pt</button>
+            </div>
+
+            <!-- Timeouts, Fouls & Possession row -->
+            <div class="flex items-center justify-between w-full pt-3 mt-3 border-t border-zinc-800/80 font-mono text-xs">
+              <button onclick="togglePossession()" id="team2-possession-badge" class="px-2 py-0.5 rounded font-bold text-[10px] border transition-all">
+                ▶ POSS
+              </button>
+
+              <div class="flex items-center gap-1.5" id="team2-fouls-container">
+                <span class="text-[10px] text-zinc-500 uppercase font-bold">FOULS:</span>
+                <span id="team2-fouls-display" class="font-bold px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200">0</span>
+                <button onclick="recordFoul(2)" class="text-[10px] px-1.5 py-0.5 rounded bg-red-950/80 hover:bg-red-900 text-red-300 border border-red-800 font-bold">+ FOUL</button>
+              </div>
+
+              <div class="flex items-center gap-1" title="Timeouts Remaining">
+                <button onclick="callTeamTimeout(2)" class="mr-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-950/80 hover:bg-amber-900 text-amber-300 border border-amber-800 font-bold">CALL</button>
+                <div id="team2-timeouts-display" class="flex gap-1 items-center"></div>
+                <span class="text-[10px] text-zinc-500 uppercase font-bold">:TO</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Volleyball Specific Action Strip (Rotation & Gender Compliance) -->
+        <div id="volleyball-action-strip" class="hidden mt-6 pt-4 border-t border-zinc-800 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-2">
+            <button onclick="rotateVolleyballCourt(1)" class="action-btn px-3 py-1.5 rounded-xl bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-xs font-mono font-bold text-cyan-300">
+              ↻ Rotate Team 1
+            </button>
+            <button onclick="rotateVolleyballCourt(2)" class="action-btn px-3 py-1.5 rounded-xl bg-amber-950 hover:bg-amber-900 border border-amber-700 text-xs font-mono font-bold text-amber-300">
+              ↻ Rotate Team 2
+            </button>
+          </div>
+
+          <!-- Mandatory MEODL Rule Compliance Badge -->
+          <div id="female-rule-compliance-badge" class="px-4 py-1.5 rounded-xl font-mono text-xs font-bold flex items-center gap-2">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ======================================================== -->
+      <!-- ROSTER, SUBSTITUTIONS & PLAYER BOX SCORES -->
+      <!-- ======================================================== -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Team 1 Player Box Scores & Substitutions -->
+        <div class="bg-zinc-900/80 rounded-2xl border border-zinc-800 p-4 space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+            <div class="flex items-center gap-2">
+              <span class="text-lg" id="panel-t1-icon">🔥</span>
+              <h3 class="font-mono font-bold text-xs uppercase text-zinc-200" id="panel-t1-title">TEAM RANKINE — ROSTER & STATS</h3>
+            </div>
+            <button onclick="openSubModal(1)" class="px-2.5 py-1 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-[11px] font-mono font-bold text-cyan-300">
+              ⇄ Substitution
+            </button>
+          </div>
+
+          <!-- Player Box Score Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left font-mono text-xs">
+              <thead>
+                <tr class="text-[10px] text-zinc-500 uppercase border-b border-zinc-800">
+                  <th class="py-1.5 px-2">#</th>
+                  <th class="py-1.5 px-2">Athlete</th>
+                  <th class="py-1.5 px-1 text-center">Status</th>
+                  <th class="py-1.5 px-1 text-center">PTS</th>
+                  <th class="py-1.5 px-1 text-center" id="th-t1-stat2">REB</th>
+                  <th class="py-1.5 px-1 text-center" id="th-t1-stat3">AST</th>
+                  <th class="py-1.5 px-1 text-center" id="th-t1-stat4">PF</th>
+                  <th class="py-1.5 px-1 text-center">MIN</th>
+                  <th class="py-1.5 px-1 text-center">Quick +</th>
+                </tr>
+              </thead>
+              <tbody id="team1-player-table" class="divide-y divide-zinc-800/60">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Team 2 Player Box Scores & Substitutions -->
+        <div class="bg-zinc-900/80 rounded-2xl border border-zinc-800 p-4 space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+            <div class="flex items-center gap-2">
+              <span class="text-lg" id="panel-t2-icon">⚡</span>
+              <h3 class="font-mono font-bold text-xs uppercase text-zinc-200" id="panel-t2-title">TEAM OTTO — ROSTER & STATS</h3>
+            </div>
+            <button onclick="openSubModal(2)" class="px-2.5 py-1 rounded-lg bg-amber-950 hover:bg-amber-900 border border-amber-700 text-[11px] font-mono font-bold text-amber-300">
+              ⇄ Substitution
+            </button>
+          </div>
+
+          <!-- Player Box Score Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left font-mono text-xs">
+              <thead>
+                <tr class="text-[10px] text-zinc-500 uppercase border-b border-zinc-800">
+                  <th class="py-1.5 px-2">#</th>
+                  <th class="py-1.5 px-2">Athlete</th>
+                  <th class="py-1.5 px-1 text-center">Status</th>
+                  <th class="py-1.5 px-1 text-center">PTS</th>
+                  <th class="py-1.5 px-1 text-center" id="th-t2-stat2">REB</th>
+                  <th class="py-1.5 px-1 text-center" id="th-t2-stat3">AST</th>
+                  <th class="py-1.5 px-1 text-center" id="th-t2-stat4">PF</th>
+                  <th class="py-1.5 px-1 text-center">MIN</th>
+                  <th class="py-1.5 px-1 text-center">Quick +</th>
+                </tr>
+              </thead>
+              <tbody id="team2-player-table" class="divide-y divide-zinc-800/60">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ======================================================== -->
+      <!-- REAL-TIME AUDIT EVENT TIMELINE -->
+      <!-- ======================================================== -->
+      <section class="bg-zinc-900/70 border border-zinc-800 rounded-2xl p-4 space-y-2">
+        <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+          <div class="flex items-center gap-2">
+            <span class="text-sm">📋</span>
+            <h3 class="font-mono font-bold text-xs uppercase text-zinc-300">Live Match Audit Log</h3>
+          </div>
+          <span class="text-[10px] font-mono text-zinc-500">All clock, score, foul and substitution events</span>
+        </div>
+
+        <div id="event-log-container" class="max-h-48 overflow-y-auto space-y-1.5 font-mono text-xs pr-2">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+
+  <!-- ======================================================== -->
+  <!-- MODAL: SUBSTITUTION DRAWER -->
+  <!-- ======================================================== -->
+  <div id="sub-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 max-w-lg w-full space-y-4 shadow-2xl font-mono">
+      <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+        <h3 class="font-bold text-sm uppercase text-white" id="sub-modal-title">EXECUTE SUBSTITUTION</h3>
+        <button onclick="closeSubModal()" class="text-zinc-500 hover:text-white">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-zinc-400 mb-1">Select Player Leaving Court (OUT):</label>
+          <select id="sub-select-out" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2.5 text-zinc-200">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-zinc-400 mb-1">Select Reserve Entering Court (IN):</label>
+          <select id="sub-select-in" class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2.5 text-zinc-200">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
+        <button onclick="closeSubModal()" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold">
+          Cancel
+        </button>
+        <button onclick="confirmSubstitution()" class="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 text-xs font-black uppercase">
+          Confirm Sub ⇄
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT: CONTROLLER & VIEW BINDINGS -->
+  <!-- ======================================================== -->
+  <script>
+    // Extract query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const sportParam = (urlParams.get('sport') || 'basketball').toLowerCase();
+    const matchParam = urlParams.get('match') || 'SF1';
+    const viewParam = urlParams.get('view') || 'console';
+
+    let engine = null;
+    let activeSubTeam = 1;
+
+    // Initialize Page
+    function init() {
+      // Create live match engine instance
+      engine = new window.MeodlLiveMatchEngine(sportParam, matchParam);
+
+      // Keyboard shortcuts
+      window.addEventListener('keydown', (e) => {
+        // Spacebar toggles clock if not focusing an input
+        if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+          e.preventDefault();
+          toggleClock();
+        }
+        // Ctrl+Z = Undo
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+          e.preventDefault();
+          performUndo();
+        }
+      });
+
+      // Subscribe to engine state updates
+      engine.subscribe((state) => {
+        renderState(state);
+      });
+
+      // Initial render
+      renderState(engine.state);
+
+      // If view=scoreboard, switch immediately to projector broadcast mode
+      if (viewParam === 'scoreboard') {
+        togglePublicScoreboard(true);
+      }
+    }
+
+    // Toggle Public Scoreboard mode
+    function togglePublicScoreboard(isPublic) {
+      const publicEl = document.getElementById('public-scoreboard-container');
+      const consoleEl = document.getElementById('operator-console-container');
+      if (isPublic) {
+        publicEl.classList.remove('hidden');
+        consoleEl.classList.add('hidden');
+        document.title = `[SCOREBOARD] MEODL ${sportParam.toUpperCase()} — LIVE`;
+      } else {
+        publicEl.classList.add('hidden');
+        consoleEl.classList.remove('hidden');
+        document.title = `MEODL ${sportParam.toUpperCase()} — Live Match Controller`;
+      }
+    }
+
+    function openPublicScoreboardWindow() {
+      const url = `live_match.html?sport=${sportParam}&match=${matchParam}&view=scoreboard`;
+      window.open(url, '_blank', 'width=1280,height=720,menubar=no,toolbar=no');
+    }
+
+    function goBackToHub() {
+      window.location.href = `index.html#${sportParam}`;
+    }
+
+    // -------------------------------------------------------------------------
+    // RENDER DISPATCHER
+    // -------------------------------------------------------------------------
+    function renderState(state) {
+      const isBasketball = state.sportId === 'basketball';
+
+      // 1. Headers & Titles
+      document.getElementById('header-sport-icon').textContent = isBasketball ? '🏀' : '🏐';
+      document.getElementById('header-sport-title').textContent = `${isBasketball ? 'BASKETBALL' : 'VOLLEYBALL'} LIVE SCOREBOARD`;
+      document.getElementById('header-match-badge').textContent = state.matchCode || state.matchId;
+      document.getElementById('header-match-label').textContent = `${state.matchLabel || 'Match'} • ${state.team1.name} vs ${state.team2.name}`;
+      
+      const statusBadge = document.getElementById('header-status-badge');
+      if (state.matchStatus === 'COMPLETED') {
+        statusBadge.textContent = 'FINAL RESULT';
+        statusBadge.className = 'font-mono text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800 font-bold uppercase';
+      } else {
+        statusBadge.textContent = state.clock.running ? 'LIVE • IN PROGRESS' : 'PAUSED / READY';
+        statusBadge.className = state.clock.running 
+          ? 'font-mono text-[10px] px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800 live-pulse font-bold uppercase'
+          : 'font-mono text-[10px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700 font-bold uppercase';
+      }
+
+      // 2. Team 1 Console Card
+      document.getElementById('team1-icon').textContent = state.team1.icon;
+      document.getElementById('team1-name').textContent = state.team1.name;
+      document.getElementById('team1-score-display').textContent = isBasketball ? state.team1.score : state.team1.currentSetScore;
+      renderTimeouts('team1-timeouts-display', state.team1.timeoutsRemaining, isBasketball ? 4 : 2);
+      document.getElementById('team1-fouls-display').textContent = state.team1.teamFouls;
+      
+      const t1PossBadge = document.getElementById('team1-possession-badge');
+      if (isBasketball) {
+        t1PossBadge.textContent = 'POSS ◀';
+        t1PossBadge.className = state.team1.hasPossession 
+          ? 'px-2 py-0.5 rounded font-bold text-[10px] border bg-cyan-950 text-cyan-300 border-cyan-600 shadow-sm'
+          : 'px-2 py-0.5 rounded font-bold text-[10px] border bg-zinc-900 text-zinc-600 border-zinc-800 opacity-60';
+      } else {
+        t1PossBadge.textContent = 'SERVE 🏐';
+        t1PossBadge.className = state.team1.isServing 
+          ? 'px-2 py-0.5 rounded font-bold text-[10px] border bg-cyan-950 text-cyan-300 border-cyan-600 shadow-sm'
+          : 'px-2 py-0.5 rounded font-bold text-[10px] border bg-zinc-900 text-zinc-600 border-zinc-800 opacity-60';
+      }
+
+      // 3. Team 2 Console Card
+      document.getElementById('team2-icon').textContent = state.team2.icon;
+      document.getElementById('team2-name').textContent = state.team2.name;
+      document.getElementById('team2-score-display').textContent = isBasketball ? state.team2.score : state.team2.currentSetScore;
+      renderTimeouts('team2-timeouts-display', state.team2.timeoutsRemaining, isBasketball ? 4 : 2);
+      document.getElementById('team2-fouls-display').textContent = state.team2.teamFouls;
+
+      const t2PossBadge = document.getElementById('team2-possession-badge');
+      if (isBasketball) {
+        t2PossBadge.textContent = '▶ POSS';
+        t2PossBadge.className = state.team2.hasPossession 
+          ? 'px-2 py-0.5 rounded font-bold text-[10px] border bg-cyan-950 text-cyan-300 border-cyan-600 shadow-sm'
+          : 'px-2 py-0.5 rounded font-bold text-[10px] border bg-zinc-900 text-zinc-600 border-zinc-800 opacity-60';
+      } else {
+        t2PossBadge.textContent = '▶ SERVE 🏐';
+        t2PossBadge.className = state.team2.isServing 
+          ? 'px-2 py-0.5 rounded font-bold text-[10px] border bg-cyan-950 text-cyan-300 border-cyan-600 shadow-sm'
+          : 'px-2 py-0.5 rounded font-bold text-[10px] border bg-zinc-900 text-zinc-600 border-zinc-800 opacity-60';
+      }
+
+      // 4. Center Game Clock & Period
+      document.getElementById('period-badge').textContent = state.clock.periodName || `Period ${state.clock.period}`;
+      document.getElementById('game-clock-display').textContent = engine.getFormattedTime();
+      
+      const toggleBtn = document.getElementById('btn-clock-toggle');
+      if (state.clock.running) {
+        toggleBtn.textContent = 'PAUSE CLOCK';
+        toggleBtn.className = 'action-btn px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-black text-xs uppercase tracking-wider transition-all shadow-md';
+      } else {
+        toggleBtn.textContent = 'START CLOCK';
+        toggleBtn.className = 'action-btn px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-black text-xs uppercase tracking-wider transition-all shadow-md';
+      }
+
+      // 5. Timeout Banner
+      const toBanner = document.getElementById('timeout-banner');
+      if (state.timeout && state.timeout.active) {
+        toBanner.classList.remove('hidden');
+        const callingTeam = state.timeout.teamNum === 1 ? state.team1.name : state.team2.name;
+        document.getElementById('timeout-banner-text').textContent = `TIMEOUT: ${callingTeam} (${state.timeout.remainingSec}s remaining)`;
+      } else {
+        toBanner.classList.add('hidden');
+      }
+
+      // 6. Sport-Specific Buttons Switcher
+      if (isBasketball) {
+        document.getElementById('team1-fast-score-buttons').classList.remove('hidden');
+        document.getElementById('team1-vb-score-buttons').classList.add('hidden');
+        document.getElementById('team2-fast-score-buttons').classList.remove('hidden');
+        document.getElementById('team2-vb-score-buttons').classList.add('hidden');
+        document.getElementById('volleyball-action-strip').classList.add('hidden');
+        document.getElementById('team1-fouls-container').classList.remove('hidden');
+        document.getElementById('team2-fouls-container').classList.remove('hidden');
+      } else {
+        document.getElementById('team1-fast-score-buttons').classList.add('hidden');
+        document.getElementById('team1-vb-score-buttons').classList.remove('hidden');
+        document.getElementById('team2-fast-score-buttons').classList.add('hidden');
+        document.getElementById('team2-vb-score-buttons').classList.remove('hidden');
+        document.getElementById('volleyball-action-strip').classList.remove('hidden');
+        document.getElementById('team1-fouls-container').classList.add('hidden');
+        document.getElementById('team2-fouls-container').classList.add('hidden');
+
+        // Volleyball Mandatory Female Rule Badge
+        renderFemaleRuleBadge();
+      }
+
+      // 7. Breakdown Matrix (Quarter or Sets)
+      renderPeriodBreakdown(state);
+
+      // 8. Player Box Score Tables
+      renderPlayerTable(1, state.team1, isBasketball);
+      renderPlayerTable(2, state.team2, isBasketball);
+
+      // 9. Event Log
+      renderEventLog(state.eventLog);
+
+      // 10. Public Scoreboard Sync
+      renderPublicScoreboard(state);
+    }
+
+    // Render Timeouts Dots (● ● ○)
+    function renderTimeouts(elId, remaining, total) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      let html = '';
+      for (let i = 0; i < total; i++) {
+        const isRemaining = i < remaining;
+        html += `<span class="timeout-dot ${isRemaining ? 'bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.6)]' : 'bg-zinc-800 border border-zinc-700'}"></span>`;
+      }
+      el.innerHTML = html;
+    }
+
+    // Render Period History Breakdown Table
+    function renderPeriodBreakdown(state) {
+      const box = document.getElementById('period-history-box');
+      if (!box) return;
+
+      if (state.sportId === 'basketball') {
+        const qScores = state.basketball.quarterScores || [];
+        box.innerHTML = `
+          <div class="grid grid-cols-6 gap-1 text-center">
+            <div class="text-zinc-500 font-bold">TEAM</div>
+            <div class="text-zinc-400">Q1</div>
+            <div class="text-zinc-400">Q2</div>
+            <div class="text-zinc-400">Q3</div>
+            <div class="text-zinc-400">Q4</div>
+            <div class="text-cyan-400 font-bold">TOT</div>
+            
+            <div class="text-zinc-300 font-bold truncate">${state.team1.name.replace('TEAM ', '')}</div>
+            <div>${state.team1.periodScores[0] || 0}</div>
+            <div>${state.team1.periodScores[1] || 0}</div>
+            <div>${state.team1.periodScores[2] || 0}</div>
+            <div>${state.team1.periodScores[3] || 0}</div>
+            <div class="text-cyan-400 font-bold">${state.team1.score}</div>
+
+            <div class="text-zinc-300 font-bold truncate">${state.team2.name.replace('TEAM ', '')}</div>
+            <div>${state.team2.periodScores[0] || 0}</div>
+            <div>${state.team2.periodScores[1] || 0}</div>
+            <div>${state.team2.periodScores[2] || 0}</div>
+            <div>${state.team2.periodScores[3] || 0}</div>
+            <div class="text-cyan-400 font-bold">${state.team2.score}</div>
+          </div>
+        `;
+      } else {
+        const sets = state.volleyball.setHistory || [];
+        const currentSet = state.volleyball.currentSet;
+        box.innerHTML = `
+          <div class="flex items-center justify-between px-2">
+            <span class="font-bold text-zinc-400">MATCH SETS (BO3):</span>
+            <span class="text-sm font-black text-cyan-400">${state.team1.score} - ${state.team2.score}</span>
+          </div>
+          <div class="mt-1 flex items-center justify-around gap-2 text-center text-[10px] text-zinc-400 pt-1 border-t border-zinc-900">
+            ${[1, 2, 3].map(sNum => {
+              const hist = sets.find(h => h.set === sNum);
+              if (hist) {
+                return `<div><span class="font-bold">Set ${sNum}:</span> <span class="text-white">${hist.s1}-${hist.s2}</span></div>`;
+              } else if (sNum === currentSet) {
+                return `<div class="text-cyan-300 font-bold">Set ${sNum} (LIVE): ${state.team1.currentSetScore}-${state.team2.currentSetScore}</div>`;
+              } else {
+                return `<div>Set ${sNum}: -</div>`;
+              }
+            }).join('')}
+          </div>
+        `;
+      }
+    }
+
+    // Render Mandatory Volleyball Female Player Rule Compliance
+    function renderFemaleRuleBadge() {
+      const badge = document.getElementById('female-rule-compliance-badge');
+      if (!badge) return;
+      const res = engine.checkFemalePlayerRule();
+      const compliant = res[1].compliant && res[2].compliant;
+
+      if (compliant) {
+        badge.className = 'px-4 py-1.5 rounded-xl font-mono text-xs font-bold flex items-center gap-2 bg-emerald-950/80 text-emerald-300 border border-emerald-700/80';
+        badge.innerHTML = `
+          <span>✅</span>
+          <span>MEODL Gender Rule Compliant: Both teams have $\\ge 1$ female athlete active on court!</span>
+        `;
+      } else {
+        badge.className = 'px-4 py-1.5 rounded-xl font-mono text-xs font-bold flex items-center gap-2 bg-red-950/80 text-red-300 border border-red-700/80 live-pulse';
+        badge.innerHTML = `
+          <span>⚠</span>
+          <span>Rule Warning: Official MEODL rule requires at least 1 female athlete on court at all times! (T1: ${res[1].femaleCount}♀, T2: ${res[2].femaleCount}♀)</span>
+        `;
+      }
+    }
+
+    // Render Player Box Score Table
+    function renderPlayerTable(teamNum, team, isBasketball) {
+      const table = document.getElementById(`team${teamNum}-player-table`);
+      if (!table) return;
+
+      // Update stat headers
+      const th2 = document.getElementById(`th-t${teamNum}-stat2`);
+      const th3 = document.getElementById(`th-t${teamNum}-stat3`);
+      const th4 = document.getElementById(`th-t${teamNum}-stat4`);
+      if (th2) th2.textContent = isBasketball ? 'REB' : 'K (Kill)';
+      if (th3) th3.textContent = isBasketball ? 'AST' : 'A (Ace)';
+      if (th4) th4.textContent = isBasketball ? 'PF' : 'B (Blk)';
+
+      // Sort: On Court players first, then Bench
+      const sorted = [...team.players].sort((a, b) => {
+        if (a.courtStatus === 'COURT' && b.courtStatus !== 'COURT') return -1;
+        if (a.courtStatus !== 'COURT' && b.courtStatus === 'COURT') return 1;
+        return parseInt(a.jerseyNumber || 0) - parseInt(b.jerseyNumber || 0);
+      });
+
+      table.innerHTML = sorted.map(p => {
+        const isCourt = p.courtStatus === 'COURT';
+        const courtBadge = isCourt 
+          ? `<span class="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 text-[9px] font-bold">COURT</span>`
+          : `<span class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 text-[9px]">BENCH</span>`;
+        
+        const foulWarning = isBasketball && p.pf >= 5 
+          ? `<span class="text-red-400 font-black" title="Fouled Out">⚠ 5 PF</span>` 
+          : (isBasketball ? p.pf : p.b);
+
+        return `
+          <tr class="hover:bg-zinc-800/40 transition-colors ${isCourt ? 'bg-zinc-950/40' : 'opacity-70'}">
+            <td class="py-1.5 px-2 font-bold text-zinc-400">#${p.jerseyNumber}</td>
+            <td class="py-1.5 px-2 truncate max-w-[150px]">
+              <div class="flex items-center gap-1.5 truncate">
+                <span class="truncate font-semibold ${isCourt ? 'text-white' : 'text-zinc-400'}">${p.name}</span>
+                ${!isBasketball ? `
+                  <button onclick="toggleGender(${teamNum}, '${p.id}')" class="text-[10px] px-1 rounded ${p.isFemale ? 'bg-pink-950 text-pink-300 border border-pink-700' : 'text-zinc-600'}" title="Toggle Female Tag">
+                    ${p.isFemale ? '♀' : '♂'}
+                  </button>
+                ` : ''}
+              </div>
+            </td>
+            <td class="py-1.5 px-1 text-center">${courtBadge}</td>
+            <td class="py-1.5 px-1 text-center font-bold text-cyan-400">${p.pts}</td>
+            <td class="py-1.5 px-1 text-center text-zinc-300">${isBasketball ? p.reb : p.k}</td>
+            <td class="py-1.5 px-1 text-center text-zinc-300">${isBasketball ? p.ast : p.a}</td>
+            <td class="py-1.5 px-1 text-center text-zinc-300">${foulWarning}</td>
+            <td class="py-1.5 px-1 text-center text-zinc-400">${p.minutesPlayed}'</td>
+            <td class="py-1.5 px-1 text-center">
+              <div class="flex items-center justify-center gap-1">
+                ${isBasketball ? `
+                  <button onclick="addScore(${teamNum}, 2, 'FG', '${p.id}')" class="action-btn px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-cyan-300 text-[10px] font-bold">+2</button>
+                ` : `
+                  <button onclick="addVbPoint(${teamNum}, 'Kill', '${p.id}')" class="action-btn px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-cyan-300 text-[10px] font-bold">+K</button>
+                `}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Render Event Log
+    function renderEventLog(logs) {
+      const container = document.getElementById('event-log-container');
+      if (!container) return;
+      if (!logs || logs.length === 0) {
+        container.innerHTML = '<div class="text-zinc-600 text-center py-2">No match events logged yet.</div>';
+        return;
+      }
+
+      container.innerHTML = logs.slice(0, 20).map(l => {
+        let badgeColor = 'bg-zinc-800 text-zinc-400';
+        if (l.type === 'SCORE' || l.type === 'POINT') badgeColor = 'bg-cyan-950 text-cyan-300 border border-cyan-800';
+        else if (l.type === 'FOUL' || l.type === 'FOUL_OUT') badgeColor = 'bg-red-950 text-red-300 border border-red-800';
+        else if (l.type === 'SUB') badgeColor = 'bg-purple-950 text-purple-300 border border-purple-800';
+        else if (l.type === 'TIMEOUT') badgeColor = 'bg-amber-950 text-amber-300 border border-amber-800';
+
+        return `
+          <div class="flex items-center gap-2 p-1.5 rounded-lg bg-zinc-950/70 border border-zinc-850">
+            <span class="text-[10px] text-zinc-500 min-w-[50px]">${l.gameClock}</span>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ${badgeColor}">${l.type}</span>
+            <span class="truncate text-zinc-200 text-xs">${l.desc}</span>
+            <span class="text-[10px] text-zinc-600 ml-auto">${l.timestamp}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render Public Scoreboard (TV Mode)
+    function renderPublicScoreboard(state) {
+      const isBasketball = state.sportId === 'basketball';
+      
+      document.getElementById('pub-sport-icon').textContent = isBasketball ? '🏀' : '🏐';
+      document.getElementById('pub-match-title').textContent = `MEODL ${state.sportId.toUpperCase()} CHAMPIONSHIP`;
+      document.getElementById('pub-match-subtitle').textContent = `${state.matchCode || state.matchId} • ${state.matchLabel || 'Live Tournament'}`;
+
+      document.getElementById('pub-team1-icon').textContent = state.team1.icon;
+      document.getElementById('pub-team1-name').textContent = state.team1.name;
+      document.getElementById('pub-team1-score').textContent = isBasketball ? state.team1.score : state.team1.currentSetScore;
+      renderTimeouts('pub-team1-timeouts', state.team1.timeoutsRemaining, isBasketball ? 4 : 2);
+      document.getElementById('pub-team1-fouls').textContent = state.team1.teamFouls;
+
+      document.getElementById('pub-team2-icon').textContent = state.team2.icon;
+      document.getElementById('pub-team2-name').textContent = state.team2.name;
+      document.getElementById('pub-team2-score').textContent = isBasketball ? state.team2.score : state.team2.currentSetScore;
+      renderTimeouts('pub-team2-timeouts', state.team2.timeoutsRemaining, isBasketball ? 4 : 2);
+      document.getElementById('pub-team2-fouls').textContent = state.team2.teamFouls;
+
+      document.getElementById('pub-clock-display').textContent = engine.getFormattedTime();
+      document.getElementById('pub-period-badge').textContent = state.clock.periodName || `Period ${state.clock.period}`;
+
+      const t1Poss = document.getElementById('pub-team1-possession');
+      const t2Poss = document.getElementById('pub-team2-possession');
+      if (isBasketball) {
+        t1Poss.classList.toggle('hidden', !state.team1.hasPossession);
+        t2Poss.classList.toggle('hidden', !state.team2.hasPossession);
+      } else {
+        t1Poss.textContent = 'SERVING 🏐';
+        t2Poss.textContent = 'SERVING 🏐';
+        t1Poss.classList.toggle('hidden', !state.team1.isServing);
+        t2Poss.classList.toggle('hidden', !state.team2.isServing);
+      }
+
+      // Breakdown table in TV mode
+      const breakdown = document.getElementById('pub-breakdown-container');
+      if (breakdown) {
+        if (isBasketball) {
+          breakdown.innerHTML = `
+            <div class="grid grid-cols-6 gap-1 text-center font-bold">
+              <div></div><div>Q1</div><div>Q2</div><div>Q3</div><div>Q4</div><div class="text-cyan-400">TOT</div>
+              <div class="truncate text-left">${state.team1.name.replace('TEAM ', '')}</div>
+              <div>${state.team1.periodScores[0]||0}</div><div>${state.team1.periodScores[1]||0}</div>
+              <div>${state.team1.periodScores[2]||0}</div><div>${state.team1.periodScores[3]||0}</div>
+              <div class="text-cyan-400 font-black">${state.team1.score}</div>
+              <div class="truncate text-left">${state.team2.name.replace('TEAM ', '')}</div>
+              <div>${state.team2.periodScores[0]||0}</div><div>${state.team2.periodScores[1]||0}</div>
+              <div>${state.team2.periodScores[2]||0}</div><div>${state.team2.periodScores[3]||0}</div>
+              <div class="text-cyan-400 font-black">${state.team2.score}</div>
+            </div>
+          `;
+        } else {
+          breakdown.innerHTML = `
+            <div class="text-center font-bold text-base text-cyan-400">
+              SETS: ${state.team1.score} - ${state.team2.score} (BO3)
+            </div>
+          `;
+        }
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // SCOREKEEPER ACTIONS
+    // -------------------------------------------------------------------------
+    function addScore(teamNum, points, shotType, playerId = null) {
+      engine.addBasketballScore(teamNum, points, shotType, playerId);
+    }
+
+    function addVbPoint(teamNum, reason, playerId = null) {
+      engine.addVolleyballPoint(teamNum, reason, playerId);
+    }
+
+    function subtractVbPoint(teamNum) {
+      engine.subtractVolleyballPoint(teamNum);
+    }
+
+    function rotateVolleyballCourt(teamNum) {
+      engine.rotateCourt(teamNum);
+    }
+
+    function recordFoul(teamNum, playerId = null) {
+      engine.recordBasketballFoul(teamNum, playerId, 'Personal');
+    }
+
+    function callTeamTimeout(teamNum) {
+      engine.callTimeout(teamNum);
+    }
+
+    function cancelActiveTimeout() {
+      engine.endTimeout();
+    }
+
+    function togglePossession() {
+      engine.togglePossession();
+    }
+
+    function toggleClock() {
+      if (engine.state.clock.running) {
+        engine.pauseClock();
+      } else {
+        engine.startClock();
+      }
+    }
+
+    function resetClockPrompt() {
+      const mins = prompt('Enter quarter clock duration in minutes:', '8');
+      if (mins !== null) {
+        const val = parseInt(mins) || 8;
+        engine.resetClock(val);
+      }
+    }
+
+    function adjustClockSec(delta) {
+      engine.adjustClock(delta);
+    }
+
+    function advancePeriod() {
+      engine.handlePeriodEnd();
+      engine.save();
+    }
+
+    function performUndo() {
+      const ok = engine.undo();
+      if (!ok) {
+        alert('No further actions in undo history.');
+      }
+    }
+
+    function toggleGender(teamNum, playerId) {
+      engine.togglePlayerGender(teamNum, playerId);
+    }
+
+    // -------------------------------------------------------------------------
+    // SUBSTITUTION MODAL LOGIC
+    // -------------------------------------------------------------------------
+    function openSubModal(teamNum) {
+      activeSubTeam = teamNum;
+      const modal = document.getElementById('sub-modal');
+      const team = teamNum === 1 ? engine.state.team1 : engine.state.team2;
+      document.getElementById('sub-modal-title').textContent = `${team.name} — SUBSTITUTION`;
+
+      const selOut = document.getElementById('sub-select-out');
+      const selIn = document.getElementById('sub-select-in');
+
+      const courtPlayers = team.players.filter(p => p.courtStatus === 'COURT');
+      const benchPlayers = team.players.filter(p => p.courtStatus === 'BENCH');
+
+      selOut.innerHTML = courtPlayers.map(p => `
+        <option value="${p.id}">#${p.jerseyNumber} ${p.name} (${p.pts} pts, ${p.minutesPlayed} mins)</option>
+      `).join('');
+
+      selIn.innerHTML = benchPlayers.map(p => `
+        <option value="${p.id}">#${p.jerseyNumber} ${p.name} (${p.minutesPlayed} mins played)</option>
+      `).join('');
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeSubModal() {
+      document.getElementById('sub-modal').classList.add('hidden');
+    }
+
+    function confirmSubstitution() {
+      const selOut = document.getElementById('sub-select-out').value;
+      const selIn = document.getElementById('sub-select-in').value;
+      if (selOut && selIn) {
+        engine.substitutePlayer(activeSubTeam, selOut, selIn);
+        closeSubModal();
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // FINAL RESULT & BRACKET SYNCHRONIZATION
+    // -------------------------------------------------------------------------
+    function confirmAndFinalizeMatch() {
+      const isBasketball = engine.sportId === 'basketball';
+      const s1 = isBasketball ? engine.state.team1.score : engine.state.team1.score;
+      const s2 = isBasketball ? engine.state.team2.score : engine.state.team2.score;
+
+      const confirmMsg = `Are you sure you want to finalize this match?\n\n${engine.state.team1.name}: ${s1}\n${engine.state.team2.name}: ${s2}\n\nThis will return the score to the Universal Bracket, advance the winner, and update the overall MEODL leaderboard!`;
+
+      if (confirm(confirmMsg)) {
+        const result = engine.finalizeMatchAndSyncHub();
+        alert(`Match Completed!\n\nWinner: ${result.winner === 1 ? result.team1 : result.team2}\nResult synchronized to Tournament Hub.`);
+        window.location.href = `index.html#${engine.sportId}`;
+      }
+    }
+
+    // Run on startup
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

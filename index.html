@@ -58,6 +58,7 @@
   <script src="./assets/qrcode.min.js"></script>
   <script src="./assets/html5-qrcode.min.js"></script>
   <script src="./assets/meodl_attendance.js"></script>
+  <script src="./assets/meodl_live_match.js"></script>
 
   <!-- Complete Standalone Styling & Fallbacks -->
   <style>
@@ -637,6 +638,9 @@
         </div>
 
         <div class="flex items-center gap-2">
+          <button id="btn-uni-live-scoreboard" onclick="launchLiveScoreboardForCurrentSport()" class="hidden px-3 py-1 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-600 text-xs font-mono font-bold text-cyan-300 flex items-center gap-1.5 shadow-sm transition-all">
+            <span>⚡ Live Match Console</span>
+          </button>
           <button onclick="openSettingsModal()" class="px-3 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono text-zinc-300 hover:text-white flex items-center gap-1.5">
             <span>⚙ Format & Names</span>
           </button>
@@ -1902,6 +1906,15 @@
         formatBadge.textContent = 'BO' + ev.bracket.bestOf;
       }
 
+      const liveBtn = document.getElementById('btn-uni-live-scoreboard');
+      if (liveBtn) {
+        if (sportId === 'basketball' || sportId === 'volleyball') {
+          liveBtn.classList.remove('hidden');
+        } else {
+          liveBtn.classList.add('hidden');
+        }
+      }
+
       const content = document.getElementById('uni-bracket-content');
       if (!content) return;
 
@@ -1988,6 +2001,16 @@
             ${renderPlayer(match.p1, match.score1, isCompleted && match.winner === 1, 1)}
             ${renderPlayer(match.p2, match.score2, isCompleted && match.winner === 2, 2)}
           </div>
+          ${(sportId === 'basketball' || sportId === 'volleyball') && hasBoth ? `
+            <div class="mt-2 pt-1.5 border-t border-zinc-800/80 flex items-center justify-between gap-1.5">
+              <a href="live_match.html?sport=${sportId}&match=${match.id}" class="flex-1 py-1 px-2 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-600/70 text-[10px] font-mono font-bold text-cyan-300 flex items-center justify-center gap-1 transition-all hover:scale-[1.02]">
+                <span>⚡ LIVE SCOREBOARD</span>
+              </a>
+              <a href="live_match.html?sport=${sportId}&match=${match.id}&view=scoreboard" target="_blank" class="py-1 px-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-[10px] font-mono text-zinc-300 transition-all" title="Open Fullscreen TV / Projector Display">
+                📺
+              </a>
+            </div>
+          ` : ''}
         </div>
       `;
     }
@@ -2518,6 +2541,14 @@
               </div>
             </div>
           </div>
+
+          ${(sportId === 'basketball' || sportId === 'volleyball') ? `
+            <div class="pt-2">
+              <a href="live_match.html?sport=${sportId}&match=${matchId}" class="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-black text-xs font-mono text-center flex items-center justify-center gap-2 uppercase shadow-md transition-all hover:scale-[1.01]">
+                <span>⚡ LAUNCH DEDICATED LIVE MATCH SCREEN</span>
+              </a>
+            </div>
+          ` : ''}
 
           <!-- Marshal Confirmation Button -->
           <div class="flex items-center justify-between gap-2 pt-2 border-t border-zinc-850">
@@ -4971,6 +5002,17 @@ This will permanently REVOKE their current QR code card and generate a new secur
       if (window.MEODL_ATTENDANCE) window.MEODL_ATTENDANCE.exportLogsCSV();
     }
 
+    function launchLiveScoreboardForCurrentSport() {
+      const sportId = appState.activeSport;
+      const ev = appState.events[sportId];
+      if (!ev || !ev.bracket || !ev.bracket.matches) return;
+      const matches = Object.values(ev.bracket.matches);
+      const target = matches.find(m => m.isLive) || matches.find(m => !m.completed && m.p1 && m.p2) || matches[0];
+      if (target) {
+        window.location.href = `live_match.html?sport=${sportId}&match=${target.id}`;
+      }
+    }
+
     // -------------------------------------------------------------------------
     // MASTER INITIALIZATION ON DOM READY
     // -------------------------------------------------------------------------
@@ -4986,6 +5028,15 @@ This will permanently REVOKE their current QR code card and generate a new secur
       const hash = (window.location.hash || '#dashboard').replace('#', '');
       if (appState.activeView !== hash) {
         navigateTo(hash);
+      }
+    });
+
+    // Real-time Storage Synchronization (e.g. When Live Match is completed)
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'MEODL_TOURNAMENT_HUB_V1') {
+        loadAppState();
+        renderCurrentSportView();
+        renderDashboardStats();
       }
     });
 
