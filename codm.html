@@ -226,9 +226,11 @@
             <span class="text-sm font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 font-mono">
               MEODL Esports
             </span>
-            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800/60 font-bold">
-              CALL OF DUTY: MOBILE
-            </span>
+            <div class="flex items-center bg-zinc-900 border border-zinc-800 rounded-lg p-0.5 gap-1">
+              <a href="index.html" class="text-[10px] font-mono px-1.5 py-0.5 rounded text-zinc-400 hover:text-cyan-300 hover:bg-zinc-800 font-semibold transition-colors">TEKKEN 8</a>
+              <a href="codm.html" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-700/60 font-bold shadow-sm">CODM</a>
+              <a href="ml.html" class="text-[10px] font-mono px-1.5 py-0.5 rounded text-zinc-400 hover:text-sky-300 hover:bg-zinc-800 font-semibold transition-colors">MLBB</a>
+            </div>
           </div>
           <div class="text-xs text-zinc-400 flex items-center gap-2 flex-wrap">
             <span class="text-amber-400 font-semibold font-mono text-[11px]">MES • UPHSD DALTA</span>
@@ -434,10 +436,10 @@
 
       <!-- Scrollable Bracket Viewport -->
       <div id="bracket-viewport" class="bracket-viewport w-full h-full overflow-auto relative">
-        <div id="bracket-canvas" class="origin-top-left transition-transform duration-75 p-8" style="transform: scale(1); min-width: 1700px;">
+        <div id="bracket-canvas" class="origin-top-left transition-transform duration-75 p-8" style="transform: scale(1); min-width: 1200px;">
           
           <!-- Dynamic SVG Connection Layer -->
-          <svg id="bracket-svg" class="absolute top-0 left-0 pointer-events-none z-10 w-full h-full" style="min-width: 1700px; min-height: 1200px;">
+          <svg id="bracket-svg" class="absolute top-0 left-0 pointer-events-none z-10 w-full h-full" style="min-width: 1200px; min-height: 850px;">
             <defs>
               <linearGradient id="amber-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.8"/>
@@ -446,85 +448,78 @@
             </defs>
           </svg>
 
-          <!-- Bracket Sections Layout -->
-          <div class="flex flex-col gap-10 relative z-20">
+          <!-- 3-Column Progression Bracket (Clean Left-to-Right Layout) -->
+          <div class="relative z-20 flex gap-14 items-start pt-6">
             
-            <!-- SECTION A: WINNERS BRACKET -->
-            <div>
-              <div class="flex items-center gap-2.5 mb-4 pl-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-tactical"></div>
-                <h2 class="text-sm font-bold uppercase tracking-wider text-amber-300 font-mono">
-                  Winners Bracket (Top Seed Path)
-                </h2>
-                <span class="text-xs text-zinc-500 font-mono">• Best of 3 (First to 2 Wins) • Winners advance to Finals</span>
-              </div>
+            <!-- COLUMN 1: ROUND 1 (UPPER & LOWER SEMIFINALS) -->
+            <div class="flex flex-col gap-12 w-72 shrink-0">
               
-              <!-- Winners Rounds Grid -->
-              <div class="flex gap-16 items-stretch">
-                <!-- WR1: Semifinals (2 matches: UB1, UB2) -->
-                <div class="flex flex-col gap-4 w-72 shrink-0">
-                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
-                    <span>UPPER SEMIFINALS</span>
-                    <span class="text-zinc-500">BO3</span>
+              <!-- Upper Semifinals Section -->
+              <div>
+                <div class="flex items-center justify-between pb-2 mb-3 border-b border-zinc-800/80">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-tactical"></span>
+                    <span class="text-xs font-mono font-bold text-amber-300 uppercase tracking-wider">Upper Semifinals</span>
                   </div>
-                  <div class="flex flex-col gap-6 justify-around flex-1" id="col-wr1"></div>
+                  <span class="text-[10px] font-mono text-zinc-500">BO3</span>
                 </div>
-
-                <!-- WR2: Winners Finals (1 match: UB3) -->
-                <div class="flex flex-col gap-4 w-72 shrink-0">
-                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-amber-800/50 text-xs font-mono font-bold text-amber-300 flex justify-between shadow-sm">
-                    <span>WINNERS FINALS</span>
-                    <span class="text-zinc-400">BO3</span>
-                  </div>
-                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-wr2"></div>
-                </div>
+                <div class="flex flex-col gap-5" id="col-wr1"></div>
               </div>
+
+              <!-- Lower Semifinals Section -->
+              <div class="pt-4 border-t border-zinc-900/90">
+                <div class="flex items-center justify-between pb-2 mb-3 border-b border-zinc-800/80">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-400 shadow-lg"></span>
+                    <span class="text-xs font-mono font-bold text-red-300 uppercase tracking-wider">Lower Semifinals</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-zinc-500">BO3</span>
+                </div>
+                <div class="flex flex-col gap-5" id="col-lr1"></div>
+              </div>
+
             </div>
 
-            <!-- SECTION B: GRAND FINALS & CHAMPION PODIUM -->
-            <div class="pt-4 border-t border-zinc-900/80">
-              <div class="flex items-center gap-2.5 mb-4 pl-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-yellow-400 shadow-mishima"></div>
-                <h2 class="text-sm font-bold uppercase tracking-wider text-yellow-300 font-mono">
-                  Grand Finals Championship
-                </h2>
-                <span class="text-xs text-zinc-500 font-mono">• Best of 3 • Bracket Reset Rules apply</span>
-              </div>
+            <!-- COLUMN 2: ROUND 2 (UPPER & LOWER FINALS) -->
+            <div class="flex flex-col gap-12 w-72 shrink-0">
               
-              <div class="flex gap-14 items-center pl-4" id="col-gf">
-                <!-- GF1 and GF2 Cards will render here -->
+              <!-- Upper Finals Section -->
+              <div>
+                <div class="flex items-center justify-between pb-2 mb-3 border-b border-zinc-800/80">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-tactical"></span>
+                    <span class="text-xs font-mono font-bold text-amber-300 uppercase tracking-wider">Upper Finals</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-amber-400 font-bold">To GF</span>
+                </div>
+                <div class="flex flex-col gap-5" id="col-wr2"></div>
               </div>
+
+              <!-- Lower Finals Section -->
+              <div class="pt-4 border-t border-zinc-900/90">
+                <div class="flex items-center justify-between pb-2 mb-3 border-b border-zinc-800/80">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-red-400 shadow-lg"></span>
+                    <span class="text-xs font-mono font-bold text-red-300 uppercase tracking-wider">Lower Finals</span>
+                  </div>
+                  <span class="text-[10px] font-mono text-amber-400 font-bold">To GF</span>
+                </div>
+                <div class="flex flex-col gap-5" id="col-lr2"></div>
+              </div>
+
             </div>
 
-            <!-- SECTION C: LOSERS BRACKET -->
-            <div class="pt-4 border-t border-zinc-900/80">
-              <div class="flex items-center gap-2.5 mb-4 pl-2">
-                <div class="w-2.5 h-2.5 rounded-full bg-red-400 shadow-lg"></div>
-                <h2 class="text-sm font-bold uppercase tracking-wider text-red-300 font-mono">
-                  Losers Bracket (Redemption Path)
-                </h2>
-                <span class="text-xs text-zinc-500 font-mono">• 1 Loss = Eliminated • Loser of Semifinal takes 4th</span>
-              </div>
-              
-              <!-- Losers Rounds Grid -->
-              <div class="flex gap-16 items-stretch">
-                <!-- LR1: Lower Semifinal (1 match: LB1) -->
-                <div class="flex flex-col gap-4 w-72 shrink-0">
-                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
-                    <span>LOSERS SEMIFINALS</span>
-                    <span class="text-zinc-500">BO3</span>
+            <!-- COLUMN 3: CHAMPIONSHIP (GRAND FINALS & RESET) -->
+            <div class="flex flex-col gap-6 w-80 shrink-0">
+              <div>
+                <div class="flex items-center justify-between pb-2 mb-3 border-b border-zinc-800/80">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-yellow-400 shadow-mishima animate-pulse"></span>
+                    <span class="text-xs font-mono font-bold text-yellow-300 uppercase tracking-wider">Grand Finals Championship</span>
                   </div>
-                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr1"></div>
+                  <span class="text-[10px] font-mono text-yellow-400 font-bold">FINAL</span>
                 </div>
-
-                <!-- LR2: Lower Final (1 match: LB2) -->
-                <div class="flex flex-col gap-4 w-72 shrink-0">
-                  <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-red-800/50 text-xs font-mono font-bold text-red-300 flex justify-between shadow-sm">
-                    <span>LOSERS FINALS</span>
-                    <span class="text-zinc-400">BO3</span>
-                  </div>
-                  <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr2"></div>
-                </div>
+                <div class="flex flex-col gap-6" id="col-gf"></div>
               </div>
             </div>
 
@@ -1017,6 +1012,21 @@
         `;
       };
 
+      let routeBadge = '';
+      if (match.id === 'W1' || match.id === 'W2') {
+        routeBadge = '<span class="text-[9px] font-mono px-1 rounded bg-zinc-800 text-zinc-400 border border-zinc-700/50" title="Loser drops to Lower Semifinal">L ➔ LB-Semi</span>';
+      } else if (match.id === 'W3') {
+        routeBadge = '<span class="text-[9px] font-mono px-1 rounded bg-amber-950/40 text-amber-400 border border-amber-800/40" title="Loser drops to Lower Final">L ➔ LB-Final</span>';
+      } else if (match.id === 'L1') {
+        routeBadge = '<span class="text-[9px] font-mono px-1 rounded bg-red-950/40 text-red-400 border border-red-800/40" title="Loser finishes 4th place">L = 4th</span>';
+      } else if (match.id === 'L2') {
+        routeBadge = '<span class="text-[9px] font-mono px-1 rounded bg-red-950/40 text-red-400 border border-red-800/40" title="Loser finishes 3rd place">L = 3rd</span>';
+      } else if (match.id === 'GF1') {
+        routeBadge = '<span class="text-[9px] font-mono px-1 rounded bg-yellow-950/40 text-yellow-400 border border-yellow-800/40 font-semibold">Championship</span>';
+      } else if (match.id === 'GF2') {
+        routeBadge = '<span class="text-[9px] font-mono px-1 rounded bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 font-semibold">Decider (Reset)</span>';
+      }
+
       return `
         <div id="card-${match.id}" data-match-id="${match.id}" class="match-node relative bg-zinc-900/90 backdrop-blur-md rounded-xl border border-zinc-800/90 hover:border-amber-500/50 p-2.5 transition-all shadow-card ${isLive ? 'match-live live-pulse' : (hasBothPlayers && !isCompleted ? 'match-ready' : (isCompleted ? 'match-complete' : ''))}">
           <div class="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-zinc-800/80">
@@ -1027,6 +1037,7 @@
               <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400">
                 BO${match.bestOf}
               </span>
+              ${routeBadge}
             </div>
             
             <div class="flex items-center gap-1">
@@ -1090,10 +1101,7 @@
         { from: 'W2', to: 'W3', slot: 2 },
         { from: 'W3', to: 'GF1', slot: 1 },
         { from: 'L1', to: 'L2', slot: 2 },
-        { from: 'L2', to: 'GF1', slot: 2 },
-        { from: 'W1', to: 'L1', slot: 1 },
-        { from: 'W2', to: 'L1', slot: 2 },
-        { from: 'W3', to: 'L2', slot: 1 }
+        { from: 'L2', to: 'GF1', slot: 2 }
       ];
 
       let svgContent = `
