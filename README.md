@@ -21,7 +21,7 @@ Production-ready, dark-mode interactive web application and tournament managemen
 
 - **Schedule & Venue Cutoff System:**
   - **Room Closes at 5:00 PM** hard venue cutoff prominently displayed across the app.
-  - Rolling target call schedule starting at **12:00 PM** (BO3 = 8 mins, BO5 = 12 mins).
+  - Rolling target call schedule starting at **12:00 PM** (All Matches BO3 = 8 mins).
   - Matches can start early whenever previous sets finish early.
   - Live pace tracking (`ON SCHEDULE`, `AHEAD`, `BEHIND`, `CRITICAL`, `ROOM CUTOFF`).
   - Dynamic estimated finish time calculation with venue safety buffer.
@@ -69,14 +69,14 @@ Production-ready, dark-mode interactive web application and tournament managemen
 | **2:32 PM** | `L10` | Losers R3 | BO3 | 8 mins |
 | **2:40 PM** | `W13` | Semifinals | BO3 | 8 mins |
 | **2:48 PM** | `W14` | Semifinals | BO3 | 8 mins |
-| **2:56 PM** | `L11` | Losers Quarters | BO5 | 12 mins |
-| **3:08 PM** | `L12` | Losers Quarters | BO5 | 12 mins |
-| **3:20 PM** | `L13` | Losers Semis | BO5 | 12 mins |
-| **3:32 PM** | `W15` | Winners Finals | BO5 | 12 mins |
-| **3:44 PM** | `L14` | Losers Finals | BO5 | 12 mins |
-| **3:56 PM** | `GF Setup` | Grand Finals Stage | -- | 4 mins |
-| **4:00 PM** | `GF1` | Grand Finals | BO5 | 12 mins |
-| **4:12 PM** | `GF2` | Grand Finals Reset | BO5 | 12 mins (If Needed) |
+| **2:56 PM** | `L11` | Losers Quarters | BO3 | 8 mins |
+| **3:04 PM** | `L12` | Losers Quarters | BO3 | 8 mins |
+| **3:12 PM** | `L13` | Losers Semis | BO3 | 8 mins |
+| **3:20 PM** | `W15` | Winners Finals | BO3 | 8 mins |
+| **3:28 PM** | `L14` | Losers Finals | BO3 | 8 mins |
+| **3:36 PM** | `GF Setup` | Grand Finals Stage | -- | 4 mins |
+| **3:40 PM** | `GF1` | Grand Finals | BO3 | 8 mins |
+| **3:48 PM** | `GF2` | Grand Finals Reset | BO3 | 8 mins (If Needed) |
 
 **Room Closes:** `5:00 PM` (Hard Cutoff)
 

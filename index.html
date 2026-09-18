@@ -449,7 +449,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
                 <h2 class="text-sm font-bold uppercase tracking-wider text-cyan-300 font-mono">
                   Winners Bracket (Top Seed Path)
                 </h2>
-                <span class="text-xs text-zinc-500 font-mono">• Best of 3 / Best of 5 (Finals)</span>
+                <span class="text-xs text-zinc-500 font-mono">• All Sets Best of 3 (First to 2 Wins)</span>
               </div>
               
               <!-- Winners Rounds Grid -->
@@ -485,7 +485,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
                 <div class="flex flex-col gap-4 w-72 shrink-0">
                   <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-cyan-800/50 text-xs font-mono font-bold text-cyan-300 flex justify-between shadow-sm">
                     <span>WINNERS FINALS</span>
-                    <span class="text-cyan-400">BO5</span>
+                    <span class="text-zinc-400">BO3</span>
                   </div>
                   <div class="flex flex-col gap-4 justify-around flex-1" id="col-wr4"></div>
                 </div>
@@ -499,7 +499,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
                 <h2 class="text-sm font-bold uppercase tracking-wider text-amber-300 font-mono">
                   Grand Finals Championship
                 </h2>
-                <span class="text-xs text-zinc-500 font-mono">• Best of 5 (1st to 3) • Bracket Reset Rules apply</span>
+                <span class="text-xs text-zinc-500 font-mono">• Best of 3 (First to 2) • Bracket Reset Rules apply</span>
               </div>
               
               <div class="flex gap-14 items-center pl-4" id="col-gf">
@@ -550,7 +550,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
                 <div class="flex flex-col gap-4 w-72 shrink-0">
                   <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
                     <span>LOSERS QUARTERS</span>
-                    <span class="text-amber-400">BO5</span>
+                    <span class="text-zinc-400">BO3</span>
                   </div>
                   <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr4"></div>
                 </div>
@@ -559,7 +559,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
                 <div class="flex flex-col gap-4 w-72 shrink-0">
                   <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-zinc-800 text-xs font-mono font-bold text-zinc-300 flex justify-between shadow-sm">
                     <span>LOSERS SEMIS</span>
-                    <span class="text-amber-400">BO5</span>
+                    <span class="text-zinc-400">BO3</span>
                   </div>
                   <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr5"></div>
                 </div>
@@ -568,7 +568,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
                 <div class="flex flex-col gap-4 w-72 shrink-0">
                   <div class="sticky top-0 z-10 bg-zinc-950/95 backdrop-blur-md py-1.5 px-3 rounded-lg border border-red-800/50 text-xs font-mono font-bold text-red-300 flex justify-between shadow-sm">
                     <span>LOSERS FINALS</span>
-                    <span class="text-red-400">BO5</span>
+                    <span class="text-zinc-400">BO3</span>
                   </div>
                   <div class="flex flex-col gap-4 justify-around flex-1" id="col-lr6"></div>
                 </div>
@@ -668,7 +668,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
               Tournament Schedule & Venue Cutoff
             </h2>
             <p class="mt-1 text-sm text-zinc-300 max-w-2xl">
-              Target call schedule with rolling transitions (BO3 = 8 mins, BO5 = 12 mins). Matches start early whenever previous sets finish early. Entire tournament must conclude before 5:00 PM room closure.
+              Target call schedule with rolling transitions (All Matches BO3 = 8 mins). Matches start early whenever previous sets finish early. Entire tournament must conclude before 5:00 PM room closure.
             </p>
           </div>
           
@@ -946,7 +946,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
       'W14': { code: 'WR3-M2', round: 'wr3', label: 'Semifinals', bestOf: 3, targetWins: 2, winDest: { match: 'W15', slot: 2 }, lossDest: { match: 'L11', slot: 2 } },
 
       // WINNERS ROUND 4 (WR4 - Winners Finals)
-      'W15': { code: 'WR4-M1', round: 'wr4', label: 'Winners Finals', bestOf: 5, targetWins: 3, winDest: { match: 'GF1', slot: 1 }, lossDest: { match: 'L14', slot: 2 } },
+      'W15': { code: 'WR4-M1', round: 'wr4', label: 'Winners Finals', bestOf: 3, targetWins: 2, winDest: { match: 'GF1', slot: 1 }, lossDest: { match: 'L14', slot: 2 } },
 
       // LOSERS ROUND 1 (LR1)
       'L2': { code: 'LR1-M1', round: 'lr1', label: 'Losers R1', bestOf: 3, targetWins: 2, winDest: { match: 'L6', slot: 2 }, lossDest: null },
@@ -964,20 +964,20 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
       'L10': { code: 'LR3-M2', round: 'lr3', label: 'Losers R3', bestOf: 3, targetWins: 2, winDest: { match: 'L12', slot: 1 }, lossDest: null },
 
       // LOSERS ROUND 4 (LR4 - Quarterfinals)
-      'L11': { code: 'LR4-M1', round: 'lr4', label: 'Losers Quarters', bestOf: 5, targetWins: 3, winDest: { match: 'L13', slot: 1 }, lossDest: null },
-      'L12': { code: 'LR4-M2', round: 'lr4', label: 'Losers Quarters', bestOf: 5, targetWins: 3, winDest: { match: 'L13', slot: 2 }, lossDest: null },
+      'L11': { code: 'LR4-M1', round: 'lr4', label: 'Losers Quarters', bestOf: 3, targetWins: 2, winDest: { match: 'L13', slot: 1 }, lossDest: null },
+      'L12': { code: 'LR4-M2', round: 'lr4', label: 'Losers Quarters', bestOf: 3, targetWins: 2, winDest: { match: 'L13', slot: 2 }, lossDest: null },
 
       // LOSERS ROUND 5 (LR5 - Semifinals)
-      'L13': { code: 'LR5-M1', round: 'lr5', label: 'Losers Semis', bestOf: 5, targetWins: 3, winDest: { match: 'L14', slot: 1 }, lossDest: null },
+      'L13': { code: 'LR5-M1', round: 'lr5', label: 'Losers Semis', bestOf: 3, targetWins: 2, winDest: { match: 'L14', slot: 1 }, lossDest: null },
 
       // LOSERS ROUND 6 (LR6 - Losers Finals)
-      'L14': { code: 'LR6-M1', round: 'lr6', label: 'Losers Finals', bestOf: 5, targetWins: 3, winDest: { match: 'GF1', slot: 2 }, lossDest: null },
+      'L14': { code: 'LR6-M1', round: 'lr6', label: 'Losers Finals', bestOf: 3, targetWins: 2, winDest: { match: 'GF1', slot: 2 }, lossDest: null },
 
       // GRAND FINALS (GF1)
-      'GF1': { code: 'GF-M1', round: 'gf', label: 'Grand Finals', bestOf: 5, targetWins: 3, winDest: null, lossDest: null },
+      'GF1': { code: 'GF-M1', round: 'gf', label: 'Grand Finals', bestOf: 3, targetWins: 2, winDest: null, lossDest: null },
 
       // GRAND FINALS RESET (GF2)
-      'GF2': { code: 'GF-RESET', round: 'gf', label: 'Grand Finals Reset', bestOf: 5, targetWins: 3, winDest: null, lossDest: null }
+      'GF2': { code: 'GF-RESET', round: 'gf', label: 'Grand Finals Reset', bestOf: 3, targetWins: 2, winDest: null, lossDest: null }
     };
 
     
@@ -1014,15 +1014,15 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
       'W13': { order: 22, code: 'WR3-M1', time: '2:40 PM',  targetMins: 160, duration: 8,  bestOf: 3, label: 'W13' },
       'W14': { order: 23, code: 'WR3-M2', time: '2:48 PM',  targetMins: 168, duration: 8,  bestOf: 3, label: 'W14' },
 
-      'L11': { order: 24, code: 'LR4-M1', time: '2:56 PM',  targetMins: 176, duration: 12, bestOf: 5, label: 'L11' },
-      'L12': { order: 25, code: 'LR4-M2', time: '3:08 PM',  targetMins: 188, duration: 12, bestOf: 5, label: 'L12' },
-      'L13': { order: 26, code: 'LR5-M1', time: '3:20 PM',  targetMins: 200, duration: 12, bestOf: 5, label: 'L13' },
-      'W15': { order: 27, code: 'WR4-M1', time: '3:32 PM',  targetMins: 212, duration: 12, bestOf: 5, label: 'W15' },
-      'L14': { order: 28, code: 'LR6-M1', time: '3:44 PM',  targetMins: 224, duration: 12, bestOf: 5, label: 'L14' },
+      'L11': { order: 24, code: 'LR4-M1', time: '2:56 PM',  targetMins: 176, duration: 8,  bestOf: 3, label: 'L11' },
+      'L12': { order: 25, code: 'LR4-M2', time: '3:04 PM',  targetMins: 184, duration: 8,  bestOf: 3, label: 'L12' },
+      'L13': { order: 26, code: 'LR5-M1', time: '3:12 PM',  targetMins: 192, duration: 8,  bestOf: 3, label: 'L13' },
+      'W15': { order: 27, code: 'WR4-M1', time: '3:20 PM',  targetMins: 200, duration: 8,  bestOf: 3, label: 'W15' },
+      'L14': { order: 28, code: 'LR6-M1', time: '3:28 PM',  targetMins: 208, duration: 8,  bestOf: 3, label: 'L14' },
 
-      'SETUP': { order: 29, code: 'GF-SETUP', time: '3:56 PM', targetMins: 236, duration: 4, label: 'Grand Finals Setup / Intros', isSetup: true },
-      'GF1': { order: 30, code: 'GF-M1',  time: '4:00 PM',  targetMins: 240, duration: 12, bestOf: 5, label: 'GF1' },
-      'GF2': { order: 31, code: 'GF-RESET', time: '4:12 PM', targetMins: 252, duration: 12, bestOf: 5, label: 'GF2 Reset (If Needed)', isConditional: true }
+      'SETUP': { order: 29, code: 'GF-SETUP', time: '3:36 PM', targetMins: 216, duration: 4, label: 'Grand Finals Setup / Intros', isSetup: true },
+      'GF1': { order: 30, code: 'GF-M1',  time: '3:40 PM',  targetMins: 220, duration: 8,  bestOf: 3, label: 'GF1' },
+      'GF2': { order: 31, code: 'GF-RESET', time: '3:48 PM', targetMins: 228, duration: 8,  bestOf: 3, label: 'GF2 Reset (If Needed)', isConditional: true }
     };
 
     const STORAGE_KEY = 'ewgf_tekken_bracket_v1';
@@ -1145,7 +1145,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
       const uncompleted = allMatches.filter(m => !m.completed);
       
       uncompleted.forEach(m => {
-        let dur = m.bestOf === 5 ? 12 : 8;
+        let dur = 8;
         if (m.id === 'GF2') {
           if (!state.grandFinalsResetNeeded && state.matches['GF1']?.completed) {
             dur = 0;
@@ -1441,7 +1441,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
         match.actualStartTime = minsToTimeString(nowM);
       }
       match.actualEndTime = minsToTimeString(nowM);
-      match.durationMins = match.actualStartMins !== null ? Math.max(1, Math.round(nowM - match.actualStartMins)) : (match.bestOf === 5 ? 12 : 8);
+      match.durationMins = match.actualStartMins !== null ? Math.max(1, Math.round(nowM - match.actualStartMins)) : 8;
 
       const targetWins = match.targetWins;
       if (winnerSlot === 1) {
@@ -1695,7 +1695,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
             ${['W13', 'W14'].map(id => createMatchCardHTML(state.matches[id])).join('')}
           </div>
           <div class="w-72 space-y-4">
-            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-cyan-400">WINNERS FINALS (BO5)</div>
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-cyan-400">WINNERS FINALS (BO3)</div>
             ${['W15'].map(id => createMatchCardHTML(state.matches[id])).join('')}
           </div>
         </div>
@@ -1719,15 +1719,15 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
             ${['L9', 'L10'].map(id => createMatchCardHTML(state.matches[id])).join('')}
           </div>
           <div class="w-72 space-y-4">
-            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS QUARTERS (BO5)</div>
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS QUARTERS (BO3)</div>
             ${['L11', 'L12'].map(id => createMatchCardHTML(state.matches[id])).join('')}
           </div>
           <div class="w-72 space-y-4">
-            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS SEMIS (BO5)</div>
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS SEMIS (BO3)</div>
             ${['L13'].map(id => createMatchCardHTML(state.matches[id])).join('')}
           </div>
           <div class="w-72 space-y-4">
-            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS FINALS (BO5)</div>
+            <div class="bg-zinc-900 border border-zinc-800 p-2 text-center rounded-lg text-xs font-mono font-bold text-amber-400">LOSERS FINALS (BO3)</div>
             ${['L14'].map(id => createMatchCardHTML(state.matches[id])).join('')}
           </div>
         </div>
@@ -2334,7 +2334,7 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
       }
       readyMatch.completed = true;
 
-      const dur = readyMatch.bestOf === 5 ? 12 : 8;
+      const dur = 8;
       readyMatch.durationMins = dur;
 
       if (state.clockMode === 'sim' || (state.clockMode === 'auto' && !isVenueHoursNow())) {
@@ -2452,6 +2452,18 @@ body{background:radial-gradient(circle at 12% -5%,rgba(34,211,238,.08),transpare
             propagateBracket();
             loaded = true;
           }
+      if (loaded && state.matches) {
+        for (const m of Object.values(state.matches)) {
+          m.bestOf = 3;
+          m.targetWins = 2;
+          const sched = SCHEDULE_TARGETS[m.id];
+          if (sched) {
+            m.scheduledTime = sched.time;
+            m.targetCallMins = sched.targetMins;
+          }
+        }
+        safeSetStorage(STORAGE_KEY, JSON.stringify(state));
+      }
         } catch(e) {}
       }
 
