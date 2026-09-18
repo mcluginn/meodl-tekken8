@@ -466,7 +466,7 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-tactical"></span>
                     <span class="text-xs font-mono font-bold text-amber-300 uppercase tracking-wider">Upper Semifinals</span>
                   </div>
-                  <span class="text-[10px] font-mono text-zinc-500">BO3</span>
+                  <span class="text-[10px] font-mono text-zinc-500">1 MATCH</span>
                 </div>
                 <div class="flex flex-col gap-5" id="col-wr1"></div>
               </div>
@@ -478,7 +478,7 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-red-400 shadow-lg"></span>
                     <span class="text-xs font-mono font-bold text-red-300 uppercase tracking-wider">Lower Semifinals</span>
                   </div>
-                  <span class="text-[10px] font-mono text-zinc-500">BO3</span>
+                  <span class="text-[10px] font-mono text-zinc-500">1 MATCH</span>
                 </div>
                 <div class="flex flex-col gap-5" id="col-lr1"></div>
               </div>
@@ -759,18 +759,18 @@
     ];
 
     const MATCH_DEFINITIONS = {
-      // UPPER BRACKET
-      'W1': { code: 'UB-M1', round: 'wr1', label: 'Upper Semifinal 1', bestOf: 3, targetWins: 2, p1Source: 'seed1', p2Source: 'seed4', winDest: { match: 'W3', slot: 1 }, lossDest: { match: 'L1', slot: 1 } },
-      'W2': { code: 'UB-M2', round: 'wr1', label: 'Upper Semifinal 2', bestOf: 3, targetWins: 2, p1Source: 'seed2', p2Source: 'seed3', winDest: { match: 'W3', slot: 2 }, lossDest: { match: 'L1', slot: 2 } },
-      'W3': { code: 'UB-FINAL', round: 'wr2', label: 'Upper Final', bestOf: 3, targetWins: 2, winDest: { match: 'GF1', slot: 1 }, lossDest: { match: 'L2', slot: 1 } },
+      // UPPER BRACKET (SINGLE MATCH PER PAIRING)
+      'W1': { code: 'UB-M1', round: 'wr1', label: 'Upper Semifinal 1', bestOf: 1, targetWins: 1, p1Source: 'seed1', p2Source: 'seed4', winDest: { match: 'W3', slot: 1 }, lossDest: { match: 'L1', slot: 1 } },
+      'W2': { code: 'UB-M2', round: 'wr1', label: 'Upper Semifinal 2', bestOf: 1, targetWins: 1, p1Source: 'seed2', p2Source: 'seed3', winDest: { match: 'W3', slot: 2 }, lossDest: { match: 'L1', slot: 2 } },
+      'W3': { code: 'UB-FINAL', round: 'wr2', label: 'Upper Final', bestOf: 1, targetWins: 1, winDest: { match: 'GF1', slot: 1 }, lossDest: { match: 'L2', slot: 1 } },
 
       // LOWER BRACKET
-      'L1': { code: 'LB-SEMI', round: 'lr1', label: 'Lower Semifinal', bestOf: 3, targetWins: 2, winDest: { match: 'L2', slot: 2 }, lossDest: null }, // Loser takes 4th
-      'L2': { code: 'LB-FINAL', round: 'lr2', label: 'Lower Final', bestOf: 3, targetWins: 2, winDest: { match: 'GF1', slot: 2 }, lossDest: null }, // Loser takes 3rd
+      'L1': { code: 'LB-SEMI', round: 'lr1', label: 'Lower Semifinal', bestOf: 1, targetWins: 1, winDest: { match: 'L2', slot: 2 }, lossDest: null }, // Loser takes 4th
+      'L2': { code: 'LB-FINAL', round: 'lr2', label: 'Lower Final', bestOf: 1, targetWins: 1, winDest: { match: 'GF1', slot: 2 }, lossDest: null }, // Loser takes 3rd
 
       // GRAND FINALS
-      'GF1': { code: 'GF-M1', round: 'gf', label: 'Grand Finals', bestOf: 3, targetWins: 2, winDest: null, lossDest: null },
-      'GF2': { code: 'GF-RESET', round: 'gf', label: 'Grand Finals Reset', bestOf: 3, targetWins: 2, winDest: null, lossDest: null }
+      'GF1': { code: 'GF-M1', round: 'gf', label: 'Grand Finals', bestOf: 1, targetWins: 1, winDest: null, lossDest: null },
+      'GF2': { code: 'GF-RESET', round: 'gf', label: 'Grand Finals Reset', bestOf: 1, targetWins: 1, winDest: null, lossDest: null }
     };
 
     let state = {

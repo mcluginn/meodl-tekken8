@@ -22,7 +22,9 @@
       supportedBracketTypes: ['single', 'double', 'roundRobin'],
       participantType: 'team',
       defaultParticipants: ['TEAM RANKINE', 'TEAM OTTO', 'TEAM BRAYTON', 'TEAM DIESEL'],
-      matchFormat: '4 Quarters (8 mins each)',
+      matchFormat: '1 Game (4 Quarters × 8 mins)',
+      formatBadge: '1 Game • 4Q',
+      isBestOf: false,
       rulesKey: 'basketball',
       accentColor: '#ef4444',
       badgeClass: 'bg-orange-950/80 text-orange-400 border-orange-700/60'
@@ -36,7 +38,9 @@
       supportedBracketTypes: ['single', 'double', 'roundRobin'],
       participantType: 'team',
       defaultParticipants: ['TEAM RANKINE', 'TEAM OTTO', 'TEAM BRAYTON', 'TEAM DIESEL'],
-      matchFormat: 'Best of 3 Sets (25-25-15)',
+      matchFormat: '1 Match (Best of 3 Sets: 25-25-15)',
+      formatBadge: '1 Match • BO3 Sets',
+      isBestOf: false,
       rulesKey: 'volleyball',
       accentColor: '#06b6d4',
       badgeClass: 'bg-cyan-950/80 text-cyan-400 border-cyan-700/60'
@@ -162,11 +166,13 @@
       name: 'Call of Duty: Mobile',
       category: 'Esports',
       icon: '🎯',
-      defaultBracketType: 'double',
+      defaultBracketType: 'single',
       supportedBracketTypes: ['single', 'double', 'roundRobin'],
       participantType: 'team',
       defaultParticipants: ['TEAM RANKINE', 'TEAM OTTO', 'TEAM BRAYTON', 'TEAM DIESEL'],
-      matchFormat: 'BO3 (Hardpoint/SND/Control)',
+      matchFormat: '1 Match (Hardpoint / SND / Control)',
+      formatBadge: '1 Match • Series',
+      isBestOf: false,
       rulesKey: 'codm',
       accentColor: '#f59e0b',
       badgeClass: 'bg-amber-950/80 text-amber-400 border-amber-700/60'
@@ -176,11 +182,13 @@
       name: 'Mobile Legends: Bang Bang',
       category: 'Esports',
       icon: '⚔️',
-      defaultBracketType: 'double',
+      defaultBracketType: 'single',
       supportedBracketTypes: ['single', 'double', 'roundRobin'],
       participantType: 'team',
       defaultParticipants: ['TEAM RANKINE', 'TEAM OTTO', 'TEAM BRAYTON', 'TEAM DIESEL'],
-      matchFormat: 'Best of 3 (Custom Draft)',
+      matchFormat: '1 Match (Custom Draft Pick)',
+      formatBadge: '1 Match • Draft',
+      isBestOf: false,
       rulesKey: 'ml',
       accentColor: '#a855f7',
       badgeClass: 'bg-purple-950/80 text-purple-400 border-purple-700/60'
@@ -190,12 +198,13 @@
   // -------------------------------------------------------------------------
   // 2. BRACKET INITIALIZATION HELPERS
   // -------------------------------------------------------------------------
-  function initSingleElimination(participants, bestOf = 3) {
-    const targetWins = Math.ceil(bestOf / 2);
+  function initSingleElimination(participants, bestOf = 1) {
+    const isBO3 = bestOf >= 3;
+    const targetWins = isBO3 ? Math.ceil(bestOf / 2) : 1;
     const p = participants || ['TEAM RANKINE', 'TEAM OTTO', 'TEAM BRAYTON', 'TEAM DIESEL'];
     return {
       type: 'single',
-      bestOf: bestOf,
+      bestOf: isBO3 ? bestOf : 1,
       targetWins: targetWins,
       matches: {
         'SF1': {
@@ -254,12 +263,13 @@
     };
   }
 
-  function initDoubleElimination(participants, bestOf = 3) {
-    const targetWins = Math.ceil(bestOf / 2);
+  function initDoubleElimination(participants, bestOf = 1) {
+    const isBO3 = bestOf >= 3;
+    const targetWins = isBO3 ? Math.ceil(bestOf / 2) : 1;
     const p = participants || ['TEAM RANKINE', 'TEAM OTTO', 'TEAM BRAYTON', 'TEAM DIESEL'];
     return {
       type: 'double',
-      bestOf: bestOf,
+      bestOf: isBO3 ? bestOf : 1,
       targetWins: targetWins,
       grandFinalsResetNeeded: false,
       matches: {

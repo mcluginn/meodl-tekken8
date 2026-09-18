@@ -1250,11 +1250,11 @@
         </div>
 
         <div>
-          <label class="text-xs font-mono text-zinc-300 block mb-1">Match Win Target / Format</label>
+          <label class="text-xs font-mono text-zinc-300 block mb-1">Match Format / Win Target</label>
           <select id="settings-best-of" class="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-200 font-mono focus:border-cyan-500">
-            <option value="1">Best of 1 (First to 1 win)</option>
-            <option value="3" selected>Best of 3 (First to 2 wins)</option>
-            <option value="5">Best of 5 (First to 3 wins)</option>
+            <option value="1">1 Game / 1 Match (Default for Basketball, Volleyball, Esports, Chess)</option>
+            <option value="3">Best of 3 Games / Matches (Badminton, Extended)</option>
+            <option value="5">Best of 5 Games / Matches (Long Series)</option>
           </select>
         </div>
 
@@ -1547,10 +1547,11 @@
         } else {
           // Standard bracket event
           const bType = def.defaultBracketType || 'single';
+          const defaultBestOf = def.isBestOf ? 3 : 1;
           let bracket;
-          if (bType === 'single') bracket = window.MEODL_ENGINE.initSingleElimination(p, 3);
-          else if (bType === 'double') bracket = window.MEODL_ENGINE.initDoubleElimination(p, 3);
-          else bracket = window.MEODL_ENGINE.initRoundRobin(p, 3);
+          if (bType === 'single') bracket = window.MEODL_ENGINE.initSingleElimination(p, defaultBestOf);
+          else if (bType === 'double') bracket = window.MEODL_ENGINE.initDoubleElimination(p, defaultBestOf);
+          else bracket = window.MEODL_ENGINE.initRoundRobin(p, defaultBestOf);
 
           events[key] = {
             id: key,
@@ -1572,6 +1573,20 @@
           appState.events = parsed.events || initDefaultEvents();
           appState.history = parsed.history || [];
           appState.settings = parsed.settings || { sound: true, autosave: true };
+
+          // Sanitization: Ensure sports where isBestOf is false are set to bestOf: 1, targetWins: 1
+          const nonBo3Sports = ['basketball', 'volleyball', 'codm', 'ml', 'chess', 'scrabble', 'generals'];
+          nonBo3Sports.forEach(sId => {
+            const ev = appState.events[sId];
+            if (ev && ev.bracket && ev.bracket.bestOf !== 1) {
+              ev.bracket.bestOf = 1;
+              ev.bracket.targetWins = 1;
+              Object.values(ev.bracket.matches || {}).forEach(m => {
+                m.bestOf = 1;
+                m.targetWins = 1;
+              });
+            }
+          });
         } else {
           appState.events = initDefaultEvents();
           migrateLegacyTekkenState();
@@ -1894,7 +1909,12 @@
 
       document.getElementById('uni-sport-icon').textContent = def.icon;
       document.getElementById('uni-sport-title').textContent = def.name;
-      document.getElementById('uni-sport-subtitle').textContent = def.category + ' • ' + (ev.bracket ? ev.bracket.bestOf + ' Games Target' : '');
+      
+      const isBO = ev.bracket && ev.bracket.bestOf > 1;
+      const formatStr = isBO 
+        ? ('Best of ' + ev.bracket.bestOf + ' Games') 
+        : (def.matchFormat || '1 Match / Single Game');
+      document.getElementById('uni-sport-subtitle').textContent = def.category + ' • ' + formatStr;
 
       const bracketBadge = document.getElementById('uni-sport-bracket-badge');
       if (bracketBadge && ev.bracket) {
@@ -1903,7 +1923,7 @@
 
       const formatBadge = document.getElementById('uni-sport-format-badge');
       if (formatBadge && ev.bracket) {
-        formatBadge.textContent = 'BO' + ev.bracket.bestOf;
+        formatBadge.textContent = def.formatBadge || (ev.bracket.bestOf > 1 ? 'BO' + ev.bracket.bestOf : '1 Match');
       }
 
       const liveBtn = document.getElementById('btn-uni-live-scoreboard');
@@ -1937,12 +1957,15 @@
       const isCompleted = match.completed;
       const isLive = match.isLive;
       const hasBoth = match.p1 && match.p2;
+      const def = window.MEODL_ENGINE.EVENT_DEFINITIONS[sportId] || {};
+      const isLiveSport = (sportId === 'basketball' || sportId === 'volleyball');
+      const isSingleMatch = !def.isBestOf && (!match.bestOf || match.bestOf === 1);
 
       let statusBadge = 'bg-zinc-800 text-zinc-400 border-zinc-700';
       let statusText = 'Ready';
-      if (isCompleted) { statusBadge = 'bg-amber-950 text-amber-300 border-amber-800'; statusText = 'Final'; }
+      if (isCompleted) { statusBadge = 'bg-amber-950/80 text-amber-300 border-amber-800/70 font-bold'; statusText = 'Final'; }
       else if (isLive) { statusBadge = 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 live-pulse font-bold'; statusText = 'Live'; }
-      else if (!hasBoth) { statusBadge = 'bg-zinc-900 text-zinc-600 border-zinc-800'; statusText = 'Waiting'; }
+      else if (!hasBoth) { statusBadge = 'bg-zinc-900/60 text-zinc-600 border-zinc-800'; statusText = 'Waiting'; }
 
       const getPresenceBadge = (name) => {
         if (!name || !window.MEODL_ATTENDANCE) return '';
@@ -1953,62 +1976,93 @@
           const stats = window.MEODL_ATTENDANCE.getStats();
           const t = stats.byTeam[matchedTeam.toLowerCase()];
           if (t) {
-            return `<span class="text-[9px] font-mono font-bold px-1 rounded ${t.inside === t.total ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-zinc-800 text-zinc-300'}" title="Venue Presence">${t.inside}/${t.total} 🟢</span>`;
+            return `<span class="text-[9px] font-mono font-bold px-1 py-0.5 rounded ${t.inside === t.total ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-800' : 'bg-zinc-800 text-zinc-300 border border-zinc-700'}" title="Venue Presence">${t.inside}/${t.total} 🟢</span>`;
           }
         }
         const student = window.MEODL_ATTENDANCE.getStudents().find(s => s.name.toUpperCase() === clean || clean.includes(s.name.toUpperCase()));
         if (student) {
           return student.status === 'INSIDE' 
-            ? `<span class="text-[9px] font-mono px-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800" title="Present inside venue">INSIDE 🟢</span>`
-            : `<span class="text-[9px] font-mono px-1 rounded bg-zinc-800 text-zinc-400" title="Outside venue">OUTSIDE 🔴</span>`;
+            ? `<span class="text-[9px] font-mono px-1 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800" title="Present inside venue">INSIDE 🟢</span>`
+            : `<span class="text-[9px] font-mono px-1 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700" title="Outside venue">OUTSIDE 🔴</span>`;
         }
         return '';
       };
 
-      const renderPlayer = (p, score, isWin, slot) => {
-        const name = p ? p.name : '<span class="text-zinc-600 italic">Waiting...</span>';
+      const getTeamTheme = (name) => {
+        if (!name) return { border: 'border-zinc-800', dot: 'bg-zinc-600' };
+        const upper = name.toUpperCase();
+        if (upper.includes('RANKINE')) return { border: 'border-l-2 border-l-red-500', dot: 'bg-red-500' };
+        if (upper.includes('OTTO')) return { border: 'border-l-2 border-l-amber-500', dot: 'bg-amber-500' };
+        if (upper.includes('BRAYTON')) return { border: 'border-l-2 border-l-cyan-400', dot: 'bg-cyan-400' };
+        if (upper.includes('DIESEL')) return { border: 'border-l-2 border-l-emerald-500', dot: 'bg-emerald-500' };
+        return { border: 'border-l-2 border-l-zinc-600', dot: 'bg-zinc-500' };
+      };
+
+      const renderCompetitor = (p, score, isWin, slot) => {
+        const name = p ? p.name : '<span class="text-zinc-600 italic">Waiting for previous round...</span>';
         const seed = p ? '#' + p.seed : '-';
         const presBadge = p ? getPresenceBadge(p.name) : '';
+        const theme = p ? getTeamTheme(p.name) : { border: 'border-transparent', dot: 'bg-zinc-700' };
+
         return `
-          <div class="flex items-center justify-between p-2 rounded-lg transition-all ${isWin ? 'bg-cyan-950/40 border border-cyan-500/50 text-cyan-300 font-bold' : 'bg-zinc-900/60 text-zinc-200'}">
+          <div class="flex items-center justify-between p-2 rounded-xl transition-all ${theme.border} ${isWin ? 'bg-cyan-950/40 border border-cyan-500/50 text-cyan-300 font-bold shadow-inner' : 'bg-zinc-950/80 border border-zinc-800/80 text-zinc-200'}">
             <div class="flex items-center gap-2 truncate pr-2">
-              <span class="text-[10px] font-mono px-1 rounded bg-zinc-800 text-zinc-400 font-semibold">${seed}</span>
-              <span class="truncate text-xs ${isWin ? 'text-cyan-300 font-bold' : ''}">${name}</span>
+              <span class="w-1.5 h-1.5 rounded-full ${theme.dot} shrink-0"></span>
+              <span class="text-[10px] font-mono px-1 rounded bg-zinc-900 text-zinc-400 font-semibold shrink-0">${seed}</span>
+              <span class="truncate text-xs ${isWin ? 'text-cyan-300 font-bold' : 'text-zinc-200'}">${name}</span>
               ${presBadge}
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
-              ${hasBoth && !isCompleted ? `
-                <button onclick="adjustUniScore('${sportId}', '${match.id}', ${slot}, -1); event.stopPropagation();" class="score-button">-</button>
-                <button onclick="adjustUniScore('${sportId}', '${match.id}', ${slot}, 1); event.stopPropagation();" class="score-button">+</button>
+              ${hasBoth && !isCompleted && !isLiveSport && isSingleMatch ? `
+                <button onclick="setUniMatchWinner('${sportId}', '${match.id}', ${slot}); event.stopPropagation();" class="text-[10px] px-2 py-0.5 rounded bg-zinc-800 hover:bg-cyan-950 hover:border-cyan-500 border border-zinc-700 text-zinc-300 hover:text-cyan-300 font-mono font-bold transition-all" title="Declare ${p ? p.name : 'Slot ' + slot} as Match Winner">Win</button>
               ` : ''}
-              <span class="font-mono text-sm font-bold min-w-[20px] text-center ${isWin ? 'text-cyan-400' : 'text-zinc-400'}">${score}</span>
-              ${isWin ? '<span class="text-cyan-400 text-xs">✓</span>' : ''}
+              ${hasBoth && !isCompleted && !isLiveSport && !isSingleMatch ? `
+                <button onclick="adjustUniScore('${sportId}', '${match.id}', ${slot}, -1); event.stopPropagation();" class="score-button" title="Decrease score">-</button>
+                <button onclick="adjustUniScore('${sportId}', '${match.id}', ${slot}, 1); event.stopPropagation();" class="score-button" title="Increase score">+</button>
+              ` : ''}
+              <span class="font-mono text-sm font-bold min-w-[22px] text-center ${isWin ? 'text-cyan-400' : 'text-zinc-300'}">${score}</span>
+              ${isWin ? '<span class="text-cyan-400 text-xs font-black">✓</span>' : ''}
             </div>
           </div>
         `;
       };
 
       return `
-        <div id="card-${sportId}-${match.id}" class="match-node relative bg-zinc-900/90 backdrop-blur-md rounded-xl border border-zinc-800 p-2.5 shadow-card w-72">
+        <div id="card-${sportId}-${match.id}" class="match-node relative bg-zinc-900/95 backdrop-blur-md rounded-2xl border border-zinc-800 p-3 shadow-card w-80 transition-all hover:border-zinc-700">
           <div class="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-zinc-800/80">
-            <div class="flex items-center gap-1.5 cursor-pointer" onclick="openUniMatchModal('${sportId}', '${match.id}')">
-              <span class="font-mono font-bold text-[11px] text-cyan-400 hover:underline">${match.code}</span>
-              <span class="text-[10px] font-mono px-1.5 rounded bg-zinc-800 text-zinc-400">${match.label}</span>
+            <div class="flex items-center gap-1.5 cursor-pointer" onclick="openUniMatchModal('${sportId}', '${match.id}')" title="Click to inspect or record match result">
+              <span class="font-mono font-black text-[11px] text-cyan-400 hover:underline">${match.code}</span>
+              <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700/60">${match.label}</span>
             </div>
-            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase ${statusBadge}">${statusText}</span>
+            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase tracking-wider ${statusBadge}">${statusText}</span>
           </div>
+
           <div class="space-y-1.5">
-            ${renderPlayer(match.p1, match.score1, isCompleted && match.winner === 1, 1)}
-            ${renderPlayer(match.p2, match.score2, isCompleted && match.winner === 2, 2)}
+            ${renderCompetitor(match.p1, match.score1, isCompleted && match.winner === 1, 1)}
+            ${renderCompetitor(match.p2, match.score2, isCompleted && match.winner === 2, 2)}
           </div>
-          ${(sportId === 'basketball' || sportId === 'volleyball') && hasBoth ? `
-            <div class="mt-2 pt-1.5 border-t border-zinc-800/80 flex items-center justify-between gap-1.5">
-              <a href="live_match.html?sport=${sportId}&match=${match.id}" class="flex-1 py-1 px-2 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-600/70 text-[10px] font-mono font-bold text-cyan-300 flex items-center justify-center gap-1 transition-all hover:scale-[1.02]">
+
+          ${isLiveSport && hasBoth ? `
+            <div class="mt-2.5 pt-2 border-t border-zinc-800/80 flex items-center justify-between gap-2">
+              <a href="live_match.html?sport=${sportId}&match=${match.id}" class="flex-1 py-1.5 px-2.5 rounded-xl bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-600/70 text-[10px] font-mono font-bold text-cyan-300 flex items-center justify-center gap-1.5 transition-all hover:scale-[1.01] shadow-sm">
                 <span>⚡ LIVE SCOREBOARD</span>
               </a>
-              <a href="live_match.html?sport=${sportId}&match=${match.id}&view=scoreboard" target="_blank" class="py-1 px-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-[10px] font-mono text-zinc-300 transition-all" title="Open Fullscreen TV / Projector Display">
+              <button onclick="openUniMatchModal('${sportId}', '${match.id}');" class="py-1.5 px-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-[10px] font-mono text-zinc-300 transition-all" title="Direct Score Input / Inspection">
+                Score
+              </button>
+              <a href="live_match.html?sport=${sportId}&match=${match.id}&view=scoreboard" target="_blank" class="py-1.5 px-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-[10px] font-mono text-zinc-300 transition-all" title="Open Fullscreen TV / Projector Display">
                 📺
               </a>
+            </div>
+          ` : ''}
+
+          ${!isLiveSport && isCompleted ? `
+            <div class="mt-2 pt-1.5 border-t border-zinc-800/80 flex items-center justify-between">
+              <span class="text-[10px] font-mono text-amber-300 flex items-center gap-1">
+                <span>🏆 Winner:</span>
+                <strong class="text-white">${match.winner === 1 ? (match.p1 ? match.p1.name : 'P1') : (match.p2 ? match.p2.name : 'P2')}</strong>
+              </span>
+              <button onclick="resetUniMatch('${sportId}', '${match.id}')" class="text-[9px] font-mono text-zinc-500 hover:text-red-400 transition-colors">Reset</button>
             </div>
           ` : ''}
         </div>
@@ -2017,80 +2071,130 @@
 
     function renderUniSingleElimination(bracket, sportId) {
       const content = document.getElementById('uni-bracket-content');
+      const def = window.MEODL_ENGINE.EVENT_DEFINITIONS[sportId] || {};
+
       content.innerHTML = `
-        <div class="flex gap-16 items-start pt-6">
-          <div class="flex flex-col gap-8 w-72">
-            <div class="pb-2 border-b border-zinc-800 text-xs font-mono font-bold text-cyan-300 uppercase">SEMIFINALS (ROUND 1)</div>
-            <div class="flex flex-col gap-6">
-              ${createUniCardHTML(bracket.matches.SF1, sportId)}
-              ${createUniCardHTML(bracket.matches.SF2, sportId)}
+        <div class="space-y-8 max-w-5xl">
+          <!-- Championship Bracket Box -->
+          <div class="bg-zinc-950/40 rounded-2xl border border-zinc-800/80 p-6 backdrop-blur-sm shadow-xl">
+            <div class="flex items-center justify-between pb-3 mb-6 border-b border-zinc-800/80">
+              <div class="flex items-center gap-2">
+                <span class="text-base text-yellow-400">🏆</span>
+                <h3 class="text-xs font-mono font-black text-amber-300 uppercase tracking-wider">Championship Tournament (Gold & Silver Medal)</h3>
+              </div>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-zinc-800">
+                ${def.formatBadge || (bracket.bestOf > 1 ? 'BO' + bracket.bestOf : '1 Match')} • Single Elimination
+              </span>
+            </div>
+
+            <!-- Semifinals and Championship Final -->
+            <div class="flex items-center gap-20">
+              <!-- Semifinals Column -->
+              <div class="flex flex-col gap-8 w-80 shrink-0">
+                <div>
+                  <div class="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> SEMIFINAL 1
+                  </div>
+                  ${createUniCardHTML(bracket.matches.SF1, sportId)}
+                </div>
+                <div>
+                  <div class="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> SEMIFINAL 2
+                  </div>
+                  ${createUniCardHTML(bracket.matches.SF2, sportId)}
+                </div>
+              </div>
+
+              <!-- Final Column (Centered relative to the Semifinals) -->
+              <div class="flex flex-col justify-center w-80 shrink-0">
+                <div class="text-[10px] font-mono font-bold text-yellow-400 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                  <span>🥇</span> CHAMPIONSHIP FINAL (1ST & 2ND)
+                </div>
+                ${createUniCardHTML(bracket.matches.FINAL, sportId)}
+              </div>
             </div>
           </div>
 
-          <div class="flex flex-col gap-8 w-72">
-            <div class="pb-2 border-b border-zinc-800 text-xs font-mono font-bold text-amber-300 uppercase">CHAMPIONSHIP & 3RD PLACE</div>
-            <div class="flex flex-col gap-6">
-              <div>
-                <div class="text-[10px] font-mono font-bold text-yellow-400 mb-1">🥇 GOLD MEDAL FINAL</div>
-                ${createUniCardHTML(bracket.matches.FINAL, sportId)}
+          <!-- Bronze Medal Playoff Box -->
+          <div class="bg-zinc-950/40 rounded-2xl border border-zinc-800/80 p-6 backdrop-blur-sm shadow-xl max-w-2xl">
+            <div class="flex items-center justify-between pb-3 mb-4 border-b border-zinc-800/80">
+              <div class="flex items-center gap-2">
+                <span class="text-base text-amber-600">🥉</span>
+                <h3 class="text-xs font-mono font-black text-amber-500 uppercase tracking-wider">Bronze Medal Match (3rd & 4th Place Playoff)</h3>
               </div>
-              <div class="pt-4 border-t border-zinc-900">
-                <div class="text-[10px] font-mono font-bold text-amber-600 mb-1">🥉 BRONZE MEDAL MATCH</div>
+              <span class="text-[10px] font-mono text-zinc-400">Loser SF1 vs Loser SF2</span>
+            </div>
+            <div class="flex items-center gap-6">
+              <div class="w-80 shrink-0">
                 ${createUniCardHTML(bracket.matches.BRONZE, sportId)}
+              </div>
+              <div class="text-[11px] font-mono text-zinc-400 leading-relaxed border-l border-zinc-800 pl-5">
+                <div class="text-zinc-200 font-bold mb-1">Playoff Points & Medals:</div>
+                <div class="flex items-center gap-1.5 mb-1"><span class="text-amber-500 font-bold">🥉 Winner:</span> 3rd Place • 5 League Points</div>
+                <div class="flex items-center gap-1.5"><span class="text-zinc-500 font-bold">4️⃣ Loser:</span> 4th Place • 3 League Points</div>
               </div>
             </div>
           </div>
         </div>
       `;
 
+      // Draw clean orthogonal connectors for Championship Tree only (NO crossing lines to bronze!)
       setTimeout(() => drawUniConnectors(sportId, [
         { from: 'SF1', to: 'FINAL', slot: 1 },
-        { from: 'SF2', to: 'FINAL', slot: 2 },
-        { from: 'SF1', to: 'BRONZE', slot: 1 },
-        { from: 'SF2', to: 'BRONZE', slot: 2 }
+        { from: 'SF2', to: 'FINAL', slot: 2 }
       ]), 50);
     }
 
     function renderUniDoubleElimination(bracket, sportId) {
       const content = document.getElementById('uni-bracket-content');
       content.innerHTML = `
-        <div class="flex gap-14 items-start pt-6">
-          <!-- Col 1: Round 1 -->
-          <div class="flex flex-col gap-10 w-72">
+        <div class="flex gap-16 items-start pt-4">
+          <!-- Col 1: Semis -->
+          <div class="flex flex-col gap-10 w-80">
             <div>
-              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-cyan-300 uppercase">UPPER SEMIS</div>
-              <div class="flex flex-col gap-5">
+              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-cyan-300 uppercase flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span> UPPER SEMIS (ROUND 1)
+              </div>
+              <div class="flex flex-col gap-6">
                 ${createUniCardHTML(bracket.matches.W1, sportId)}
                 ${createUniCardHTML(bracket.matches.W2, sportId)}
               </div>
             </div>
-            <div class="pt-4 border-t border-zinc-900">
-              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-red-300 uppercase">LOWER SEMIS (LOSER = 4TH)</div>
+            <div class="pt-4 border-t border-zinc-800/80">
+              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-red-400 uppercase flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-red-500"></span> LOWER SEMIS (LOSER = 4TH)
+              </div>
               ${createUniCardHTML(bracket.matches.L1, sportId)}
             </div>
           </div>
 
-          <!-- Col 2: Round 2 -->
-          <div class="flex flex-col gap-10 w-72">
+          <!-- Col 2: Finals -->
+          <div class="flex flex-col gap-10 w-80">
             <div>
-              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-cyan-300 uppercase">UPPER FINALS (TO GF)</div>
+              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-cyan-300 uppercase flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span> UPPER FINALS (TO GF)
+              </div>
               ${createUniCardHTML(bracket.matches.W3, sportId)}
             </div>
-            <div class="pt-4 border-t border-zinc-900">
-              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-red-300 uppercase">LOWER FINALS (LOSER = 3RD)</div>
+            <div class="pt-8 border-t border-zinc-800/80">
+              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-red-400 uppercase flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-red-500"></span> LOWER FINALS (LOSER = 🥉 BRONZE)
+              </div>
               ${createUniCardHTML(bracket.matches.L2, sportId)}
             </div>
           </div>
 
-          <!-- Col 3: Championship -->
+          <!-- Col 3: Grand Championship -->
           <div class="flex flex-col gap-6 w-80">
             <div>
-              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-yellow-300 uppercase">GRAND FINALS CHAMPIONSHIP</div>
+              <div class="pb-2 mb-3 border-b border-zinc-800 text-xs font-mono font-bold text-yellow-300 uppercase flex items-center gap-2">
+                <span>🏆</span> GRAND FINALS CHAMPIONSHIP
+              </div>
               <div class="flex flex-col gap-6">
                 ${createUniCardHTML(bracket.matches.GF1, sportId)}
                 ${(bracket.grandFinalsResetNeeded || (bracket.matches.GF2 && bracket.matches.GF2.p1)) ? `
                   <div>
-                    <div class="text-[10px] font-mono font-bold text-yellow-400 mb-1">⚡ RESET MATCH</div>
+                    <div class="text-[10px] font-mono font-bold text-yellow-400 mb-1">⚡ BRACKET RESET MATCH</div>
                     ${createUniCardHTML(bracket.matches.GF2, sportId)}
                   </div>
                 ` : ''}
@@ -2174,11 +2278,25 @@
       if (!svg) return;
       const canvas = document.getElementById('uni-bracket-canvas');
       if (!canvas) return;
+
+      // Ensure SVG covers the canvas
+      svg.style.width = canvas.scrollWidth + 'px';
+      svg.style.height = canvas.scrollHeight + 'px';
+      svg.setAttribute('width', canvas.scrollWidth);
+      svg.setAttribute('height', canvas.scrollHeight);
+
       const canvasRect = canvas.getBoundingClientRect();
       const ev = appState.events[sportId];
       if (!ev || !ev.bracket) return;
 
-      let svgHTML = '';
+      let svgHTML = `
+        <defs>
+          <filter id="uni-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#22d3ee" flood-opacity="0.8"/>
+          </filter>
+        </defs>
+      `;
+
       links.forEach(l => {
         const fromEl = document.getElementById('card-' + sportId + '-' + l.from);
         const toEl = document.getElementById('card-' + sportId + '-' + l.to);
@@ -2190,17 +2308,21 @@
         const x1 = fRect.right - canvasRect.left;
         const y1 = fRect.top + fRect.height / 2 - canvasRect.top;
         const x2 = tRect.left - canvasRect.left;
-        const targetOffset = l.slot === 1 ? tRect.height * 0.35 : tRect.height * 0.65;
+        const targetOffset = l.slot === 1 ? (tRect.height * 0.32) : (tRect.height * 0.68);
         const y2 = tRect.top + targetOffset - canvasRect.top;
 
         const fromMatch = ev.bracket.matches[l.from];
         const isActive = fromMatch && fromMatch.completed && fromMatch.winner;
-        const strokeClass = isActive ? 'connector-active' : 'connector-inactive';
+        const strokeColor = isActive ? '#22d3ee' : '#3f3f46';
+        const strokeWidth = isActive ? '2.5' : '1.5';
+        const strokeDash = isActive ? '' : 'stroke-dasharray="4 3"';
+        const filterAttr = isActive ? 'filter="url(#uni-glow)"' : '';
 
-        const midX = x1 + (x2 - x1) / 2;
-        const pathData = `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`;
-        svgHTML += `<path d="${pathData}" fill="none" class="connector-line ${strokeClass}" />`;
+        const midX = x1 + (x2 - x1) * 0.5;
+        const pathData = `M ${x1} ${y1} H ${midX} V ${y2} H ${x2}`;
+        svgHTML += `<path d="${pathData}" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}" ${strokeDash} ${filterAttr} stroke-linecap="round" stroke-linejoin="round" />`;
       });
+
       svg.innerHTML = svgHTML;
     }
 
@@ -2216,7 +2338,7 @@
       if (slot === 1) m.score1 = Math.max(0, m.score1 + delta);
       else if (slot === 2) m.score2 = Math.max(0, m.score2 + delta);
 
-      const target = ev.bracket.targetWins || 2;
+      const target = ev.bracket.targetWins || 1;
       if (m.score1 >= target && m.score1 > m.score2) {
         m.winner = 1;
         m.completed = true;
@@ -2235,6 +2357,51 @@
 
       saveAppState();
       renderCurrentSportView();
+    }
+
+    function setUniMatchWinner(sportId, matchId, winnerSlot) {
+      pushUndoSnapshot();
+      const ev = appState.events[sportId];
+      if (!ev || !ev.bracket || !ev.bracket.matches[matchId]) return;
+      const m = ev.bracket.matches[matchId];
+      if (!m.p1 || !m.p2) return;
+
+      m.winner = winnerSlot;
+      m.completed = true;
+      m.isLive = false;
+      if (winnerSlot === 1) {
+        m.score1 = Math.max(1, m.score1);
+        if (m.score1 <= m.score2) m.score1 = m.score2 + 1;
+      } else if (winnerSlot === 2) {
+        m.score2 = Math.max(1, m.score2);
+        if (m.score2 <= m.score1) m.score2 = m.score1 + 1;
+      }
+
+      if (ev.bracket.type === 'single') window.MEODL_ENGINE.propagateSingleElim(ev.bracket);
+      else if (ev.bracket.type === 'double') window.MEODL_ENGINE.propagateDoubleElim(ev.bracket);
+
+      saveAppState();
+      renderCurrentSportView();
+      showToast(`${m.code}: ${winnerSlot === 1 ? m.p1.name : m.p2.name} declared winner!`);
+    }
+
+    function resetUniMatch(sportId, matchId) {
+      pushUndoSnapshot();
+      const ev = appState.events[sportId];
+      if (!ev || !ev.bracket || !ev.bracket.matches[matchId]) return;
+      const m = ev.bracket.matches[matchId];
+      m.winner = null;
+      m.completed = false;
+      m.isLive = false;
+      m.score1 = 0;
+      m.score2 = 0;
+
+      if (ev.bracket.type === 'single') window.MEODL_ENGINE.propagateSingleElim(ev.bracket);
+      else if (ev.bracket.type === 'double') window.MEODL_ENGINE.propagateDoubleElim(ev.bracket);
+
+      saveAppState();
+      renderCurrentSportView();
+      showToast(`${m.code} match reset.`);
     }
 
     // -------------------------------------------------------------------------
@@ -2489,12 +2656,14 @@
       const ev = appState.events[sportId];
       if (!modal || !content || !ev || !ev.bracket || !ev.bracket.matches[matchId]) return;
 
+      const def = window.MEODL_ENGINE.EVENT_DEFINITIONS[sportId] || {};
       const m = ev.bracket.matches[matchId];
       document.getElementById('uni-modal-match-code').textContent = (ev.name || sportId).toUpperCase() + ' • ' + (m.code || matchId);
-      document.getElementById('uni-modal-match-label').textContent = m.label || 'Match Inspection';
+      document.getElementById('uni-modal-match-label').textContent = (m.label || 'Match Inspection') + (def.formatBadge ? ' (' + def.formatBadge + ')' : '');
 
       const p1Name = m.p1 ? m.p1.name : 'Waiting for competitor';
       const p2Name = m.p2 ? m.p2.name : 'Waiting for competitor';
+      const hasBoth = m.p1 && m.p2;
 
       // Check venue presence
       let pres1 = 'Unknown';
@@ -2502,67 +2671,197 @@
       if (window.MEODL_ATTENDANCE) {
         const stats = window.MEODL_ATTENDANCE.getStats();
         ['rankine', 'otto', 'brayton', 'diesel'].forEach(t => {
-          if (p1Name.toLowerCase().includes(t)) pres1 = `${stats.byTeam[t].inside}/${stats.byTeam[t].total} inside venue 🟢`;
-          if (p2Name.toLowerCase().includes(t)) pres2 = `${stats.byTeam[t].inside}/${stats.byTeam[t].total} inside venue 🟢`;
+          if (p1Name.toLowerCase().includes(t)) pres1 = `${stats.byTeam[t].inside}/${stats.byTeam[t].total} inside 🟢`;
+          if (p2Name.toLowerCase().includes(t)) pres2 = `${stats.byTeam[t].inside}/${stats.byTeam[t].total} inside 🟢`;
         });
       }
 
+      const isLiveSport = (sportId === 'basketball' || sportId === 'volleyball');
+      const isSingleMatch = !def.isBestOf && (!m.bestOf || m.bestOf === 1);
+
       content.innerHTML = `
-        <div class="space-y-3 font-mono text-xs">
+        <div class="space-y-4 font-mono text-xs">
           <!-- Competitors & Presence Verification -->
-          <div class="p-3 rounded-xl bg-zinc-950 border border-zinc-800 space-y-2">
-            <div class="flex items-center justify-between pb-1.5 border-b border-zinc-850">
-              <span class="font-bold text-white truncate">${p1Name}</span>
-              <span class="text-[10px] text-cyan-400 font-bold">${pres1}</span>
+          <div class="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-2.5">
+            <div class="flex items-center justify-between pb-2 border-b border-zinc-850">
+              <div class="flex items-center gap-2 truncate">
+                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                <span class="font-bold text-white truncate text-sm">${p1Name}</span>
+              </div>
+              <span class="text-[10px] text-cyan-400 font-bold shrink-0">${pres1}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="font-bold text-white truncate">${p2Name}</span>
-              <span class="text-[10px] text-cyan-400 font-bold">${pres2}</span>
+              <div class="flex items-center gap-2 truncate">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="font-bold text-white truncate text-sm">${p2Name}</span>
+              </div>
+              <span class="text-[10px] text-cyan-400 font-bold shrink-0">${pres2}</span>
             </div>
           </div>
 
-          <!-- Score Adjustment -->
-          <div class="flex items-center justify-around p-4 rounded-xl bg-zinc-950 border border-zinc-800 text-center">
-            <div>
-              <span class="text-[10px] text-zinc-500 block mb-1">SCORE 1</span>
-              <div class="flex items-center gap-2">
-                <button onclick="adjustUniScore('${sportId}', '${matchId}', 1, -1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">-</button>
-                <span class="text-xl font-black text-cyan-400">${m.score1}</span>
-                <button onclick="adjustUniScore('${sportId}', '${matchId}', 1, 1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">+</button>
-              </div>
-            </div>
-            <div class="text-zinc-600 font-bold text-sm">VS</div>
-            <div>
-              <span class="text-[10px] text-zinc-500 block mb-1">SCORE 2</span>
-              <div class="flex items-center gap-2">
-                <button onclick="adjustUniScore('${sportId}', '${matchId}', 2, -1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">-</button>
-                <span class="text-xl font-black text-cyan-400">${m.score2}</span>
-                <button onclick="adjustUniScore('${sportId}', '${matchId}', 2, 1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">+</button>
-              </div>
-            </div>
+          <!-- Match Status & Format Banner -->
+          <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-[11px]">
+            <span class="text-zinc-400">Format: <strong class="text-zinc-200">${def.matchFormat || '1 Match'}</strong></span>
+            <span class="font-bold ${m.completed ? 'text-amber-400' : m.isLive ? 'text-cyan-400' : 'text-zinc-400'}">
+              ${m.completed ? '🏆 FINAL RESULT' : m.isLive ? '⚡ LIVE IN PROGRESS' : 'READY TO PLAY'}
+            </span>
           </div>
 
-          ${(sportId === 'basketball' || sportId === 'volleyball') ? `
-            <div class="pt-2">
+          ${sportId === 'basketball' ? `
+            <!-- Basketball Point Score Input -->
+            <div class="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-3">
+              <div class="text-[10px] font-bold text-zinc-400 text-center uppercase tracking-wider">Final Game Points (4 Quarters × 8 mins)</div>
+              <div class="flex items-center justify-around text-center">
+                <div>
+                  <span class="text-[10px] text-zinc-500 block mb-1 truncate max-w-[120px]">${p1Name}</span>
+                  <input id="uni-score-p1" type="number" min="0" value="${m.score1}" class="w-20 text-center font-black text-2xl bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-cyan-400 focus:border-cyan-400 focus:outline-none">
+                  <div class="flex justify-center gap-1 mt-1.5">
+                    <button onclick="document.getElementById('uni-score-p1').value = Math.max(0, parseInt(document.getElementById('uni-score-p1').value || 0) + 1)" class="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] text-zinc-300 hover:bg-zinc-700">+1</button>
+                    <button onclick="document.getElementById('uni-score-p1').value = Math.max(0, parseInt(document.getElementById('uni-score-p1').value || 0) + 2)" class="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] text-zinc-300 hover:bg-zinc-700">+2</button>
+                    <button onclick="document.getElementById('uni-score-p1').value = Math.max(0, parseInt(document.getElementById('uni-score-p1').value || 0) + 3)" class="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] text-zinc-300 hover:bg-zinc-700">+3</button>
+                  </div>
+                </div>
+                <div class="text-zinc-600 font-bold text-sm">VS</div>
+                <div>
+                  <span class="text-[10px] text-zinc-500 block mb-1 truncate max-w-[120px]">${p2Name}</span>
+                  <input id="uni-score-p2" type="number" min="0" value="${m.score2}" class="w-20 text-center font-black text-2xl bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-cyan-400 focus:border-cyan-400 focus:outline-none">
+                  <div class="flex justify-center gap-1 mt-1.5">
+                    <button onclick="document.getElementById('uni-score-p2').value = Math.max(0, parseInt(document.getElementById('uni-score-p2').value || 0) + 1)" class="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] text-zinc-300 hover:bg-zinc-700">+1</button>
+                    <button onclick="document.getElementById('uni-score-p2').value = Math.max(0, parseInt(document.getElementById('uni-score-p2').value || 0) + 2)" class="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] text-zinc-300 hover:bg-zinc-700">+2</button>
+                    <button onclick="document.getElementById('uni-score-p2').value = Math.max(0, parseInt(document.getElementById('uni-score-p2').value || 0) + 3)" class="px-1.5 py-0.5 rounded bg-zinc-800 text-[10px] text-zinc-300 hover:bg-zinc-700">+3</button>
+                  </div>
+                </div>
+              </div>
+              <button onclick="saveUniMatchDirectScore('${sportId}', '${matchId}')" class="w-full py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs uppercase tracking-wide transition-all shadow-md">
+                Save Points & Advance Bracket
+              </button>
+            </div>
+          ` : sportId === 'volleyball' ? `
+            <!-- Volleyball Sets Won Input -->
+            <div class="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-3">
+              <div class="text-[10px] font-bold text-zinc-400 text-center uppercase tracking-wider">Match Sets Won (Best of 3 Sets: 25-25-15)</div>
+              <div class="flex items-center justify-around text-center">
+                <div>
+                  <span class="text-[10px] text-zinc-500 block mb-1 truncate max-w-[120px]">${p1Name}</span>
+                  <input id="uni-score-p1" type="number" min="0" max="2" value="${m.score1}" class="w-16 text-center font-black text-2xl bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-cyan-400 focus:border-cyan-400 focus:outline-none">
+                  <span class="text-[10px] text-zinc-500 block mt-1">Sets</span>
+                </div>
+                <div class="text-zinc-600 font-bold text-sm">VS</div>
+                <div>
+                  <span class="text-[10px] text-zinc-500 block mb-1 truncate max-w-[120px]">${p2Name}</span>
+                  <input id="uni-score-p2" type="number" min="0" max="2" value="${m.score2}" class="w-16 text-center font-black text-2xl bg-zinc-900 border border-zinc-700 rounded-xl p-2 text-cyan-400 focus:border-cyan-400 focus:outline-none">
+                  <span class="text-[10px] text-zinc-500 block mt-1">Sets</span>
+                </div>
+              </div>
+              <button onclick="saveUniMatchDirectScore('${sportId}', '${matchId}')" class="w-full py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold text-xs uppercase tracking-wide transition-all shadow-md">
+                Save Sets & Advance Bracket
+              </button>
+            </div>
+          ` : `
+            <!-- Standard / Esports Quick Win & Score Input -->
+            <div class="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-3">
+              <div class="text-[10px] font-bold text-zinc-400 text-center uppercase tracking-wider">Declare Match Result</div>
+              ${hasBoth ? `
+                <div class="grid grid-cols-2 gap-2">
+                  <button onclick="setUniMatchWinner('${sportId}', '${matchId}', 1); closeUniMatchModal();" class="py-3 px-2 rounded-xl bg-zinc-900 hover:bg-emerald-950/80 border border-zinc-700 hover:border-emerald-500 text-zinc-200 hover:text-emerald-300 font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                    <span>🏆 WINNER</span>
+                    <span class="text-[11px] truncate max-w-[120px] text-cyan-300">${p1Name}</span>
+                  </button>
+                  <button onclick="setUniMatchWinner('${sportId}', '${matchId}', 2); closeUniMatchModal();" class="py-3 px-2 rounded-xl bg-zinc-900 hover:bg-emerald-950/80 border border-zinc-700 hover:border-emerald-500 text-zinc-200 hover:text-emerald-300 font-bold text-xs flex flex-col items-center gap-1 transition-all">
+                    <span>🏆 WINNER</span>
+                    <span class="text-[11px] truncate max-w-[120px] text-cyan-300">${p2Name}</span>
+                  </button>
+                </div>
+              ` : `
+                <div class="text-center text-zinc-500 italic py-2">Waiting for competitors to be determined.</div>
+              `}
+
+              ${!isSingleMatch ? `
+                <div class="pt-2 border-t border-zinc-850 flex items-center justify-around text-center">
+                  <div>
+                    <span class="text-[10px] text-zinc-500 block mb-1">SCORE 1</span>
+                    <div class="flex items-center gap-2">
+                      <button onclick="adjustUniScore('${sportId}', '${matchId}', 1, -1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">-</button>
+                      <span class="text-xl font-black text-cyan-400">${m.score1}</span>
+                      <button onclick="adjustUniScore('${sportId}', '${matchId}', 1, 1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">+</button>
+                    </div>
+                  </div>
+                  <div class="text-zinc-600 font-bold text-sm">VS</div>
+                  <div>
+                    <span class="text-[10px] text-zinc-500 block mb-1">SCORE 2</span>
+                    <div class="flex items-center gap-2">
+                      <button onclick="adjustUniScore('${sportId}', '${matchId}', 2, -1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">-</button>
+                      <span class="text-xl font-black text-cyan-400">${m.score2}</span>
+                      <button onclick="adjustUniScore('${sportId}', '${matchId}', 2, 1); openUniMatchModal('${sportId}', '${matchId}');" class="score-button">+</button>
+                    </div>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+          `}
+
+          ${isLiveSport && hasBoth ? `
+            <div>
               <a href="live_match.html?sport=${sportId}&match=${matchId}" class="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-black text-xs font-mono text-center flex items-center justify-center gap-2 uppercase shadow-md transition-all hover:scale-[1.01]">
                 <span>⚡ LAUNCH DEDICATED LIVE MATCH SCREEN</span>
               </a>
             </div>
           ` : ''}
 
-          <!-- Marshal Confirmation Button -->
+          <!-- Marshal Actions and Reset -->
           <div class="flex items-center justify-between gap-2 pt-2 border-t border-zinc-850">
             <button onclick="confirmParticipantsPresent('${sportId}', '${matchId}')" class="flex-1 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 font-bold text-xs">
               ✓ Confirm Competitors Present
             </button>
+            ${m.completed ? `
+              <button onclick="resetUniMatch('${sportId}', '${matchId}'); openUniMatchModal('${sportId}', '${matchId}');" class="py-2 px-3 rounded-xl bg-red-950/70 hover:bg-red-900 border border-red-800/80 text-red-300 font-bold text-xs">
+                Reset Result
+              </button>
+            ` : ''}
             <button onclick="closeUniMatchModal()" class="py-2 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs">
-              Done
+              Close
             </button>
           </div>
         </div>
       `;
 
       modal.classList.remove('hidden');
+    }
+
+    function saveUniMatchDirectScore(sportId, matchId) {
+      pushUndoSnapshot();
+      const ev = appState.events[sportId];
+      if (!ev || !ev.bracket || !ev.bracket.matches[matchId]) return;
+      const m = ev.bracket.matches[matchId];
+      const inp1 = document.getElementById('uni-score-p1');
+      const inp2 = document.getElementById('uni-score-p2');
+      if (!inp1 || !inp2) return;
+
+      const s1 = Math.max(0, parseInt(inp1.value) || 0);
+      const s2 = Math.max(0, parseInt(inp2.value) || 0);
+      m.score1 = s1;
+      m.score2 = s2;
+
+      if (s1 > s2) {
+        m.winner = 1;
+        m.completed = true;
+        m.isLive = false;
+      } else if (s2 > s1) {
+        m.winner = 2;
+        m.completed = true;
+        m.isLive = false;
+      } else {
+        m.winner = null;
+        m.completed = false;
+      }
+
+      if (ev.bracket.type === 'single') window.MEODL_ENGINE.propagateSingleElim(ev.bracket);
+      else if (ev.bracket.type === 'double') window.MEODL_ENGINE.propagateDoubleElim(ev.bracket);
+
+      saveAppState();
+      closeUniMatchModal();
+      renderCurrentSportView();
+      showToast(`${m.code} score saved: ${s1} - ${s2}`);
     }
 
     function closeUniMatchModal() {
@@ -2798,9 +3097,13 @@
       if (confirm('Reset ' + sportId.toUpperCase() + ' bracket results?')) {
         pushUndoSnapshot();
         const defs = window.MEODL_ENGINE.EVENT_DEFINITIONS;
-        const def = defs[sportId];
+        const def = defs[sportId] || {};
         const p = appState.events[sportId].participants || def.defaultParticipants;
-        appState.events[sportId].bracket = window.MEODL_ENGINE.initSingleElimination(p, 3);
+        const bType = appState.events[sportId].bracket ? appState.events[sportId].bracket.type : (def.defaultBracketType || 'single');
+        const bestOf = def.isBestOf ? 3 : 1;
+        if (bType === 'single') appState.events[sportId].bracket = window.MEODL_ENGINE.initSingleElimination(p, bestOf);
+        else if (bType === 'double') appState.events[sportId].bracket = window.MEODL_ENGINE.initDoubleElimination(p, bestOf);
+        else appState.events[sportId].bracket = window.MEODL_ENGINE.initRoundRobin(p, bestOf);
         saveAppState();
         renderCurrentSportView();
         showToast(sportId.toUpperCase() + ' bracket reset.');
