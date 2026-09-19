@@ -1,4 +1,62 @@
 /* MEODL Authoritative Roster & Guidelines Data */
+const TEAM_ASSETS = {
+  rankine: {
+    name: 'TEAM RANKINE',
+    cycle: 'Rankine Cycle',
+    description: 'Steam turbine • thermal power generation',
+    banner: './assets/rankine_banner.png',
+    logo: './assets/rankine_logo.png',
+    accent: 'crimson'
+  },
+
+  otto: {
+    name: 'TEAM OTTO',
+    cycle: 'Otto Cycle',
+    description: 'Four-stroke • spark ignition',
+    banner: './assets/otto_banner.png',
+    logo: './assets/otto_logo.png',
+    accent: 'amber'
+  },
+
+  brayton: {
+    name: 'TEAM BRAYTON',
+    cycle: 'Brayton Cycle',
+    description: 'Gas turbine • jet propulsion',
+    banner: './assets/brayton_banner.png',
+    logo: './assets/brayton_logo.png',
+    accent: 'cyan'
+  },
+
+  diesel: {
+    name: 'TEAM DIESEL',
+    cycle: 'Diesel Cycle',
+    description: 'Compression ignition • heavy-duty power',
+    banner: './assets/diesel_banner.png',
+    logo: './assets/diesel_logo.png',
+    accent: 'emerald'
+  }
+};
+
+function getTeamKey(name) {
+  if (!name) return null;
+  const s = String(name).toUpperCase();
+  if (s.includes('RANKINE')) return 'rankine';
+  if (s.includes('OTTO')) return 'otto';
+  if (s.includes('BRAYTON')) return 'brayton';
+  if (s.includes('DIESEL')) return 'diesel';
+  return null;
+}
+
+function assetFallback(img, fallback) {
+  if (!img) return;
+  img.onerror = null;
+  img.src = fallback || './assets/mes_logo.png';
+}
+
+window.TEAM_ASSETS = TEAM_ASSETS;
+window.getTeamKey = getTeamKey;
+window.assetFallback = assetFallback;
+
 window.MEODL_DATA = {
   "teams": [
     {
