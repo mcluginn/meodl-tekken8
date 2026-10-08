@@ -728,6 +728,9 @@
           <button onclick="exportAttendanceAuditCSV()" class="px-3 py-2 rounded-xl bg-[#081d38] hover:bg-[#102d52] text-slate-300 font-semibold border border-[#2c4f75] transition-colors" title="Export Gate Scans Audit Log CSV">
             📊 Logs
           </button>
+          <button onclick="confirmResetAllAttendance()" class="px-3 py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 text-red-300 font-semibold border border-red-700/60 transition-colors flex items-center gap-1.5" title="Reset All Attendance Records">
+            <span>🗑️</span> Reset
+          </button>
         </div>
       </div>
 
@@ -2041,13 +2044,18 @@
       </div>
 
       <!-- Footer Actions -->
-      <div class="pt-3 border-t border-[#2c4f75] flex items-center justify-between text-xs shrink-0">
+      <div class="pt-3 border-t border-[#2c4f75] flex items-center justify-between text-xs shrink-0 flex-wrap gap-2">
         <button onclick="toggleAttendanceFromHistoryModal()" id="history-modal-toggle-btn" class="px-3 py-2 rounded-xl bg-[#06162f] hover:bg-[#102d52] border border-[#2c4f75] text-[#f7b943] font-bold transition-all">
           ⚡ Toggle Presence
         </button>
-        <button onclick="closeStudentHistoryModal()" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all shadow-md">
-          Close History
-        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="confirmClearStudentAttendanceFromModal()" class="px-3 py-2 rounded-xl bg-red-950/70 hover:bg-red-900 border border-red-700/80 text-red-300 font-bold transition-all flex items-center gap-1.5" title="Clear all scans and reset attendance for this student">
+            <span>🗑️</span> Remove Attendance
+          </button>
+          <button onclick="closeStudentHistoryModal()" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all shadow-md">
+            Close History
+          </button>
+        </div>
       </div>
 
     </div>
@@ -6676,6 +6684,9 @@
                 <button onclick="quickToggleStudentAttendance('${s.id}')" class="px-2 py-1 rounded-lg bg-[#06162f] border border-[#2c4f75] hover:bg-[#102d52] text-[10px] font-bold ${quickActionColor} transition-colors">
                   ${quickActionText}
                 </button>
+                <button onclick="confirmClearStudentAttendance('${s.id}')" class="p-1 rounded-lg bg-[#06162f] hover:bg-red-950/70 border border-[#2c4f75] hover:border-red-700/80 text-red-400 text-xs transition-colors" title="Reset / Clear Attendance for this Athlete">
+                  🗑️
+                </button>
                 <button onclick="openStudentQRModal('${s.id}')" class="p-1 rounded-lg bg-[#06162f] hover:bg-[#102d52] border border-[#2c4f75] text-[#38bdf8] text-xs" title="View Personal QR Pass">
                   🪪
                 </button>
@@ -6818,31 +6829,35 @@
             extraInfo += `<span class="text-sky-300 block text-[10px]">Expected Return: ${h.expectedReturn}</span>`;
           }
 
-          return `
-            <div class="p-3 rounded-2xl bg-[#06162f] border border-[#2c4f75] hover:border-slate-500 transition-colors flex items-start justify-between gap-3">
-              <div class="flex items-start gap-2.5">
-                <div class="w-7 h-7 rounded-full bg-[#0a2344] border border-[#2c4f75] flex items-center justify-center font-bold text-[11px] text-[#f7b943] shrink-0 mt-0.5">
-                  #${history.length - idx}
-                </div>
-                <div>
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">
-                      ${actionText}
-                    </span>
-                    <span class="text-white font-bold text-xs">${timeStr}</span>
-                    <span class="text-slate-400 text-[11px]">• ${dateStr}</span>
+            return `
+              <div class="p-3 rounded-2xl bg-[#06162f] border border-[#2c4f75] hover:border-slate-500 transition-colors flex items-start justify-between gap-3">
+                <div class="flex items-start gap-2.5 flex-1 min-w-0">
+                  <div class="w-7 h-7 rounded-full bg-[#0a2344] border border-[#2c4f75] flex items-center justify-center font-bold text-[11px] text-[#f7b943] shrink-0 mt-0.5">
+                    #${history.length - idx}
                   </div>
-                  ${extraInfo}
-                  <div class="text-[10px] text-slate-400 mt-1 flex items-center gap-2">
-                    <span>Staff: <strong class="text-slate-300">${h.performedBy || 'Marshal'}</strong></span>
-                    <span>•</span>
-                    <span>Method: <span class="uppercase">${h.method || 'qr_scan'}</span></span>
-                    ${h.deviceId ? `<span>• Device: ${h.deviceId}</span>` : ''}
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">
+                        ${actionText}
+                      </span>
+                      <span class="text-white font-bold text-xs">${timeStr}</span>
+                      <span class="text-slate-400 text-[11px]">• ${dateStr}</span>
+                    </div>
+                    ${extraInfo}
+                    <div class="text-[10px] text-slate-400 mt-1 flex items-center gap-2">
+                      <span>Staff: <strong class="text-slate-300">${h.performedBy || 'Marshal'}</strong></span>
+                      <span>•</span>
+                      <span>Method: <span class="uppercase">${h.method || 'qr_scan'}</span></span>
+                      ${h.deviceId ? `<span>• Device: ${h.deviceId}</span>` : ''}
+                    </div>
                   </div>
                 </div>
+                ${h.eventId ? `
+                <button onclick="confirmDeleteEvent('${h.eventId}')" class="p-1.5 rounded-lg bg-red-950/50 hover:bg-red-900 border border-red-800 text-red-400 hover:text-red-200 transition-colors shrink-0 text-xs" title="Delete this scan event">
+                  🗑️
+                </button>` : ''}
               </div>
-            </div>
-          `;
+            `;
         }).join('');
       });
 
@@ -6860,6 +6875,59 @@
         setTimeout(() => {
           openStudentHistoryModal(activeHistoryStudentId);
         }, 150);
+      }
+    }
+
+    async function confirmClearStudentAttendance(studentId) {
+      if (!window.MEODL_ATTENDANCE) return;
+      const s = window.MEODL_ATTENDANCE.getStudentById(studentId);
+      if (!s) return;
+
+      const ok = confirm(`REMOVE ATTENDANCE FOR ${s.name}?\n\nThis will clear all check-in/out records for this athlete and reset their status back to OUTSIDE.`);
+      if (!ok) return;
+
+      await window.MEODL_ATTENDANCE.clearStudentAttendance(studentId);
+      showToast(`Attendance removed for ${s.name}`);
+      renderAttendanceView();
+      if (activeHistoryStudentId === studentId) {
+        openStudentHistoryModal(studentId);
+      }
+    }
+
+    async function confirmClearStudentAttendanceFromModal() {
+      if (activeHistoryStudentId) {
+        await confirmClearStudentAttendance(activeHistoryStudentId);
+      }
+    }
+
+    async function confirmDeleteEvent(eventId) {
+      if (!window.MEODL_ATTENDANCE || !eventId) return;
+
+      const ok = confirm(`Delete this specific scan record?\n\nThe athlete's attendance status will be automatically recalculated from their remaining scan history.`);
+      if (!ok) return;
+
+      await window.MEODL_ATTENDANCE.removeAttendanceEvent(eventId);
+      showToast('Scan record deleted');
+      renderAttendanceView();
+      if (activeHistoryStudentId) {
+        openStudentHistoryModal(activeHistoryStudentId);
+      }
+    }
+
+    async function confirmResetAllAttendance() {
+      if (!window.MEODL_ATTENDANCE) return;
+
+      const typed = prompt(`⚠️ RESET ALL ATTENDANCE?\n\nThis will permanently clear ALL check-ins and check-outs for ALL 175 athletes across all sports.\n\nType 'RESET' to confirm:`);
+      if (typed !== 'RESET' && typed !== 'RESET_ATTENDANCE') {
+        if (typed !== null) alert('Reset cancelled. You must type RESET in all caps to confirm.');
+        return;
+      }
+
+      await window.MEODL_ATTENDANCE.resetAllAttendance();
+      showToast('All attendance data reset to fresh state');
+      renderAttendanceView();
+      if (activeHistoryStudentId) {
+        closeStudentHistoryModal();
       }
     }
 

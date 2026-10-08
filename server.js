@@ -518,6 +518,62 @@ export async function handleRequest(req, res) {
   if (reqPath === '/api/attendance/reset' && req.method === 'POST') {
     try {
       const payload = await parseJsonBody(req);
+
+      // A. Reset Individual Student Attendance
+      if (payload.studentId) {
+        const studentId = String(payload.studentId).trim();
+        if (attendanceState.students[studentId]) {
+          attendanceEvents = attendanceEvents.filter(e => e.studentId !== studentId);
+          attendanceEventsMap.forEach((v, k) => {
+            if (v.studentId === studentId) attendanceEventsMap.delete(k);
+          });
+          const defaultStudents = buildDefaultStudentsRoster();
+          if (defaultStudents[studentId]) {
+            attendanceState.students[studentId] = defaultStudents[studentId];
+          }
+          attendanceState.version = (attendanceState.version || 1) + 1;
+          attendanceState.lastUpdated = new Date().toISOString();
+
+          atomicWriteJson(EVENTS_FILE, attendanceEvents);
+          atomicWriteJson(STATE_FILE, attendanceState);
+
+          return sendJson(res, 200, {
+            ok: true,
+            message: `Attendance cleared for ${studentId}`,
+            serverTime: new Date().toISOString(),
+            stats: calculateAttendanceStats()
+          });
+        }
+      }
+
+      // B. Delete Specific Scan Event
+      if (payload.eventId) {
+        const eventId = String(payload.eventId).trim();
+        const targetEvent = attendanceEventsMap.get(eventId);
+        if (targetEvent) {
+          attendanceEvents = attendanceEvents.filter(e => e.eventId !== eventId);
+          attendanceEventsMap.delete(eventId);
+
+          const stId = targetEvent.studentId;
+          const studentAllEvents = attendanceEvents.filter(e => e.studentId === stId);
+          const defaultStudent = buildDefaultStudentsRoster()[stId];
+          attendanceState.students[stId] = rederiveStudentState(defaultStudent, studentAllEvents);
+          attendanceState.version = (attendanceState.version || 1) + 1;
+          attendanceState.lastUpdated = new Date().toISOString();
+
+          atomicWriteJson(EVENTS_FILE, attendanceEvents);
+          atomicWriteJson(STATE_FILE, attendanceState);
+
+          return sendJson(res, 200, {
+            ok: true,
+            message: `Event ${eventId} deleted`,
+            serverTime: new Date().toISOString(),
+            stats: calculateAttendanceStats()
+          });
+        }
+      }
+
+      // C. Reset All Attendance
       if (payload.confirmation !== 'RESET_ATTENDANCE') {
         return sendJson(res, 400, { ok: false, error: 'Confirmation required: RESET_ATTENDANCE' });
       }
@@ -531,7 +587,12 @@ export async function handleRequest(req, res) {
       atomicWriteJson(EVENTS_FILE, attendanceEvents);
       atomicWriteJson(STATE_FILE, attendanceState);
 
-      return sendJson(res, 200, { ok: true, message: 'Attendance reset successful', serverTime: new Date().toISOString() });
+      return sendJson(res, 200, {
+        ok: true,
+        message: 'Attendance reset successful',
+        serverTime: new Date().toISOString(),
+        stats: calculateAttendanceStats()
+      });
     } catch (err) {
       return sendJson(res, 500, { ok: false, error: err.message });
     }

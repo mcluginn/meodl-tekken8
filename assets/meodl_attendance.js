@@ -240,6 +240,86 @@
       } catch (e) {}
     }
 
+    async deleteEvent(eventId) {
+      await this.readyPromise;
+      if (!this.db) {
+        let events = this.getAllEventsFromLocalStorage();
+        events = events.filter(e => e.eventId !== eventId);
+        localStorage.setItem('MEODL_EVENTS_FALLBACK_V1', JSON.stringify(events));
+        let q = this.getQueueFromLocalStorage();
+        q = q.filter(e => e.eventId !== eventId);
+        this.saveQueueToLocalStorage(q);
+        return;
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['attendanceEvents', 'syncQueue'], 'readwrite');
+          tx.objectStore('attendanceEvents').delete(eventId);
+          tx.objectStore('syncQueue').delete(eventId);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    async deleteEventsForStudent(studentId) {
+      await this.readyPromise;
+      if (!this.db) {
+        let events = this.getAllEventsFromLocalStorage();
+        events = events.filter(e => e.studentId !== studentId);
+        localStorage.setItem('MEODL_EVENTS_FALLBACK_V1', JSON.stringify(events));
+        let q = this.getQueueFromLocalStorage();
+        q = q.filter(e => e.studentId !== studentId);
+        this.saveQueueToLocalStorage(q);
+        return;
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['attendanceEvents', 'syncQueue'], 'readwrite');
+          const evStore = tx.objectStore('attendanceEvents');
+          const qStore = tx.objectStore('syncQueue');
+          const req = evStore.getAll();
+          req.onsuccess = () => {
+            const list = req.result || [];
+            list.filter(e => e.studentId === studentId).forEach(e => {
+              evStore.delete(e.eventId);
+              qStore.delete(e.eventId);
+            });
+          };
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    async clearAll() {
+      await this.readyPromise;
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem('MEODL_EVENTS_FALLBACK_V1');
+          localStorage.removeItem('MEODL_QUEUE_FALLBACK_V1');
+        }
+      } catch (e) {}
+
+      if (!this.db) return;
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['attendanceEvents', 'syncQueue', 'attendanceSnapshot'], 'readwrite');
+          tx.objectStore('attendanceEvents').clear();
+          tx.objectStore('syncQueue').clear();
+          tx.objectStore('attendanceSnapshot').clear();
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
     getAllEventsFromLocalStorage() {
       try {
         const raw = localStorage.getItem('MEODL_EVENTS_FALLBACK_V1');
@@ -1025,6 +1105,160 @@
 
       this.save();
       return { success: true, student, newToken };
+    }
+
+    async clearStudentAttendance(studentId, options = {}) {
+      const student = this.state.students[studentId];
+      if (!student) return { error: 'Student not found' };
+
+      // 1. Remove events from IndexedDB
+      await this.db.deleteEventsForStudent(studentId);
+
+      // 2. Reset student state to pristine OUTSIDE
+      student.status = 'OUTSIDE';
+      student.currentAction = null;
+      student.lastCheckIn = null;
+      student.lastCheckOut = null;
+      student.exitReason = null;
+      student.expectedReturn = null;
+      student.totalVisits = 0;
+      student.totalMinutesInside = 0;
+      student.history = [];
+      student.updatedAt = new Date().toISOString();
+
+      // 3. Remove audit logs for this student
+      if (Array.isArray(this.state.auditLog)) {
+        this.state.auditLog = this.state.auditLog.filter(l => l.studentId !== studentId);
+      }
+
+      this.save();
+      this.updatePendingCount();
+
+      // 4. If server reachable, inform server
+      try {
+        await fetch(this.getApiUrl('/api/attendance/reset'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ studentId })
+        });
+      } catch (e) {}
+
+      return { success: true, student };
+    }
+
+    async removeAttendanceEvent(eventId) {
+      if (!eventId) return { error: 'Missing eventId' };
+
+      // Find student associated with event
+      let targetStudentId = null;
+      Object.values(this.state.students).forEach(s => {
+        if (s.history && s.history.some(h => h.eventId === eventId)) {
+          targetStudentId = s.id;
+        }
+      });
+
+      if (!targetStudentId) {
+        const allEv = await this.db.getAllEvents();
+        const ev = allEv.find(e => e.eventId === eventId);
+        if (ev) targetStudentId = ev.studentId;
+      }
+
+      // 1. Delete from IndexedDB
+      await this.db.deleteEvent(eventId);
+
+      // 2. Remove from auditLog
+      if (Array.isArray(this.state.auditLog)) {
+        this.state.auditLog = this.state.auditLog.filter(l => l.eventId !== eventId);
+      }
+
+      // 3. If student found, re-derive their state from remaining events
+      if (targetStudentId && this.state.students[targetStudentId]) {
+        const student = this.state.students[targetStudentId];
+        if (Array.isArray(student.history)) {
+          student.history = student.history.filter(h => h.eventId !== eventId);
+        }
+
+        const remainingEvents = await this.db.getAllEvents();
+        const studentEvents = remainingEvents.filter(e => e.studentId === targetStudentId);
+        studentEvents.sort((a, b) => new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime());
+
+        // Reset to initial
+        student.status = 'OUTSIDE';
+        student.currentAction = null;
+        student.lastCheckIn = null;
+        student.lastCheckOut = null;
+        student.exitReason = null;
+        student.expectedReturn = null;
+        student.totalVisits = 0;
+        student.totalMinutesInside = 0;
+
+        // Replay remaining events
+        studentEvents.forEach(ev => {
+          if (ev.action === 'check_in') {
+            student.status = 'INSIDE';
+            student.currentAction = 'check_in';
+            student.lastCheckIn = ev.occurredAt;
+            student.exitReason = null;
+            student.expectedReturn = null;
+            student.totalVisits = Math.max(student.totalVisits || 0, 1);
+          } else if (ev.action === 'check_out') {
+            student.status = 'OUTSIDE';
+            student.currentAction = 'check_out';
+            student.lastCheckOut = ev.occurredAt;
+            student.exitReason = ev.reason || null;
+            student.expectedReturn = ev.expectedReturn || null;
+          } else if (ev.action === 'manual_override') {
+            student.status = ev.newStatus || 'OUTSIDE';
+            student.currentAction = 'manual_override';
+            if (student.status === 'INSIDE') {
+              student.lastCheckIn = ev.occurredAt;
+              student.exitReason = null;
+              student.expectedReturn = null;
+            } else {
+              student.lastCheckOut = ev.occurredAt;
+              student.exitReason = ev.reason || 'Manual override';
+            }
+          }
+        });
+        student.updatedAt = new Date().toISOString();
+      }
+
+      this.save();
+      this.updatePendingCount();
+
+      // 4. Notify server
+      try {
+        await fetch(this.getApiUrl('/api/attendance/reset'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ eventId })
+        });
+      } catch (e) {}
+
+      return { success: true };
+    }
+
+    async resetAllAttendance() {
+      // 1. Clear IndexedDB
+      await this.db.clearAll();
+
+      // 2. Clear in-memory audit log and re-init roster
+      this.state.auditLog = [];
+      this.initDefaultRoster();
+      this.pendingCount = 0;
+      this.save();
+      this.notifySyncStatus();
+
+      // 3. Notify server
+      try {
+        await fetch(this.getApiUrl('/api/attendance/reset'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ confirmation: 'RESET_ATTENDANCE' })
+        });
+      } catch (e) {}
+
+      return { success: true };
     }
 
     isOverdue(student) {
