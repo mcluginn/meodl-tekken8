@@ -187,6 +187,28 @@
       });
     }
 
+    async enqueuePending(event) {
+      await this.readyPromise;
+      if (!this.db) {
+        let q = this.getQueueFromLocalStorage();
+        if (!q.some(e => e.eventId === event.eventId)) {
+          q.push(event);
+          this.saveQueueToLocalStorage(q);
+        }
+        return;
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['syncQueue'], 'readwrite');
+          tx.objectStore('syncQueue').put(event);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
     async getAllEvents() {
       await this.readyPromise;
       if (!this.db) {
@@ -276,6 +298,60 @@
 
       this.init();
       this.initSyncWorker();
+      this.rehydrateFromEvents();
+    }
+
+    async rehydrateFromEvents() {
+      try {
+        const events = await this.db.getAllEvents();
+        if (!events || !events.length) return;
+
+        // Chronological replay ensures state is derived deterministically from the immutable event log
+        events.sort((a, b) => new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime());
+
+        let changed = false;
+        events.forEach(ev => {
+          if (!ev || !ev.studentId) return;
+          const s = this.state.students[ev.studentId];
+          if (!s) return;
+
+          if (ev.action === 'check_in') {
+            s.status = 'INSIDE';
+            s.currentAction = 'check_in';
+            s.lastCheckIn = ev.occurredAt;
+            s.exitReason = null;
+            s.expectedReturn = null;
+            s.totalVisits = Math.max(s.totalVisits || 0, 1);
+            changed = true;
+          } else if (ev.action === 'check_out') {
+            s.status = 'OUTSIDE';
+            s.currentAction = 'check_out';
+            s.lastCheckOut = ev.occurredAt;
+            s.exitReason = ev.exitReason || null;
+            s.expectedReturn = ev.expectedReturn || null;
+            changed = true;
+          } else if (ev.action === 'manual_override') {
+            s.status = ev.newStatus || (ev.action === 'check_in' ? 'INSIDE' : 'OUTSIDE');
+            s.currentAction = 'manual_override';
+            if (s.status === 'INSIDE') {
+              s.lastCheckIn = ev.occurredAt;
+              s.exitReason = null;
+              s.expectedReturn = null;
+            } else {
+              s.lastCheckOut = ev.occurredAt;
+              s.exitReason = ev.reason || 'Manual override';
+            }
+            changed = true;
+          }
+        });
+
+        if (changed) {
+          this.save();
+          this.notify();
+        }
+      } catch (e) {
+        console.warn('[AttendanceEngine] Failed to rehydrate from events:', e);
+      }
     }
 
     getApiUrl(endpoint) {
@@ -978,7 +1054,21 @@
         clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
-          return data && data.ok;
+          if (data && data.ok) {
+            // Auto-heal cold-booted or restarted server if it has fewer events than our local ledger
+            if (typeof data.eventsCount === 'number') {
+              const allLocalEvents = await this.db.getAllEvents();
+              if (allLocalEvents && allLocalEvents.length > data.eventsCount) {
+                console.log(`[AttendanceSync] Server appears cold-booted (${data.eventsCount} vs local ${allLocalEvents.length} events). Auto-healing server from local IndexedDB.`);
+                for (const ev of allLocalEvents) {
+                  await this.db.enqueuePending(ev);
+                }
+                const q = await this.db.getPendingQueue();
+                this.pendingCount = q.length;
+              }
+            }
+            return true;
+          }
         }
       } catch (err) {
         // Network failure or timeout
@@ -1091,7 +1181,27 @@
           if (pendingStudentIds.has(stId)) return;
 
           const local = this.state.students[stId];
-          if (!local || local.status !== serverStudent.status || local.lastCheckIn !== serverStudent.lastCheckIn || local.lastCheckOut !== serverStudent.lastCheckOut) {
+          if (!local) {
+            this.state.students[stId] = serverStudent;
+            changed = true;
+            return;
+          }
+
+          // Compute latest activity timestamp
+          const localLatest = Math.max(
+            local.lastCheckIn ? new Date(local.lastCheckIn).getTime() : 0,
+            local.lastCheckOut ? new Date(local.lastCheckOut).getTime() : 0,
+            local.updatedAt ? new Date(local.updatedAt).getTime() : 0
+          );
+          const serverLatest = Math.max(
+            serverStudent.lastCheckIn ? new Date(serverStudent.lastCheckIn).getTime() : 0,
+            serverStudent.lastCheckOut ? new Date(serverStudent.lastCheckOut).getTime() : 0,
+            serverStudent.updatedAt ? new Date(serverStudent.updatedAt).getTime() : 0
+          );
+
+          // Crucial: Only accept server record if it contains strictly newer activity than local.
+          // This guarantees that a cold-booted, empty, or restarted server will NEVER wipe local check-ins!
+          if (serverLatest > localLatest && serverLatest > 0) {
             this.state.students[stId] = {
               ...local,
               ...serverStudent
