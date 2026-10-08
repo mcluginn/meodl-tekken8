@@ -126,21 +126,28 @@ function buildDefaultStudentsRoster() {
   return students;
 }
 
-// In-memory working state
-let attendanceEvents = safeReadJson(EVENTS_FILE, safeReadJson(path.join(__dirname, 'attendance_events.json'), []));
+function getBundledJson(relPath, defaultVal) {
+  try {
+    const p = fileURLToPath(new URL(relPath, import.meta.url));
+    if (fs.existsSync(p)) return JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch (e) {}
+  return defaultVal;
+}
+
+let attendanceEvents = safeReadJson(EVENTS_FILE, getBundledJson('./attendance_events.json', []));
 let attendanceEventsMap = new Map();
 attendanceEvents.forEach(ev => {
   if (ev && ev.eventId) attendanceEventsMap.set(ev.eventId, ev);
 });
 
-let attendanceState = safeReadJson(STATE_FILE, safeReadJson(path.join(__dirname, 'attendance_state.json'), null));
+let attendanceState = safeReadJson(STATE_FILE, getBundledJson('./attendance_state.json', null));
 if (!attendanceState || !attendanceState.students || Object.keys(attendanceState.students).length === 0) {
   attendanceState = {
     students: buildDefaultStudentsRoster(),
     version: 1,
     lastUpdated: new Date().toISOString()
   };
-  atomicWriteJson(STATE_FILE, attendanceState);
+  try { atomicWriteJson(STATE_FILE, attendanceState); } catch(e) {}
 }
 
 // Deterministic event ordering comparator
