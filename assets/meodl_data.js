@@ -4,36 +4,54 @@ const TEAM_ASSETS = {
     name: 'TEAM RANKINE',
     cycle: 'Rankine Cycle',
     description: 'Steam turbine • thermal power generation',
-    banner: './assets/rankine_banner.png',
+    banner: './assets/official/team_banner_rankine.jpg',
     logo: './assets/rankine_logo.png',
-    accent: 'crimson'
+    accent: 'crimson',
+    rosters: [
+      './assets/official/roster_rankine_1.jpg',
+      './assets/official/roster_rankine_2.jpg',
+      './assets/official/roster_rankine_3.jpg'
+    ]
   },
 
   otto: {
     name: 'TEAM OTTO',
     cycle: 'Otto Cycle',
     description: 'Four-stroke • spark ignition',
-    banner: './assets/otto_banner.png',
+    banner: './assets/official/team_banner_otto.jpg',
     logo: './assets/otto_logo.png',
-    accent: 'amber'
+    accent: 'amber',
+    rosters: [
+      './assets/official/roster_otto_1.jpg',
+      './assets/official/roster_otto_2.jpg'
+    ]
   },
 
   brayton: {
     name: 'TEAM BRAYTON',
     cycle: 'Brayton Cycle',
     description: 'Gas turbine • jet propulsion',
-    banner: './assets/brayton_banner.png',
+    banner: './assets/official/team_banner_brayton.jpg',
     logo: './assets/brayton_logo.png',
-    accent: 'cyan'
+    accent: 'cyan',
+    rosters: [
+      './assets/official/roster_brayton_1.jpg',
+      './assets/official/roster_brayton_2.jpg'
+    ]
   },
 
   diesel: {
     name: 'TEAM DIESEL',
     cycle: 'Diesel Cycle',
     description: 'Compression ignition • heavy-duty power',
-    banner: './assets/diesel_banner.png',
+    banner: './assets/official/team_banner_diesel.jpg',
     logo: './assets/diesel_logo.png',
-    accent: 'emerald'
+    accent: 'emerald',
+    rosters: [
+      './assets/official/roster_diesel_1.jpg',
+      './assets/official/roster_diesel_2.jpg',
+      './assets/official/roster_diesel_3.jpg'
+    ]
   }
 };
 
@@ -53,7 +71,114 @@ function assetFallback(img, fallback) {
   img.src = fallback || './assets/mes_logo.png';
 }
 
+const SPORT_BACKGROUNDS = {
+  basketball: './assets/official/trophy_basketball.jpg',
+  volleyball: './assets/official/trophy_volleyball.jpg',
+  badmintonSingles: './assets/official/trophy_badminton.jpg',
+  badmintonDoubles: './assets/official/trophy_badminton.jpg',
+  chess: './assets/official/trophy_board_esports.jpg',
+  scrabble: './assets/official/trophy_board_esports.jpg',
+  swimming: './assets/official/trophy_swimming.jpg',
+  amazingRace: './assets/official/trophy_amazing_race.jpg',
+  eggHunt: './assets/official/trophy_egg_hunt.jpg',
+  tekken8: './assets/official/trophy_board_esports.jpg',
+  codm: './assets/official/trophy_board_esports.jpg',
+  ml: './assets/official/trophy_board_esports.jpg',
+  dashboard: './assets/official/meodl_banner_league.jpg',
+  attendance: './assets/official/meodl_trophy_championship.jpg'
+};
+
+const SPORT_TROPHIES = {
+  basketball: './assets/official/trophy_basketball.jpg',
+  volleyball: './assets/official/trophy_volleyball.jpg',
+  badmintonSingles: './assets/official/trophy_badminton.jpg',
+  badmintonDoubles: './assets/official/trophy_badminton.jpg',
+  chess: './assets/official/trophy_board_esports.jpg',
+  scrabble: './assets/official/trophy_board_esports.jpg',
+  swimming: './assets/official/trophy_swimming.jpg',
+  amazingRace: './assets/official/trophy_amazing_race.jpg',
+  eggHunt: './assets/official/trophy_egg_hunt.jpg',
+  tekken8: './assets/official/trophy_board_esports.jpg',
+  codm: './assets/official/trophy_board_esports.jpg',
+  ml: './assets/official/trophy_board_esports.jpg'
+};
+
+const SPORT_RULES_POSTERS = {
+  basketball: [
+    { title: 'Basketball Official Mechanics', src: './assets/official/rules_basketball.jpg' }
+  ],
+  volleyball: [
+    { title: 'Volleyball Official Mechanics', src: './assets/official/rules_volleyball.jpg' }
+  ],
+  badmintonSingles: [
+    { title: 'Badminton Mechanics & Attire', src: './assets/official/rules_badminton_1.jpg' },
+    { title: 'Badminton BWF Rally Point Scoring', src: './assets/official/rules_badminton_2.jpg' }
+  ],
+  badmintonDoubles: [
+    { title: 'Badminton Mechanics & Attire', src: './assets/official/rules_badminton_1.jpg' },
+    { title: 'Badminton BWF Rally Point Scoring', src: './assets/official/rules_badminton_2.jpg' }
+  ],
+  chess: [
+    { title: 'Board Games Mechanics & Categories', src: './assets/official/rules_board_games_1.jpg' },
+    { title: 'Touch-Move Rules & Clocks', src: './assets/official/rules_board_games_2.jpg' }
+  ],
+  scrabble: [
+    { title: 'Board Games Mechanics & Categories', src: './assets/official/rules_board_games_1.jpg' },
+    { title: 'Touch-Move Rules & Clocks', src: './assets/official/rules_board_games_2.jpg' }
+  ],
+  swimming: [
+    { title: 'Swimming Mechanics & Single False Start', src: './assets/official/rules_swimming_1.jpg' },
+    { title: 'Swimming Stroke Rules & Turn Guidelines', src: './assets/official/rules_swimming_2.jpg' }
+  ],
+  amazingRace: [
+    { title: 'Amazing Race Overview', src: './assets/official/rules_amazing_race_cover.jpg' },
+    { title: 'Teams & 4 Main Stations', src: './assets/official/rules_amazing_race_1.jpg' },
+    { title: 'Final Escape Room & Challenge Pieces', src: './assets/official/rules_amazing_race_2.jpg' },
+    { title: 'Safety, Anti-Cheating & Scoring', src: './assets/official/rules_amazing_race_3.jpg' },
+    { title: 'Rotation Sequence Per Year Level', src: './assets/official/rules_amazing_race_stations.jpg' }
+  ],
+  eggHunt: [
+    { title: 'Egg Hunt Eligibility & Boundaries', src: './assets/official/rules_egg_hunt_1.jpg' },
+    { title: 'Pointing System (10 / 25 / 50 pts)', src: './assets/official/rules_egg_hunt_2.jpg' }
+  ],
+  tekken8: [
+    { title: 'Esports Categories & Account Rules', src: './assets/official/rules_esports_1.jpg' },
+    { title: 'Grace Period & Substitutions Policy', src: './assets/official/rules_esports_2.jpg' }
+  ],
+  codm: [
+    { title: 'Esports Categories & Account Rules', src: './assets/official/rules_esports_1.jpg' },
+    { title: 'Grace Period & Substitutions Policy', src: './assets/official/rules_esports_2.jpg' }
+  ],
+  ml: [
+    { title: 'Esports Categories & Account Rules', src: './assets/official/rules_esports_1.jpg' },
+    { title: 'Grace Period & Substitutions Policy', src: './assets/official/rules_esports_2.jpg' }
+  ]
+};
+
+const SPORT_BRACKET_POSTERS = {
+  basketball: './assets/official/bracket_basketball.jpg',
+  volleyball: './assets/official/bracket_volleyball.jpg',
+  badmintonSingles: './assets/official/bracket_badminton.jpg',
+  badmintonDoubles: './assets/official/bracket_badminton.jpg',
+  chess: './assets/official/bracket_board_games.jpg',
+  scrabble: './assets/official/bracket_board_games.jpg',
+  tekken8: './assets/official/bracket_esports.jpg',
+  codm: './assets/official/bracket_esports.jpg',
+  ml: './assets/official/bracket_esports.jpg'
+};
+
+const LEAGUE_OFFICIAL_ASSETS = {
+  championshipCup: './assets/official/meodl_trophy_championship.jpg',
+  leagueBanner: './assets/official/meodl_banner_league.jpg',
+  teamsTitle: './assets/official/meodl_teams_title.jpg'
+};
+
 window.TEAM_ASSETS = TEAM_ASSETS;
+window.SPORT_BACKGROUNDS = SPORT_BACKGROUNDS;
+window.SPORT_TROPHIES = SPORT_TROPHIES;
+window.SPORT_RULES_POSTERS = SPORT_RULES_POSTERS;
+window.SPORT_BRACKET_POSTERS = SPORT_BRACKET_POSTERS;
+window.LEAGUE_OFFICIAL_ASSETS = LEAGUE_OFFICIAL_ASSETS;
 window.getTeamKey = getTeamKey;
 window.assetFallback = assetFallback;
 
@@ -335,13 +460,6 @@ window.MEODL_DATA = {
       "timeControl": "25 minutes per player.",
       "rules": "Standard official dictionary rules apply. Challenges must be raised prior to the next player's turn.",
       "bracket": "Single Elimination / Round Robin."
-    },
-    "generals": {
-      "title": "Board Games: Game of the Generals Guidelines",
-      "eligibility": "Must be a bonafide student of the College of Mechanical Engineering at UPHSD Calamba.",
-      "timeControl": "15 minutes per player.",
-      "rules": "Neutral arbiter / referee inspects piece clashes according to rank hierarchy.",
-      "bracket": "Single Elimination / Swiss."
     },
     "swimming": {
       "title": "Swimming Guidelines & Regulations",

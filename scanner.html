@@ -104,6 +104,83 @@
     </div>
   </header>
 
+  <!-- Offline-First Distributed Sync Status Bar -->
+  <div class="bg-zinc-950 border-b border-zinc-800/90 px-4 py-2 font-mono text-xs flex items-center justify-between gap-2 flex-wrap">
+    <!-- Status Badge -->
+    <div class="flex items-center gap-2">
+      <span id="sync-status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-zinc-900 text-zinc-400 border-zinc-700 transition-all">
+        <span id="sync-status-dot" class="w-2 h-2 rounded-full bg-zinc-500"></span>
+        <span id="sync-status-text">INITIALIZING...</span>
+      </span>
+      <span id="sync-pending-tag" class="hidden text-[10px] text-amber-400 font-bold px-2 py-0.5 rounded bg-amber-950/80 border border-amber-800/80">0 PENDING</span>
+      <span id="sync-last-time" class="text-[10px] text-zinc-500 hidden sm:inline">Last sync: --</span>
+    </div>
+
+    <!-- Actions: Sync Now, Device Config, Emergency Export -->
+    <div class="flex items-center gap-1.5">
+      <button onclick="triggerManualSync()" id="btn-sync-now" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-[10px] text-zinc-300 hover:text-white flex items-center gap-1 transition-colors" title="Force Sync Now">
+        <span id="sync-icon">🔄</span> Sync Now
+      </button>
+      <button onclick="openDeviceSettingsModal()" class="px-2 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-[10px] text-zinc-300 hover:text-white transition-colors" title="Configure Device ID & Gate">
+        ⚙️
+      </button>
+      <div class="relative inline-block text-left">
+        <button onclick="toggleExportMenu()" class="px-2 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-[10px] text-zinc-300 hover:text-white transition-colors" title="Export Offline Scans">
+          💾
+        </button>
+        <div id="export-menu" class="hidden absolute right-0 mt-1 w-44 rounded-xl bg-zinc-900 border border-zinc-700 shadow-2xl py-1 z-50 text-[11px]">
+          <button onclick="exportScansJSON(); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-zinc-800 text-zinc-200 flex items-center gap-2">
+            <span>📄</span> Export JSON
+          </button>
+          <button onclick="exportScansCSV(); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-zinc-800 text-zinc-200 flex items-center gap-2">
+            <span>📊</span> Export CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Device Identity & Gate Settings Modal -->
+  <div id="device-settings-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-zinc-950 border border-zinc-800 rounded-3xl p-5 shadow-2xl font-mono text-xs">
+      <div class="flex items-center justify-between pb-3 border-b border-zinc-800 mb-4">
+        <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+          <span>⚙️</span> Scanner Device Settings
+        </h3>
+        <button onclick="closeDeviceSettingsModal()" class="text-zinc-400 hover:text-white text-base">✕</button>
+      </div>
+
+      <div class="space-y-3 mb-5">
+        <div>
+          <label class="block text-[10px] text-zinc-400 mb-1">DEVICE ID (PERSISTENT):</label>
+          <input type="text" id="setting-device-id" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-cyan-300 font-bold uppercase focus:outline-none focus:border-cyan-500" />
+        </div>
+        <div>
+          <label class="block text-[10px] text-zinc-400 mb-1">MARSHAL NAME / ID:</label>
+          <input type="text" id="setting-marshal-id" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white focus:outline-none focus:border-cyan-500" placeholder="e.g. John (Gate 1)" />
+        </div>
+        <div>
+          <label class="block text-[10px] text-zinc-400 mb-1">GATE CHECKPOINT:</label>
+          <input type="text" id="setting-gate-id" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white focus:outline-none focus:border-cyan-500" placeholder="e.g. Gym Entrance A" />
+        </div>
+        <div>
+          <label class="block text-[10px] text-zinc-400 mb-1">CLOUD / SERVER URL (OPTIONAL):</label>
+          <input type="text" id="setting-server-url" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-cyan-300 font-mono text-[11px] placeholder-zinc-500 focus:outline-none focus:border-cyan-500" placeholder="e.g. https://meodl-server.onrender.com" />
+          <span class="text-[9px] text-zinc-500 block mt-1">Leave empty for same host / standalone offline mode</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="closeDeviceSettingsModal()" class="py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white font-bold">
+          Cancel
+        </button>
+        <button onclick="saveDeviceSettings()" class="py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-lg shadow-cyan-950">
+          Save Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Main View -->
   <main class="flex-1 max-w-lg w-full mx-auto px-4 py-4 flex flex-col gap-4">
 
@@ -127,9 +204,15 @@
         <div id="cam-fallback" class="hidden absolute inset-0 bg-zinc-950 flex flex-col items-center justify-center p-4 text-center z-20">
           <span class="text-3xl mb-2">📷</span>
           <p class="text-xs text-zinc-300 font-mono mb-3" id="cam-fallback-msg">Camera not started or permission needed.</p>
-          <button onclick="startScanner()" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold">
-            Start Camera Scanner
-          </button>
+          <div class="flex items-center gap-2 flex-wrap justify-center">
+            <button onclick="startScanner()" class="px-3.5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold">
+              Try Camera
+            </button>
+            <label class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-mono font-bold cursor-pointer flex items-center gap-1.5 shadow-lg">
+              📸 Snap QR Photo
+              <input type="file" accept="image/*" capture="environment" class="hidden" onchange="scanImageFile(event)" />
+            </label>
+          </div>
         </div>
       </div>
 
@@ -145,7 +228,11 @@
         <button onclick="processManualInput()" class="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-mono font-bold">
           Verify
         </button>
-        <label class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 cursor-pointer text-xs" title="Scan Image File">
+        <label class="p-2 rounded-xl bg-amber-950/70 hover:bg-amber-900/80 border border-amber-700/70 text-amber-300 cursor-pointer text-xs" title="Snap QR Photo with Phone Camera (Works 100% on iOS & Android)">
+          📸
+          <input type="file" id="qr-camera-input" accept="image/*" capture="environment" class="hidden" onchange="scanImageFile(event)" />
+        </label>
+        <label class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 cursor-pointer text-xs text-zinc-300" title="Choose Image File">
           📁
           <input type="file" id="qr-file-input" accept="image/*" class="hidden" onchange="scanImageFile(event)" />
         </label>
@@ -343,13 +430,31 @@
     let currentCameraId = null;
     let camerasList = [];
 
-    // Synthesized Audio Beep for zero-asset offline audio
+    // Synthesized Audio Beep for zero-asset offline audio (iOS Safari & Android optimized)
+    let sharedAudioCtx = null;
+    function getAudioContext() {
+      if (!sharedAudioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) sharedAudioCtx = new AudioContextClass();
+      }
+      if (sharedAudioCtx && sharedAudioCtx.state === 'suspended') {
+        sharedAudioCtx.resume();
+      }
+      return sharedAudioCtx;
+    }
+
+    // Auto-unlock Web Audio on first user gesture for iOS Safari
+    ['touchstart', 'touchend', 'click'].forEach(evt => {
+      document.addEventListener(evt, () => {
+        try { getAudioContext(); } catch(e) {}
+      }, { once: true, passive: true });
+    });
+
     function playBeep(type = 'success') {
       if (!audioEnabled) return;
       try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
+        const ctx = getAudioContext();
+        if (!ctx) return;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
 
@@ -393,6 +498,7 @@
           updateStatsUI();
           renderRecentActivity();
         });
+        window.MEODL_ATTENDANCE.subscribeSyncStatus(renderSyncStatusUI);
       }
     });
 
@@ -686,6 +792,130 @@
           </div>
         `;
       }).join('');
+    }
+
+    // -------------------------------------------------------------------------
+    // OFFLINE-FIRST DISTRIBUTED SYNC UI CONTROLLER
+    // -------------------------------------------------------------------------
+    function renderSyncStatusUI(syncState) {
+      if (!syncState) return;
+      const badge = document.getElementById('sync-status-badge');
+      const dot = document.getElementById('sync-status-dot');
+      const text = document.getElementById('sync-status-text');
+      const pendingTag = document.getElementById('sync-pending-tag');
+      const lastTime = document.getElementById('sync-last-time');
+      const syncIcon = document.getElementById('sync-icon');
+
+      if (!badge || !dot || !text) return;
+
+      const st = syncState.status || 'OFFLINE';
+
+      if (st === 'LIVE_CONNECTED') {
+        badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-emerald-950/80 text-emerald-300 border-emerald-700/80 transition-all';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        text.textContent = 'LIVE CONNECTED';
+      } else if (st === 'SYNCING') {
+        badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-cyan-950/80 text-cyan-300 border-cyan-700/80 transition-all';
+        dot.className = 'w-2 h-2 rounded-full bg-cyan-400 animate-ping';
+        text.textContent = 'SYNCING...';
+      } else if (st === 'ERROR') {
+        badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-rose-950/80 text-rose-300 border-rose-700/80 transition-all';
+        dot.className = 'w-2 h-2 rounded-full bg-rose-400';
+        text.textContent = 'SYNC ERROR';
+      } else { // OFFLINE or default
+        badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border bg-amber-950/80 text-amber-300 border-amber-700/80 transition-all';
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+        text.textContent = 'OFFLINE MODE';
+      }
+
+      if (pendingTag) {
+        if (syncState.pendingCount > 0) {
+          pendingTag.classList.remove('hidden');
+          pendingTag.textContent = `${syncState.pendingCount} PENDING`;
+        } else {
+          pendingTag.classList.add('hidden');
+        }
+      }
+
+      if (lastTime) {
+        if (syncState.lastSyncTime) {
+          lastTime.textContent = `Last sync: ${syncState.lastSyncTime}`;
+        } else if (st === 'OFFLINE') {
+          lastTime.textContent = 'Server offline (saving locally)';
+        } else {
+          lastTime.textContent = 'Last sync: --';
+        }
+      }
+
+      if (syncIcon) {
+        if (st === 'SYNCING') {
+          syncIcon.classList.add('animate-spin', 'inline-block');
+        } else {
+          syncIcon.classList.remove('animate-spin', 'inline-block');
+        }
+      }
+    }
+
+    function triggerManualSync() {
+      if (!window.MEODL_ATTENDANCE) return;
+      window.MEODL_ATTENDANCE.syncPendingEvents(true);
+    }
+
+    function openDeviceSettingsModal() {
+      if (!window.MEODL_ATTENDANCE) return;
+      const cfg = window.MEODL_ATTENDANCE.getSyncState();
+      const devInp = document.getElementById('setting-device-id');
+      const marInp = document.getElementById('setting-marshal-id');
+      const gateInp = document.getElementById('setting-gate-id');
+      const srvInp = document.getElementById('setting-server-url');
+      if (devInp) devInp.value = cfg.deviceId || '';
+      if (marInp) marInp.value = cfg.marshalId || '';
+      if (gateInp) gateInp.value = cfg.gateId || '';
+      if (srvInp) srvInp.value = cfg.serverUrl || '';
+      const modal = document.getElementById('device-settings-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeDeviceSettingsModal() {
+      const modal = document.getElementById('device-settings-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveDeviceSettings() {
+      if (!window.MEODL_ATTENDANCE) return;
+      const deviceId = (document.getElementById('setting-device-id')?.value || '').trim();
+      const marshalId = (document.getElementById('setting-marshal-id')?.value || '').trim();
+      const gateId = (document.getElementById('setting-gate-id')?.value || '').trim();
+      const serverUrl = (document.getElementById('setting-server-url')?.value || '').trim();
+      window.MEODL_ATTENDANCE.setDeviceSettings({ deviceId, marshalId, gateId, serverUrl });
+      closeDeviceSettingsModal();
+    }
+
+    function toggleExportMenu() {
+      const menu = document.getElementById('export-menu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', (e) => {
+      const menu = document.getElementById('export-menu');
+      if (menu && !menu.classList.contains('hidden')) {
+        const btn = e.target.closest('button[onclick*="toggleExportMenu"]');
+        if (!btn && !menu.contains(e.target)) {
+          menu.classList.add('hidden');
+        }
+      }
+    });
+
+    function exportScansJSON() {
+      if (window.MEODL_ATTENDANCE) {
+        window.MEODL_ATTENDANCE.exportAttendanceEventsJSON();
+      }
+    }
+
+    function exportScansCSV() {
+      if (window.MEODL_ATTENDANCE) {
+        window.MEODL_ATTENDANCE.exportAttendanceEventsCSV();
+      }
     }
   </script>
 </body>

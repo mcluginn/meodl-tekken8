@@ -103,20 +103,6 @@
       accentColor: '#10b981',
       badgeClass: 'bg-emerald-950/80 text-emerald-400 border-emerald-700/60'
     },
-    generals: {
-      id: 'generals',
-      name: 'Game of the Generals',
-      category: 'Racket & Board',
-      icon: '🎖️',
-      defaultBracketType: 'single',
-      supportedBracketTypes: ['single', 'double', 'roundRobin'],
-      participantType: 'player',
-      defaultParticipants: ['Rankine Generals Rep', 'Otto Generals Rep', 'Brayton Generals Rep', 'Diesel Generals Rep'],
-      matchFormat: '15 Mins Time Control',
-      rulesKey: 'generals',
-      accentColor: '#eab308',
-      badgeClass: 'bg-yellow-950/80 text-yellow-400 border-yellow-700/60'
-    },
 
     // FIELD & TIMED
     swimming: {

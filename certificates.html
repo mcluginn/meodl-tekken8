@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MEODL 2026 • Official Certificate & Awards Center</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Inter, JetBrains Mono, Cinzel, Alex Brush, Great Vibes, Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@600;700;800;900&family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Local QR Generator, jsPDF, Mechanical Gear and MEODL Data Modules -->
+  <link rel="stylesheet" href="./assets/meodl_gear.css">
+  <script src="./assets/meodl_gear.js"></script>
+  <script src="./assets/qrcode.min.js"></script>
+  <script src="./assets/jspdf.umd.min.js"></script>
+  <script src="./assets/meodl_data.js"></script>
+  <script src="./assets/meodl_attendance.js"></script>
+
+  <!-- Tailwind Configuration matching Tournament & Quiz Bee Theme -->
+  <script>
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+              cinzel: ['Cinzel', 'Georgia', 'serif'],
+              alex: ['"Alex Brush"', '"Great Vibes"', 'cursive'],
+              montserrat: ['Montserrat', 'sans-serif'],
+            },
+            colors: {
+              navy: {
+                950: '#030b17',
+                900: '#06162f',
+                850: '#081e3d',
+                800: '#0a2344',
+                750: '#0e2d56',
+                700: '#103768',
+                600: '#1b4d8d',
+              },
+              gold: {
+                300: '#ffe494',
+                400: '#f7b943',
+                500: '#d99824',
+                600: '#a37827',
+                700: '#795513',
+              },
+              burgundy: {
+                DEFAULT: '#4A1521',
+                light: '#6d2131',
+                dark: '#360e17',
+              },
+              rankine: '#e11d48',
+              otto: '#f59e0b',
+              brayton: '#06b6d4',
+              diesel: '#10b981',
+            }
+          }
+        }
+      };
+    }
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #030b17;
+      color: #f1f5f9;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+    }
+    
+    .bg-grid-glow {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(247, 185, 67, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(6, 182, 212, 0.04) 1px, transparent 1px);
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #06162f; }
+    ::-webkit-scrollbar-thumb { background: #1b4d8d; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #f7b943; }
+
+    /* High-Resolution Landscape A4 Print Setup */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #batch-print-container, #batch-print-container * {
+        visibility: visible;
+      }
+      #batch-print-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+      }
+      .cert-print-sheet {
+        page-break-after: always;
+        page-break-inside: avoid;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0;
+        padding: 0;
+      }
+      .cert-print-sheet img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      @page {
+        size: landscape;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body class="bg-navy-950 bg-grid-glow text-slate-100 min-h-screen flex flex-col">
+
+  <!-- ================= TOP NAVIGATION HEADER ================= -->
+  <header class="sticky top-0 z-40 bg-navy-900/95 backdrop-blur-xl border-b border-navy-750 shadow-2xl px-4 lg:px-8 py-3.5">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Badges -->
+      <div class="flex items-center space-x-3.5">
+        <div class="relative flex items-center space-x-2">
+          <img src="./assets/mechanical-engineering-society.png" alt="MES" class="w-10 h-10 object-contain drop-shadow" onerror="this.src='./assets/mes_logo.png'" />
+          <div class="w-2.5 h-2.5 rounded-full bg-gold-400 animate-pulse"></div>
+        </div>
+
+        <!-- Small Interlocking Mechanical Gear Assembly -->
+        <div class="hidden md:flex items-center justify-center opacity-85 hover:opacity-100 transition-opacity shrink-0" title="Mechanical Engineering Society Gear Train">
+          <div data-meodl-gear-assembly data-scale="small" data-state="idle"></div>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg lg:text-xl font-black font-cinzel tracking-wider text-slate-100 flex items-center gap-2">
+              MEODL <span class="text-gold-400">CERTIFICATE CENTER</span>
+            </h1>
+            <span class="px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase bg-gold-400/20 text-gold-300 border border-gold-400/40 rounded-full">
+              OFFICIAL 2026
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 font-medium">Mechanical Engineering Society • Authoritative Awards & Verification Engine</p>
+        </div>
+      </div>
+
+      <!-- Quick Portals & Tools -->
+      <div class="flex items-center flex-wrap gap-2">
+        <a href="index.html" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 hover:text-white border border-navy-700 text-xs font-semibold transition">
+          <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>Main Hub</span>
+        </a>
+        <a href="scanner.html" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 hover:text-white border border-navy-700 text-xs font-semibold transition">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+          <span>Scanner</span>
+        </a>
+        <a href="print_cards.html" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 hover:text-white border border-navy-700 text-xs font-semibold transition">
+          <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <span>Print Cards</span>
+        </a>
+
+        <!-- System Controls -->
+        <button id="btn-open-verify" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/50 text-xs font-semibold transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <span>Verify Cert</span>
+        </button>
+
+        <button id="btn-open-settings" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300 hover:text-white border border-navy-700 text-xs font-semibold transition">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          <span>Signatories</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN DASHBOARD CONTAINER ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 flex flex-col gap-6">
+
+    <!-- KPI Metric Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      
+      <div class="bg-navy-900/90 rounded-xl border border-navy-750 p-4 shadow-xl flex items-center space-x-3.5 relative overflow-hidden group hover:border-gold-400/50 transition">
+        <div class="w-12 h-12 rounded-xl bg-gold-400/15 border border-gold-400/30 flex items-center justify-center text-gold-400 shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Total Certificates</p>
+          <div class="flex items-baseline space-x-2">
+            <span id="stat-total-certs" class="text-2xl font-black font-mono text-slate-100">0</span>
+            <span class="text-[11px] text-emerald-400 font-semibold">Active</span>
+          </div>
+        </div>
+        <!-- Decorative Mechanical Watermark Gear -->
+        <div class="absolute -bottom-3 -right-3 opacity-15 pointer-events-none" data-meodl-gear-single data-teeth="24" data-size="68" data-accent="true"></div>
+      </div>
+
+      <div class="bg-navy-900/90 rounded-xl border border-navy-750 p-4 shadow-xl flex items-center space-x-3.5 relative overflow-hidden group hover:border-cyan-400/50 transition">
+        <div class="w-12 h-12 rounded-xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Participation</p>
+          <div class="flex items-baseline space-x-2">
+            <span id="stat-part-certs" class="text-2xl font-black font-mono text-slate-100">0</span>
+            <span class="text-[11px] text-slate-400">/ 175 Athletes</span>
+          </div>
+        </div>
+        <!-- Decorative Mechanical Watermark Gear -->
+        <div class="absolute -bottom-3 -right-3 opacity-15 pointer-events-none" data-meodl-gear-single data-teeth="16" data-size="62" data-reverse="true"></div>
+      </div>
+
+      <div class="bg-navy-900/90 rounded-xl border border-navy-750 p-4 shadow-xl flex items-center space-x-3.5 relative overflow-hidden group hover:border-amber-400/50 transition">
+        <div class="w-12 h-12 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Podium & MVP</p>
+          <div class="flex items-baseline space-x-2">
+            <span id="stat-award-certs" class="text-2xl font-black font-mono text-slate-100">0</span>
+            <span class="text-[11px] text-gold-400 font-semibold">Excellence</span>
+          </div>
+        </div>
+        <!-- Decorative Mechanical Watermark Gear -->
+        <div class="absolute -bottom-3 -right-3 opacity-15 pointer-events-none" data-meodl-gear-single data-teeth="20" data-size="66" data-accent="true"></div>
+      </div>
+
+      <div class="bg-navy-900/90 rounded-xl border border-navy-750 p-4 shadow-xl flex items-center space-x-3.5 relative overflow-hidden group hover:border-emerald-400/50 transition">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">Security Engine</p>
+          <div class="flex items-baseline space-x-2">
+            <span class="text-lg font-black font-mono text-emerald-400">SHA-256</span>
+            <span class="text-[10px] text-slate-400 font-semibold">QR Tamper-Proof</span>
+          </div>
+        </div>
+        <!-- Decorative Mechanical Watermark Gear -->
+        <div class="absolute -bottom-3 -right-3 opacity-15 pointer-events-none" data-meodl-gear-single data-teeth="16" data-size="62" data-reverse="true"></div>
+      </div>
+
+    </div>
+
+    <!-- Batch Generation & Action Toolbar -->
+    <div class="bg-navy-900 rounded-xl border border-navy-750 p-4 shadow-xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      
+      <!-- Primary Batch Action Buttons -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        <button id="btn-gen-all" class="flex items-center space-x-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-gold-500 to-amber-600 hover:from-gold-400 hover:to-amber-500 text-navy-950 font-bold text-xs uppercase tracking-wider shadow-lg shadow-gold-500/20 hover:shadow-gold-500/40 transition active:scale-95">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <span>Batch Generate All 175 Athletes</span>
+        </button>
+
+        <button id="btn-gen-podium" class="flex items-center space-x-2 px-3.5 py-2.5 rounded-lg bg-navy-800 hover:bg-navy-750 text-gold-300 hover:text-gold-200 border border-gold-400/40 font-semibold text-xs tracking-wide transition active:scale-95">
+          <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          <span>Podium & MVP Awards</span>
+        </button>
+
+        <button id="btn-open-create" class="flex items-center space-x-2 px-3.5 py-2.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 hover:text-white border border-navy-700 font-semibold text-xs transition active:scale-95">
+          <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>Custom Certificate</span>
+        </button>
+      </div>
+
+      <!-- Export & Print Buttons -->
+      <div class="flex items-center flex-wrap gap-2">
+        <button id="btn-batch-print" class="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-navy-800 hover:bg-navy-750 text-slate-200 hover:text-white border border-navy-700 text-xs font-semibold transition">
+          <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <span>Batch Print (A4 Landscape)</span>
+        </button>
+
+        <button id="btn-preview-sample" class="flex items-center space-x-1.5 px-3.5 py-2 rounded-lg bg-navy-800 hover:bg-navy-750 text-gold-300 border border-gold-400/30 text-xs font-semibold transition">
+          <svg class="w-4 h-4 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          <span>Canva Master Preview</span>
+        </button>
+
+        <button id="btn-clear-all" class="flex items-center space-x-1 px-3 py-2 rounded-lg bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/40 text-xs font-semibold transition" title="Reset All Certificates">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          <span>Reset</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Search & Filter Controls -->
+    <div class="bg-navy-900/80 rounded-xl border border-navy-750 p-3.5 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Search Input -->
+      <div class="relative flex-1 min-w-[260px]">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </span>
+        <input type="text" id="search-input" placeholder="Search athlete name, ID, cert #, or award title..." class="w-full pl-9 pr-4 py-2 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs placeholder-slate-500 focus:outline-none focus:border-gold-400 transition" />
+      </div>
+
+      <!-- Filters -->
+      <div class="flex items-center flex-wrap gap-2">
+        <!-- Team Division Filter -->
+        <select id="filter-team" class="px-3 py-2 rounded-lg bg-navy-950 border border-navy-700 text-slate-300 text-xs font-medium focus:outline-none focus:border-gold-400 transition">
+          <option value="ALL">All Teams (175 Students)</option>
+          <option value="RANKINE">Team Rankine Dynamo</option>
+          <option value="OTTO">Team Otto Turbo</option>
+          <option value="BRAYTON">Team Brayton Jet</option>
+          <option value="DIESEL">Team Diesel Power</option>
+        </select>
+
+        <!-- Category Filter -->
+        <select id="filter-type" class="px-3 py-2 rounded-lg bg-navy-950 border border-navy-700 text-slate-300 text-xs font-medium focus:outline-none focus:border-gold-400 transition">
+          <option value="ALL">All Award Types</option>
+          <option value="PARTICIPATION">Participation</option>
+          <option value="CHAMPION">Grand Champion</option>
+          <option value="FIRST_RUNNER_UP">1st Runner-Up</option>
+          <option value="SECOND_RUNNER_UP">2nd Runner-Up</option>
+          <option value="EVENT_CHAMPION">Sport & Event Champions</option>
+          <option value="MVP">Division MVP</option>
+        </select>
+
+        <!-- Status Filter -->
+        <select id="filter-status" class="px-3 py-2 rounded-lg bg-navy-950 border border-navy-700 text-slate-300 text-xs font-medium focus:outline-none focus:border-gold-400 transition">
+          <option value="ALL">All Statuses</option>
+          <option value="ISSUED">Issued & Active</option>
+          <option value="VOIDED">Voided / Revoked</option>
+        </select>
+
+        <!-- Count Indicator -->
+        <span id="filter-count-badge" class="px-2.5 py-1.5 rounded-lg bg-navy-800 text-gold-300 font-mono text-xs border border-navy-700">
+          Showing: 0
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Certificate Cards Grid -->
+    <div id="certificates-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Generated dynamically by JavaScript -->
+    </div>
+
+    <!-- Empty State Container -->
+    <div id="empty-state" class="hidden flex-col items-center justify-center py-16 px-4 bg-navy-900/40 rounded-2xl border border-dashed border-navy-750 text-center">
+      <div class="w-16 h-16 rounded-full bg-gold-400/10 border border-gold-400/20 flex items-center justify-center text-gold-400 mb-4">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <h3 class="text-base font-bold text-slate-200 mb-1">No Certificates Found</h3>
+      <p class="text-xs text-slate-400 max-w-md mb-5">Click "Batch Generate All 175 Athletes" above or create a custom certificate to generate authoritative records.</p>
+      <button onclick="document.getElementById('btn-gen-all').click()" class="px-4 py-2 rounded-lg bg-gold-400 hover:bg-gold-300 text-navy-950 font-bold text-xs uppercase tracking-wider transition">
+        Batch Generate Now
+      </button>
+    </div>
+
+  </main>
+
+  <!-- ================= PREVIEW MODAL ================= -->
+  <div id="preview-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="relative w-full max-w-5xl bg-navy-900 border border-navy-750 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-4 border-b border-navy-750 bg-navy-950/80 shrink-0">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-gold-400/20 border border-gold-400/40 flex items-center justify-center text-gold-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+          </div>
+          <div>
+            <h3 id="preview-cert-no" class="text-base font-bold font-mono text-slate-100">MEODL-2026-C-0001</h3>
+            <p id="preview-award-title" class="text-xs text-gold-300 font-semibold">Overall Grand Champion</p>
+          </div>
+        </div>
+        
+        <!-- Actions & Close -->
+        <div class="flex items-center space-x-2">
+          <button id="btn-preview-print" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-gold-400 hover:bg-gold-300 text-navy-950 font-bold text-xs transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span>Print A4</span>
+          </button>
+          <button id="btn-preview-download-png" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 border border-navy-700 text-xs font-semibold transition">
+            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>PNG</span>
+          </button>
+          <button id="btn-preview-download-pdf" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-200 border border-navy-700 text-xs font-semibold transition">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <span>PDF</span>
+          </button>
+          <button onclick="closeModal('preview-modal')" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-navy-800 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Preview Canvas Area -->
+      <div class="p-6 bg-navy-950 flex flex-col items-center justify-center overflow-auto flex-1">
+        <div class="relative max-w-full shadow-2xl rounded-lg overflow-hidden border border-gold-400/20 bg-white">
+          <canvas id="preview-canvas" width="2048" height="1442" class="max-w-full h-auto max-h-[65vh] object-contain block"></canvas>
+        </div>
+        
+        <!-- Metadata bar -->
+        <div class="mt-4 w-full max-w-3xl flex flex-wrap items-center justify-between gap-3 text-xs bg-navy-900/90 border border-navy-750 px-4 py-2.5 rounded-xl text-slate-300">
+          <div>
+            <span class="text-slate-500 uppercase font-semibold">Recipient:</span>
+            <span id="preview-meta-recipient" class="font-bold text-slate-100 ml-1">Chris Advien Etorma</span>
+            <span id="preview-meta-team" class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300">Rankine</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-slate-500 uppercase font-semibold">SHA-256:</span>
+            <span id="preview-meta-hash" class="font-mono text-[11px] text-emerald-400 truncate max-w-[180px]">e3b0c44...</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= CUSTOM CERTIFICATE CREATOR DRAWER / MODAL ================= -->
+  <div id="create-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="relative w-full max-w-xl bg-navy-900 border border-navy-750 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <div class="flex items-center justify-between px-6 py-4 border-b border-navy-750 bg-navy-950/80">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-cyan-400/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-100">Create Official Certificate</h3>
+            <p class="text-xs text-slate-400">Award an individual student athlete or special category</p>
+          </div>
+        </div>
+        <button onclick="closeModal('create-modal')" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-navy-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="form-create-cert" class="p-6 space-y-4 overflow-y-auto flex-1">
+        
+        <!-- Recipient Selection Mode -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Select Registered Athlete (175 Students)</label>
+          <select id="create-select-student" class="w-full px-3 py-2.5 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs focus:border-gold-400 focus:outline-none">
+            <option value="">-- Or enter custom name below --</option>
+          </select>
+        </div>
+
+        <!-- Custom Recipient Name -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Recipient Full Name</label>
+          <input type="text" id="create-input-name" required placeholder="e.g. ETORMA, CHRIS ADVIEN" class="w-full px-3 py-2.5 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs focus:border-gold-400 focus:outline-none uppercase font-semibold" />
+        </div>
+
+        <!-- Team Division & Student Code -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Team Division</label>
+            <select id="create-select-team" class="w-full px-3 py-2.5 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs focus:border-gold-400 focus:outline-none">
+              <option value="RANKINE">Team Rankine Dynamo</option>
+              <option value="OTTO">Team Otto Turbo</option>
+              <option value="BRAYTON">Team Brayton Jet</option>
+              <option value="DIESEL">Team Diesel Power</option>
+              <option value="GENERAL">Mechanical Engineering Society</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Student / Reg #</label>
+            <input type="text" id="create-input-code" placeholder="e.g. MEODL-0001" class="w-full px-3 py-2.5 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs focus:border-gold-400 focus:outline-none uppercase font-mono" />
+          </div>
+        </div>
+
+        <!-- Award Category -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Award Category</label>
+          <select id="create-select-award-type" class="w-full px-3 py-2.5 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs focus:border-gold-400 focus:outline-none">
+            <option value="PARTICIPATION">Certificate of Appreciation (Participation)</option>
+            <option value="CHAMPION">Overall Grand Champion (Certificate of Excellence)</option>
+            <option value="FIRST_RUNNER_UP">1st Runner-Up (Certificate of Recognition)</option>
+            <option value="SECOND_RUNNER_UP">2nd Runner-Up (Certificate of Recognition)</option>
+            <option value="TEKKEN_CHAMPION">Tekken 8 Champion</option>
+            <option value="ML_CHAMPION">Mobile Legends Champion</option>
+            <option value="CODM_CHAMPION">Call of Duty Mobile Champion</option>
+            <option value="BASKETBALL_CHAMPION">Basketball 3v3 Champion</option>
+            <option value="VOLLEYBALL_CHAMPION">Volleyball Champion</option>
+            <option value="BADMINTON_CHAMPION">Badminton Champion</option>
+            <option value="CHESS_CHAMPION">Chess Master Champion</option>
+            <option value="MVP">Division Most Valuable Player (MVP)</option>
+            <option value="CUSTOM">Custom Award Title...</option>
+          </select>
+        </div>
+
+        <!-- Custom Award Title (if Custom selected) -->
+        <div id="create-custom-title-wrapper" class="hidden">
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Custom Award Title</label>
+          <input type="text" id="create-input-custom-title" placeholder="e.g. Sportsmanship of the Tournament" class="w-full px-3 py-2.5 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs focus:border-gold-400 focus:outline-none" />
+        </div>
+
+        <!-- Custom Citation Text -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Citation Body Text</label>
+          <textarea id="create-input-citation" rows="3" class="w-full px-3 py-2 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs focus:border-gold-400 focus:outline-none"></textarea>
+          <p class="text-[11px] text-slate-400 mt-1">Leave empty to auto-generate official citation matching the Canva master format.</p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="pt-4 flex items-center justify-end space-x-3 border-t border-navy-750">
+          <button type="button" onclick="closeModal('create-modal')" class="px-4 py-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300 text-xs font-semibold transition">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-gold-400 hover:bg-gold-300 text-navy-950 font-bold text-xs uppercase tracking-wider transition">
+            Generate Certificate
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= SETTINGS & SIGNATORIES MODAL ================= -->
+  <div id="settings-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="relative w-full max-w-lg bg-navy-900 border border-navy-750 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <div class="flex items-center justify-between px-6 py-4 border-b border-navy-750 bg-navy-950/80">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-gold-400/20 border border-gold-400/40 flex items-center justify-center text-gold-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-100">Certificate Settings & Signatories</h3>
+            <p class="text-xs text-slate-400">Official Canva master signatories & metadata</p>
+          </div>
+        </div>
+        <button onclick="closeModal('settings-modal')" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-navy-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form id="form-settings" class="p-6 space-y-4 overflow-y-auto flex-1">
+        
+        <!-- Event Title -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Event Title</label>
+          <input type="text" id="setting-event-title" value="MEODL LEAGUE 2026" class="w-full px-3 py-2 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs font-semibold focus:border-gold-400 focus:outline-none" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Date Text</label>
+            <input type="text" id="setting-date-text" value="March 2026" class="w-full px-3 py-2 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs focus:border-gold-400 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Venue Text</label>
+            <input type="text" id="setting-venue-text" value="Main Campus Auditorium & Arena" class="w-full px-3 py-2 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs focus:border-gold-400 focus:outline-none" />
+          </div>
+        </div>
+
+        <!-- Official Signatories Section -->
+        <div class="p-3.5 rounded-xl bg-navy-950 border border-navy-800 space-y-3">
+          <h4 class="text-xs font-bold text-gold-400 uppercase tracking-wider flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            <span>Official Signatories (Canva Master Default)</span>
+          </h4>
+
+          <!-- Signatory 1 (Left) -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-400">Signatory 1 (Left)</label>
+              <input type="text" id="setting-sig1-name" value="EPHRAIM RICK R. BENGCO" class="w-full px-2.5 py-1.5 rounded-lg bg-navy-900 border border-navy-700 text-slate-200 text-xs font-semibold focus:border-gold-400 focus:outline-none uppercase" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-400">Title</label>
+              <input type="text" id="setting-sig1-title" value="MES PRESIDENT" class="w-full px-2.5 py-1.5 rounded-lg bg-navy-900 border border-navy-700 text-slate-200 text-xs font-semibold focus:border-gold-400 focus:outline-none uppercase" />
+            </div>
+          </div>
+
+          <!-- Signatory 2 (Right) -->
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-400">Signatory 2 (Right)</label>
+              <input type="text" id="setting-sig2-name" value="ENGR. MC. LUGINN F. SEÑA" class="w-full px-2.5 py-1.5 rounded-lg bg-navy-900 border border-navy-700 text-slate-200 text-xs font-semibold focus:border-gold-400 focus:outline-none uppercase" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-400">Title</label>
+              <input type="text" id="setting-sig2-title" value="MES ADVISER" class="w-full px-2.5 py-1.5 rounded-lg bg-navy-900 border border-navy-700 text-slate-200 text-xs font-semibold focus:border-gold-400 focus:outline-none uppercase" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="pt-3 flex items-center justify-end space-x-3 border-t border-navy-750">
+          <button type="button" onclick="closeModal('settings-modal')" class="px-4 py-2 rounded-lg bg-navy-800 hover:bg-navy-700 text-slate-300 text-xs font-semibold transition">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-lg bg-gold-400 hover:bg-gold-300 text-navy-950 font-bold text-xs uppercase tracking-wider transition">
+            Save Settings
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= VERIFICATION MODAL ================= -->
+  <div id="verify-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+    <div class="relative w-full max-w-lg bg-navy-900 border border-navy-750 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      
+      <div class="flex items-center justify-between px-6 py-4 border-b border-navy-750 bg-navy-950/80">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-emerald-400/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-slate-100">Certificate Verification</h3>
+            <p class="text-xs text-slate-400">Authenticate cryptographic seal & record</p>
+          </div>
+        </div>
+        <button onclick="closeModal('verify-modal')" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-navy-800 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">Enter Certificate # or SHA-256 Hash</label>
+          <div class="flex items-center space-x-2">
+            <input type="text" id="verify-search-input" placeholder="e.g. MEODL-2026-P-0001" class="flex-1 px-3.5 py-2.5 rounded-lg bg-navy-950 border border-navy-700 text-slate-200 text-xs font-mono focus:border-emerald-400 focus:outline-none" />
+            <button id="btn-run-verify" class="px-4 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-navy-950 font-bold text-xs uppercase tracking-wider transition">
+              Verify
+            </button>
+          </div>
+        </div>
+
+        <!-- Verification Results Card -->
+        <div id="verify-result-card" class="hidden p-4 rounded-xl border">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Hidden Batch Print Container -->
+  <div id="batch-print-container"></div>
+
+  <!-- Offscreen QR generator canvas -->
+  <div id="offscreen-qr" style="display:none;"></div>
+
+  <!-- ================= JAVASCRIPT LOGIC ENGINE ================= -->
+  <script>
+    (function() {
+      'use strict';
+
+      const STORAGE_CERTS_KEY = 'MEODL_CERTS_DATABASE_V1';
+      const STORAGE_SETTINGS_KEY = 'MEODL_CERTS_SETTINGS_V1';
+
+      // Default Template Background Image
+      const TEMPLATE_BG_SRC = './assets/certificate-template-background.png';
+      let templateImage = new Image();
+      let isTemplateLoaded = false;
+      templateImage.onload = () => { isTemplateLoaded = true; };
+      templateImage.src = TEMPLATE_BG_SRC;
+
+      // Global State
+      let certificates = [];
+      let currentSelectedCert = null;
+      let settings = {
+        eventTitle: 'MEODL LEAGUE 2026',
+        dateText: 'March 2026',
+        venueText: 'Main Campus Gymnasium & Arena',
+        sig1Name: 'EPHRAIM RICK R. BENGCO',
+        sig1Title: 'MES PRESIDENT',
+        sig2Name: 'ENGR. MC. LUGINN F. SEÑA',
+        sig2Title: 'MES ADVISER'
+      };
+
+      // Pure JS SHA-256 implementation
+      function sha256(ascii) {
+        function rightRotate(value, amount) {
+          return (value >>> amount) | (value << (32 - amount));
+        }
+        const mathPow = Math.pow;
+        const maxWord = mathPow(2, 32);
+        let i, j, result = '';
+        const words = [];
+        const asciiBitLength = ascii.length * 8;
+        let hash = [];
+        const k = [];
+        let primeCounter = 0;
+        const isComposite = {};
+        for (let candidate = 2; primeCounter < 64; candidate++) {
+          if (!isComposite[candidate]) {
+            for (i = 0; i < 300; i += candidate) isComposite[i] = candidate;
+            hash[primeCounter] = (mathPow(candidate, 0.5) * maxWord) | 0;
+            k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+          }
+        }
+        ascii += '\x80';
+        while ((ascii.length % 64) - 56) ascii += '\x00';
+        for (i = 0; i < ascii.length; i++) {
+          j = ascii.charCodeAt(i);
+          if (j >> 8) return '';
+          words[i >> 2] |= j << (((3 - i) % 4) * 8);
+        }
+        words[words.length] = (asciiBitLength / maxWord) | 0;
+        words[words.length] = asciiBitLength;
+        for (j = 0; j < words.length;) {
+          const w = words.slice(j, j += 16);
+          const oldHash = hash;
+          hash = hash.slice(0, 8);
+          for (i = 0; i < 64; i++) {
+            const w15 = w[i - 15], w2 = w[i - 2];
+            const s0 = i >= 16 ? (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) : 0;
+            const s1 = i >= 16 ? (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10)) : 0;
+            const ch = (hash[4] & hash[5]) ^ (~hash[4] & hash[6]);
+            const maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);
+            const temp1 = hash[7] + (rightRotate(hash[4], 6) ^ rightRotate(hash[4], 11) ^ rightRotate(hash[4], 25)) + ch + k[i] + (i < 16 ? (w[i] = (w[i] || 0)) : (w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0));
+            const temp2 = (rightRotate(hash[0], 2) ^ rightRotate(hash[0], 13) ^ rightRotate(hash[0], 22)) + maj;
+            hash = [(temp1 + temp2) | 0].concat(hash);
+            hash[4] = (hash[4] + temp1) | 0;
+          }
+          for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+        }
+        for (i = 0; i < 8; i++) {
+          for (let b = 3; b >= 0; b--) {
+            const byte = (hash[i] >> (b * 8)) & 255;
+            result += (byte < 16 ? '0' : '') + byte.toString(16);
+          }
+        }
+        return result;
+      }
+
+      // Load Settings from LocalStorage
+      function loadSettings() {
+        try {
+          const saved = localStorage.getItem(STORAGE_SETTINGS_KEY);
+          if (saved) settings = Object.assign(settings, JSON.parse(saved));
+        } catch(e) {}
+        document.getElementById('setting-event-title').value = settings.eventTitle;
+        document.getElementById('setting-date-text').value = settings.dateText;
+        document.getElementById('setting-venue-text').value = settings.venueText;
+        document.getElementById('setting-sig1-name').value = settings.sig1Name;
+        document.getElementById('setting-sig1-title').value = settings.sig1Title;
+        document.getElementById('setting-sig2-name').value = settings.sig2Name;
+        document.getElementById('setting-sig2-title').value = settings.sig2Title;
+      }
+
+      function saveSettings() {
+        settings.eventTitle = document.getElementById('setting-event-title').value.trim();
+        settings.dateText = document.getElementById('setting-date-text').value.trim();
+        settings.venueText = document.getElementById('setting-venue-text').value.trim();
+        settings.sig1Name = document.getElementById('setting-sig1-name').value.trim();
+        settings.sig1Title = document.getElementById('setting-sig1-title').value.trim();
+        settings.sig2Name = document.getElementById('setting-sig2-name').value.trim();
+        settings.sig2Title = document.getElementById('setting-sig2-title').value.trim();
+        localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(settings));
+      }
+
+      // Load Certificates from LocalStorage
+      function loadCertificates() {
+        try {
+          const saved = localStorage.getItem(STORAGE_CERTS_KEY);
+          if (saved) certificates = JSON.parse(saved);
+        } catch(e) {}
+        if (!certificates || certificates.length === 0) {
+          // Initialize sample Canva master certificate
+          initSampleMasterCertificate();
+        }
+      }
+
+      function saveCertificates() {
+        localStorage.setItem(STORAGE_CERTS_KEY, JSON.stringify(certificates));
+        renderDashboard();
+      }
+
+      // Standard Sample Canva Master Certificate
+      function initSampleMasterCertificate() {
+        const sampleCert = {
+          id: 'cert_sample_001',
+          certificateNumber: 'MEODL-2026-P-0001',
+          type: 'PARTICIPATION',
+          awardTitle: 'Certificate of Participation',
+          documentTitle: 'CERTIFICATE',
+          documentSubtitle: 'OF APPRECIATION',
+          recipientName: 'Etorma, Chris Advien',
+          recipientId: 'student-0001',
+          studentCode: 'MEODL-0001',
+          team: 'RANKINE',
+          teamName: 'Team Rankine Dynamo',
+          citation: 'Presented to Etorma, Chris Advien, in appreciation for placing 1st among the 1st-year participants in the 2026 MEODL Quiz Bee and League.',
+          issuedAt: new Date().toISOString(),
+          status: 'ISSUED',
+          sha256Hash: sha256('MEODL-2026-P-0001:Etorma, Chris Advien:RANKINE:2026')
+        };
+        certificates = [sampleCert];
+      }
+
+      // Populate student selector from 175 registered roster
+      function populateStudentSelector() {
+        const select = document.getElementById('create-select-student');
+        select.innerHTML = '<option value="">-- Choose from 175 Registered Students --</option>';
+
+        const rosters = (window.MEODL_DATA && window.MEODL_DATA.rosters) ? window.MEODL_DATA.rosters : {};
+        const teams = ['RANKINE', 'OTTO', 'BRAYTON', 'DIESEL'];
+        let globalIndex = 1;
+
+        teams.forEach(tKey => {
+          const members = rosters[tKey] || [];
+          if (members.length === 0) return;
+
+          const group = document.createElement('optgroup');
+          group.label = `Team ${tKey} (${members.length} Athletes)`;
+
+          members.forEach(name => {
+            const opt = document.createElement('option');
+            const code = 'MEODL-' + String(globalIndex).padStart(4, '0');
+            opt.value = JSON.stringify({ name: name, team: tKey, code: code, id: 'student-' + String(globalIndex).padStart(4, '0') });
+            opt.textContent = `${code} • ${name}`;
+            group.appendChild(opt);
+            globalIndex++;
+          });
+
+          select.appendChild(group);
+        });
+
+        select.addEventListener('change', (e) => {
+          if (!e.target.value) return;
+          try {
+            const data = JSON.parse(e.target.value);
+            document.getElementById('create-input-name').value = data.name;
+            document.getElementById('create-select-team').value = data.team;
+            document.getElementById('create-input-code').value = data.code;
+            updateCitationPreview();
+          } catch(err) {}
+        });
+      }
+
+      // Helper to compute standard citation text
+      function getStandardCitation(recipientName, awardType, customTitle) {
+        const name = recipientName || 'the athlete';
+        switch(awardType) {
+          case 'CHAMPION':
+            return `Presented to ${name}, with highest distinction for emerging as the Grand Champion in the 2026 Mechanical Engineering One Day League (MEODL).`;
+          case 'FIRST_RUNNER_UP':
+            return `Presented to ${name}, in recognition for exemplary performance and placing 1st Runner-Up on the official podium in the 2026 MEODL League.`;
+          case 'SECOND_RUNNER_UP':
+            return `Presented to ${name}, in recognition for exemplary performance and placing 2nd Runner-Up on the official podium in the 2026 MEODL League.`;
+          case 'TEKKEN_CHAMPION':
+            return `Presented to ${name}, for exceptional martial mastery and claiming the official Championship Title in the 2026 MEODL Esports Tekken 8 Tournament.`;
+          case 'ML_CHAMPION':
+            return `Presented to ${name}, for tactical superiority and clinching the Championship Crown in the 2026 MEODL Mobile Legends: Bang Bang Tournament.`;
+          case 'CODM_CHAMPION':
+            return `Presented to ${name}, for unmatched marksmanship and securing the Championship Title in the 2026 MEODL Call of Duty Mobile Tournament.`;
+          case 'BASKETBALL_CHAMPION':
+            return `Presented to ${name}, for dominance on the court and winning the Championship Title in the 2026 MEODL 3v3 Basketball Tournament.`;
+          case 'VOLLEYBALL_CHAMPION':
+            return `Presented to ${name}, for outstanding athleticism and emerging as Champion in the 2026 MEODL Volleyball Tournament.`;
+          case 'BADMINTON_CHAMPION':
+            return `Presented to ${name}, for speed, agility, and clinching the Championship Title in the 2026 MEODL Badminton Championship.`;
+          case 'CHESS_CHAMPION':
+            return `Presented to ${name}, for strategic brilliance and emerging as the Grand Champion in the 2026 MEODL Chess Tournament.`;
+          case 'MVP':
+            return `Presented to ${name}, in high recognition for extraordinary sportsmanship, skill, and receiving the Division Most Valuable Player (MVP) Award in the 2026 MEODL League.`;
+          case 'CUSTOM':
+            return `Presented to ${name}, in recognition of ${customTitle || 'outstanding achievement'} in the 2026 Mechanical Engineering One Day League.`;
+          case 'PARTICIPATION':
+          default:
+            return `Presented to ${name}, in appreciation for actively participating in the 2026 Mechanical Engineering One Day League and demonstrating dedication to athletic and academic excellence.`;
+        }
+      }
+
+      function updateCitationPreview() {
+        const name = document.getElementById('create-input-name').value.trim();
+        const type = document.getElementById('create-select-award-type').value;
+        const customTitle = document.getElementById('create-input-custom-title').value.trim();
+        const citationEl = document.getElementById('create-input-citation');
+        citationEl.value = getStandardCitation(name, type, customTitle);
+      }
+
+      // Generate Certificates for all 175 Registered Students
+      function generateAllParticipationCertificates() {
+        const rosters = (window.MEODL_DATA && window.MEODL_DATA.rosters) ? window.MEODL_DATA.rosters : {};
+        const teams = ['RANKINE', 'OTTO', 'BRAYTON', 'DIESEL'];
+        const existingRecipients = new Set(certificates.map(c => `${c.recipientName}_${c.type}`));
+        
+        let addedCount = 0;
+        let globalIndex = 1;
+
+        teams.forEach(tKey => {
+          const members = rosters[tKey] || [];
+          members.forEach(name => {
+            const key = `${name}_PARTICIPATION`;
+            if (!existingRecipients.has(key)) {
+              const certNo = 'MEODL-2026-P-' + String(globalIndex).padStart(4, '0');
+              const newCert = {
+                id: 'cert_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                certificateNumber: certNo,
+                type: 'PARTICIPATION',
+                awardTitle: 'Certificate of Participation',
+                documentTitle: 'CERTIFICATE',
+                documentSubtitle: 'OF APPRECIATION',
+                recipientName: name,
+                recipientId: 'student-' + String(globalIndex).padStart(4, '0'),
+                studentCode: 'MEODL-' + String(globalIndex).padStart(4, '0'),
+                team: tKey,
+                teamName: 'Team ' + tKey.charAt(0) + tKey.slice(1).toLowerCase(),
+                citation: getStandardCitation(name, 'PARTICIPATION'),
+                issuedAt: new Date().toISOString(),
+                status: 'ISSUED',
+                sha256Hash: sha256(`${certNo}:${name}:${tKey}:2026`)
+              };
+              certificates.push(newCert);
+              addedCount++;
+            }
+            globalIndex++;
+          });
+        });
+
+        saveCertificates();
+        alert(`Successfully generated ${addedCount} official Participation Certificates for registered student athletes!`);
+      }
+
+      // Generate Official Competition Podium & MVP Awards
+      function generatePodiumAndMvpAwards() {
+        const podiumAwards = [
+          { type: 'CHAMPION', awardTitle: 'Overall Grand Champion', docTitle: 'CERTIFICATE', docSub: 'OF EXCELLENCE', recipient: 'TEAM RANKINE DYNAMO', team: 'RANKINE', code: 'RANKINE-CHAMP' },
+          { type: 'FIRST_RUNNER_UP', awardTitle: '1st Runner-Up (Silver)', docTitle: 'CERTIFICATE', docSub: 'OF RECOGNITION', recipient: 'TEAM OTTO TURBO', team: 'OTTO', code: 'OTTO-RUNNER1' },
+          { type: 'SECOND_RUNNER_UP', awardTitle: '2nd Runner-Up (Bronze)', docTitle: 'CERTIFICATE', docSub: 'OF RECOGNITION', recipient: 'TEAM BRAYTON JET', team: 'BRAYTON', code: 'BRAYTON-RUNNER2' },
+          { type: 'TEKKEN_CHAMPION', awardTitle: 'Tekken 8 Tournament Champion', docTitle: 'CERTIFICATE', docSub: 'OF EXCELLENCE', recipient: 'Etorma, Chris Advien', team: 'RANKINE', code: 'MEODL-0001' },
+          { type: 'ML_CHAMPION', awardTitle: 'Mobile Legends Champion', docTitle: 'CERTIFICATE', docSub: 'OF EXCELLENCE', recipient: 'Diesel Vanguard ML Team', team: 'DIESEL', code: 'DIESEL-ML' },
+          { type: 'CODM_CHAMPION', awardTitle: 'Call of Duty Mobile Champion', docTitle: 'CERTIFICATE', docSub: 'OF EXCELLENCE', recipient: 'Brayton Recon CODM Team', team: 'BRAYTON', code: 'BRAYTON-CODM' },
+          { type: 'MVP', awardTitle: 'Division MVP — Team Rankine', docTitle: 'CERTIFICATE', docSub: 'OF EXCELLENCE', recipient: 'SANTOS, KARL ANGELO DIAGO', team: 'RANKINE', code: 'MEODL-0023' },
+          { type: 'MVP', awardTitle: 'Division MVP — Team Otto', docTitle: 'CERTIFICATE', docSub: 'OF EXCELLENCE', recipient: 'PEÑA, CARLOS MIGUEL ANTIDO', team: 'OTTO', code: 'MEODL-0068' }
+        ];
+
+        let addedCount = 0;
+        podiumAwards.forEach((pod, idx) => {
+          const certNo = 'MEODL-2026-A-' + String(idx + 1).padStart(4, '0');
+          const exists = certificates.some(c => c.certificateNumber === certNo);
+          if (!exists) {
+            const cert = {
+              id: 'cert_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+              certificateNumber: certNo,
+              type: pod.type,
+              awardTitle: pod.awardTitle,
+              documentTitle: pod.docTitle,
+              documentSubtitle: pod.docSub,
+              recipientName: pod.recipient,
+              recipientId: pod.code,
+              studentCode: pod.code,
+              team: pod.team,
+              teamName: 'Team ' + pod.team,
+              citation: getStandardCitation(pod.recipient, pod.type),
+              issuedAt: new Date().toISOString(),
+              status: 'ISSUED',
+              sha256Hash: sha256(`${certNo}:${pod.recipient}:${pod.team}:2026:AWARD`)
+            };
+            certificates.unshift(cert);
+            addedCount++;
+          }
+        });
+
+        saveCertificates();
+        alert(`Successfully generated ${addedCount} official Podium & Championship Award certificates!`);
+      }
+
+      // High-Fidelity Canvas Rendering Function matching Canva Master Template
+      async function drawCertificateOnCanvas(canvas, cert) {
+        const ctx = canvas.getContext('2d');
+        const W = 2048;
+        const H = 1442;
+        const centerX = W / 2;
+        const S = 2.0; // Scale factor relative to 1024x721 base image
+
+        canvas.width = W;
+        canvas.height = H;
+
+        // Ensure template image is ready
+        if (!isTemplateLoaded || !templateImage.complete) {
+          await new Promise((res) => {
+            const img = new Image();
+            img.onload = () => { templateImage = img; isTemplateLoaded = true; res(); };
+            img.onerror = () => { res(); };
+            img.src = TEMPLATE_BG_SRC;
+          });
+        }
+
+        // Draw background template image
+        if (isTemplateLoaded && templateImage.naturalWidth > 0) {
+          ctx.drawImage(templateImage, 0, 0, W, H);
+        } else {
+          // Fallback background if image missing
+          ctx.fillStyle = '#fefdfa';
+          ctx.fillRect(0, 0, W, H);
+          ctx.strokeStyle = '#06162f';
+          ctx.lineWidth = 14;
+          ctx.strokeRect(30, 30, W - 60, H - 60);
+          ctx.strokeStyle = '#f7b943';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(48, 48, W - 96, H - 96);
+        }
+
+        // 1. Top Title: "CERTIFICATE" (Cinzel, Deep Burgundy #4A1521)
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#4A1521';
+        ctx.font = 'bold 64px "Cinzel", Georgia, serif';
+        ctx.letterSpacing = '4px';
+        ctx.fillText(cert.documentTitle || 'CERTIFICATE', centerX, 180 * S);
+
+        // 2. Subtitle: "OF APPRECIATION" / "OF EXCELLENCE" (Cinzel, Deep Burgundy #4A1521)
+        ctx.font = 'bold 34px "Cinzel", Georgia, serif';
+        ctx.letterSpacing = '3px';
+        ctx.fillText(cert.documentSubtitle || 'OF APPRECIATION', centerX, 235 * S);
+
+        // 3. Presentation Line: "THIS CERTIFICATE IS PRESENTED TO"
+        ctx.fillStyle = '#555555';
+        ctx.font = '600 17px "Montserrat", "Inter", sans-serif';
+        ctx.letterSpacing = '3.5px';
+        ctx.fillText('THIS CERTIFICATE IS PRESENTED TO', centerX, 295 * S);
+
+        // 4. Recipient Name: Calligraphic Script in Antique Warm Bronze/Gold (#997028)
+        const name = cert.recipientName || 'Student Athlete';
+        let nameFontSize = 74;
+        if (name.length > 25) nameFontSize = 62;
+        if (name.length > 35) nameFontSize = 48;
+        
+        ctx.fillStyle = '#997028';
+        ctx.font = `italic 700 ${nameFontSize}px "Alex Brush", "Great Vibes", cursive`;
+        ctx.letterSpacing = '1px';
+        ctx.fillText(name, centerX, 365 * S);
+
+        // 5. Underline Accent Divider Line (#8f6f28)
+        ctx.strokeStyle = '#8f6f28';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 310 * S, 398 * S);
+        ctx.lineTo(centerX + 310 * S, 398 * S);
+        ctx.stroke();
+
+        // 6. Body Citation (Montserrat, Deep Burgundy #4A1521)
+        ctx.fillStyle = '#4A1521';
+        ctx.font = '600 22px "Montserrat", "Inter", sans-serif';
+        ctx.letterSpacing = '0.5px';
+        const citation = cert.citation || getStandardCitation(name, cert.type);
+        
+        // Wrap citation text
+        const maxTextWidth = 1400;
+        const words = citation.split(' ');
+        let line = '';
+        const lines = [];
+        for (let n = 0; n < words.length; n++) {
+          const testLine = line + words[n] + ' ';
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxTextWidth && n > 0) {
+            lines.push(line);
+            line = words[n] + ' ';
+          } else {
+            line = testLine;
+          }
+        }
+        lines.push(line);
+
+        let citationY = 442 * S;
+        for (let k = 0; k < lines.length; k++) {
+          ctx.fillText(lines[k].trim(), centerX, citationY + (k * 34));
+        }
+
+        // 7. Signatories (Flanking Gold Medal Seal at bottom center)
+        const sigY = 555 * S;
+        const sig1Name = (settings.sig1Name || 'EPHRAIM RICK R. BENGCO').toUpperCase();
+        const sig1Title = (settings.sig1Title || 'MES PRESIDENT').toUpperCase();
+        const sig2Name = (settings.sig2Name || 'ENGR. MC. LUGINN F. SEÑA').toUpperCase();
+        const sig2Title = (settings.sig2Title || 'MES ADVISER').toUpperCase();
+
+        // Left Signatory Underline & Text (X: ~320 * S = 640)
+        ctx.strokeStyle = '#666666';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(215 * S, sigY);
+        ctx.lineTo(425 * S, sigY);
+        ctx.stroke();
+
+        ctx.fillStyle = '#222222';
+        ctx.font = 'bold 20px "Montserrat", sans-serif';
+        ctx.letterSpacing = '0.8px';
+        ctx.fillText(sig1Name, 320 * S, sigY + 22);
+
+        ctx.fillStyle = '#4A1521';
+        ctx.font = 'bold 17px "Montserrat", sans-serif';
+        ctx.letterSpacing = '1px';
+        ctx.fillText(sig1Title, 320 * S, sigY + 44);
+
+        // Right Signatory Underline & Text (X: ~705 * S = 1410)
+        ctx.beginPath();
+        ctx.moveTo(600 * S, sigY);
+        ctx.lineTo(810 * S, sigY);
+        ctx.stroke();
+
+        ctx.fillStyle = '#222222';
+        ctx.font = 'bold 20px "Montserrat", sans-serif';
+        ctx.letterSpacing = '0.8px';
+        ctx.fillText(sig2Name, 705 * S, sigY + 22);
+
+        ctx.fillStyle = '#4A1521';
+        ctx.font = 'bold 17px "Montserrat", sans-serif';
+        ctx.letterSpacing = '1px';
+        ctx.fillText(sig2Title, 705 * S, sigY + 44);
+
+        // 8. Official QR Code & Verification Stamp in Bottom-Right Corner
+        try {
+          const qrDiv = document.getElementById('offscreen-qr');
+          qrDiv.innerHTML = '';
+          const verifyUrl = `${window.location.origin}${window.location.pathname}?verify=${encodeURIComponent(cert.certificateNumber)}`;
+          
+          new QRCode(qrDiv, {
+            text: verifyUrl,
+            width: 130,
+            height: 130,
+            colorDark: '#06162f',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+
+          // Wait a tick for QR canvas/img
+          await new Promise(r => setTimeout(r, 60));
+          const qrImg = qrDiv.querySelector('img') || qrDiv.querySelector('canvas');
+          if (qrImg) {
+            ctx.drawImage(qrImg, 1840, 1220, 130, 130);
+          }
+        } catch(e) {}
+
+        // Certificate Serial & Security Hash Watermark
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#718096';
+        ctx.font = '600 13px "JetBrains Mono", monospace';
+        ctx.letterSpacing = '0.5px';
+        ctx.fillText(`SERIAL: ${cert.certificateNumber}`, 1820, 1315);
+        ctx.fillText(`VERIFIED: ${(cert.sha256Hash || '').substring(0, 16)}...`, 1820, 1335);
+
+        // If certificate is voided, stamp a bold red watermark
+        if (cert.status === 'VOIDED') {
+          ctx.save();
+          ctx.translate(centerX, H / 2);
+          ctx.rotate(-Math.PI / 8);
+          ctx.fillStyle = 'rgba(225, 29, 72, 0.45)';
+          ctx.strokeStyle = '#e11d48';
+          ctx.lineWidth = 10;
+          ctx.font = '900 160px "Inter", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.strokeText('VOID / REVOKED', 0, 40);
+          ctx.fillText('VOID / REVOKED', 0, 40);
+          ctx.restore();
+        }
+      }
+
+      // Render Dashboard Cards
+      function renderDashboard() {
+        const grid = document.getElementById('certificates-grid');
+        const emptyState = document.getElementById('empty-state');
+        const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+        const teamFilter = document.getElementById('filter-team').value;
+        const typeFilter = document.getElementById('filter-type').value;
+        const statusFilter = document.getElementById('filter-status').value;
+
+        // Filter certificates
+        const filtered = certificates.filter(c => {
+          if (teamFilter !== 'ALL' && c.team !== teamFilter) return false;
+          if (typeFilter !== 'ALL' && c.type !== typeFilter) return false;
+          if (statusFilter !== 'ALL' && c.status !== statusFilter) return false;
+          if (searchQuery) {
+            const matchesName = (c.recipientName || '').toLowerCase().includes(searchQuery);
+            const matchesNo = (c.certificateNumber || '').toLowerCase().includes(searchQuery);
+            const matchesCode = (c.studentCode || '').toLowerCase().includes(searchQuery);
+            const matchesAward = (c.awardTitle || '').toLowerCase().includes(searchQuery);
+            if (!matchesName && !matchesNo && !matchesCode && !matchesAward) return false;
+          }
+          return true;
+        });
+
+        // Update KPI Counters
+        document.getElementById('stat-total-certs').textContent = certificates.filter(c => c.status === 'ISSUED').length;
+        document.getElementById('stat-part-certs').textContent = certificates.filter(c => c.type === 'PARTICIPATION' && c.status === 'ISSUED').length;
+        document.getElementById('stat-award-certs').textContent = certificates.filter(c => c.type !== 'PARTICIPATION' && c.status === 'ISSUED').length;
+        document.getElementById('filter-count-badge').textContent = `Showing: ${filtered.length} of ${certificates.length}`;
+
+        if (filtered.length === 0) {
+          grid.innerHTML = '';
+          emptyState.classList.remove('hidden');
+          emptyState.classList.add('flex');
+          return;
+        }
+
+        emptyState.classList.add('hidden');
+        emptyState.classList.remove('flex');
+
+        grid.innerHTML = filtered.map(cert => {
+          const isVoid = cert.status === 'VOIDED';
+          let teamColor = 'border-slate-750 text-slate-300';
+          let teamBadge = 'bg-slate-800 text-slate-300';
+          if (cert.team === 'RANKINE') { teamColor = 'border-rose-500/40'; teamBadge = 'bg-rose-500/20 text-rose-300 border border-rose-500/30'; }
+          else if (cert.team === 'OTTO') { teamColor = 'border-amber-500/40'; teamBadge = 'bg-amber-500/20 text-amber-300 border border-amber-500/30'; }
+          else if (cert.team === 'BRAYTON') { teamColor = 'border-cyan-500/40'; teamBadge = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'; }
+          else if (cert.team === 'DIESEL') { teamColor = 'border-emerald-500/40'; teamBadge = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'; }
+
+          const isPodium = cert.type !== 'PARTICIPATION';
+
+          return `
+            <div class="bg-navy-900 rounded-xl border ${teamColor} p-4 shadow-xl flex flex-col justify-between relative group hover:border-gold-400 transition">
+              
+              <!-- Header Bar -->
+              <div class="flex items-start justify-between gap-2 mb-3">
+                <div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${teamBadge}">
+                    ${cert.team || 'MEODL'}
+                  </span>
+                  <h4 class="text-sm font-bold text-slate-100 mt-1.5 line-clamp-1">${cert.recipientName}</h4>
+                  <p class="text-[11px] font-mono text-slate-400">${cert.studentCode || cert.recipientId || 'N/A'}</p>
+                </div>
+                <div class="text-right">
+                  <span class="font-mono text-xs font-bold text-gold-400">${cert.certificateNumber}</span>
+                  <div class="mt-1">
+                    ${isVoid ? 
+                      '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">VOIDED</span>' : 
+                      '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">OFFICIAL</span>'
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Award Title & Citation preview -->
+              <div class="p-2.5 rounded-lg bg-navy-950/80 border border-navy-800 mb-3 flex-1">
+                <p class="text-xs font-bold text-gold-300 flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                  <span>${cert.awardTitle}</span>
+                </p>
+                <p class="text-[11px] text-slate-400 mt-1 line-clamp-2 leading-relaxed">${cert.citation}</p>
+              </div>
+
+              <!-- Action Footer -->
+              <div class="flex items-center justify-between pt-2 border-t border-navy-750 text-xs">
+                <button onclick="window.previewCertificate('${cert.id}')" class="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-gold-400/15 hover:bg-gold-400/30 text-gold-300 font-semibold border border-gold-400/30 transition">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  <span>Preview</span>
+                </button>
+
+                <div class="flex items-center space-x-1">
+                  <button onclick="window.quickDownloadPng('${cert.id}')" title="Download PNG" class="p-1.5 rounded-lg bg-navy-800 hover:bg-navy-750 text-cyan-400 border border-navy-700 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  </button>
+
+                  <button onclick="window.toggleVoidCertificate('${cert.id}')" title="${isVoid ? 'Reactivate' : 'Void / Revoke'}" class="p-1.5 rounded-lg ${isVoid ? 'bg-emerald-950 text-emerald-400' : 'bg-rose-950/40 text-rose-400'} border border-navy-700 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Preview Single Certificate Modal Handler
+      window.previewCertificate = async function(certId) {
+        const cert = certificates.find(c => c.id === certId);
+        if (!cert) return;
+        currentSelectedCert = cert;
+
+        document.getElementById('preview-cert-no').textContent = cert.certificateNumber;
+        document.getElementById('preview-award-title').textContent = cert.awardTitle;
+        document.getElementById('preview-meta-recipient').textContent = cert.recipientName;
+        document.getElementById('preview-meta-team').textContent = cert.team || 'MEODL';
+        document.getElementById('preview-meta-hash').textContent = cert.sha256Hash || 'N/A';
+
+        const canvas = document.getElementById('preview-canvas');
+        await drawCertificateOnCanvas(canvas, cert);
+
+        openModal('preview-modal');
+      };
+
+      // Quick PNG download
+      window.quickDownloadPng = async function(certId) {
+        const cert = certificates.find(c => c.id === certId);
+        if (!cert) return;
+        const tempCanvas = document.createElement('canvas');
+        await drawCertificateOnCanvas(tempCanvas, cert);
+        
+        const cleanName = cert.recipientName.replace(/[^a-zA-Z0-9]/g, '_');
+        const link = document.createElement('a');
+        link.download = `${cert.certificateNumber}_${cleanName}.png`;
+        link.href = tempCanvas.toDataURL('image/png');
+        link.click();
+      };
+
+      // Toggle Void / Active status
+      window.toggleVoidCertificate = function(certId) {
+        const cert = certificates.find(c => c.id === certId);
+        if (!cert) return;
+        if (cert.status === 'VOIDED') {
+          if (confirm(`Reactivate certificate ${cert.certificateNumber}?`)) {
+            cert.status = 'ISSUED';
+            saveCertificates();
+          }
+        } else {
+          if (confirm(`Are you sure you want to void / revoke certificate ${cert.certificateNumber}?`)) {
+            cert.status = 'VOIDED';
+            saveCertificates();
+          }
+        }
+      };
+
+      // Batch Print All Filtered Certificates into Clean A4 Landscape Continuous Pages
+      async function handleBatchPrint() {
+        const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+        const teamFilter = document.getElementById('filter-team').value;
+        const typeFilter = document.getElementById('filter-type').value;
+        const statusFilter = document.getElementById('filter-status').value;
+
+        const filtered = certificates.filter(c => {
+          if (teamFilter !== 'ALL' && c.team !== teamFilter) return false;
+          if (typeFilter !== 'ALL' && c.type !== typeFilter) return false;
+          if (statusFilter !== 'ALL' && c.status !== statusFilter) return false;
+          if (searchQuery) {
+            const matchesName = (c.recipientName || '').toLowerCase().includes(searchQuery);
+            const matchesNo = (c.certificateNumber || '').toLowerCase().includes(searchQuery);
+            if (!matchesName && !matchesNo) return false;
+          }
+          return true;
+        });
+
+        if (filtered.length === 0) {
+          alert('No certificates match your current filter.');
+          return;
+        }
+
+        if (!confirm(`Prepare batch print for ${filtered.length} certificates? This will render high-resolution print pages.`)) {
+          return;
+        }
+
+        const printContainer = document.getElementById('batch-print-container');
+        printContainer.innerHTML = '<div class="text-center p-8 text-white">Rendering certificates for high-resolution print...</div>';
+
+        const tempCanvas = document.createElement('canvas');
+        let html = '';
+
+        for (let i = 0; i < filtered.length; i++) {
+          await drawCertificateOnCanvas(tempCanvas, filtered[i]);
+          const dataUrl = tempCanvas.toDataURL('image/png');
+          html += `
+            <div class="cert-print-sheet">
+              <img src="${dataUrl}" alt="Certificate ${filtered[i].certificateNumber}" />
+            </div>
+          `;
+        }
+
+        printContainer.innerHTML = html;
+
+        setTimeout(() => {
+          window.print();
+        }, 300);
+      }
+
+      // Download Multi-Page Vector PDF using jsPDF
+      async function handleDownloadPdf(certOrList) {
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+          alert('PDF generation engine loading. You can also click "Print A4" to save as PDF via your browser!');
+          return;
+        }
+
+        const list = Array.isArray(certOrList) ? certOrList : [certOrList];
+        if (list.length === 0) return;
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        const tempCanvas = document.createElement('canvas');
+
+        for (let i = 0; i < list.length; i++) {
+          if (i > 0) doc.addPage('a4', 'landscape');
+          await drawCertificateOnCanvas(tempCanvas, list[i]);
+          const dataUrl = tempCanvas.toDataURL('image/jpeg', 0.95);
+          doc.addImage(dataUrl, 'JPEG', 0, 0, 297, 210);
+        }
+
+        const filename = list.length === 1 
+          ? `${list[0].certificateNumber}_${list[0].recipientName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
+          : `MEODL_Certificates_Batch_${new Date().toISOString().slice(0, 10)}.pdf`;
+
+        doc.save(filename);
+      }
+
+      // Verify Certificate Logic
+      function verifyCertificate(query) {
+        const cleanQuery = (query || '').trim().toLowerCase();
+        const card = document.getElementById('verify-result-card');
+        if (!cleanQuery) {
+          card.classList.add('hidden');
+          return;
+        }
+
+        const matched = certificates.find(c => 
+          (c.certificateNumber && c.certificateNumber.toLowerCase() === cleanQuery) ||
+          (c.sha256Hash && c.sha256Hash.toLowerCase().includes(cleanQuery)) ||
+          (c.recipientName && c.recipientName.toLowerCase() === cleanQuery)
+        );
+
+        card.classList.remove('hidden');
+
+        if (matched) {
+          const isVoid = matched.status === 'VOIDED';
+          card.className = `p-4 rounded-xl border ${isVoid ? 'bg-rose-950/40 border-rose-500/50' : 'bg-emerald-950/40 border-emerald-500/50'}`;
+          card.innerHTML = `
+            <div class="flex items-start space-x-3">
+              <div class="w-8 h-8 rounded-full ${isVoid ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'} flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  ${isVoid 
+                    ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>' 
+                    : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>'
+                  }
+                </svg>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-sm font-bold ${isVoid ? 'text-rose-300' : 'text-emerald-300'}">
+                    ${isVoid ? 'CERTIFICATE VOIDED / REVOKED' : 'OFFICIAL & AUTHENTIC CERTIFICATE'}
+                  </h4>
+                  <span class="font-mono text-xs font-bold text-slate-300">${matched.certificateNumber}</span>
+                </div>
+                <p class="text-xs text-slate-200 mt-1 font-semibold">${matched.recipientName} • <span class="text-gold-400">${matched.awardTitle}</span></p>
+                <p class="text-[11px] text-slate-400 mt-0.5">${matched.teamName || matched.team} • Issued ${new Date(matched.issuedAt).toLocaleDateString()}</p>
+                <p class="text-[10px] font-mono text-slate-500 mt-2 break-all">SHA-256: ${matched.sha256Hash}</p>
+              </div>
+            </div>
+          `;
+        } else {
+          card.className = 'p-4 rounded-xl border bg-rose-950/30 border-rose-500/40';
+          card.innerHTML = `
+            <div class="flex items-center space-x-2 text-rose-400 text-xs font-bold">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <span>Record Not Found or Unverified</span>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">No registered certificate matches the entered serial number or cryptographic hash.</p>
+          `;
+        }
+      }
+
+      // Modal helpers
+      window.openModal = function(id) {
+        document.getElementById(id).classList.remove('hidden');
+      };
+      window.closeModal = function(id) {
+        document.getElementById(id).classList.add('hidden');
+      };
+
+      // Event Listeners Initialization
+      function initEventListeners() {
+        // Search & Filter listeners
+        document.getElementById('search-input').addEventListener('input', renderDashboard);
+        document.getElementById('filter-team').addEventListener('change', renderDashboard);
+        document.getElementById('filter-type').addEventListener('change', renderDashboard);
+        document.getElementById('filter-status').addEventListener('change', renderDashboard);
+
+        // Batch generation buttons
+        document.getElementById('btn-gen-all').addEventListener('click', generateAllParticipationCertificates);
+        document.getElementById('btn-gen-podium').addEventListener('click', generatePodiumAndMvpAwards);
+        document.getElementById('btn-batch-print').addEventListener('click', handleBatchPrint);
+
+        // Reset all button
+        document.getElementById('btn-clear-all').addEventListener('click', () => {
+          if (confirm('Are you sure you want to reset certificates? This will reinitialize to sample master.')) {
+            initSampleMasterCertificate();
+            saveCertificates();
+          }
+        });
+
+        // Sample master template preview
+        document.getElementById('btn-preview-sample').addEventListener('click', () => {
+          const sample = certificates[0] || {
+            certificateNumber: 'MEODL-2026-SAMPLE',
+            awardTitle: 'Top Performer – 1st Year',
+            documentTitle: 'CERTIFICATE',
+            documentSubtitle: 'OF APPRECIATION',
+            recipientName: 'Etorma, Chris Advien',
+            team: 'RANKINE',
+            citation: 'Presented to Etorma, Chris Advien, in appreciation for placing 1st among the 1st-year participants in the 2026 MEODL Quiz Bee.',
+            sha256Hash: sha256('sample')
+          };
+          window.previewCertificate(sample.id || certificates[0].id);
+        });
+
+        // Modal triggers
+        document.getElementById('btn-open-create').addEventListener('click', () => {
+          updateCitationPreview();
+          openModal('create-modal');
+        });
+        document.getElementById('btn-open-settings').addEventListener('click', () => {
+          loadSettings();
+          openModal('settings-modal');
+        });
+        document.getElementById('btn-open-verify').addEventListener('click', () => {
+          openModal('verify-modal');
+        });
+
+        // Create modal type change listener
+        document.getElementById('create-select-award-type').addEventListener('change', (e) => {
+          const customWrapper = document.getElementById('create-custom-title-wrapper');
+          if (e.target.value === 'CUSTOM') customWrapper.classList.remove('hidden');
+          else customWrapper.classList.add('hidden');
+          updateCitationPreview();
+        });
+        document.getElementById('create-input-name').addEventListener('input', updateCitationPreview);
+        document.getElementById('create-input-custom-title').addEventListener('input', updateCitationPreview);
+
+        // Form Submit: Create Single Certificate
+        document.getElementById('form-create-cert').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const name = document.getElementById('create-input-name').value.trim();
+          const team = document.getElementById('create-select-team').value;
+          const code = document.getElementById('create-input-code').value.trim() || 'MEODL-CUSTOM';
+          const type = document.getElementById('create-select-award-type').value;
+          const customTitle = document.getElementById('create-input-custom-title').value.trim();
+          const citation = document.getElementById('create-input-citation').value.trim() || getStandardCitation(name, type, customTitle);
+
+          let awardTitle = 'Certificate of Participation';
+          let docTitle = 'CERTIFICATE';
+          let docSub = 'OF APPRECIATION';
+
+          if (type === 'CHAMPION') {
+            awardTitle = 'Overall Grand Champion';
+            docSub = 'OF EXCELLENCE';
+          } else if (type === 'FIRST_RUNNER_UP') {
+            awardTitle = '1st Runner-Up';
+            docSub = 'OF RECOGNITION';
+          } else if (type === 'SECOND_RUNNER_UP') {
+            awardTitle = '2nd Runner-Up';
+            docSub = 'OF RECOGNITION';
+          } else if (type === 'MVP') {
+            awardTitle = 'Division Most Valuable Player (MVP)';
+            docSub = 'OF EXCELLENCE';
+          } else if (type === 'CUSTOM') {
+            awardTitle = customTitle || 'Special Recognition Award';
+            docSub = 'OF RECOGNITION';
+          } else if (type.includes('CHAMPION')) {
+            awardTitle = document.getElementById('create-select-award-type').selectedOptions[0].text;
+            docSub = 'OF EXCELLENCE';
+          }
+
+          const certNo = 'MEODL-2026-C-' + String(certificates.length + 1).padStart(4, '0');
+          const newCert = {
+            id: 'cert_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+            certificateNumber: certNo,
+            type: type,
+            awardTitle: awardTitle,
+            documentTitle: docTitle,
+            documentSubtitle: docSub,
+            recipientName: name,
+            recipientId: code,
+            studentCode: code,
+            team: team,
+            teamName: 'Team ' + team,
+            citation: citation,
+            issuedAt: new Date().toISOString(),
+            status: 'ISSUED',
+            sha256Hash: sha256(`${certNo}:${name}:${team}:2026`)
+          };
+
+          certificates.unshift(newCert);
+          saveCertificates();
+          closeModal('create-modal');
+          window.previewCertificate(newCert.id);
+        });
+
+        // Form Submit: Settings
+        document.getElementById('form-settings').addEventListener('submit', (e) => {
+          e.preventDefault();
+          saveSettings();
+          closeModal('settings-modal');
+          if (currentSelectedCert) {
+            const canvas = document.getElementById('preview-canvas');
+            drawCertificateOnCanvas(canvas, currentSelectedCert);
+          }
+          alert('Certificate settings and signatories updated successfully!');
+        });
+
+        // Verification Submit
+        document.getElementById('btn-run-verify').addEventListener('click', () => {
+          const val = document.getElementById('verify-search-input').value;
+          verifyCertificate(val);
+        });
+        document.getElementById('verify-search-input').addEventListener('keyup', (e) => {
+          if (e.key === 'Enter') verifyCertificate(e.target.value);
+        });
+
+        // Preview Actions
+        document.getElementById('btn-preview-print').addEventListener('click', () => {
+          if (currentSelectedCert) {
+            const printContainer = document.getElementById('batch-print-container');
+            const canvas = document.getElementById('preview-canvas');
+            printContainer.innerHTML = `
+              <div class="cert-print-sheet">
+                <img src="${canvas.toDataURL('image/png')}" alt="Certificate" />
+              </div>
+            `;
+            setTimeout(() => window.print(), 200);
+          }
+        });
+
+        document.getElementById('btn-preview-download-png').addEventListener('click', () => {
+          if (currentSelectedCert) window.quickDownloadPng(currentSelectedCert.id);
+        });
+
+        document.getElementById('btn-preview-download-pdf').addEventListener('click', () => {
+          if (currentSelectedCert) handleDownloadPdf(currentSelectedCert);
+        });
+
+        // Check if URL has ?verify= parameter
+        const params = new URLSearchParams(window.location.search);
+        const verifyParam = params.get('verify');
+        if (verifyParam) {
+          openModal('verify-modal');
+          document.getElementById('verify-search-input').value = verifyParam;
+          verifyCertificate(verifyParam);
+        }
+      }
+
+      // Boot Application
+      window.addEventListener('DOMContentLoaded', () => {
+        loadSettings();
+        loadCertificates();
+        populateStudentSelector();
+        initEventListeners();
+        renderDashboard();
+      });
+
+    })();
+  </script>
+</body>
+</html>

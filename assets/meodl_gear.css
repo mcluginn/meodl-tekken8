@@ -1,0 +1,183 @@
+/* =========================================================================
+   MEODL AUTHENTIC MECHANICAL GEAR TRAIN & ASSEMBLY STYLES
+   Directly derived from MEODL Quiz Bee 2026 Engineering Design System
+   ========================================================================= */
+
+.gear-assembly {
+  width: 156px;
+  height: 124px;
+  position: relative;
+  flex-shrink: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.gear-assembly-plane {
+  position: absolute;
+  width: 195px;
+  height: 155px;
+  transform: scale(0.8);
+  transform-origin: top left;
+}
+
+.gear-assembly--small {
+  width: 59px;
+  height: 47px;
+}
+
+.gear-assembly--small .gear-assembly-plane {
+  transform: scale(0.3);
+}
+
+.gear-assembly--medium {
+  width: 156px;
+  height: 124px;
+}
+
+.gear-assembly--medium .gear-assembly-plane {
+  transform: scale(0.8);
+}
+
+.gear-assembly--large {
+  width: 195px;
+  height: 155px;
+}
+
+.gear-assembly--large .gear-assembly-plane {
+  transform: scale(1.0);
+}
+
+.gear-position {
+  position: absolute;
+}
+
+.mechanical-gear {
+  display: block;
+  color: #8ea8c0;
+}
+
+.mechanical-gear-body {
+  fill: #0a2344;
+  stroke: currentColor;
+  stroke-width: 0.8px;
+}
+
+.mechanical-gear--brass {
+  color: #f7b943;
+}
+
+.mechanical-gear--brass .mechanical-gear-body {
+  fill: #593e0b;
+}
+
+.mechanical-gear--cyan {
+  color: #38bdf8;
+}
+
+.mechanical-gear--cyan .mechanical-gear-body {
+  fill: #082f49;
+}
+
+.gear-construction {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: #8ea8c0;
+  opacity: 0.28;
+}
+
+/* Authentic Tooth Pitch-Matched Gear Rotation Animations */
+/* Gear 0 (24 teeth): 6s per full rotation (Clockwise) */
+@keyframes gear-rotor-0 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Gear 1 (16 teeth): 4s per full rotation (Counter-Clockwise, phase offset 11.25deg for tooth meshing) */
+@keyframes gear-rotor-1 {
+  from { transform: rotate(11.25deg); }
+  to { transform: rotate(-348.75deg); }
+}
+
+/* Gear 2 (12 teeth): 3s per full rotation (Clockwise) */
+@keyframes gear-rotor-2 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.gear-rotor-0 {
+  animation: gear-rotor-0 6s linear infinite;
+  transform-origin: center;
+}
+
+.gear-rotor-1 {
+  animation: gear-rotor-1 4s linear infinite;
+  transform-origin: center;
+}
+
+.gear-rotor-2 {
+  animation: gear-rotor-2 3s linear infinite;
+  transform-origin: center;
+}
+
+/* Speed states */
+.gear-assembly[data-mechanical-state="processing"] .gear-rotor-0 { animation-duration: 3.3s; }
+.gear-assembly[data-mechanical-state="processing"] .gear-rotor-1 { animation-duration: 2.2s; }
+.gear-assembly[data-mechanical-state="processing"] .gear-rotor-2 { animation-duration: 1.65s; }
+
+.gear-assembly[data-mechanical-state="generation"] .gear-rotor-0 { animation-duration: 2.4s; }
+.gear-assembly[data-mechanical-state="generation"] .gear-rotor-1 { animation-duration: 1.6s; }
+.gear-assembly[data-mechanical-state="generation"] .gear-rotor-2 { animation-duration: 1.2s; }
+
+.gear-assembly[data-mechanical-state="paused"] .gear-rotor-0,
+.gear-assembly[data-mechanical-state="paused"] .gear-rotor-1,
+.gear-assembly[data-mechanical-state="paused"] .gear-rotor-2 {
+  animation-play-state: paused;
+}
+
+/* Standalone Watermark Gear Spinning */
+@keyframes spin-gear-watermark-cw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes spin-gear-watermark-ccw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+.animate-gear-spin-slow {
+  animation: spin-gear-watermark-cw 20s linear infinite;
+  transform-origin: center;
+}
+
+.animate-gear-spin-reverse {
+  animation: spin-gear-watermark-ccw 16s linear infinite;
+  transform-origin: center;
+}
+
+/* Mechanical Loader Widget */
+.mechanical-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 47px;
+  color: #8ea8c0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+}
+
+.mechanical-loader[data-busy="true"] {
+  color: #f7b943;
+}
+
+/* Accessibility: respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .gear-rotor-0,
+  .gear-rotor-1,
+  .gear-rotor-2,
+  .animate-gear-spin-slow,
+  .animate-gear-spin-reverse {
+    animation: none !important;
+  }
+}
