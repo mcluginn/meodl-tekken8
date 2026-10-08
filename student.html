@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MEODL — Mechanical Engineering One Day League Tournament Hub</title>
+  <title>MEODL 2026 — Student Spectator Hub (Read-Only)</title>
+  <script>window.MEODL_STUDENT_MODE = true;</script>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -235,7 +236,7 @@
     }
   </style>
 </head>
-<body class="bg-[#06162f] text-slate-100 flex flex-col min-h-screen relative">
+<body class="student-mode bg-[#06162f] text-slate-100 flex flex-col min-h-screen relative">
 
   <!-- ======================================================== -->
   <!-- SITE-WIDE TOURNAMENT ARENA ATMOSPHERE BACKGROUND LAYER -->
@@ -282,16 +283,16 @@
         <div>
           <div class="flex items-center gap-2">
             <span class="text-sm font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#ffd477] via-[#f7b943] to-sky-300 font-mono cursor-pointer" onclick="navigateTo('dashboard')">
-              MEODL TOURNAMENT HUB
+              MEODL STUDENT HUB
             </span>
-            <span id="active-event-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0a2344] text-[#f7b943] border border-[#2c4f75] font-bold">
-              DASHBOARD
+            <span id="active-event-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40 font-bold">
+              SPECTATOR
             </span>
           </div>
           <div class="text-[11px] text-slate-400 flex items-center gap-1.5 flex-wrap">
             <span class="text-[#f7b943] font-semibold font-mono">MES • UPHSD CALAMBA</span>
             <span class="text-slate-600">•</span>
-            <span id="header-subtitle">Mechanical Engineering One Day League</span>
+            <span id="header-subtitle">Student Spectator Hub (Read-Only)</span>
           </div>
         </div>
       </div>
@@ -317,10 +318,16 @@
           <span class="hidden sm:inline">Certificates</span>
         </button>
 
-        <!-- Student View Link -->
-        <a href="student.html" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono font-bold text-cyan-300 hover:text-white transition-all shadow-sm" title="Open Public Student Spectator Hub (Read-Only)">
-          <span>🎓</span>
-          <span class="hidden md:inline">Student View</span>
+        <!-- Spectator Hub Badge -->
+        <div class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold shadow-sm" title="Public Spectator Mode (Read-Only)">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="hidden sm:inline">SPECTATOR</span>
+        </div>
+
+        <!-- Staff Hub Link -->
+        <a href="index.html" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono font-bold text-slate-300 hover:text-white transition-all shadow-sm" title="Switch to Admin Organizer Dashboard">
+          <span>🔒</span>
+          <span class="hidden md:inline">Staff Hub ↗</span>
         </a>
 
         <!-- Passes Portal Link -->

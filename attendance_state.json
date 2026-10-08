@@ -80,15 +80,29 @@
       "studentCode": "MEODL-0005",
       "activeToken": "tok_453c986f1f66c2351f66c2367900a453",
       "revokedTokens": [],
-      "status": "OUTSIDE",
-      "currentAction": null,
-      "lastCheckIn": null,
+      "status": "INSIDE",
+      "currentAction": "check_in",
+      "lastCheckIn": "2026-10-08T22:46:51.462Z",
       "lastCheckOut": null,
       "exitReason": null,
       "expectedReturn": null,
-      "totalVisits": 0,
+      "totalVisits": 1,
       "totalMinutesInside": 0,
-      "history": []
+      "history": [
+        {
+          "eventId": "test-evt-1791499671462-1",
+          "action": "check_in",
+          "timestamp": "2026-10-08T22:46:51.462Z",
+          "displayTime": "06:46 AM",
+          "method": "qr_scan",
+          "performedBy": "Marshal Alex",
+          "deviceId": "MARSHAL-GATE-A"
+        }
+      ],
+      "lastEventId": "test-evt-1791499671462-1",
+      "lastAction": "check_in",
+      "lastOccurredAt": "2026-10-08T22:46:51.462Z",
+      "updatedAt": "2026-10-08T22:47:51.482Z"
     },
     "student-0006": {
       "id": "student-0006",
@@ -98,15 +112,29 @@
       "studentCode": "MEODL-0006",
       "activeToken": "tok_af79ed2c-adc488a0adc48896cba2ef0",
       "revokedTokens": [],
-      "status": "OUTSIDE",
-      "currentAction": null,
-      "lastCheckIn": null,
+      "status": "INSIDE",
+      "currentAction": "check_in",
+      "lastCheckIn": "2026-10-08T22:47:51.462Z",
       "lastCheckOut": null,
       "exitReason": null,
       "expectedReturn": null,
-      "totalVisits": 0,
+      "totalVisits": 1,
       "totalMinutesInside": 0,
-      "history": []
+      "history": [
+        {
+          "eventId": "test-evt-1791499671462-2",
+          "action": "check_in",
+          "timestamp": "2026-10-08T22:47:51.462Z",
+          "displayTime": "06:47 AM",
+          "method": "qr_scan",
+          "performedBy": "Marshal Alex",
+          "deviceId": "MARSHAL-GATE-A"
+        }
+      ],
+      "lastEventId": "test-evt-1791499671462-2",
+      "lastAction": "check_in",
+      "lastOccurredAt": "2026-10-08T22:47:51.462Z",
+      "updatedAt": "2026-10-08T22:47:51.482Z"
     },
     "student-0007": {
       "id": "student-0007",
@@ -116,15 +144,29 @@
       "studentCode": "MEODL-0007",
       "activeToken": "tok_afd97fb8-a7cda1e0a7cda1d6c1abc7c",
       "revokedTokens": [],
-      "status": "OUTSIDE",
-      "currentAction": null,
-      "lastCheckIn": null,
+      "status": "INSIDE",
+      "currentAction": "check_in",
+      "lastCheckIn": "2026-10-08T22:47:51.496Z",
       "lastCheckOut": null,
       "exitReason": null,
       "expectedReturn": null,
-      "totalVisits": 0,
+      "totalVisits": 1,
       "totalMinutesInside": 0,
-      "history": []
+      "history": [
+        {
+          "eventId": "test-evt-1791499671496-3",
+          "action": "check_in",
+          "timestamp": "2026-10-08T22:47:51.496Z",
+          "displayTime": "06:47 AM",
+          "method": "qr_scan",
+          "performedBy": "Marshal",
+          "deviceId": "MARSHAL-GATE-A"
+        }
+      ],
+      "lastEventId": "test-evt-1791499671496-3",
+      "lastAction": "check_in",
+      "lastOccurredAt": "2026-10-08T22:47:51.496Z",
+      "updatedAt": "2026-10-08T22:47:51.501Z"
     },
     "student-0008": {
       "id": "student-0008",
@@ -171,14 +213,39 @@
       "activeToken": "tok_0379a8d05923f28a5923f28b3f4594ec",
       "revokedTokens": [],
       "status": "OUTSIDE",
-      "currentAction": null,
-      "lastCheckIn": null,
-      "lastCheckOut": null,
-      "exitReason": null,
-      "expectedReturn": null,
-      "totalVisits": 0,
-      "totalMinutesInside": 0,
-      "history": []
+      "currentAction": "check_out",
+      "lastCheckIn": "2026-10-08T22:47:21.504Z",
+      "lastCheckOut": "2026-10-08T22:47:41.504Z",
+      "exitReason": "Lunch Break",
+      "expectedReturn": "13:00",
+      "totalVisits": 1,
+      "totalMinutesInside": 1,
+      "history": [
+        {
+          "eventId": "evt-devA-1791499671504",
+          "action": "check_in",
+          "timestamp": "2026-10-08T22:47:21.504Z",
+          "displayTime": "06:47 AM",
+          "method": "qr_scan",
+          "performedBy": "Marshal A",
+          "deviceId": "DEVICE-A"
+        },
+        {
+          "eventId": "evt-devB-1791499671504",
+          "action": "check_out",
+          "timestamp": "2026-10-08T22:47:41.504Z",
+          "displayTime": "06:47 AM",
+          "reason": "Lunch Break",
+          "expectedReturn": "13:00",
+          "method": "qr_scan",
+          "performedBy": "Marshal B",
+          "deviceId": "DEVICE-B"
+        }
+      ],
+      "lastEventId": "evt-devB-1791499671504",
+      "lastAction": "check_out",
+      "lastOccurredAt": "2026-10-08T22:47:41.504Z",
+      "updatedAt": "2026-10-08T22:47:51.527Z"
     },
     "student-0011": {
       "id": "student-0011",
@@ -3151,6 +3218,6 @@
       "history": []
     }
   },
-  "version": 32,
-  "lastUpdated": "2026-10-08T22:05:15.542Z"
+  "version": 36,
+  "lastUpdated": "2026-10-08T22:47:51.527Z"
 }

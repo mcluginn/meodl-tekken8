@@ -112,6 +112,15 @@
     .bg-grid-pattern { background-size: 36px 36px; background-image: linear-gradient(to right, rgba(44, 79, 117, 0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(44, 79, 117, 0.12) 1px, transparent 1px); }
     .bracket-viewport { overflow: auto !important; scroll-behavior: smooth; }
 
+    /* Read-Only Student Spectator Mode */
+    body.student-mode .admin-only {
+      display: none !important;
+    }
+    body.student-mode .admin-pointer-only {
+      cursor: default !important;
+      pointer-events: none !important;
+    }
+
     /* Bracket SVG Connector Lines Layering */
     #uni-bracket-svg, #bracket-svg {
       position: absolute;
@@ -290,14 +299,14 @@
       <!-- Quick Actions Toolbar: Undo, Settings, Certificate, Rules, Export -->
       <div class="flex items-center gap-2">
         <!-- Undo Button with Counter Badge -->
-        <button id="btn-undo" onclick="performUndo()" disabled class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] disabled:opacity-30 disabled:pointer-events-none border border-[#2c4f75] text-xs font-semibold text-[#f7b943] transition-all shadow-sm" title="Undo last action">
+        <button id="btn-undo" onclick="performUndo()" disabled class="admin-only flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] disabled:opacity-30 disabled:pointer-events-none border border-[#2c4f75] text-xs font-semibold text-[#f7b943] transition-all shadow-sm" title="Undo last action">
           <span class="text-sm font-bold">↶</span>
           <span>Undo</span>
           <span id="undo-badge" class="px-1.5 py-0.2 rounded-full text-[9px] font-mono bg-[#f7b943]/20 text-[#f7b943] font-bold border border-[#f7b943]/40">0</span>
         </button>
 
         <!-- Sport Bracket Settings Button -->
-        <button id="btn-sport-settings" onclick="openSettingsModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-medium text-slate-200 hover:text-white transition-all shadow-sm" title="Tournament Bracket & Team Settings">
+        <button id="btn-sport-settings" onclick="openSettingsModal()" class="admin-only flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-medium text-slate-200 hover:text-white transition-all shadow-sm" title="Tournament Bracket & Team Settings">
           <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
           <span class="hidden sm:inline">Settings</span>
         </button>
@@ -307,6 +316,12 @@
           <span>🎓</span>
           <span class="hidden sm:inline">Certificates</span>
         </button>
+
+        <!-- Student View Link -->
+        <a href="student.html" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono font-bold text-cyan-300 hover:text-white transition-all shadow-sm" title="Open Public Student Spectator Hub (Read-Only)">
+          <span>🎓</span>
+          <span class="hidden md:inline">Student View</span>
+        </a>
 
         <!-- Passes Portal Link -->
         <a href="student_qr.html" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono font-medium text-slate-200 hover:text-white transition-all shadow-sm" title="Open Student Passes Portal">
@@ -334,7 +349,7 @@
               <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
               <span>Export Full League Backup</span>
             </a>
-            <a href="javascript:void(0)" onclick="triggerJSONImport()" class="flex items-center gap-2 px-3 py-2 text-slate-300 hover:bg-[#102d52] hover:text-[#f7b943]">
+            <a href="javascript:void(0)" onclick="triggerJSONImport()" class="admin-only flex items-center gap-2 px-3 py-2 text-slate-300 hover:bg-[#102d52] hover:text-[#f7b943]">
               <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
               <span>Import League Backup</span>
             </a>
@@ -354,7 +369,7 @@
               <span>📋</span>
               <span>Export Gate Audit Log</span>
             </a>
-            <a href="backup.html" class="flex items-center gap-2 px-3 py-2 text-amber-300 hover:bg-[#102d52] border-t border-[#1e3a5f] mt-1 font-semibold">
+            <a href="backup.html" class="admin-only flex items-center gap-2 px-3 py-2 text-amber-300 hover:bg-[#102d52] border-t border-[#1e3a5f] mt-1 font-semibold">
               <span>🛡️</span>
               <span>Open Standalone Backup</span>
             </a>
@@ -363,9 +378,8 @@
         </div>
 
         <!-- Reset Button -->
-        <button onclick="confirmResetCurrentEvent()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 text-xs font-medium text-red-400 hover:text-red-200 transition-all shadow-sm" title="Reset Current Event or Bracket">
+        <button onclick="confirmResetCurrentEvent()" class="admin-only flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-950/40 hover:bg-red-900/60 border border-red-800/50 text-xs font-medium text-red-400 hover:text-red-200 transition-all shadow-sm" title="Reset Current Event or Bracket">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
-          <span class="hidden sm:inline">Reset</span>
         </button>
       </div>
 
@@ -683,7 +697,7 @@
         <!-- Action Links -->
         <div class="flex items-center gap-2 flex-wrap font-mono text-xs">
           <!-- Server Sync Status Badge & Controls -->
-          <div class="flex items-center gap-1.5 bg-[#06162f] p-1 rounded-xl border border-[#2c4f75]">
+          <div class="admin-only flex items-center gap-1.5 bg-[#06162f] p-1 rounded-xl border border-[#2c4f75]">
             <span id="hub-sync-status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold border bg-slate-900 text-slate-400 border-slate-700 transition-all">
               <span id="hub-sync-status-dot" class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
               <span id="hub-sync-status-text">INITIALIZING...</span>
@@ -715,7 +729,7 @@
           <button onclick="exportAttendanceAuditCSV()" class="px-3 py-2 rounded-xl bg-[#081d38] hover:bg-[#102d52] text-slate-300 font-semibold border border-[#2c4f75] transition-colors" title="Export Gate Scans Audit Log CSV">
             📊 Logs
           </button>
-          <button onclick="confirmResetAllAttendance()" class="px-3 py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 text-red-300 font-semibold border border-red-700/60 transition-colors flex items-center gap-1.5" title="Reset All Attendance Records">
+          <button onclick="confirmResetAllAttendance()" class="admin-only px-3 py-2 rounded-xl bg-red-950/60 hover:bg-red-900/80 text-red-300 font-semibold border border-red-700/60 transition-colors flex items-center gap-1.5" title="Reset All Attendance Records">
             <span>🗑️</span> Reset
           </button>
         </div>
@@ -1020,7 +1034,7 @@
       </div>
 
       <!-- Add Swimmer Entry Form -->
-      <div class="bg-[#0a2344]/95 backdrop-blur-md rounded-2xl border border-[#2c4f75] p-5 space-y-4 shadow-card">
+      <div class="admin-only bg-[#0a2344]/95 backdrop-blur-md rounded-2xl border border-[#2c4f75] p-5 space-y-4 shadow-card">
         <div class="flex items-center justify-between pb-2.5 border-b border-[#1e3a5f]">
           <h3 class="text-xs font-bold text-[#38bdf8] font-mono uppercase tracking-wider flex items-center gap-1.5">
             <span>⏱</span> Record Swimmer Heat Time
@@ -1169,7 +1183,7 @@
           <button onclick="openImageModal('./assets/official/rules_egg_hunt_2.jpg', 'Egg Hunt Official Pointing System')" class="px-3.5 py-2 bg-[#102d52] hover:bg-[#163b6b] border border-[#f7b943]/60 text-[#f7b943] font-mono font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all shadow-sm">
             <span>🖼️</span> Pointing Pubmat
           </button>
-          <button onclick="resetEggHunt()" class="px-3 py-2 bg-[#081d38] hover:bg-[#102d52] hover:border-red-500/60 border border-[#2c4f75] text-slate-300 hover:text-red-400 font-mono font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all">
+          <button onclick="resetEggHunt()" class="admin-only px-3 py-2 bg-[#081d38] hover:bg-[#102d52] hover:border-red-500/60 border border-[#2c4f75] text-slate-300 hover:text-red-400 font-mono font-bold rounded-xl text-xs flex items-center gap-1.5 transition-all">
             <span>↺</span> Reset Scores
           </button>
         </div>
@@ -1234,7 +1248,7 @@
           <button onclick="switchView('finals')" id="tab-finals" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200">
             <span>👑 Finals Spotlight</span>
           </button>
-          <button onclick="switchView('control')" id="tab-control" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200">
+          <button onclick="switchView('control')" id="tab-control" class="admin-only nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200">
             <span>🎮 Control Room</span>
           </button>
           <button onclick="switchView('schedule')" id="tab-schedule" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200">
@@ -1977,11 +1991,11 @@
         <span id="qr-modal-status-badge" class="px-2 py-0.5 rounded font-bold">OUTSIDE</span>
       </div>
 
-      <div class="grid grid-cols-2 gap-2 pt-2 border-t border-[#2c4f75] font-mono text-xs">
-        <button onclick="regenerateActiveStudentQR()" class="py-2 px-3 rounded-xl bg-[#081d38] hover:bg-[#102d52] border border-[#2c4f75] text-[#f7b943] font-semibold transition-all shadow-sm" title="Revoke old QR and generate new">
+      <div class="flex items-center gap-2 pt-2 border-t border-[#2c4f75] font-mono text-xs">
+        <button onclick="regenerateActiveStudentQR()" class="admin-only flex-1 py-2 px-3 rounded-xl bg-[#081d38] hover:bg-[#102d52] border border-[#2c4f75] text-[#f7b943] font-semibold transition-all shadow-sm" title="Revoke old QR and generate new">
           🔄 Revoke / Regen
         </button>
-        <button onclick="closeStudentQRModal()" class="py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold">
+        <button onclick="closeStudentQRModal()" class="flex-1 py-2 px-3 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all">
           Done
         </button>
       </div>
@@ -2042,11 +2056,11 @@
 
       <!-- Footer Actions -->
       <div class="pt-3 border-t border-[#2c4f75] flex items-center justify-between text-xs shrink-0 flex-wrap gap-2">
-        <button onclick="toggleAttendanceFromHistoryModal()" id="history-modal-toggle-btn" class="px-3 py-2 rounded-xl bg-[#06162f] hover:bg-[#102d52] border border-[#2c4f75] text-[#f7b943] font-bold transition-all">
+        <button onclick="toggleAttendanceFromHistoryModal()" id="history-modal-toggle-btn" class="admin-only px-3 py-2 rounded-xl bg-[#06162f] hover:bg-[#102d52] border border-[#2c4f75] text-[#f7b943] font-bold transition-all">
           ⚡ Toggle Presence
         </button>
         <div class="flex items-center gap-2">
-          <button onclick="confirmClearStudentAttendanceFromModal()" class="px-3 py-2 rounded-xl bg-red-950/70 hover:bg-red-900 border border-red-700/80 text-red-300 font-bold transition-all flex items-center gap-1.5" title="Clear all scans and reset attendance for this student">
+          <button onclick="confirmClearStudentAttendanceFromModal()" class="admin-only px-3 py-2 rounded-xl bg-red-950/70 hover:bg-red-900 border border-red-700/80 text-red-300 font-bold transition-all flex items-center gap-1.5" title="Clear all scans and reset attendance for this student">
             <span>🗑️</span> Remove Attendance
           </button>
           <button onclick="closeStudentHistoryModal()" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all shadow-md">
@@ -2089,13 +2103,13 @@
       <div id="modal-competitors-box" class="space-y-4 mb-6"></div>
 
       <!-- Quick Actions -->
-      <div id="modal-live-control" class="mb-4"></div>
+      <div id="modal-live-control" class="admin-only mb-4"></div>
       <div class="flex items-center justify-between pt-4 border-t border-[#2c4f75] text-xs">
-        <button onclick="resetCurrentMatchScore()" class="px-3 py-2 rounded-lg bg-[#081d38] hover:bg-[#102d52] border border-[#2c4f75] text-slate-200 font-medium">
+        <button onclick="resetCurrentMatchScore()" class="admin-only px-3 py-2 rounded-lg bg-[#081d38] hover:bg-[#102d52] border border-[#2c4f75] text-slate-200 font-medium">
           Reset Match
         </button>
-        <div class="flex items-center gap-2">
-          <button onclick="closeMatchModal()" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold shadow-electric">
+        <div class="flex items-center gap-2 [body.student-mode_&]:w-full">
+          <button onclick="closeMatchModal()" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold shadow-electric [body.student-mode_&]:w-full">
             Done
           </button>
         </div>
@@ -2299,6 +2313,21 @@
   <!-- ======================================================== -->
   <script>
     // -------------------------------------------------------------------------
+    // STUDENT SPECTATOR VIEW & ROLE ENFORCEMENT
+    // -------------------------------------------------------------------------
+    const IS_STUDENT_MODE = (typeof window.MEODL_STUDENT_MODE !== 'undefined' && window.MEODL_STUDENT_MODE === true) || 
+                            location.pathname.endsWith('student.html') || 
+                            new URLSearchParams(location.search).get('view') === 'student';
+
+    if (IS_STUDENT_MODE) {
+      document.addEventListener('DOMContentLoaded', () => {
+        document.body.classList.add('student-mode');
+        const sub = document.getElementById('header-subtitle');
+        if (sub) sub.textContent = 'Student Spectator Portal • Read-Only';
+      });
+    }
+
+    // -------------------------------------------------------------------------
     // MASTER APPLICATION STATE MODEL
     // -------------------------------------------------------------------------
     const HUB_STORAGE_KEY = 'MEODL_TOURNAMENT_HUB_V1';
@@ -2465,6 +2494,7 @@
     }
 
     function performUndo() {
+      if (IS_STUDENT_MODE) return;
       if (!appState.history || appState.history.length === 0) return;
       const last = appState.history.pop();
       if (!last || !last.sport || !last.data) return;
@@ -3446,6 +3476,7 @@
 
     // Score Adjuster for Universal Matches
     function adjustUniScore(sportId, matchId, slot, delta) {
+      if (IS_STUDENT_MODE) return;
       pushUndoSnapshot();
       const ev = appState.events[sportId];
       if (!ev || !ev.bracket || !ev.bracket.matches[matchId]) return;
@@ -3480,6 +3511,7 @@
     }
 
     function setUniMatchWinner(sportId, matchId, winnerSlot) {
+      if (IS_STUDENT_MODE) return;
       pushUndoSnapshot();
       const ev = appState.events[sportId];
       if (!ev || !ev.bracket || !ev.bracket.matches[matchId]) return;
@@ -3508,6 +3540,7 @@
     }
 
     function resetUniMatch(sportId, matchId) {
+      if (IS_STUDENT_MODE) return;
       pushUndoSnapshot();
       const ev = appState.events[sportId];
       if (!ev || !ev.bracket || !ev.bracket.matches[matchId]) return;
@@ -3534,6 +3567,7 @@
     let swimTimerRunning = false;
 
     function toggleSwimTimer() {
+      if (IS_STUDENT_MODE) return;
       const btn = document.getElementById('btn-swim-timer-toggle');
       if (swimTimerRunning) {
         clearInterval(swimTimerInterval);
@@ -3551,6 +3585,7 @@
     }
 
     function resetSwimTimer() {
+      if (IS_STUDENT_MODE) return;
       if (swimTimerRunning) toggleSwimTimer();
       swimTimerElapsed = 0;
       updateSwimDisplay();
@@ -3566,6 +3601,7 @@
     }
 
     function captureStopwatchToInput() {
+      if (IS_STUDENT_MODE) return;
       const sec = parseFloat((swimTimerElapsed / 1000).toFixed(2));
       const input = document.getElementById('swim-input-time');
       if (input) {
@@ -3575,6 +3611,7 @@
     }
 
     function addSwimEntry() {
+      if (IS_STUDENT_MODE) return;
       const name = (document.getElementById('swim-input-name').value || '').trim();
       const team = document.getElementById('swim-input-team').value;
       const heat = parseInt(document.getElementById('swim-input-heat').value) || 1;
@@ -3632,13 +3669,16 @@
           </td>
           <td class="py-2.5 px-3 font-mono font-bold text-[#38bdf8]">${e.timeSeconds.toFixed(2)}s</td>
           <td class="py-2.5 px-3 text-right">
+            ${!IS_STUDENT_MODE ? `
             <button onclick="removeSwimEntry('${e.id}')" class="text-slate-500 hover:text-red-400 font-bold px-1 transition-colors" title="Delete Heat Entry">✕</button>
+            ` : '<span class="text-slate-600">-</span>'}
           </td>
         </tr>
       `).join('');
     }
 
     function removeSwimEntry(id) {
+      if (IS_STUDENT_MODE) return;
       pushUndoSnapshot();
       const ev = appState.events.swimming;
       if (!ev || !ev.entries) return;
@@ -3707,14 +3747,14 @@
             <div class="space-y-2 text-xs font-mono">
               <div class="text-[10px] text-slate-400 uppercase tracking-wider">Station Progress:</div>
               ${[1, 2, 3, 4].map(stNum => `
-                <label class="flex items-center gap-2 p-1.5 rounded-lg bg-[#06162f]/90 border border-[#1e3a5f] cursor-pointer hover:border-[#2c4f75] transition-colors">
-                  <input type="checkbox" ${t.stations[stNum - 1] ? 'checked' : ''} onchange="toggleAmazingRaceStation('${teamKey}', ${stNum - 1})" class="rounded border-[#2c4f75] text-[#38bdf8] focus:ring-0">
+                <label class="flex items-center gap-2 p-1.5 rounded-lg bg-[#06162f]/90 border border-[#1e3a5f] ${IS_STUDENT_MODE ? 'cursor-default' : 'cursor-pointer hover:border-[#2c4f75]'} transition-colors">
+                  <input type="checkbox" ${t.stations[stNum - 1] ? 'checked' : ''} ${IS_STUDENT_MODE ? 'disabled' : `onchange="toggleAmazingRaceStation('${teamKey}', ${stNum - 1})"`} class="rounded border-[#2c4f75] text-[#38bdf8] focus:ring-0 ${IS_STUDENT_MODE ? 'pointer-events-none' : ''}">
                   <span class="${t.stations[stNum - 1] ? 'text-white font-bold' : 'text-slate-400'}">Station ${stNum} Cleared</span>
                 </label>
               `).join('')}
 
-              <label class="flex items-center gap-2 p-2 rounded-xl bg-amber-950/40 border border-[#f7b943]/60 cursor-pointer mt-2 text-[#f7b943] font-bold shadow-sm">
-                <input type="checkbox" ${t.escaped ? 'checked' : ''} onchange="toggleAmazingRaceEscape('${teamKey}')" class="rounded border-[#f7b943] text-[#f7b943] focus:ring-0">
+              <label class="flex items-center gap-2 p-2 rounded-xl bg-amber-950/40 border border-[#f7b943]/60 ${IS_STUDENT_MODE ? 'cursor-default' : 'cursor-pointer'} mt-2 text-[#f7b943] font-bold shadow-sm">
+                <input type="checkbox" ${t.escaped ? 'checked' : ''} ${IS_STUDENT_MODE ? 'disabled' : `onchange="toggleAmazingRaceEscape('${teamKey}')"`} class="rounded border-[#f7b943] text-[#f7b943] focus:ring-0 ${IS_STUDENT_MODE ? 'pointer-events-none' : ''}">
                 <span>🏆 Escape Room Solved (Rm120)</span>
               </label>
             </div>
@@ -3724,7 +3764,11 @@
               <div class="flex items-center justify-between text-xs font-mono">
                 <span class="text-slate-400">Total Run Time:</span>
                 <div class="flex items-center gap-1">
-                  <input type="number" value="${t.totalSeconds || 0}" onchange="updateAmazingRaceTime('${teamKey}', this.value)" class="w-20 bg-[#06162f] border border-[#2c4f75] rounded-lg px-2 py-1 text-right text-[#f7b943] font-bold font-mono focus:border-[#f7b943] outline-none">
+                  ${IS_STUDENT_MODE ? `
+                    <span class="text-right text-[#f7b943] font-bold font-mono px-2 py-1 text-sm">${t.totalSeconds || 0}</span>
+                  ` : `
+                    <input type="number" value="${t.totalSeconds || 0}" onchange="updateAmazingRaceTime('${teamKey}', this.value)" class="w-20 bg-[#06162f] border border-[#2c4f75] rounded-lg px-2 py-1 text-right text-[#f7b943] font-bold font-mono focus:border-[#f7b943] outline-none">
+                  `}
                   <span class="text-slate-400">sec</span>
                 </div>
               </div>
@@ -3735,6 +3779,7 @@
     }
 
     function toggleAmazingRaceStation(teamKey, idx) {
+      if (IS_STUDENT_MODE) return;
       pushUndoSnapshot();
       const t = appState.events.amazingRace.teams[teamKey];
       t.stations[idx] = !t.stations[idx];
@@ -3743,6 +3788,7 @@
     }
 
     function toggleAmazingRaceEscape(teamKey) {
+      if (IS_STUDENT_MODE) return;
       pushUndoSnapshot();
       const t = appState.events.amazingRace.teams[teamKey];
       t.escaped = !t.escaped;
@@ -3751,6 +3797,7 @@
     }
 
     function updateAmazingRaceTime(teamKey, val) {
+      if (IS_STUDENT_MODE) return;
       pushUndoSnapshot();
       const t = appState.events.amazingRace.teams[teamKey];
       t.totalSeconds = Math.max(0, parseInt(val) || 0);
@@ -3824,9 +3871,9 @@
                 <div class="flex items-center justify-between bg-[#06162f]/90 border border-amber-700/60 p-2.5 rounded-xl">
                   <span class="text-amber-400 font-bold flex items-center gap-1.5"><span>🥉</span> Bronze <span class="text-[10px] text-amber-500 font-normal">(10 pts)</span></span>
                   <div class="flex items-center gap-1.5">
-                    <button onclick="adjustEggScore('${teamName}', 'bronze', -1)" class="score-button" title="Minus 1">-</button>
+                    ${!IS_STUDENT_MODE ? `<button onclick="adjustEggScore('${teamName}', 'bronze', -1)" class="score-button" title="Minus 1">-</button>` : ''}
                     <span class="w-6 text-center font-bold text-slate-100 text-sm num-mono">${s.bronze}</span>
-                    <button onclick="adjustEggScore('${teamName}', 'bronze', 1)" class="score-button" title="Add 1">+</button>
+                    ${!IS_STUDENT_MODE ? `<button onclick="adjustEggScore('${teamName}', 'bronze', 1)" class="score-button" title="Add 1">+</button>` : ''}
                   </div>
                 </div>
 
@@ -3834,9 +3881,9 @@
                 <div class="flex items-center justify-between bg-[#06162f]/90 border border-slate-500/60 p-2.5 rounded-xl">
                   <span class="text-slate-200 font-bold flex items-center gap-1.5"><span>🥈</span> Silver <span class="text-[10px] text-slate-400 font-normal">(25 pts)</span></span>
                   <div class="flex items-center gap-1.5">
-                    <button onclick="adjustEggScore('${teamName}', 'silver', -1)" class="score-button" title="Minus 1">-</button>
+                    ${!IS_STUDENT_MODE ? `<button onclick="adjustEggScore('${teamName}', 'silver', -1)" class="score-button" title="Minus 1">-</button>` : ''}
                     <span class="w-6 text-center font-bold text-slate-100 text-sm num-mono">${s.silver}</span>
-                    <button onclick="adjustEggScore('${teamName}', 'silver', 1)" class="score-button" title="Add 1">+</button>
+                    ${!IS_STUDENT_MODE ? `<button onclick="adjustEggScore('${teamName}', 'silver', 1)" class="score-button" title="Add 1">+</button>` : ''}
                   </div>
                 </div>
 
@@ -3844,9 +3891,9 @@
                 <div class="flex items-center justify-between bg-[#06162f]/90 border border-[#f7b943]/70 p-2.5 rounded-xl shadow-[0_0_12px_rgba(247,185,67,0.15)]">
                   <span class="text-[#f7b943] font-bold flex items-center gap-1.5"><span>🥇</span> Golden <span class="text-[10px] text-amber-400 font-normal">(50 pts)</span></span>
                   <div class="flex items-center gap-1.5">
-                    <button onclick="adjustEggScore('${teamName}', 'gold', -1)" class="score-button" title="Minus 1">-</button>
+                    ${!IS_STUDENT_MODE ? `<button onclick="adjustEggScore('${teamName}', 'gold', -1)" class="score-button" title="Minus 1">-</button>` : ''}
                     <span class="w-6 text-center font-black text-[#f7b943] text-sm num-mono">${s.gold}</span>
-                    <button onclick="adjustEggScore('${teamName}', 'gold', 1)" class="score-button" title="Add 1">+</button>
+                    ${!IS_STUDENT_MODE ? `<button onclick="adjustEggScore('${teamName}', 'gold', 1)" class="score-button" title="Add 1">+</button>` : ''}
                   </div>
                 </div>
               </div>
@@ -3876,7 +3923,9 @@
               <td class="py-3 px-3 text-center text-[#f7b943] font-bold font-mono">${s.gold} (${s.gold * 50} pts)</td>
               <td class="py-3 px-3 text-center font-black text-[#f7b943] text-base font-mono">${s.total} pts</td>
               <td class="py-3 px-3 text-right">
+                ${!IS_STUDENT_MODE ? `
                 <button onclick="resetTeamEggScore('${s.name}')" class="text-xs text-slate-500 hover:text-red-400 font-mono transition-colors">Reset</button>
+                ` : '<span class="text-slate-600">-</span>'}
               </td>
             </tr>
           `;
@@ -3885,6 +3934,7 @@
     }
 
     function adjustEggScore(teamName, type, delta) {
+      if (IS_STUDENT_MODE) return;
       pushUndoSnapshot();
       const s = appState.events.eggHunt.scores[teamName];
       s[type] = Math.max(0, s[type] + delta);
@@ -3894,6 +3944,7 @@
     }
 
     function resetTeamEggScore(teamName) {
+      if (IS_STUDENT_MODE) return;
       pushUndoSnapshot();
       const s = appState.events.eggHunt.scores[teamName];
       if (s) {
@@ -3905,6 +3956,7 @@
     }
 
     function resetEggHunt() {
+      if (IS_STUDENT_MODE) return;
       if (!confirm('Reset all Egg Hunt scores to zero?')) return;
       pushUndoSnapshot();
       Object.values(appState.events.eggHunt.scores).forEach(s => {
@@ -4006,7 +4058,7 @@
             </span>
           </div>
 
-          ${sportId === 'basketball' ? `
+          ${!IS_STUDENT_MODE ? (sportId === 'basketball' ? `
             <!-- Basketball Point Score Input -->
             <div class="p-4 rounded-2xl bg-[#081d38] border border-[#2c4f75] space-y-3">
               <div class="text-[10px] font-bold text-slate-300 text-center uppercase tracking-wider">Final Game Points (4 Quarters × 8 mins)</div>
@@ -4097,7 +4149,7 @@
                 </div>
               ` : ''}
             </div>
-          `}
+          `) : ''}
 
           ${isLiveSport && hasBoth ? `
             <div>
@@ -4109,15 +4161,17 @@
 
           <!-- Marshal Actions and Reset -->
           <div class="flex items-center justify-between gap-2 pt-2 border-t border-[#2c4f75]">
-            <button onclick="confirmParticipantsPresent('${sportId}', '${matchId}')" class="flex-1 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 font-bold text-xs">
-              ✓ Confirm Competitors Present
-            </button>
-            ${m.completed ? `
-              <button onclick="resetUniMatch('${sportId}', '${matchId}'); openUniMatchModal('${sportId}', '${matchId}');" class="py-2 px-3 rounded-xl bg-red-950/70 hover:bg-red-900 border border-red-800/80 text-red-300 font-bold text-xs">
-                Reset Result
+            ${!IS_STUDENT_MODE ? `
+              <button onclick="confirmParticipantsPresent('${sportId}', '${matchId}')" class="flex-1 py-2 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/80 text-emerald-300 font-bold text-xs">
+                ✓ Confirm Competitors Present
               </button>
+              ${m.completed ? `
+                <button onclick="resetUniMatch('${sportId}', '${matchId}'); openUniMatchModal('${sportId}', '${matchId}');" class="py-2 px-3 rounded-xl bg-red-950/70 hover:bg-red-900 border border-red-800/80 text-red-300 font-bold text-xs">
+                  Reset Result
+                </button>
+              ` : ''}
             ` : ''}
-            <button onclick="closeUniMatchModal()" class="py-2 px-4 rounded-xl bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-white font-bold text-xs">
+            <button onclick="closeUniMatchModal()" class="py-2 px-4 rounded-xl bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-white font-bold text-xs ${IS_STUDENT_MODE ? 'w-full' : ''}">
               Close
             </button>
           </div>
@@ -4128,6 +4182,7 @@
     }
 
     function saveUniMatchDirectScore(sportId, matchId) {
+      if (IS_STUDENT_MODE) return;
       pushUndoSnapshot();
       const ev = appState.events[sportId];
       if (!ev || !ev.bracket || !ev.bracket.matches[matchId]) return;
@@ -4169,6 +4224,7 @@
     }
 
     function confirmParticipantsPresent(sportId, matchId) {
+      if (IS_STUDENT_MODE) return;
       showToast('Marshal Verified: Both competitors confirmed present for ' + matchId);
       closeUniMatchModal();
     }
@@ -4200,6 +4256,7 @@
     }
 
     function saveSportSettings() {
+      if (IS_STUDENT_MODE) return;
       const sportId = appState.activeSport;
       const ev = appState.events[sportId];
       if (!ev) return;
@@ -4535,6 +4592,7 @@
     }
 
     function confirmResetCurrentEvent() {
+      if (IS_STUDENT_MODE) return;
       const sportId = appState.activeSport;
       if (!sportId) {
         if (confirm('Reset all sports and leaderboard across the entire league?')) {
@@ -5105,6 +5163,7 @@
     }
 
     function selectMatchWinner(matchId, winnerSlot) {
+      if (IS_STUDENT_MODE) return;
       const match = state.matches[matchId];
       if (!match || !match.p1 || !match.p2) return;
 
@@ -5138,6 +5197,7 @@
     }
 
     function adjustScore(matchId, slot, delta) {
+      if (IS_STUDENT_MODE) return;
       const match = state.matches[matchId];
       if (!match || !match.p1 || !match.p2) return;
 
@@ -5175,6 +5235,7 @@
     }
 
     function updatePlayerCharacter(playerId, characterName) {
+      if (IS_STUDENT_MODE) return;
       const player = state.players.find(p => p.id === playerId);
       if (player) {
         player.character = characterName;
@@ -6030,25 +6091,35 @@
                 <span class="font-bold text-sm text-white">${player.name}</span>
                 <span class="text-xs text-slate-400 font-mono">(${player.year})</span>
               </div>
+              ${!IS_STUDENT_MODE ? `
               <button onclick="selectMatchWinner('${match.id}', ${slotNum}); closeMatchModal();" class="px-2.5 py-1 rounded-lg bg-cyan-950 hover:bg-cyan-900 border border-cyan-700 text-xs font-mono font-bold text-cyan-300 transition-all">
                 Win Set
               </button>
+              ` : ''}
             </div>
 
             <div class="flex items-center justify-between gap-4 pt-1">
               <div class="flex items-center gap-2 text-xs">
                 <span class="text-slate-400">Tekken 8 Main:</span>
+                ${!IS_STUDENT_MODE ? `
                 <select onchange="updatePlayerCharacter('${player.id}', this.value)" class="bg-[#0a2344] border border-[#2c4f75] rounded px-2 py-1 text-xs text-cyan-300 font-mono focus:outline-none focus:border-[#38bdf8]">
                   ${charOptions}
                 </select>
+                ` : `
+                <span class="font-mono font-bold text-cyan-300">${player.character || 'Jin'}</span>
+                `}
               </div>
 
               <div class="flex items-center gap-2">
                 <span class="text-xs text-slate-400">Score:</span>
                 <div class="flex items-center gap-1">
+                  ${!IS_STUDENT_MODE ? `
                   <button onclick="adjustScore('${match.id}', ${slotNum}, -1); openMatchModal('${match.id}')" class="w-6 h-6 rounded bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-sm font-mono font-bold text-slate-200 transition-all">-</button>
+                  ` : ''}
                   <span class="w-8 text-center font-mono font-bold text-base text-[#f7b943]">${score}</span>
+                  ${!IS_STUDENT_MODE ? `
                   <button onclick="adjustScore('${match.id}', ${slotNum}, 1); openMatchModal('${match.id}')" class="w-6 h-6 rounded bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-sm font-mono font-bold text-slate-200 transition-all">+</button>
+                  ` : ''}
                 </div>
               </div>
             </div>
@@ -6072,6 +6143,7 @@
     }
 
     function resetCurrentMatchScore() {
+      if (IS_STUDENT_MODE) return;
       if (!activeModalMatchId) return;
       const match = state.matches[activeModalMatchId];
       if (match) {
@@ -6089,6 +6161,7 @@
     // 8. SIMULATION, EXPORT & TOURNAMENT RESET
     // -------------------------------------------------------------------------
     function simulateNextMatch() {
+      if (IS_STUDENT_MODE) return;
       const readyMatch = Object.values(state.matches).find(m => 
         !m.completed && m.p1 && m.p2 && !m.p1.isBye && !m.p2.isBye
       );
@@ -6134,6 +6207,7 @@
     }
 
     function confirmResetTournament() {
+      if (IS_STUDENT_MODE) return;
       document.getElementById('reset-modal').classList.remove('hidden');
     }
 
@@ -6142,6 +6216,7 @@
     }
 
     function executeResetTournament() {
+      if (IS_STUDENT_MODE) return;
       safeRemoveStorage(STORAGE_KEY);
       initializeTournamentState();
       renderAllViews();
@@ -6678,18 +6753,20 @@
                 <button onclick="openStudentHistoryModal('${s.id}')" class="px-2 py-1 rounded-lg bg-[#081d38] hover:bg-[#102d52] border border-[#2c4f75] text-[#ffd477] text-[10px] font-bold flex items-center gap-1 transition-colors" title="View Full History Timeline">
                   📜 History
                 </button>
-                <button onclick="quickToggleStudentAttendance('${s.id}')" class="px-2 py-1 rounded-lg bg-[#06162f] border border-[#2c4f75] hover:bg-[#102d52] text-[10px] font-bold ${quickActionColor} transition-colors">
+                ${!IS_STUDENT_MODE ? `
+                <button onclick="quickToggleStudentAttendance('${s.id}')" class="admin-only px-2 py-1 rounded-lg bg-[#06162f] border border-[#2c4f75] hover:bg-[#102d52] text-[10px] font-bold ${quickActionColor} transition-colors">
                   ${quickActionText}
                 </button>
-                <button onclick="confirmClearStudentAttendance('${s.id}')" class="p-1 rounded-lg bg-[#06162f] hover:bg-red-950/70 border border-[#2c4f75] hover:border-red-700/80 text-red-400 text-xs transition-colors" title="Reset / Clear Attendance for this Athlete">
+                <button onclick="confirmClearStudentAttendance('${s.id}')" class="admin-only p-1 rounded-lg bg-[#06162f] hover:bg-red-950/70 border border-[#2c4f75] hover:border-red-700/80 text-red-400 text-xs transition-colors" title="Reset / Clear Attendance for this Athlete">
                   🗑️
-                </button>
+                </button>` : ''}
                 <button onclick="openStudentQRModal('${s.id}')" class="p-1 rounded-lg bg-[#06162f] hover:bg-[#102d52] border border-[#2c4f75] text-[#38bdf8] text-xs" title="View Personal QR Pass">
                   🪪
                 </button>
-                <button onclick="promptRegenerateQR('${s.id}')" class="p-1 rounded-lg bg-[#06162f] hover:bg-[#102d52] border border-[#2c4f75] text-[#f7b943] text-xs" title="Revoke & Regenerate QR">
+                ${!IS_STUDENT_MODE ? `
+                <button onclick="promptRegenerateQR('${s.id}')" class="admin-only p-1 rounded-lg bg-[#06162f] hover:bg-[#102d52] border border-[#2c4f75] text-[#f7b943] text-xs" title="Revoke & Regenerate QR">
                   🔄
-                </button>
+                </button>` : ''}
               </div>
             </td>
           </tr>
@@ -6849,8 +6926,8 @@
                     </div>
                   </div>
                 </div>
-                ${h.eventId ? `
-                <button onclick="confirmDeleteEvent('${h.eventId}')" class="p-1.5 rounded-lg bg-red-950/50 hover:bg-red-900 border border-red-800 text-red-400 hover:text-red-200 transition-colors shrink-0 text-xs" title="Delete this scan event">
+                ${(h.eventId && !IS_STUDENT_MODE) ? `
+                <button onclick="confirmDeleteEvent('${h.eventId}')" class="admin-only p-1.5 rounded-lg bg-red-950/50 hover:bg-red-900 border border-red-800 text-red-400 hover:text-red-200 transition-colors shrink-0 text-xs" title="Delete this scan event">
                   🗑️
                 </button>` : ''}
               </div>
@@ -6867,6 +6944,7 @@
     }
 
     function toggleAttendanceFromHistoryModal() {
+      if (IS_STUDENT_MODE) return;
       if (activeHistoryStudentId) {
         quickToggleStudentAttendance(activeHistoryStudentId);
         setTimeout(() => {
@@ -6876,6 +6954,7 @@
     }
 
     async function confirmClearStudentAttendance(studentId) {
+      if (IS_STUDENT_MODE) return;
       if (!window.MEODL_ATTENDANCE) return;
       const s = window.MEODL_ATTENDANCE.getStudentById(studentId);
       if (!s) return;
@@ -6892,12 +6971,14 @@
     }
 
     async function confirmClearStudentAttendanceFromModal() {
+      if (IS_STUDENT_MODE) return;
       if (activeHistoryStudentId) {
         await confirmClearStudentAttendance(activeHistoryStudentId);
       }
     }
 
     async function confirmDeleteEvent(eventId) {
+      if (IS_STUDENT_MODE) return;
       if (!window.MEODL_ATTENDANCE || !eventId) return;
 
       const ok = confirm(`Delete this specific scan record?\n\nThe athlete's attendance status will be automatically recalculated from their remaining scan history.`);
@@ -6912,6 +6993,7 @@
     }
 
     async function confirmResetAllAttendance() {
+      if (IS_STUDENT_MODE) return;
       if (!window.MEODL_ATTENDANCE) return;
 
       const typed = prompt(`⚠️ RESET ALL ATTENDANCE?\n\nThis will permanently clear ALL check-ins and check-outs for ALL 175 athletes across all sports.\n\nType 'RESET' to confirm:`);
@@ -6929,6 +7011,7 @@
     }
 
     function quickToggleStudentAttendance(studentId) {
+      if (IS_STUDENT_MODE) return;
       if (!window.MEODL_ATTENDANCE) return;
       const s = window.MEODL_ATTENDANCE.getStudentById(studentId);
       if (!s) return;
@@ -6954,6 +7037,7 @@
     }
 
     function promptRegenerateQR(studentId) {
+      if (IS_STUDENT_MODE) return;
       if (!window.MEODL_ATTENDANCE) return;
       const s = window.MEODL_ATTENDANCE.getStudentById(studentId);
       if (!s) return;
@@ -7012,6 +7096,7 @@ This will permanently REVOKE their current QR code card and generate a new secur
     }
 
     function regenerateActiveStudentQR() {
+      if (IS_STUDENT_MODE) return;
       if (activeModalStudentId) {
         promptRegenerateQR(activeModalStudentId);
       }
