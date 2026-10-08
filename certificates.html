@@ -13,13 +13,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@600;700;800;900&family=Great+Vibes&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Local QR Generator, jsPDF, Mechanical Gear and MEODL Data Modules -->
-  <link rel="stylesheet" href="./assets/meodl_gear.css">
-  <script src="./assets/meodl_gear.js"></script>
-  <script src="./assets/qrcode.min.js"></script>
-  <script src="./assets/jspdf.umd.min.js"></script>
-  <script src="./assets/meodl_data.js"></script>
-  <script src="./assets/meodl_attendance.js"></script>
+  <!-- Local QR Generator, jsPDF, Mechanical Gear and MEODL Data Modules with Resilient Multi-Network Fallback -->
+  <link rel="stylesheet" href="./assets/meodl_gear.css" onerror="if(!this.dataset.retried){this.dataset.retried=1;this.href='https://mcluginn.github.io/meodl-tekken8/assets/meodl_gear.css';}">
+  <script src="./assets/meodl_gear.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_gear.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/qrcode.min.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/qrcode.min.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/jspdf.umd.min.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/jspdf.umd.min.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/meodl_data.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_data.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/meodl_attendance.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_attendance.js';document.head.appendChild(s);}"></script>
 
   <!-- Tailwind Configuration matching Tournament & Quiz Bee Theme -->
   <script>
