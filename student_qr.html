@@ -169,6 +169,19 @@
             Present this personal pass to the Gate Marshal on arrival and exit.
           </p>
         </div>
+
+        <!-- Attendance History Timeline for Student -->
+        <div class="mt-4 pt-3 border-t border-zinc-800 font-mono text-xs">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-bold text-zinc-300 uppercase tracking-wider flex items-center gap-1">
+              <span>📜</span> My Attendance History
+            </span>
+            <span id="student-history-count" class="text-[10px] text-cyan-400 font-bold">0 events</span>
+          </div>
+          <div id="student-history-list" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+            <p class="text-center text-zinc-500 py-2 text-[10px]">No scans recorded yet today.</p>
+          </div>
+        </div>
       </div>
 
       <!-- Action Buttons -->
@@ -304,6 +317,37 @@
         });
       } else {
         qrTarget.innerHTML = `<div class="text-xs font-mono text-zinc-600 text-center p-2">${payload}</div>`;
+      }
+
+      // Populate personal activity history
+      const histList = document.getElementById('student-history-list');
+      const histCount = document.getElementById('student-history-count');
+      if (histList && window.MEODL_ATTENDANCE && typeof window.MEODL_ATTENDANCE.getStudentHistory === 'function') {
+        window.MEODL_ATTENDANCE.getStudentHistory(student.id).then(history => {
+          if (histCount) histCount.textContent = `${history.length} event${history.length === 1 ? '' : 's'}`;
+          if (!history || !history.length) {
+            histList.innerHTML = '<p class="text-center text-zinc-500 py-2 text-[10px]">No scans recorded yet today.</p>';
+            return;
+          }
+          histList.innerHTML = history.map(h => {
+            const isCheckIn = h.action === 'check_in';
+            const badge = isCheckIn 
+              ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">IN</span>' 
+              : '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-950 text-red-300 border border-red-800">OUT</span>';
+            const time = h.displayTime || '--:--';
+            const details = h.reason ? ` - ${h.reason}` : '';
+            return `
+              <div class="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px] flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                  ${badge}
+                  <span class="text-white font-bold">${time}</span>
+                  <span class="text-zinc-400 text-[10px] truncate max-w-[140px]">${details}</span>
+                </div>
+                <span class="text-zinc-500 text-[9px]">${h.performedBy || 'Gate'}</span>
+              </div>
+            `;
+          }).join('');
+        });
       }
     }
 

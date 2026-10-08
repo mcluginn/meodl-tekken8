@@ -326,11 +326,26 @@
       </div>
 
       <!-- Current Venue Status -->
-      <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-900 border border-zinc-800 font-mono text-xs mb-5">
+      <div class="flex items-center justify-between p-3 rounded-xl bg-zinc-900 border border-zinc-800 font-mono text-xs mb-3">
         <span class="text-zinc-400">Current Status:</span>
         <span id="modal-current-status" class="px-3 py-1 rounded-lg text-xs font-bold">
           🔴 OUTSIDE
         </span>
+      </div>
+
+      <!-- Complete Student Attendance History Timeline -->
+      <div class="mb-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 p-3.5 font-mono text-xs">
+        <div class="flex items-center justify-between pb-2 border-b border-zinc-800 mb-2">
+          <span class="text-[11px] font-bold text-zinc-300 uppercase tracking-wide flex items-center gap-1.5">
+            <span>📜</span> Full Attendance History
+          </span>
+          <span id="modal-history-count" class="text-[10px] px-2 py-0.5 rounded-full bg-zinc-800 text-cyan-300 font-bold border border-zinc-700">
+            0 records
+          </span>
+        </div>
+        <div id="modal-history-timeline" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+          <p class="text-center text-zinc-500 py-2 text-[11px]">Loading scan history...</p>
+        </div>
       </div>
 
       <!-- Action Buttons -->
@@ -680,6 +695,51 @@
         lastText = 'Checked out at ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (student.exitReason ? ` (${student.exitReason})` : '');
       }
       document.getElementById('modal-last-action').textContent = lastText;
+
+      // Populate Complete Attendance History Timeline
+      const timelineEl = document.getElementById('modal-history-timeline');
+      const countEl = document.getElementById('modal-history-count');
+      if (timelineEl) {
+        timelineEl.innerHTML = '<p class="text-center text-zinc-500 py-2 text-[11px]">Loading scan history...</p>';
+        if (window.MEODL_ATTENDANCE && typeof window.MEODL_ATTENDANCE.getStudentHistory === 'function') {
+          window.MEODL_ATTENDANCE.getStudentHistory(student.id).then(history => {
+            if (countEl) countEl.textContent = `${history.length} record${history.length === 1 ? '' : 's'}`;
+            if (!history || !history.length) {
+              timelineEl.innerHTML = '<p class="text-center text-zinc-500 py-2 text-[11px]">No prior scan events yet. First arrival at gate.</p>';
+              return;
+            }
+            timelineEl.innerHTML = history.map(h => {
+              const isCheckIn = h.action === 'check_in';
+              const isOverride = h.action === 'manual_override';
+              const badgeClass = isCheckIn 
+                ? 'bg-emerald-950 text-emerald-300 border-emerald-800' 
+                : (isOverride ? 'bg-amber-950 text-amber-300 border-amber-800' : 'bg-red-950 text-red-300 border-red-800');
+              const actionLabel = isCheckIn ? '🟢 IN' : (isOverride ? '⚙️ OVERRIDE' : '🔴 OUT');
+              const dateStr = h.timestamp ? new Date(h.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
+              const details = h.reason ? `<span class="text-zinc-400 block text-[10px] mt-0.5">${h.reason}${h.expectedReturn ? ' (Return: ' + h.expectedReturn + ')' : ''}</span>` : '';
+              return `
+                <div class="p-2 rounded-xl bg-zinc-950 border border-zinc-800/80 flex items-start justify-between gap-2">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="px-1.5 py-0.5 rounded text-[9px] font-bold border ${badgeClass}">${actionLabel}</span>
+                      <span class="text-white font-bold text-[11px]">${h.displayTime || '--:--'}</span>
+                      <span class="text-zinc-500 text-[10px]">${dateStr}</span>
+                    </div>
+                    ${details}
+                  </div>
+                  <div class="text-right text-[10px] text-zinc-500 font-mono shrink-0">
+                    <span>${h.performedBy || 'Marshal'}</span>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          }).catch(err => {
+            timelineEl.innerHTML = '<p class="text-center text-zinc-500 py-2 text-[11px]">No prior scan history found.</p>';
+          });
+        } else {
+          timelineEl.innerHTML = '<p class="text-center text-zinc-500 py-2 text-[11px]">No history engine available.</p>';
+        }
+      }
 
       modal.classList.remove('hidden');
     }

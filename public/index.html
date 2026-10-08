@@ -1988,6 +1988,71 @@
     </div>
   </div>
 
+  <!-- 6. STUDENT FULL ATTENDANCE HISTORY TIMELINE MODAL -->
+  <div id="student-history-modal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-[#0a2344] border-2 border-[#f7b943]/80 rounded-3xl max-w-xl w-full p-6 shadow-2xl space-y-4 relative max-h-[90vh] flex flex-col font-mono">
+      <button onclick="closeStudentHistoryModal()" class="absolute top-4 right-4 text-slate-300 hover:text-white text-lg w-8 h-8 rounded-full bg-[#06162f] border border-[#2c4f75] flex items-center justify-center">✕</button>
+      
+      <!-- Header -->
+      <div class="flex items-center gap-3 border-b border-[#2c4f75] pb-3 shrink-0">
+        <div id="history-modal-avatar" class="w-12 h-12 rounded-2xl bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-extrabold text-lg flex items-center justify-center shrink-0 shadow-inner">
+          ST
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h3 id="history-modal-student-name" class="text-base font-extrabold text-white truncate max-w-xs font-sans uppercase">STUDENT NAME</h3>
+            <span id="history-modal-team-badge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border">TEAM</span>
+          </div>
+          <div class="flex items-center gap-2 mt-0.5 text-xs">
+            <span id="history-modal-student-code" class="text-cyan-400 font-bold">MEODL-0000</span>
+            <span class="text-slate-600">•</span>
+            <span id="history-modal-current-status" class="px-2 py-0.5 rounded text-[10px] font-bold">OUTSIDE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Strip -->
+      <div class="grid grid-cols-3 gap-2 text-center shrink-0 text-xs">
+        <div class="p-2.5 rounded-xl bg-[#06162f] border border-[#2c4f75]">
+          <span class="text-[10px] text-slate-400 block">TOTAL VISITS</span>
+          <span id="history-modal-total-visits" class="text-sm font-bold text-white">0</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-[#06162f] border border-[#2c4f75]">
+          <span class="text-[10px] text-slate-400 block">TIME INSIDE</span>
+          <span id="history-modal-total-minutes" class="text-sm font-bold text-emerald-300">0 mins</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-[#06162f] border border-[#2c4f75]">
+          <span class="text-[10px] text-slate-400 block">AUDIT SCANS</span>
+          <span id="history-modal-total-events" class="text-sm font-bold text-[#f7b943]">0</span>
+        </div>
+      </div>
+
+      <!-- Chronological History Timeline Header -->
+      <div class="flex items-center justify-between pt-1 shrink-0 text-xs">
+        <span class="text-slate-300 font-bold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+          <span>📋</span> Scan Event Timeline (Chronological)
+        </span>
+        <span id="history-modal-order-tag" class="text-[10px] text-slate-400">Newest first</span>
+      </div>
+
+      <!-- Scrollable Chronological History Timeline Feed -->
+      <div class="flex-1 overflow-y-auto pr-1 min-h-[160px] max-h-[340px] space-y-2 text-xs" id="history-modal-timeline">
+        <p class="text-center text-slate-400 py-6 text-xs">Loading attendance event records...</p>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="pt-3 border-t border-[#2c4f75] flex items-center justify-between text-xs shrink-0">
+        <button onclick="toggleAttendanceFromHistoryModal()" id="history-modal-toggle-btn" class="px-3 py-2 rounded-xl bg-[#06162f] hover:bg-[#102d52] border border-[#2c4f75] text-[#f7b943] font-bold transition-all">
+          ⚡ Toggle Presence
+        </button>
+        <button onclick="closeStudentHistoryModal()" class="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold transition-all shadow-md">
+          Close History
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Preserved Tekken Modals (Match Edit, JSON, Presentation) -->
   <!-- Match Quick Edit / Score Modal -->
   <div id="match-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
@@ -6594,7 +6659,7 @@
         return `
           <tr class="hover:bg-[#102d52]/40 transition-colors">
             <td class="py-2 px-3 font-bold text-cyan-400">${s.studentCode}</td>
-            <td class="py-2 px-3 font-semibold text-white truncate max-w-[200px]">${s.name}</td>
+            <td class="py-2 px-3 font-semibold text-white truncate max-w-[200px] cursor-pointer hover:text-cyan-300" onclick="openStudentHistoryModal('${s.id}')" title="Click to view full attendance history">${s.name}</td>
             <td class="py-2 px-3">
               <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase border ${teamStyles[s.team] || ''}">
                 ${s.team.toUpperCase()}
@@ -6605,6 +6670,9 @@
             <td class="py-2 px-3 text-slate-300 text-[11px] truncate max-w-[160px]">${exitDetails}</td>
             <td class="py-2 px-3 text-right">
               <div class="flex items-center justify-end gap-1">
+                <button onclick="openStudentHistoryModal('${s.id}')" class="px-2 py-1 rounded-lg bg-[#081d38] hover:bg-[#102d52] border border-[#2c4f75] text-[#ffd477] text-[10px] font-bold flex items-center gap-1 transition-colors" title="View Full History Timeline">
+                  📜 History
+                </button>
                 <button onclick="quickToggleStudentAttendance('${s.id}')" class="px-2 py-1 rounded-lg bg-[#06162f] border border-[#2c4f75] hover:bg-[#102d52] text-[10px] font-bold ${quickActionColor} transition-colors">
                   ${quickActionText}
                 </button>
@@ -6625,34 +6693,174 @@
       const tbody = document.getElementById('att-audit-table-body');
       if (!tbody || !window.MEODL_ATTENDANCE) return;
 
-      const logs = window.MEODL_ATTENDANCE.getAuditLog();
-      if (!logs.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400 font-mono text-xs">No gate audit logs recorded yet.</td></tr>';
-        return;
+      tbody.innerHTML = '<tr><td colspan="8" class="py-6 text-center text-slate-400 font-mono text-xs">Loading audit event log...</td></tr>';
+
+      const fetchLogs = (typeof window.MEODL_ATTENDANCE.getFullAuditLog === 'function')
+        ? window.MEODL_ATTENDANCE.getFullAuditLog()
+        : Promise.resolve(window.MEODL_ATTENDANCE.getAuditLog());
+
+      fetchLogs.then(logs => {
+        if (!logs || !logs.length) {
+          tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-slate-400 font-mono text-xs">No gate audit logs recorded yet.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = logs.slice(0, 200).map(l => {
+          const isCheckIn = l.action === 'check_in';
+          const isOverride = l.action === 'manual_override';
+          const actionBadge = isCheckIn 
+            ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">CHECK IN</span>'
+            : (isOverride ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800">OVERRIDE</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-950 text-red-300 border border-red-800">CHECK OUT</span>');
+
+          const d = l.timestamp ? new Date(l.timestamp) : new Date();
+          const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          return `
+            <tr class="hover:bg-[#102d52]/40 transition-colors">
+              <td class="py-2 px-3 text-slate-300 text-[11px]">${dateStr}</td>
+              <td class="py-2 px-3 text-cyan-400 font-bold">${l.studentCode || '—'}</td>
+              <td class="py-2 px-3 text-white font-semibold truncate max-w-[180px] cursor-pointer hover:text-cyan-300" onclick="openStudentHistoryModal('${l.studentId}')" title="Click to view student full history">${l.studentName || '—'}</td>
+              <td class="py-2 px-3 text-slate-300 uppercase">${l.team || '—'}</td>
+              <td class="py-2 px-3">${actionBadge}</td>
+              <td class="py-2 px-3 text-slate-300 uppercase text-[10px]">${l.method || 'qr_scan'}</td>
+              <td class="py-2 px-3 text-slate-200">${l.performedBy || 'Gate'}</td>
+              <td class="py-2 px-3 text-slate-300 text-[11px]">${l.reason || l.expectedReturn || '—'}</td>
+            </tr>
+          `;
+        }).join('');
+      });
+    }
+
+    let activeHistoryStudentId = null;
+
+    function openStudentHistoryModal(studentId) {
+      if (!window.MEODL_ATTENDANCE) return;
+      activeHistoryStudentId = studentId;
+      const s = window.MEODL_ATTENDANCE.getStudentById(studentId);
+      if (!s) return;
+
+      document.getElementById('history-modal-student-name').textContent = s.name;
+      document.getElementById('history-modal-student-code').textContent = s.studentCode;
+
+      // Avatar
+      const parts = s.name.split(/[\s,]+/);
+      const initials = parts.slice(0, 2).map(p => p[0] || '').join('');
+      document.getElementById('history-modal-avatar').textContent = initials.toUpperCase() || 'ST';
+
+      // Team badge
+      const teamStyles = {
+        rankine: 'bg-red-950/80 text-red-400 border-red-700/80',
+        otto: 'bg-amber-950/80 text-amber-400 border-amber-700/80',
+        brayton: 'bg-cyan-950/80 text-cyan-400 border-cyan-700/80',
+        diesel: 'bg-emerald-950/80 text-emerald-400 border-emerald-700/80'
+      };
+      const teamBadge = document.getElementById('history-modal-team-badge');
+      teamBadge.textContent = s.teamName || ('TEAM ' + s.team.toUpperCase());
+      teamBadge.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${teamStyles[s.team] || ''}`;
+
+      // Status pill
+      const statusPill = document.getElementById('history-modal-current-status');
+      if (s.status === 'INSIDE') {
+        statusPill.textContent = '🟢 CURRENTLY INSIDE VENUE';
+        statusPill.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-700/80';
+      } else {
+        statusPill.textContent = '🔴 CURRENTLY OUTSIDE VENUE';
+        statusPill.className = 'px-2 py-0.5 rounded text-[10px] font-bold bg-[#081d38] text-slate-300 border border-[#2c4f75]';
       }
 
-      tbody.innerHTML = logs.slice(0, 100).map(l => {
-        const isCheckIn = l.action === 'check_in';
-        const actionBadge = isCheckIn 
-          ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800">CHECK IN</span>'
-          : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-950 text-red-300 border border-red-800">CHECK OUT</span>';
+      // Quick toggle button text
+      const toggleBtn = document.getElementById('history-modal-toggle-btn');
+      if (toggleBtn) {
+        toggleBtn.textContent = s.status === 'INSIDE' ? '🔴 Check Out Athlete' : '🟢 Check In Athlete';
+        toggleBtn.className = s.status === 'INSIDE' 
+          ? 'px-3 py-2 rounded-xl bg-red-950/70 hover:bg-red-900 border border-red-700 text-red-300 font-bold transition-all'
+          : 'px-3 py-2 rounded-xl bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-700 text-emerald-300 font-bold transition-all';
+      }
 
-        const d = l.timestamp ? new Date(l.timestamp) : new Date();
-        const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      // Metrics
+      document.getElementById('history-modal-total-visits').textContent = `${s.totalVisits || 0} time${s.totalVisits === 1 ? '' : 's'}`;
+      document.getElementById('history-modal-total-minutes').textContent = `${s.totalMinutesInside || 0} mins`;
 
-        return `
-          <tr class="hover:bg-[#102d52]/40 transition-colors">
-            <td class="py-2 px-3 text-slate-300 text-[11px]">${dateStr}</td>
-            <td class="py-2 px-3 text-cyan-400 font-bold">${l.studentCode || '—'}</td>
-            <td class="py-2 px-3 text-white font-semibold truncate max-w-[180px]">${l.studentName || '—'}</td>
-            <td class="py-2 px-3 text-slate-300 uppercase">${l.team || '—'}</td>
-            <td class="py-2 px-3">${actionBadge}</td>
-            <td class="py-2 px-3 text-slate-300 uppercase text-[10px]">${l.method || 'qr_scan'}</td>
-            <td class="py-2 px-3 text-slate-200">${l.performedBy || 'Gate'}</td>
-            <td class="py-2 px-3 text-slate-300 text-[11px]">${l.reason || l.expectedReturn || '—'}</td>
-          </tr>
-        `;
-      }).join('');
+      // Render timeline list
+      const timelineEl = document.getElementById('history-modal-timeline');
+      timelineEl.innerHTML = '<p class="text-center text-slate-400 py-6 text-xs">Loading attendance event records...</p>';
+
+      window.MEODL_ATTENDANCE.getStudentHistory(studentId).then(history => {
+        document.getElementById('history-modal-total-events').textContent = `${history.length} scans`;
+        if (!history || !history.length) {
+          timelineEl.innerHTML = `
+            <div class="text-center py-8 text-slate-400">
+              <span class="text-2xl block mb-1">📭</span>
+              <p class="font-bold text-white text-xs">No gate scans recorded yet</p>
+              <p class="text-[11px] text-slate-400 mt-1">This student athlete has not yet been scanned at any gate today.</p>
+            </div>
+          `;
+          return;
+        }
+
+        timelineEl.innerHTML = history.map((h, idx) => {
+          const isCheckIn = h.action === 'check_in';
+          const isOverride = h.action === 'manual_override';
+          const badgeClass = isCheckIn 
+            ? 'bg-emerald-950 text-emerald-300 border-emerald-800' 
+            : (isOverride ? 'bg-amber-950 text-amber-300 border-amber-800' : 'bg-red-950 text-red-300 border-red-800');
+          const actionText = isCheckIn ? '🟢 CHECKED IN' : (isOverride ? '⚙️ OVERRIDE' : '🔴 CHECKED OUT');
+
+          const d = h.timestamp ? new Date(h.timestamp) : new Date();
+          const dateStr = d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+          const timeStr = h.displayTime || d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          let extraInfo = '';
+          if (h.reason) {
+            extraInfo += `<span class="text-amber-300 font-semibold block text-[11px] mt-0.5">Reason: ${h.reason}</span>`;
+          }
+          if (h.expectedReturn) {
+            extraInfo += `<span class="text-sky-300 block text-[10px]">Expected Return: ${h.expectedReturn}</span>`;
+          }
+
+          return `
+            <div class="p-3 rounded-2xl bg-[#06162f] border border-[#2c4f75] hover:border-slate-500 transition-colors flex items-start justify-between gap-3">
+              <div class="flex items-start gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-[#0a2344] border border-[#2c4f75] flex items-center justify-center font-bold text-[11px] text-[#f7b943] shrink-0 mt-0.5">
+                  #${history.length - idx}
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">
+                      ${actionText}
+                    </span>
+                    <span class="text-white font-bold text-xs">${timeStr}</span>
+                    <span class="text-slate-400 text-[11px]">• ${dateStr}</span>
+                  </div>
+                  ${extraInfo}
+                  <div class="text-[10px] text-slate-400 mt-1 flex items-center gap-2">
+                    <span>Staff: <strong class="text-slate-300">${h.performedBy || 'Marshal'}</strong></span>
+                    <span>•</span>
+                    <span>Method: <span class="uppercase">${h.method || 'qr_scan'}</span></span>
+                    ${h.deviceId ? `<span>• Device: ${h.deviceId}</span>` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      });
+
+      document.getElementById('student-history-modal').classList.remove('hidden');
+    }
+
+    function closeStudentHistoryModal() {
+      document.getElementById('student-history-modal').classList.add('hidden');
+      activeHistoryStudentId = null;
+    }
+
+    function toggleAttendanceFromHistoryModal() {
+      if (activeHistoryStudentId) {
+        quickToggleStudentAttendance(activeHistoryStudentId);
+        setTimeout(() => {
+          openStudentHistoryModal(activeHistoryStudentId);
+        }, 150);
+      }
     }
 
     function quickToggleStudentAttendance(studentId) {

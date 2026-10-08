@@ -315,6 +315,42 @@
           const s = this.state.students[ev.studentId];
           if (!s) return;
 
+          const timeStr = new Date(ev.occurredAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+          if (!s.history) s.history = [];
+          if (!s.history.some(h => h.eventId === ev.eventId)) {
+            s.history.push({
+              eventId: ev.eventId,
+              action: ev.action,
+              timestamp: ev.occurredAt,
+              displayTime: timeStr,
+              reason: ev.reason || null,
+              expectedReturn: ev.expectedReturn || null,
+              method: ev.method || 'qr_scan',
+              performedBy: ev.marshalId || 'Marshal',
+              deviceId: ev.deviceId || 'DEVICE'
+            });
+          }
+
+          if (!this.state.auditLog) this.state.auditLog = [];
+          if (!this.state.auditLog.some(l => l.eventId === ev.eventId)) {
+            this.state.auditLog.push({
+              id: 'log_' + ev.eventId,
+              eventId: ev.eventId,
+              studentId: s.id,
+              studentName: s.name,
+              studentCode: s.studentCode,
+              team: s.team,
+              action: ev.action,
+              reason: ev.reason || null,
+              expectedReturn: ev.expectedReturn || null,
+              method: ev.method || 'qr_scan',
+              performedBy: ev.marshalId || 'Marshal',
+              timestamp: ev.occurredAt,
+              displayTime: timeStr
+            });
+          }
+
           if (ev.action === 'check_in') {
             s.status = 'INSIDE';
             s.currentAction = 'check_in';
@@ -327,7 +363,7 @@
             s.status = 'OUTSIDE';
             s.currentAction = 'check_out';
             s.lastCheckOut = ev.occurredAt;
-            s.exitReason = ev.exitReason || null;
+            s.exitReason = ev.reason || null;
             s.expectedReturn = ev.expectedReturn || null;
             changed = true;
           } else if (ev.action === 'manual_override') {
@@ -345,6 +381,10 @@
           }
         });
 
+        if (this.state.auditLog && this.state.auditLog.length > 0) {
+          this.state.auditLog.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        }
+
         if (changed) {
           this.save();
           this.notify();
@@ -352,6 +392,73 @@
       } catch (e) {
         console.warn('[AttendanceEngine] Failed to rehydrate from events:', e);
       }
+    }
+
+    async getStudentHistory(studentId) {
+      const student = this.getStudentById(studentId);
+      const allEvents = await this.db.getAllEvents();
+      const studentEvents = (allEvents || []).filter(e => e.studentId === studentId);
+
+      const map = new Map();
+      if (student && Array.isArray(student.history)) {
+        student.history.forEach(h => {
+          const key = h.eventId || (h.timestamp + '_' + h.action);
+          map.set(key, h);
+        });
+      }
+      studentEvents.forEach(ev => {
+        const timeStr = new Date(ev.occurredAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        map.set(ev.eventId, {
+          eventId: ev.eventId,
+          action: ev.action,
+          timestamp: ev.occurredAt,
+          displayTime: timeStr,
+          reason: ev.reason || null,
+          expectedReturn: ev.expectedReturn || null,
+          method: ev.method || 'qr_scan',
+          performedBy: ev.marshalId || 'Marshal',
+          deviceId: ev.deviceId || 'DEVICE'
+        });
+      });
+
+      const list = Array.from(map.values());
+      list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      return list;
+    }
+
+    async getFullAuditLog() {
+      const allEvents = await this.db.getAllEvents();
+      const map = new Map();
+      if (Array.isArray(this.state.auditLog)) {
+        this.state.auditLog.forEach(l => {
+          const key = l.eventId || l.id;
+          map.set(key, l);
+        });
+      }
+      allEvents.forEach(ev => {
+        const key = ev.eventId;
+        if (!map.has(key)) {
+          const timeStr = new Date(ev.occurredAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          map.set(key, {
+            id: 'log_' + ev.eventId,
+            eventId: ev.eventId,
+            studentId: ev.studentId,
+            studentName: ev.studentName,
+            studentCode: ev.studentCode,
+            team: ev.team,
+            action: ev.action,
+            reason: ev.reason || null,
+            expectedReturn: ev.expectedReturn || null,
+            method: ev.method || 'qr_scan',
+            performedBy: ev.marshalId || 'Marshal',
+            timestamp: ev.occurredAt,
+            displayTime: timeStr
+          });
+        }
+      });
+      const list = Array.from(map.values());
+      list.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      return list;
     }
 
     getApiUrl(endpoint) {
