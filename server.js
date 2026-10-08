@@ -9,8 +9,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3333;
-const EVENTS_FILE = path.join(__dirname, 'attendance_events.json');
-const STATE_FILE = path.join(__dirname, 'attendance_state.json');
+const IS_VERCEL = Boolean(process.env.VERCEL);
+const DATA_DIR = IS_VERCEL ? '/tmp' : __dirname;
+const EVENTS_FILE = path.join(DATA_DIR, 'attendance_events.json');
+const STATE_FILE = path.join(DATA_DIR, 'attendance_state.json');
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -125,13 +127,13 @@ function buildDefaultStudentsRoster() {
 }
 
 // In-memory working state
-let attendanceEvents = safeReadJson(EVENTS_FILE, []);
+let attendanceEvents = safeReadJson(EVENTS_FILE, safeReadJson(path.join(__dirname, 'attendance_events.json'), []));
 let attendanceEventsMap = new Map();
 attendanceEvents.forEach(ev => {
   if (ev && ev.eventId) attendanceEventsMap.set(ev.eventId, ev);
 });
 
-let attendanceState = safeReadJson(STATE_FILE, null);
+let attendanceState = safeReadJson(STATE_FILE, safeReadJson(path.join(__dirname, 'attendance_state.json'), null));
 if (!attendanceState || !attendanceState.students || Object.keys(attendanceState.students).length === 0) {
   attendanceState = {
     students: buildDefaultStudentsRoster(),
@@ -317,6 +319,12 @@ function sendJson(res, statusCode, data) {
 
 // Helper: read request body
 function parseJsonBody(req) {
+  if (req.body && typeof req.body === 'object') {
+    return Promise.resolve(req.body);
+  }
+  if (typeof req.body === 'string' && req.body.trim()) {
+    try { return Promise.resolve(JSON.parse(req.body)); } catch (e) {}
+  }
   return new Promise((resolve, reject) => {
     let body = '';
     req.on('data', chunk => {
@@ -339,7 +347,7 @@ function parseJsonBody(req) {
 // -------------------------------------------------------------------------
 // HTTP SERVER & ROUTING
 // -------------------------------------------------------------------------
-const server = http.createServer(async (req, res) => {
+export async function handleRequest(req, res) {
   // CORS Preflight
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
@@ -548,19 +556,25 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(200, { 'Content-Type': contentType });
     fs.createReadStream(safePath).pipe(res);
   });
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`MEODL Esports & Attendance Server active on port ${PORT}:`);
-  console.log(`  • Localhost:       http://localhost:${PORT}`);
-  try {
-    const interfaces = os.networkInterfaces();
-    for (const name of Object.keys(interfaces)) {
-      for (const iface of interfaces[name]) {
-        if (iface.family === 'IPv4' && !iface.internal) {
-          console.log(`  • Mobile (LAN):    http://${iface.address}:${PORT}/scanner.html`);
+const server = http.createServer(handleRequest);
+
+if (!IS_VERCEL) {
+  server.listen(PORT, () => {
+    console.log(`MEODL Esports & Attendance Server active on port ${PORT}:`);
+    console.log(`  • Localhost:       http://localhost:${PORT}`);
+    try {
+      const interfaces = os.networkInterfaces();
+      for (const name of Object.keys(interfaces)) {
+        for (const iface of interfaces[name]) {
+          if (iface.family === 'IPv4' && !iface.internal) {
+            console.log(`  • Mobile (LAN):    http://${iface.address}:${PORT}/scanner.html`);
+          }
         }
       }
-    }
-  } catch(e) {}
-});
+    } catch(e) {}
+  });
+}
+
+export default handleRequest;
