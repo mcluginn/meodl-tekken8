@@ -501,3 +501,252 @@ window.MEODL_DATA = {
     }
   }
 };
+
+const PROGRAM_FLOW_DATA = {
+  title: "MEODL Official Program Flow",
+  subtitle: "University of Perpetual Help System Dalta Calamba • Mechanical Engineering Society",
+  sheets: [
+    {
+      id: "cover",
+      title: "Program Flow Official Cover Pubmat",
+      image: "./assets/official/program_flow_cover.jpg",
+      description: "Official 3D Program Flow Pubmat with Mechanical Engineering Society seal"
+    },
+    {
+      id: "part1",
+      title: "Program Flow Part 1 (Morning Ceremonies & Basketball)",
+      image: "./assets/official/program_flow_part1.jpg",
+      description: "Registration, Ceremonies, Opening Remarks, Guest Speaker, Basketball Games 1-3"
+    },
+    {
+      id: "part2",
+      title: "Program Flow Part 2 (Swimming, Amazing Race, Lunch & Volleyball)",
+      image: "./assets/official/program_flow_part2.jpg",
+      description: "Swimming Heats (Freestyle, Backstroke, Breaststroke), Amazing Race, Lunch & Attendance Roll Call, Volleyball Games 1-2"
+    },
+    {
+      id: "part3",
+      title: "Program Flow Part 3 (Volleyball Game 3, Badminton, Awarding & After Party)",
+      image: "./assets/official/program_flow_part3.jpg",
+      description: "Volleyball Game 3, Badminton Singles & Doubles Games 1-3, Preparation for Awarding, Awarding, After Party"
+    }
+  ],
+  schedule: [
+    {
+      time: "7:30 AM – 8:00 AM",
+      activity: "Registration",
+      person: "MES Officers",
+      venue: "Main Venue Entrance / Registration Booth",
+      block: "morning",
+      badge: "CEREMONY",
+      icon: "📝"
+    },
+    {
+      time: "8:00 AM – 8:15 AM",
+      activity: "Opening Prayer • National Anthem • Perpetual Hymn",
+      person: "MES Officers",
+      venue: "Main Stage / Arena Court",
+      block: "morning",
+      badge: "CEREMONY",
+      icon: "🙏"
+    },
+    {
+      time: "8:15 AM – 8:30 AM",
+      activity: "Opening Remarks • Introduction of Guest Speaker",
+      person: "Engr. Mc Luginn Seña",
+      venue: "Main Stage",
+      block: "morning",
+      badge: "KEYNOTE",
+      icon: "🎙️"
+    },
+    {
+      time: "8:30 AM – 9:00 AM",
+      activity: "Inspirational Message",
+      person: "Guest Speaker",
+      venue: "Main Stage",
+      block: "morning",
+      badge: "KEYNOTE",
+      icon: "⭐"
+    },
+    {
+      time: "9:00 AM – 9:50 AM",
+      activity: "Basketball Game 1",
+      person: "Edmel John Opinio, John Lenrick Prado",
+      venue: "Basketball Court",
+      block: "morning",
+      sportId: "basketball",
+      badge: "SPORTS",
+      icon: "🏀"
+    },
+    {
+      time: "9:00 AM – 9:30 AM",
+      activity: "Swimming (Free Style)",
+      person: "Ephraim Rick Bengco",
+      venue: "Swimming Pool Area",
+      block: "morning",
+      sportId: "swimming",
+      badge: "AQUATICS",
+      icon: "🏊‍♂️"
+    },
+    {
+      time: "9:30 AM – 10:00 AM",
+      activity: "Swimming (Back Stroke)",
+      person: "Ephraim Rick Bengco",
+      venue: "Swimming Pool Area",
+      block: "morning",
+      sportId: "swimming",
+      badge: "AQUATICS",
+      icon: "🏊‍♂️"
+    },
+    {
+      time: "9:50 AM – 10:40 AM",
+      activity: "Basketball Game 2",
+      person: "Edmel John Opinio, John Lenrick Prado",
+      venue: "Basketball Court",
+      block: "morning",
+      sportId: "basketball",
+      badge: "SPORTS",
+      icon: "🏀"
+    },
+    {
+      time: "10:00 AM – 10:30 AM",
+      activity: "Swimming (Breaststroke)",
+      person: "Ephraim Rick Bengco",
+      venue: "Swimming Pool Area",
+      block: "morning",
+      sportId: "swimming",
+      badge: "AQUATICS",
+      icon: "🏊‍♂️"
+    },
+    {
+      time: "10:40 AM – 11:30 AM",
+      activity: "Basketball Game 3",
+      person: "Edmel John Opinio, John Lenrick Prado",
+      venue: "Basketball Court",
+      block: "morning",
+      sportId: "basketball",
+      badge: "SPORTS",
+      icon: "🏀"
+    },
+    {
+      time: "9:00 AM – 12:00 NN",
+      activity: "Amazing Race",
+      person: "MES Officers",
+      venue: "4 Campus Stations + Final Escape Room (ME LAB Rm120)",
+      block: "morning",
+      sportId: "amazingRace",
+      badge: "CHALLENGE",
+      icon: "🏃‍♂️"
+    },
+    {
+      time: "12:00 NN – 1:00 PM",
+      activity: "Lunch Break",
+      person: "MES Officers",
+      venue: "Designated Dining / Pavilion Area",
+      block: "midday",
+      badge: "INTERMISSION",
+      icon: "🍱"
+    },
+    {
+      time: "12:45 PM – 1:00 PM",
+      activity: "Afternoon Attendance Roll Call",
+      person: "MES Officers",
+      venue: "Gate Marshal Scanner Stations & Main Pavilion",
+      block: "midday",
+      badge: "AUDIT & ROLL CALL",
+      icon: "📲"
+    },
+    {
+      time: "1:00 PM – 2:00 PM",
+      activity: "Volleyball Game 1",
+      person: "Vanna Jenille Alvarez, Gabrielle Lance Estrellado, Gabbielle Nero, Rowen Victor Pulgar",
+      venue: "Volleyball Court",
+      block: "afternoon",
+      sportId: "volleyball",
+      badge: "SPORTS",
+      icon: "🏐"
+    },
+    {
+      time: "1:00 PM – 1:30 PM",
+      activity: "Badminton (Singles and Doubles) Game 1",
+      person: "Ephraim Rick Bengco, Jaruzz Lancelot Dadis, Ryu Emanuel Argañosa, Edmel John Opinio",
+      venue: "Badminton Courts",
+      block: "afternoon",
+      sportId: "badmintonSingles",
+      badge: "SPORTS",
+      icon: "🏸"
+    },
+    {
+      time: "1:30 PM – 2:00 PM",
+      activity: "Badminton (Singles and Doubles) Game 2",
+      person: "Ephraim Rick Bengco, Jaruzz Lancelot Dadis, Ryu Emanuel Argañosa, Edmel John Opinio",
+      venue: "Badminton Courts",
+      block: "afternoon",
+      sportId: "badmintonSingles",
+      badge: "SPORTS",
+      icon: "🏸"
+    },
+    {
+      time: "2:00 PM – 3:00 PM",
+      activity: "Volleyball Game 2",
+      person: "Vanna Jenille Alvarez, Gabrielle Lance Estrellado, Gabbielle Nero, Rowen Victor Pulgar",
+      venue: "Volleyball Court",
+      block: "afternoon",
+      sportId: "volleyball",
+      badge: "SPORTS",
+      icon: "🏐"
+    },
+    {
+      time: "2:00 PM – 2:30 PM",
+      activity: "Badminton (Singles and Doubles) Game 3",
+      person: "Ephraim Rick Bengco, Jaruzz Lancelot Dadis, Ryu Emanuel Argañosa, Edmel John Opinio",
+      venue: "Badminton Courts",
+      block: "afternoon",
+      sportId: "badmintonSingles",
+      badge: "SPORTS",
+      icon: "🏸"
+    },
+    {
+      time: "3:00 PM – 4:00 PM",
+      activity: "Volleyball Game 3",
+      person: "Vanna Jenille Alvarez, Gabrielle Lance Estrellado, Gabbielle Nero, Rowen Victor Pulgar",
+      venue: "Volleyball Court",
+      block: "afternoon",
+      sportId: "volleyball",
+      badge: "SPORTS",
+      icon: "🏐"
+    },
+    {
+      time: "4:00 PM – 5:00 PM",
+      activity: "Preparation for Awarding",
+      person: "MES Officers",
+      venue: "Main Stage / Tally Center",
+      block: "evening",
+      badge: "CEREMONY",
+      icon: "🎖️"
+    },
+    {
+      time: "5:00 PM – 6:00 PM",
+      activity: "Awarding",
+      person: "MES Officers",
+      venue: "Main Stage",
+      block: "evening",
+      badge: "AWARDING",
+      icon: "🏆"
+    },
+    {
+      time: "6:00 PM – 9:00 PM",
+      activity: "After Party",
+      person: "MES Officers",
+      venue: "Main Grounds & Fellowship Hall",
+      block: "evening",
+      badge: "FELLOWSHIP",
+      icon: "🎉"
+    }
+  ]
+};
+
+window.PROGRAM_FLOW_DATA = PROGRAM_FLOW_DATA;
+window.SPORT_BACKGROUNDS = window.SPORT_BACKGROUNDS || {};
+window.SPORT_BACKGROUNDS.programFlow = './assets/official/program_flow_cover.jpg';
+

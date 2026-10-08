@@ -335,6 +335,12 @@
           <span>🪪</span>
           <span class="hidden md:inline">Passes</span>
         </a>
+        <!-- Program Flow Quick Button -->
+        <button onclick="navigateTo('programFlow')" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono font-medium text-amber-300 hover:text-white transition-all shadow-sm" title="View Official Event Schedule & Program Flow">
+          <span>⏱️</span>
+          <span class="hidden sm:inline">Program Flow</span>
+        </button>
+
         <button onclick="openGuidelinesModal()" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-medium text-slate-200 hover:text-white transition-all shadow-sm" title="View Official Event Rules & Guidelines">
           <svg class="w-3.5 h-3.5 text-[#f7b943]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
           <span class="hidden sm:inline">Rules</span>
@@ -397,6 +403,9 @@
       <div class="flex items-center p-1 rounded-xl bg-[#081d38]/90 border border-[#2c4f75]/70 text-xs font-medium space-x-1 shrink-0">
         <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="nav-tab active-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-[#f7b943] bg-[#102d52] border border-[#f7b943]/40 shadow-sm font-semibold">
           <span>🏆 Dashboard & Groupings</span>
+        </button>
+        <button onclick="navigateTo('programFlow')" id="nav-programFlow" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-[#0a2344]">
+          <span>⏱️ Program Flow</span>
         </button>
         <button onclick="navigateTo('attendance')" id="nav-attendance" class="nav-tab px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 hover:bg-[#0a2344]">
           <span>📋 Venue Presence</span>
@@ -470,6 +479,9 @@
                 <span>🎓</span>
                 <span>ISSUE OFFICIAL CERTIFICATES</span>
               </button>
+              <button onclick="navigateTo('programFlow')" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#102d52] hover:bg-[#163b6b] border border-[#f7b943]/60 text-xs font-mono font-bold text-[#f7b943] transition-all hover:scale-105 shadow-sm">
+                <span>⏱️</span> Official Program Flow
+              </button>
               <a href="student_qr.html" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono text-slate-200 hover:text-white transition-all">
                 <span>🪪</span> Passes Portal
               </a>
@@ -512,6 +524,37 @@
         <!-- Background Decorative Mechanical Gear Assembly (Quiz Bee Architecture) -->
         <div class="absolute -bottom-10 -right-10 opacity-20 pointer-events-none scale-125 md:scale-150">
           <div data-meodl-gear-assembly data-scale="large" data-state="idle"></div>
+        </div>
+      </div>
+
+      <!-- PROGRAM FLOW FEATURED BANNER WIDGET -->
+      <div class="bg-gradient-to-r from-[#081d38] via-[#0a2344] to-[#081d38] rounded-2xl border border-amber-500/40 p-5 shadow-card relative overflow-hidden group">
+        <div class="absolute -right-12 -top-12 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative z-10">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl overflow-hidden border border-[#f7b943]/60 shadow-lg shrink-0 cursor-pointer hover:scale-105 transition-transform" onclick="openImageModal('./assets/official/program_flow_cover.jpg', 'MEODL Official Program Flow Cover Pubmat')" title="Click to view Official Program Flow Sheet">
+              <img src="./assets/official/program_flow_cover.jpg" alt="Program Flow Cover" class="w-full h-full object-cover" onerror="assetFallback(this, './assets/mes_logo.png')" />
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2 py-0.5 rounded text-[9px] font-mono bg-amber-500/20 text-[#f7b943] border border-amber-500/40 font-bold uppercase tracking-wider">OFFICIAL SCHEDULE</span>
+                <h3 class="text-sm sm:text-base font-black text-white font-mono tracking-wide">MEODL 2026 Event Program Flow</h3>
+              </div>
+              <p class="text-xs text-slate-300 font-mono mt-0.5">
+                Full 4-Part Official Pubmats & Chronological Timeline (7:30 AM – 9:00 PM) • Basketball, Swimming, Amazing Race, Volleyball, Badminton & Ceremonies
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <button onclick="navigateTo('programFlow')" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#f7b943] to-[#e5a832] hover:from-[#ffd477] hover:to-[#f7b943] text-[#06162f] font-mono font-bold text-xs shadow-md shadow-[#f7b943]/20 transition-all hover:scale-105">
+              <span>⏱️</span>
+              <span>Open Program Flow</span>
+              <span>➔</span>
+            </button>
+            <button onclick="openImageModal('./assets/official/program_flow_cover.jpg', 'Program Flow Official Cover Pubmat')" class="p-2 rounded-xl bg-[#06162f] hover:bg-[#102d52] border border-[#2c4f75] text-slate-300 hover:text-white transition-all" title="View Full Cover Sheet">
+              <span>🔍</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -678,6 +721,113 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="events-grid-cards">
           <!-- Rendered dynamically for all 13 events -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW: OFFICIAL PROGRAM FLOW & SCHEDULE (#view-program-flow) -->
+    <div id="view-program-flow" class="hidden flex-1 p-4 lg:p-8 max-w-7xl mx-auto w-full z-10 space-y-6">
+      
+      <!-- Top Title Strip & Live Clock -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0a2344] via-[#081d38] to-[#06162f] border border-amber-500/50 p-6 md:p-8 shadow-2xl">
+        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-amber-500/20 text-[#f7b943] border border-amber-500/50 font-bold uppercase tracking-wider">
+                OFFICIAL PUBMAT & ITINERARY
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-bold">
+                MES • UPHSD CALAMBA
+              </span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#ffd477] via-[#f7b943] to-sky-300 font-mono tracking-wide">
+              MEODL 2026 PROGRAM FLOW
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-300 font-mono max-w-2xl leading-relaxed">
+              Complete official event schedule from morning assembly to the evening after party. Tap any pubmat sheet to inspect at full resolution.
+            </p>
+          </div>
+
+          <!-- Live Event Clock Widget & Quick Nav -->
+          <div class="flex flex-col sm:flex-row md:flex-col lg:flex-row items-stretch sm:items-center gap-3 shrink-0">
+            <div class="bg-[#06162f]/90 border border-[#2c4f75] rounded-2xl p-3.5 font-mono text-center min-w-[200px] shadow-card">
+              <div class="text-[10px] text-slate-400 uppercase tracking-wider">Philippine Standard Time</div>
+              <div id="pf-live-clock-display" class="text-xl font-black text-[#f7b943] tracking-widest my-0.5">--:--:-- --</div>
+              <div class="text-[10px] text-emerald-400 flex items-center justify-center gap-1 font-bold">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>OFFICIAL TIMELINE</span>
+              </div>
+            </div>
+            <div class="flex flex-row sm:flex-col gap-2">
+              <button onclick="window.print()" class="flex-1 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono font-semibold text-slate-200 hover:text-white transition-all shadow-sm">
+                <span>🖨️</span> Print Schedule
+              </button>
+              <button onclick="navigateTo('attendance')" class="flex-1 flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/60 text-xs font-mono font-bold text-[#f7b943] transition-all shadow-sm">
+                <span>📋</span> Gate Roll Call
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 1: 4 OFFICIAL PUBMAT SHEETS GALLERY -->
+      <div>
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-amber-400 shadow-tactical"></span>
+            <h2 class="text-base sm:text-lg font-bold text-white font-mono uppercase tracking-wide">
+              Official Pubmat Graphic Sheets
+            </h2>
+            <span class="text-xs text-slate-400 font-mono">(4 Official Posters • Click to Zoom)</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="pf-sheets-gallery">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- SECTION 2: INTERACTIVE TIMELINE & FILTERABLE SCHEDULE TABLE -->
+      <div class="bg-[#0a2344]/90 rounded-2xl border border-[#2c4f75] p-5 shadow-card space-y-4">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 pb-3 border-b border-[#1e3a5f]">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">⏱️</span>
+            <div>
+              <h3 class="text-base font-bold text-white font-mono tracking-wide">Chronological Itinerary & Schedule</h3>
+              <p class="text-xs text-slate-400 font-mono">22 Activities • Persons-in-charge • Venues • Instant Bracket Links</p>
+            </div>
+          </div>
+
+          <!-- Search Input -->
+          <div class="w-full md:w-72 relative">
+            <input type="text" id="pf-search-input" oninput="handleProgramFlowSearch(event)" placeholder="Search activity, person, venue..." class="w-full bg-[#06162f] border border-[#2c4f75] rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 font-mono focus:outline-none focus:border-[#f7b943]" />
+            <span class="absolute right-3 top-2 text-slate-500 text-xs pointer-events-none">🔍</span>
+          </div>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-mono" id="pf-filter-pills">
+          <button onclick="filterProgramFlow('all')" data-filter="all" class="pf-filter-btn px-3 py-1.5 rounded-lg bg-[#102d52] text-[#f7b943] border border-amber-500/50 font-bold shadow-sm whitespace-nowrap">
+            All Activities (22)
+          </button>
+          <button onclick="filterProgramFlow('morning')" data-filter="morning" class="pf-filter-btn px-3 py-1.5 rounded-lg bg-[#06162f] text-slate-400 hover:text-slate-200 border border-[#2c4f75] whitespace-nowrap">
+            🌅 Morning (7:30 AM – 12:00 NN)
+          </button>
+          <button onclick="filterProgramFlow('midday')" data-filter="midday" class="pf-filter-btn px-3 py-1.5 rounded-lg bg-[#06162f] text-slate-400 hover:text-slate-200 border border-[#2c4f75] whitespace-nowrap">
+            🍱 Midday & Roll Call (12:00 NN – 1:00 PM)
+          </button>
+          <button onclick="filterProgramFlow('afternoon')" data-filter="afternoon" class="pf-filter-btn px-3 py-1.5 rounded-lg bg-[#06162f] text-slate-400 hover:text-slate-200 border border-[#2c4f75] whitespace-nowrap">
+            ⚡ Afternoon Games (1:00 PM – 4:00 PM)
+          </button>
+          <button onclick="filterProgramFlow('evening')" data-filter="evening" class="pf-filter-btn px-3 py-1.5 rounded-lg bg-[#06162f] text-slate-400 hover:text-slate-200 border border-[#2c4f75] whitespace-nowrap">
+            🏆 Evening & Socials (4:00 PM – 9:00 PM)
+          </button>
+        </div>
+
+        <!-- Schedule Items Container -->
+        <div class="space-y-2.5" id="pf-schedule-container">
+          <!-- Rendered dynamically -->
         </div>
       </div>
 
@@ -2558,6 +2708,7 @@
       // Hide all top-level application views
       [
         'view-dashboard',
+        'view-program-flow',
         'view-attendance',
         'view-universal-sport',
         'view-swimming',
@@ -2575,6 +2726,7 @@
         const targetBg = window.SPORT_BACKGROUNDS[viewId] 
           || (viewId === 'dashboard' ? window.SPORT_BACKGROUNDS.dashboard : null)
           || (viewId === 'attendance' ? window.SPORT_BACKGROUNDS.attendance : null)
+          || (viewId === 'programFlow' ? window.SPORT_BACKGROUNDS.programFlow : null)
           || './assets/official/meodl_banner_league.jpg';
         ambientBgEl.style.backgroundImage = `url('${targetBg}')`;
       }
@@ -2582,7 +2734,12 @@
       const badge = document.getElementById('active-event-badge');
       const defs = window.MEODL_ENGINE ? window.MEODL_ENGINE.EVENT_DEFINITIONS : {};
 
-      if (viewId === 'attendance') {
+      if (viewId === 'programFlow') {
+        appState.activeSport = null;
+        document.getElementById('view-program-flow').classList.remove('hidden');
+        if (badge) badge.textContent = 'PROGRAM FLOW';
+        renderProgramFlowView();
+      } else if (viewId === 'attendance') {
         appState.activeSport = null;
         document.getElementById('view-attendance').classList.remove('hidden');
         if (badge) badge.textContent = 'VENUE PRESENCE';
@@ -2640,6 +2797,163 @@
           if (typeof drawUniConnectorsForCurrentSport === 'function') drawUniConnectorsForCurrentSport();
         }, 250);
       }
+    }
+
+    // -------------------------------------------------------------------------
+    // PROGRAM FLOW MODULE
+    // -------------------------------------------------------------------------
+    let currentPfFilter = 'all';
+    let currentPfSearch = '';
+
+    function renderProgramFlowView() {
+      renderProgramFlowSheets();
+      renderProgramFlowSchedule();
+      updateProgramFlowLiveClock();
+    }
+
+    function renderProgramFlowSheets() {
+      const container = document.getElementById('pf-sheets-gallery');
+      if (!container) return;
+      const data = window.PROGRAM_FLOW_DATA;
+      if (!data || !data.sheets) return;
+
+      container.innerHTML = data.sheets.map((sheet, idx) => `
+        <div class="bg-[#081d38] border border-[#2c4f75] hover:border-amber-500/60 rounded-2xl overflow-hidden shadow-card transition-all group flex flex-col">
+          <div class="relative h-64 bg-[#06162f] overflow-hidden cursor-pointer" onclick="openImageModal('${sheet.image}', '${sheet.title.replace(/'/g, "\\'")}')">
+            <img src="${sheet.image}" alt="${sheet.title}" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300" onerror="assetFallback(this, './assets/mes_logo.png')" />
+            <div class="absolute inset-0 bg-gradient-to-t from-[#06162f] via-transparent to-transparent opacity-60"></div>
+            <div class="absolute top-2.5 right-2.5 px-2 py-1 rounded-lg bg-[#06162f]/80 backdrop-blur-md border border-[#2c4f75] text-[10px] font-mono font-bold text-amber-300 flex items-center gap-1 shadow">
+              <span>🔍</span> Tap to Zoom
+            </div>
+            <div class="absolute bottom-2 left-2.5 right-2.5">
+              <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider bg-amber-500/20 text-[#f7b943] border border-amber-500/40">
+                Sheet ${idx + 1} of ${data.sheets.length}
+              </span>
+            </div>
+          </div>
+          <div class="p-4 flex-1 flex flex-col justify-between space-y-2 bg-[#081d38]">
+            <div>
+              <h4 class="text-xs font-bold text-white font-mono group-hover:text-[#f7b943] transition-colors">${sheet.title}</h4>
+              <p class="text-[11px] text-slate-400 font-mono mt-1 leading-snug">${sheet.description}</p>
+            </div>
+            <div class="pt-2 border-t border-[#1e3a5f]/60 flex items-center justify-between gap-2">
+              <button onclick="openImageModal('${sheet.image}', '${sheet.title.replace(/'/g, "\\'")}')" class="w-full py-1.5 px-3 rounded-lg bg-[#102d52] hover:bg-[#163b6b] border border-[#2c4f75] hover:border-amber-500/40 text-slate-200 hover:text-white text-[11px] font-mono font-semibold flex items-center justify-center gap-1 transition-all">
+                <span>🔍</span> Full View
+              </button>
+              <a href="${sheet.image}" download="${sheet.id}.jpg" class="p-1.5 rounded-lg bg-[#06162f] hover:bg-[#102d52] border border-[#2c4f75] text-slate-400 hover:text-white text-xs transition-all" title="Download Sheet">
+                ⬇️
+              </a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderProgramFlowSchedule() {
+      const container = document.getElementById('pf-schedule-container');
+      if (!container) return;
+      const data = window.PROGRAM_FLOW_DATA;
+      if (!data || !data.schedule) return;
+
+      const q = (currentPfSearch || '').toLowerCase().trim();
+      const filtered = data.schedule.filter(item => {
+        if (currentPfFilter !== 'all' && item.block !== currentPfFilter) return false;
+        if (q) {
+          const matchAct = item.activity.toLowerCase().includes(q);
+          const matchPer = (item.person || '').toLowerCase().includes(q);
+          const matchVen = (item.venue || '').toLowerCase().includes(q);
+          const matchBdg = (item.badge || '').toLowerCase().includes(q);
+          const matchTime = (item.time || '').toLowerCase().includes(q);
+          if (!matchAct && !matchPer && !matchVen && !matchBdg && !matchTime) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-[#06162f] rounded-xl border border-[#2c4f75] text-slate-400 font-mono text-xs">
+            No program flow activities match your criteria.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map((item) => {
+        let badgeColor = 'bg-slate-800 text-slate-300 border-slate-600';
+        if (item.badge === 'SPORTS') badgeColor = 'bg-blue-950/80 text-blue-300 border-blue-500/40';
+        else if (item.badge === 'AQUATICS') badgeColor = 'bg-cyan-950/80 text-cyan-300 border-cyan-500/40';
+        else if (item.badge === 'KEYNOTE') badgeColor = 'bg-amber-950/80 text-[#f7b943] border-amber-500/40';
+        else if (item.badge === 'CHALLENGE') badgeColor = 'bg-purple-950/80 text-purple-300 border-purple-500/40';
+        else if (item.badge === 'INTERMISSION' || (item.badge && item.badge.includes('ROLL CALL'))) badgeColor = 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40';
+        else if (item.badge === 'AWARDING') badgeColor = 'bg-yellow-950/80 text-yellow-300 border-yellow-500/40';
+        else if (item.badge === 'FELLOWSHIP') badgeColor = 'bg-pink-950/80 text-pink-300 border-pink-500/40';
+
+        const bracketBtn = item.sportId ? `
+          <button onclick="navigateTo('${item.sportId}')" class="shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#102d52] hover:bg-[#184277] text-[#f7b943] hover:text-white border border-[#f7b943]/40 text-[10px] font-mono font-bold transition-all shadow-sm hover:scale-105">
+            <span>View Bracket</span> <span>➔</span>
+          </button>
+        ` : '';
+
+        return `
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 p-3.5 rounded-xl bg-[#081d38]/90 hover:bg-[#0c274c] border border-[#2c4f75]/80 hover:border-amber-500/40 transition-all">
+            <div class="flex items-start md:items-center gap-3 w-full md:w-auto">
+              <!-- Time Block Pill -->
+              <div class="px-3 py-1.5 rounded-xl bg-[#06162f] border border-[#2c4f75] font-mono text-center shrink-0 min-w-[135px]">
+                <div class="text-[11px] font-extrabold text-[#f7b943] flex items-center justify-center gap-1">
+                  <span>${item.icon || '⏱️'}</span>
+                  <span>${item.time}</span>
+                </div>
+              </div>
+
+              <!-- Activity Details -->
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider border ${badgeColor}">
+                    ${item.badge}
+                  </span>
+                  <h4 class="text-xs sm:text-sm font-bold text-white font-mono">${item.activity}</h4>
+                </div>
+                <div class="flex items-center gap-2 text-[11px] text-slate-300 font-mono flex-wrap">
+                  <span class="text-slate-400">👤 In-charge:</span>
+                  <span class="text-amber-300 font-semibold">${item.person}</span>
+                  <span class="text-slate-600">•</span>
+                  <span class="text-slate-400">📍 Venue:</span>
+                  <span class="text-slate-200">${item.venue}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex items-center gap-2 self-end md:self-center shrink-0">
+              ${bracketBtn}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterProgramFlow(block) {
+      currentPfFilter = block;
+      document.querySelectorAll('.pf-filter-btn').forEach(btn => {
+        if (btn.dataset.filter === block) {
+          btn.className = 'pf-filter-btn px-3 py-1.5 rounded-lg bg-[#102d52] text-[#f7b943] border border-amber-500/50 font-bold shadow-sm whitespace-nowrap';
+        } else {
+          btn.className = 'pf-filter-btn px-3 py-1.5 rounded-lg bg-[#06162f] text-slate-400 hover:text-slate-200 border border-[#2c4f75] whitespace-nowrap';
+        }
+      });
+      renderProgramFlowSchedule();
+    }
+
+    function handleProgramFlowSearch(e) {
+      currentPfSearch = (e && e.target ? e.target.value : '');
+      renderProgramFlowSchedule();
+    }
+
+    function updateProgramFlowLiveClock() {
+      const el = document.getElementById('pf-live-clock-display');
+      if (!el) return;
+      const now = new Date();
+      el.textContent = now.toLocaleTimeString('en-US', { hour12: true });
     }
 
     // -------------------------------------------------------------------------
@@ -4301,7 +4615,35 @@
       if (!modal || !container) return;
 
       const guidelines = window.MEODL_DATA ? window.MEODL_DATA.guidelines : {};
-      container.innerHTML = Object.entries(guidelines).map(([key, g]) => {
+      const programFlowCard = (window.PROGRAM_FLOW_DATA && window.PROGRAM_FLOW_DATA.sheets) ? `
+        <div id="rule-section-programFlow" class="bg-gradient-to-r from-[#081d38] via-[#0a2344] to-[#081d38] rounded-2xl border border-amber-500/60 p-5 space-y-4 mb-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#1e3a5f]">
+            <div class="flex items-center gap-3">
+              <span class="text-2xl">⏱️</span>
+              <div>
+                <h4 class="font-mono font-bold text-base text-[#f7b943] uppercase">MEODL 2026 Official Program Flow</h4>
+                <span class="text-[11px] text-slate-300 font-mono">Complete Schedule Itinerary & 4 Official Pubmat Sheets</span>
+              </div>
+            </div>
+            <button onclick="closeGuidelinesModal(); navigateTo('programFlow');" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#f7b943] to-[#e5a832] text-[#06162f] font-mono font-extrabold text-xs shadow-md transition-all hover:scale-105 flex items-center gap-1.5">
+              <span>Open Program Flow Tab</span> <span>➔</span>
+            </button>
+          </div>
+          <div>
+            <span class="text-[10px] font-mono font-bold text-amber-300 block uppercase mb-2">4 Official Program Flow Sheets (Click to Zoom):</span>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              ${window.PROGRAM_FLOW_DATA.sheets.map(s => `
+                <div class="group relative rounded-xl overflow-hidden border border-[#2c4f75] hover:border-[#f7b943] bg-[#06162f] cursor-pointer transition-all shadow-sm" onclick="openImageModal('${s.image}', '${s.title.replace(/'/g, "\\'")}')">
+                  <img src="${s.image}" alt="${s.title}" class="w-full h-32 object-cover object-top group-hover:scale-105 transition-transform duration-300" onerror="assetFallback(this, './assets/mes_logo.png')" />
+                  <div class="p-1.5 bg-[#081d38] text-[10px] font-mono text-slate-200 truncate group-hover:text-[#f7b943]">${s.title}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      ` : '';
+
+      container.innerHTML = programFlowCard + Object.entries(guidelines).map(([key, g]) => {
         const posters = (window.SPORT_RULES_POSTERS && window.SPORT_RULES_POSTERS[key]) || [];
         const bracketPoster = (window.SPORT_BRACKET_POSTERS && window.SPORT_BRACKET_POSTERS[key]) || null;
         const trophyImg = (window.SPORT_TROPHIES && window.SPORT_TROPHIES[key]) || null;
