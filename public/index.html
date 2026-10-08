@@ -308,11 +308,7 @@
           <span class="hidden sm:inline">Certificates</span>
         </button>
 
-        <!-- Scanner & Passes -->
-        <a href="scanner.html" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono font-bold text-cyan-300 transition-all shadow-sm" title="Launch Mobile Gate Scanner">
-          <span>📷</span>
-          <span class="hidden md:inline">Scanner</span>
-        </a>
+        <!-- Passes Portal Link -->
         <a href="student_qr.html" target="_blank" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono font-medium text-slate-200 hover:text-white transition-all shadow-sm" title="Open Student Passes Portal">
           <span>🪪</span>
           <span class="hidden md:inline">Passes</span>
@@ -453,9 +449,6 @@
                 <span>🎓</span>
                 <span>ISSUE OFFICIAL CERTIFICATES</span>
               </button>
-              <a href="scanner.html" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono font-bold text-cyan-300 transition-all">
-                <span>📷</span> Gate Scanner
-              </a>
               <a href="student_qr.html" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0a2344] hover:bg-[#102d52] border border-[#2c4f75] text-xs font-mono text-slate-200 hover:text-white transition-all">
                 <span>🪪</span> Passes Portal
               </a>
@@ -518,9 +511,6 @@
             <button onclick="openCertificateModal()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-[#f7b943] font-bold border border-[#f7b943]/60 shadow-sm transition-all hover:scale-[1.02]">
               <span>🎓</span> Certificates
             </button>
-            <a href="scanner.html" target="_blank" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-lg shadow-cyan-950 transition-all hover:scale-[1.02]">
-              <span>📷</span> Launch Scanner
-            </a>
             <button onclick="navigateTo('attendance')" class="px-3 py-1.5 rounded-xl bg-[#081d38] hover:bg-[#102d52] text-cyan-300 font-semibold border border-[#2c4f75] transition-colors">
               Manage Attendance ➔
             </button>
@@ -713,9 +703,6 @@
           <button onclick="openCertificateModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-[#f7b943] font-bold border border-[#f7b943]/60 shadow-sm transition-all hover:scale-[1.02]">
             <span>🎓</span> Certificates
           </button>
-          <a href="scanner.html" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-lg shadow-cyan-950 transition-all hover:scale-[1.02]">
-            <span>📷</span> Mobile Scanner
-          </a>
           <a href="print_cards.html" target="_blank" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#081d38] hover:bg-[#102d52] text-slate-200 font-semibold border border-[#2c4f75] transition-colors">
             <span>🖨️</span> Print Badges
           </a>
@@ -1821,6 +1808,16 @@
               <input type="text" id="settings-seed-4" class="w-full bg-[#06162f] border border-[#2c4f75] rounded px-2.5 py-1 text-xs text-slate-200 font-mono">
             </div>
           </div>
+        </div>
+
+        <div class="pt-3 border-t border-[#2c4f75] flex items-center justify-between">
+          <div>
+            <span class="text-xs font-mono font-bold text-slate-300 block">Gate Marshal Scanner</span>
+            <span class="text-[10px] text-slate-400 block font-mono">Restricted access for venue marshals & staff</span>
+          </div>
+          <a href="scanner.html" target="_blank" class="px-3 py-1.5 rounded-lg bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-700/60 text-xs font-mono font-bold text-cyan-300 hover:text-white transition-colors">
+            📷 Open Scanner ↗
+          </a>
         </div>
       </div>
 

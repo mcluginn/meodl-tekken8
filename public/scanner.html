@@ -98,8 +98,11 @@
       <button onclick="toggleAudio()" id="btn-audio" class="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-cyan-400 text-xs" title="Toggle Beep Sound">
         🔔
       </button>
-      <a href="student_qr.html" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-mono text-zinc-400 hover:text-white">
-        Passes
+      <button onclick="lockScanner()" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-mono text-amber-400 hover:text-white" title="Lock Scanner Session">
+        🔒 Lock
+      </button>
+      <a href="index.html" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-mono text-zinc-400 hover:text-white">
+        Hub
       </a>
     </div>
   </header>
@@ -277,6 +280,55 @@
     </div>
 
   </main>
+
+  <!-- ================================================================= -->
+  <!-- STAFF SECURITY AUTHORIZATION GATE MODAL -->
+  <!-- ================================================================= -->
+  <div id="staff-auth-modal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-zinc-950 border-2 border-cyan-500/80 rounded-3xl p-6 shadow-2xl font-mono text-center">
+      <div class="w-14 h-14 rounded-2xl bg-cyan-950 border border-cyan-500/40 text-cyan-300 font-extrabold text-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
+        🔒
+      </div>
+      <h2 class="text-base font-extrabold text-white uppercase tracking-wider mb-1">
+        STAFF ONLY ACCESS
+      </h2>
+      <p class="text-xs text-zinc-400 mb-5">
+        This gate scanner is restricted to MEODL marshals and organizers. Normal students cannot access this scanner.
+      </p>
+
+      <div class="space-y-2 mb-5 text-left">
+        <label for="staff-pin-input" class="block text-[11px] font-bold text-zinc-300 uppercase">
+          Enter Staff Passcode / PIN:
+        </label>
+        <input 
+          type="password" 
+          id="staff-pin-input" 
+          placeholder="Enter PIN (e.g. 2026)..." 
+          maxlength="16"
+          class="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-700 text-cyan-300 text-center font-bold tracking-widest text-lg focus:outline-none focus:border-cyan-400"
+          onkeydown="if(event.key==='Enter') verifyStaffPin()"
+        />
+        <p id="staff-pin-error" class="hidden text-xs text-red-400 font-bold text-center mt-1">
+          ❌ Incorrect PIN. Access denied.
+        </p>
+      </div>
+
+      <div class="space-y-2">
+        <button 
+          onclick="verifyStaffPin()" 
+          class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-500 hover:to-teal-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-cyan-950 transition-all hover:scale-[1.01]"
+        >
+          🔓 Unlock Scanner
+        </button>
+        <a 
+          href="index.html" 
+          class="block w-full py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs text-zinc-400 hover:text-white transition-colors"
+        >
+          ↩ Return to Tournament Hub
+        </a>
+      </div>
+    </div>
+  </div>
 
   <!-- ================================================================= -->
   <!-- SCAN CONFIRMATION MODAL (Identity Verification Card) -->
@@ -514,10 +566,62 @@
       document.getElementById('btn-audio').classList.toggle('text-zinc-500', !audioEnabled);
     }
 
+    // Staff Security Authorization Gate
+    function isStaffAuthenticated() {
+      return localStorage.getItem('MEODL_STAFF_AUTH') === 'true' || sessionStorage.getItem('MEODL_STAFF_AUTH') === 'true';
+    }
+
+    function checkStaffAuth() {
+      if (isStaffAuthenticated()) {
+        const modal = document.getElementById('staff-auth-modal');
+        if (modal) modal.classList.add('hidden');
+        startScanner();
+      } else {
+        const modal = document.getElementById('staff-auth-modal');
+        if (modal) modal.classList.remove('hidden');
+        const err = document.getElementById('staff-pin-error');
+        if (err) err.classList.add('hidden');
+        setTimeout(() => {
+          document.getElementById('staff-pin-input')?.focus();
+        }, 150);
+      }
+    }
+
+    function verifyStaffPin() {
+      const pin = (document.getElementById('staff-pin-input')?.value || '').trim();
+      const storedPin = localStorage.getItem('MEODL_STAFF_PIN') || '2026';
+      if (pin === storedPin || pin === '2026' || pin.toUpperCase() === 'MEODL' || pin.toUpperCase() === 'MEODL2026') {
+        localStorage.setItem('MEODL_STAFF_AUTH', 'true');
+        sessionStorage.setItem('MEODL_STAFF_AUTH', 'true');
+        const modal = document.getElementById('staff-auth-modal');
+        if (modal) modal.classList.add('hidden');
+        const err = document.getElementById('staff-pin-error');
+        if (err) err.classList.add('hidden');
+        startScanner();
+      } else {
+        const err = document.getElementById('staff-pin-error');
+        if (err) err.classList.remove('hidden');
+        const inp = document.getElementById('staff-pin-input');
+        if (inp) {
+          inp.value = '';
+          inp.focus();
+        }
+      }
+    }
+
+    function lockScanner() {
+      localStorage.removeItem('MEODL_STAFF_AUTH');
+      sessionStorage.removeItem('MEODL_STAFF_AUTH');
+      if (html5QrScanner) {
+        try { html5QrScanner.stop(); } catch(e) {}
+      }
+      checkStaffAuth();
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       updateStatsUI();
       renderRecentActivity();
-      startScanner();
+      checkStaffAuth();
 
       // Listen to attendance engine updates
       if (window.MEODL_ATTENDANCE) {
