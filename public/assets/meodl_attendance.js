@@ -59,6 +59,45 @@
     return 'evt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
   }
 
+  function formatManilaTime(dateOrIso, options = {}) {
+    if (!dateOrIso) return '--:--';
+    const d = (dateOrIso instanceof Date) ? dateOrIso : new Date(dateOrIso);
+    if (isNaN(d.getTime())) return String(dateOrIso);
+    try {
+      return d.toLocaleTimeString('en-US', {
+        timeZone: 'Asia/Manila',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        ...options
+      });
+    } catch (e) {
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true, ...options });
+    }
+  }
+
+  function formatManilaDate(dateOrIso, options = {}) {
+    if (!dateOrIso) return '';
+    const d = (dateOrIso instanceof Date) ? dateOrIso : new Date(dateOrIso);
+    if (isNaN(d.getTime())) return '';
+    try {
+      return d.toLocaleDateString('en-US', {
+        timeZone: 'Asia/Manila',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        ...options
+      });
+    } catch (e) {
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric', ...options });
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    window.formatManilaTime = formatManilaTime;
+    window.formatManilaDate = formatManilaDate;
+  }
+
   // -------------------------------------------------------------------------
   // 2. INDEXEDDB PERSISTENCE LAYER (OFFLINE EVENT STORE & OUTBOX)
   // -------------------------------------------------------------------------
@@ -395,7 +434,7 @@
           const s = this.state.students[ev.studentId];
           if (!s) return;
 
-          const timeStr = new Date(ev.occurredAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const timeStr = formatManilaTime(ev.occurredAt);
 
           if (!s.history) s.history = [];
           if (!s.history.some(h => h.eventId === ev.eventId)) {
@@ -483,11 +522,12 @@
       if (student && Array.isArray(student.history)) {
         student.history.forEach(h => {
           const key = h.eventId || (h.timestamp + '_' + h.action);
-          map.set(key, h);
+          const fixedDisplayTime = h.timestamp ? formatManilaTime(h.timestamp) : (h.displayTime || '--:--');
+          map.set(key, { ...h, displayTime: fixedDisplayTime });
         });
       }
       studentEvents.forEach(ev => {
-        const timeStr = new Date(ev.occurredAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const timeStr = formatManilaTime(ev.occurredAt);
         map.set(ev.eventId, {
           eventId: ev.eventId,
           action: ev.action,
@@ -512,13 +552,14 @@
       if (Array.isArray(this.state.auditLog)) {
         this.state.auditLog.forEach(l => {
           const key = l.eventId || l.id;
-          map.set(key, l);
+          const fixedDisplayTime = l.timestamp ? formatManilaTime(l.timestamp) : (l.displayTime || '--:--');
+          map.set(key, { ...l, displayTime: fixedDisplayTime });
         });
       }
       allEvents.forEach(ev => {
         const key = ev.eventId;
         if (!map.has(key)) {
-          const timeStr = new Date(ev.occurredAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const timeStr = formatManilaTime(ev.occurredAt);
           map.set(key, {
             id: 'log_' + ev.eventId,
             eventId: ev.eventId,
@@ -888,8 +929,7 @@
 
       const event = this.createAttendanceEvent(student, 'check_in', options);
 
-      const now = new Date(event.occurredAt);
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const timeStr = formatManilaTime(event.occurredAt);
       const isoStr = event.occurredAt;
       const staff = event.marshalId;
       const method = event.method;
@@ -944,7 +984,7 @@
       const event = this.createAttendanceEvent(student, 'check_out', options);
 
       const now = new Date(event.occurredAt);
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const timeStr = formatManilaTime(event.occurredAt);
       const isoStr = event.occurredAt;
       const staff = event.marshalId;
       const method = event.method;
@@ -1015,7 +1055,7 @@
       });
 
       const now = new Date(event.occurredAt);
-      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const timeStr = formatManilaTime(event.occurredAt);
       const isoStr = event.occurredAt;
 
       student.status = newStatus;
@@ -1100,7 +1140,7 @@
         method: 'admin',
         performedBy: performedBy,
         timestamp: isoStr,
-        displayTime: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        displayTime: formatManilaTime(now)
       });
 
       this.save();

@@ -805,10 +805,10 @@
       let lastText = 'Never checked in';
       if (student.lastCheckIn && student.status === 'INSIDE') {
         const d = new Date(student.lastCheckIn);
-        lastText = 'Checked in today at ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        lastText = 'Checked in today at ' + ((window.formatManilaTime) ? window.formatManilaTime(d) : d.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: true }));
       } else if (student.lastCheckOut) {
         const d = new Date(student.lastCheckOut);
-        lastText = 'Checked out at ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + (student.exitReason ? ` (${student.exitReason})` : '');
+        lastText = 'Checked out at ' + ((window.formatManilaTime) ? window.formatManilaTime(d) : d.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: true })) + (student.exitReason ? ` (${student.exitReason})` : '');
       }
       document.getElementById('modal-last-action').textContent = lastText;
 
@@ -831,14 +831,15 @@
                 ? 'bg-emerald-950 text-emerald-300 border-emerald-800' 
                 : (isOverride ? 'bg-amber-950 text-amber-300 border-amber-800' : 'bg-red-950 text-red-300 border-red-800');
               const actionLabel = isCheckIn ? '🟢 IN' : (isOverride ? '⚙️ OVERRIDE' : '🔴 OUT');
-              const dateStr = h.timestamp ? new Date(h.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
+              const dateStr = h.timestamp ? ((window.formatManilaDate) ? window.formatManilaDate(h.timestamp, { month: 'short', day: 'numeric', year: undefined }) : new Date(h.timestamp).toLocaleDateString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric' })) : '';
+              const timeStr = h.timestamp ? ((window.formatManilaTime) ? window.formatManilaTime(h.timestamp) : new Date(h.timestamp).toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: true })) : (h.displayTime || '--:--');
               const details = h.reason ? `<span class="text-zinc-400 block text-[10px] mt-0.5">${h.reason}${h.expectedReturn ? ' (Return: ' + h.expectedReturn + ')' : ''}</span>` : '';
               return `
                 <div class="p-2 rounded-xl bg-zinc-950 border border-zinc-800/80 flex items-start justify-between gap-2">
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1.5 flex-wrap">
                       <span class="px-1.5 py-0.5 rounded text-[9px] font-bold border ${badgeClass}">${actionLabel}</span>
-                      <span class="text-white font-bold text-[11px]">${h.displayTime || '--:--'}</span>
+                      <span class="text-white font-bold text-[11px]">${timeStr}</span>
                       <span class="text-zinc-500 text-[10px]">${dateStr}</span>
                     </div>
                     ${details}
@@ -964,7 +965,7 @@
                 <span class="text-zinc-200 font-bold truncate">${l.studentName || l.studentCode}</span>
                 <span class="text-[10px] text-zinc-500">(${l.studentCode})</span>
               </div>
-              <p class="text-[10px] text-zinc-400 truncate">${l.displayTime || ''}${sub}</p>
+              <p class="text-[10px] text-zinc-400 truncate">${(l.timestamp && window.formatManilaTime) ? window.formatManilaTime(l.timestamp) : (l.displayTime || '')}${sub}</p>
             </div>
             <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass} flex-shrink-0">
               ${actionText}

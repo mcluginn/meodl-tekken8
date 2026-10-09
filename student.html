@@ -2953,7 +2953,7 @@
       const el = document.getElementById('pf-live-clock-display');
       if (!el) return;
       const now = new Date();
-      el.textContent = now.toLocaleTimeString('en-US', { hour12: true });
+      el.textContent = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
     }
 
     // -------------------------------------------------------------------------
@@ -7071,10 +7071,10 @@
         let lastSeenText = '—';
         if (s.lastCheckIn && s.status === 'INSIDE') {
           const d = new Date(s.lastCheckIn);
-          lastSeenText = 'In: ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          lastSeenText = 'In: ' + ((window.formatManilaTime) ? window.formatManilaTime(d) : d.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: true }));
         } else if (s.lastCheckOut) {
           const d = new Date(s.lastCheckOut);
-          lastSeenText = 'Out: ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          lastSeenText = 'Out: ' + ((window.formatManilaTime) ? window.formatManilaTime(d) : d.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: true }));
         }
 
         let exitDetails = '—';
@@ -7147,7 +7147,7 @@
             : (isOverride ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800">OVERRIDE</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-red-950 text-red-300 border border-red-800">CHECK OUT</span>');
 
           const d = l.timestamp ? new Date(l.timestamp) : new Date();
-          const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const dateStr = ((window.formatManilaDate) ? window.formatManilaDate(d) : d.toLocaleDateString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' })) + ' ' + ((window.formatManilaTime) ? window.formatManilaTime(d) : d.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: true }));
 
           return `
             <tr class="hover:bg-[#102d52]/40 transition-colors">
@@ -7241,8 +7241,13 @@
           const actionText = isCheckIn ? '🟢 CHECKED IN' : (isOverride ? '⚙️ OVERRIDE' : '🔴 CHECKED OUT');
 
           const d = h.timestamp ? new Date(h.timestamp) : new Date();
-          const dateStr = d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
-          const timeStr = h.displayTime || d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const hasValidTs = h.timestamp && !isNaN(d.getTime());
+          const dateStr = hasValidTs
+            ? ((window.formatManilaDate) ? window.formatManilaDate(d) : d.toLocaleDateString('en-US', { timeZone: 'Asia/Manila', month: 'short', day: 'numeric', year: 'numeric' }))
+            : d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+          const timeStr = hasValidTs
+            ? ((window.formatManilaTime) ? window.formatManilaTime(d) : d.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', hour12: true }))
+            : (h.displayTime || '--:--');
 
           let extraInfo = '';
           if (h.reason) {

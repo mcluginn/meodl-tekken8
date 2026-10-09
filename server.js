@@ -27,6 +27,40 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+function formatManilaTime(dateOrIso, options = {}) {
+  if (!dateOrIso) return '--:--';
+  const d = (dateOrIso instanceof Date) ? dateOrIso : new Date(dateOrIso);
+  if (isNaN(d.getTime())) return String(dateOrIso);
+  try {
+    return d.toLocaleTimeString('en-US', {
+      timeZone: 'Asia/Manila',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+      ...options
+    });
+  } catch (e) {
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true, ...options });
+  }
+}
+
+function formatManilaDate(dateOrIso, options = {}) {
+  if (!dateOrIso) return '';
+  const d = (dateOrIso instanceof Date) ? dateOrIso : new Date(dateOrIso);
+  if (isNaN(d.getTime())) return '';
+  try {
+    return d.toLocaleDateString('en-US', {
+      timeZone: 'Asia/Manila',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      ...options
+    });
+  } catch (e) {
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric', ...options });
+  }
+}
+
 // -------------------------------------------------------------------------
 // PERSISTENT DATA LAYER (ATOMIC SAFE WRITES)
 // -------------------------------------------------------------------------
@@ -187,7 +221,7 @@ function rederiveStudentState(student, studentEvents) {
 
   for (const ev of sorted) {
     const action = String(ev.action || '').toLowerCase();
-    const timeStr = new Date(ev.occurredAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const timeStr = formatManilaTime(ev.occurredAt);
 
     if (action === 'check_in') {
       updated.status = 'INSIDE';
