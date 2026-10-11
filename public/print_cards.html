@@ -201,8 +201,8 @@
                       </p>
                     </div>
 
-                    <!-- QR Code container -->
-                    <div class="w-[80px] h-[80px] flex items-center justify-center bg-white p-1 rounded border border-zinc-300 flex-shrink-0" id="qr-${student.id}">
+                    <!-- QR Code container (Enlarged with Level L for maximum module size) -->
+                    <div class="w-[92px] h-[92px] flex items-center justify-center bg-white p-1 rounded border border-zinc-300 flex-shrink-0" id="qr-${student.id}">
                     </div>
                   </div>
 
@@ -226,11 +226,11 @@
             const payload = window.MEODL_ATTENDANCE.getQRPayload(student);
             new QRCode(target, {
               text: payload,
-              width: 74,
-              height: 74,
+              width: 86,
+              height: 86,
               colorDark: '#000000',
               colorLight: '#ffffff',
-              correctLevel: QRCode.CorrectLevel.M
+              correctLevel: QRCode.CorrectLevel.L
             });
           }
         });

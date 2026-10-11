@@ -219,6 +219,13 @@
           </button>
         </div>
 
+        <!-- Quick Zoom Pills (Crucial for Small QR Codes) -->
+        <div class="absolute top-2.5 left-2.5 flex items-center gap-1 z-10 bg-black/60 backdrop-blur-md p-1 rounded-xl border border-white/20 text-[11px] font-mono shadow-lg">
+          <button id="zoom-1x" onclick="cycleZoom(1.0)" class="px-2 py-0.5 rounded-lg font-bold bg-cyan-600 text-white transition-all scale-105" title="Standard 1x View">1x</button>
+          <button id="zoom-15x" onclick="cycleZoom(1.5)" class="px-2 py-0.5 rounded-lg font-medium text-zinc-300 hover:text-white transition-all" title="1.5x Zoom for Small Codes">1.5x</button>
+          <button id="zoom-2x" onclick="cycleZoom(2.0)" class="px-2 py-0.5 rounded-lg font-medium text-zinc-300 hover:text-white transition-all" title="2x Zoom for Tiny Codes">2x</button>
+        </div>
+
         <!-- Camera Off / Fallback Overlay -->
         <div id="cam-fallback" class="hidden absolute inset-0 bg-zinc-950 flex flex-col items-center justify-center p-4 text-center z-20">
           <span class="text-3xl mb-2">📷</span>
@@ -233,6 +240,17 @@
             </label>
           </div>
         </div>
+      </div>
+
+      <!-- Small QR Code Smart Tip Banner -->
+      <div class="px-3 py-1.5 bg-cyan-950/30 border-t border-cyan-800/40 text-[11px] text-cyan-300 flex items-center justify-between">
+        <div class="flex items-center gap-1.5 truncate">
+          <span class="text-sm">🔍</span>
+          <span class="truncate">Small QR code? Tap <strong>1.5x</strong> or <strong>2x Zoom</strong>! (Hold 15–20cm away)</span>
+        </div>
+        <button onclick="toggleTorch()" class="text-cyan-400 hover:text-cyan-200 underline shrink-0 font-bold ml-1 text-[10px]">
+          Torch 🔦
+        </button>
       </div>
 
       <!-- Quick Manual Code Entry / File Upload Bar -->
@@ -674,29 +692,125 @@
       });
     }
 
+    let currentZoom = 1.0;
+
     function launchCamera(cameraConfig) {
       if (html5QrScanner) {
         try { html5QrScanner.stop(); } catch(e) {}
       }
 
-      html5QrScanner = new Html5Qrcode("reader");
+      // Configure HTML5 QR Code with native hardware acceleration and pure QR focus
+      const scannerOpts = {
+        formatsToSupport: [ 0 ], // Html5QrcodeSupportedFormats.QR_CODE = 0
+        experimentalFeatures: {
+          useBarCodeDetectorIfSupported: true
+        },
+        verbose: false
+      };
+      html5QrScanner = new Html5Qrcode("reader", scannerOpts);
+
+      // Build HD camera constraints (1080p / 720p with continuous auto-focus)
+      let cameraConstraint = cameraConfig;
+      if (typeof cameraConfig === 'string') {
+        cameraConstraint = {
+          deviceId: { exact: cameraConfig },
+          width: { min: 1280, ideal: 1920 },
+          height: { min: 720, ideal: 1080 },
+          advanced: [{ focusMode: "continuous" }]
+        };
+      } else if (typeof cameraConfig === 'object') {
+        cameraConstraint = {
+          facingMode: cameraConfig.facingMode || { ideal: "environment" },
+          width: { min: 1280, ideal: 1920 },
+          height: { min: 720, ideal: 1080 },
+          advanced: [{ focusMode: "continuous" }]
+        };
+      }
+
       const config = {
-        fps: 15,
-        qrbox: { width: 220, height: 220 },
-        aspectRatio: 1.0
+        fps: 20, // 20 FPS for responsive small QR detection
+        qrbox: function(viewfinderWidth, viewfinderHeight) {
+          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+          const edge = Math.max(220, Math.floor(minEdge * 0.8));
+          return { width: edge, height: edge };
+        },
+        aspectRatio: 1.0,
+        disableFlip: false
       };
 
       html5QrScanner.start(
-        cameraConfig,
+        cameraConstraint,
         config,
         onScanSuccess,
         onScanFailure
-      ).catch(err => {
-        console.error('Camera start failed:', err);
-        const fallback = document.getElementById('cam-fallback');
-        fallback.classList.remove('hidden');
-        document.getElementById('cam-fallback-msg').textContent = 'Camera blocked or unavailable. Use manual search below.';
+      ).then(() => {
+        if (currentZoom > 1.0) {
+          applyZoom(currentZoom);
+        }
+      }).catch(err => {
+        console.warn('High-res camera start failed, falling back to basic camera config:', err);
+        html5QrScanner.start(
+          cameraConfig,
+          config,
+          onScanSuccess,
+          onScanFailure
+        ).then(() => {
+          if (currentZoom > 1.0) applyZoom(currentZoom);
+        }).catch(err2 => {
+          console.error('Camera start failed:', err2);
+          const fallback = document.getElementById('cam-fallback');
+          fallback.classList.remove('hidden');
+          document.getElementById('cam-fallback-msg').textContent = 'Camera blocked or unavailable. Use manual search below.';
+        });
       });
+    }
+
+    function cycleZoom(level) {
+      currentZoom = level;
+      applyZoom(level);
+    }
+
+    function applyZoom(level) {
+      // Update UI button highlights
+      ['1x', '15x', '2x'].forEach(id => {
+        const btn = document.getElementById('zoom-' + id);
+        if (btn) {
+          const isTarget = (id === '1x' && level === 1.0) || (id === '15x' && level === 1.5) || (id === '2x' && level === 2.0);
+          btn.className = isTarget 
+            ? 'px-2 py-0.5 rounded-lg font-bold bg-cyan-600 text-white transition-all scale-105 shadow' 
+            : 'px-2 py-0.5 rounded-lg font-medium text-zinc-300 hover:text-white transition-all';
+        }
+      });
+
+      // 1. Hardware Zoom attempt
+      if (html5QrScanner) {
+        html5QrScanner.applyVideoConstraints({
+          advanced: [{ zoom: level }]
+        }).then(() => {
+          resetCssZoom();
+        }).catch(() => {
+          // 2. Fallback to digital CSS zoom
+          applyCssZoom(level);
+        });
+      } else {
+        applyCssZoom(level);
+      }
+    }
+
+    function applyCssZoom(level) {
+      const videoEl = document.querySelector("#reader video");
+      if (videoEl) {
+        videoEl.style.transform = `scale(${level})`;
+        videoEl.style.transformOrigin = 'center center';
+        videoEl.style.transition = 'transform 0.2s ease-out';
+      }
+    }
+
+    function resetCssZoom() {
+      const videoEl = document.querySelector("#reader video");
+      if (videoEl) {
+        videoEl.style.transform = 'none';
+      }
     }
 
     function switchCamera() {
@@ -711,9 +825,19 @@
     function toggleTorch() {
       if (!html5QrScanner) return;
       torchOn = !torchOn;
+      const btn = document.getElementById('btn-torch');
       html5QrScanner.applyVideoConstraints({
         advanced: [{ torch: torchOn }]
-      }).catch(e => console.warn('Torch not supported', e));
+      }).then(() => {
+        if (btn) {
+          btn.className = torchOn 
+            ? 'p-2 rounded-xl bg-amber-500 text-black font-bold transition-all text-xs shadow-lg shadow-amber-500/40' 
+            : 'p-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs hover:bg-black/80 transition-colors';
+        }
+      }).catch(e => {
+        console.warn('Torch not supported', e);
+        torchOn = false;
+      });
     }
 
     // Process Scanned QR
