@@ -47,17 +47,37 @@
       min-height: 100vh;
       touch-action: manipulation;
     }
+    #reader {
+      position: relative;
+      width: 100% !important;
+      height: 100% !important;
+      overflow: hidden;
+      border-radius: 1rem;
+    }
     #reader video {
+      width: 100% !important;
+      height: 100% !important;
       object-fit: cover !important;
       border-radius: 1rem !important;
+    }
+    /* Suppress iOS Safari WebKit native media controls and pause/play button */
+    #reader video::-webkit-media-controls,
+    #reader video::-webkit-media-controls-start-playback-button,
+    #reader video::-webkit-media-controls-play-button,
+    #reader video::-webkit-media-controls-enclosure,
+    #reader video::-webkit-media-controls-panel {
+      display: none !important;
+      -webkit-appearance: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
     }
     .scan-reticle {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 220px;
-      height: 220px;
+      width: 230px;
+      height: 230px;
       pointer-events: none;
       box-shadow: 0 0 0 4000px rgba(9, 9, 11, 0.65);
       border-radius: 1.25rem;
@@ -187,6 +207,13 @@
         <div class="laser-line"></div>
       </div>
 
+      <!-- Aim Guide Label -->
+      <div class="absolute bottom-4 inset-x-0 flex justify-center pointer-events-none z-10">
+        <span class="px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-mono text-amber-300">
+          Aim QR code inside box
+        </span>
+      </div>
+
       <!-- Controls Overlay: Flash & Flip -->
       <div class="absolute top-3 right-3 flex items-center gap-2 z-20">
         <button id="btn-torch" onclick="toggleTorch()" class="p-2.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-black/80 transition-all text-xs" title="Toggle Flashlight">
@@ -202,6 +229,16 @@
         <button id="zoom-1x" onclick="cycleZoom(1.0)" class="px-2 py-0.5 rounded-lg font-bold bg-amber-600 text-white transition-all scale-105" title="Standard 1x View">1x</button>
         <button id="zoom-15x" onclick="cycleZoom(1.5)" class="px-2 py-0.5 rounded-lg font-medium text-zinc-300 hover:text-white transition-all" title="1.5x Zoom for Small Codes">1.5x</button>
         <button id="zoom-2x" onclick="cycleZoom(2.0)" class="px-2 py-0.5 rounded-lg font-medium text-zinc-300 hover:text-white transition-all" title="2x Zoom for Tiny Codes">2x</button>
+      </div>
+
+      <!-- iOS Safari Video Paused Overlay (Tap Anywhere to Resume) -->
+      <div id="video-paused-alert" onclick="ensureVideoPlaying()" class="hidden absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-30 cursor-pointer">
+        <div class="w-14 h-14 rounded-full bg-amber-600 flex items-center justify-center text-white text-2xl mb-2 shadow-xl animate-pulse">
+          ▶
+        </div>
+        <h3 class="text-sm font-bold text-white mb-1">Camera Feed Paused</h3>
+        <p class="text-xs text-amber-300 mb-3 max-w-xs">Tap anywhere to resume live camera scanning</p>
+        <span class="px-3 py-1 rounded-lg bg-zinc-800 text-[10px] text-zinc-300 border border-zinc-700">Tap to Unpause</span>
       </div>
 
       <!-- Camera Error Fallback Message -->
@@ -221,7 +258,7 @@
     <div class="flex items-center justify-between px-3 py-1.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-[11px] text-amber-300">
       <div class="flex items-center gap-1.5 truncate">
         <span class="text-sm">🔍</span>
-        <span class="truncate">Small QR code? Tap <strong>1.5x</strong> or <strong>2x Zoom</strong>! (Hold 15–20cm away)</span>
+        <span class="truncate">Aim at <strong>QR Code</strong> (not entire card) • Tap <strong>1.5x / 2x</strong></span>
       </div>
       <button onclick="toggleTorch()" class="text-amber-400 hover:text-amber-200 underline shrink-0 font-bold ml-1 text-[10px]">
         Torch 🔦
@@ -623,38 +660,118 @@
       renderGameTabs();
     }
 
-    // Camera Lifecycle
+    // =========================================================================
+    // CAMERA ENGINE & iOS SAFARI VIDEO GUARDIAN
+    // =========================================================================
+    let currentZoom = 1.0;
+    let videoWatcherInterval = null;
+    let currentCameraFacing = 'environment';
+
+    function ensureVideoPlaying() {
+      const video = document.querySelector("#reader video");
+      if (!video) return;
+
+      // Force WebKit inline and muted attributes so iOS Safari never pauses it
+      video.setAttribute("playsinline", "true");
+      video.setAttribute("webkit-playsinline", "true");
+      video.setAttribute("autoplay", "true");
+      video.setAttribute("muted", "true");
+      if (video.hasAttribute("controls")) video.removeAttribute("controls");
+      video.muted = true;
+      video.playsInline = true;
+      video.autoplay = true;
+
+      if (video.paused) {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {});
+        }
+      }
+
+      // Sync paused alert UI
+      const pausedAlert = document.getElementById("video-paused-alert");
+      if (pausedAlert) {
+        if (video.paused) {
+          pausedAlert.classList.remove("hidden");
+        } else {
+          pausedAlert.classList.add("hidden");
+        }
+      }
+    }
+
+    function onCameraReady() {
+      const fallback = document.getElementById('cam-fallback');
+      if (fallback) fallback.classList.add('hidden');
+
+      const video = document.querySelector("#reader video");
+      if (video) {
+        ensureVideoPlaying();
+        ['loadedmetadata', 'canplay', 'pause', 'play', 'stalled', 'suspend'].forEach(evtName => {
+          video.addEventListener(evtName, ensureVideoPlaying);
+        });
+      }
+
+      if (videoWatcherInterval) clearInterval(videoWatcherInterval);
+      videoWatcherInterval = setInterval(ensureVideoPlaying, 350);
+
+      // Attempt continuous autofocus post-start if supported (Android / Chrome)
+      try {
+        if (html5QrScanner && html5QrScanner.applyVideoConstraints) {
+          html5QrScanner.applyVideoConstraints({
+            advanced: [{ focusMode: "continuous" }]
+          }).catch(() => {});
+        }
+      } catch(e) {}
+
+      // Re-apply zoom level
+      if (currentZoom > 1.0) {
+        applyZoom(currentZoom);
+      }
+
+      // Refresh camera devices list with real labels now that permission is active
+      Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) camerasList = devices;
+      }).catch(() => {});
+    }
+
     function startScanner() {
+      const fallback = document.getElementById('cam-fallback');
+      if (fallback) fallback.classList.add('hidden');
+
       if (typeof Html5Qrcode === 'undefined') {
         setTimeout(startScanner, 200);
         return;
       }
 
       Html5Qrcode.getCameras().then(devices => {
-        camerasList = devices;
-        if (devices && devices.length) {
-          const backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear') || d.label.toLowerCase().includes('environment'));
-          const selected = backCam ? backCam.id : devices[0].id;
-          currentCameraId = selected;
-          launchCamera(selected);
+        camerasList = devices || [];
+        const backCam = camerasList.find(d => {
+          const lbl = (d.label || '').toLowerCase();
+          return lbl.includes('back') || lbl.includes('rear') || lbl.includes('environment');
+        });
+
+        if (backCam) {
+          currentCameraId = backCam.id;
+          launchCamera(backCam.id);
         } else {
+          // On iOS Safari before permissions are granted, labels are blank.
+          // Requesting { facingMode: "environment" } guarantees the rear camera on iPhone!
+          currentCameraId = null;
           launchCamera({ facingMode: "environment" });
         }
       }).catch(err => {
+        console.warn('getCameras error or restricted:', err);
         launchCamera({ facingMode: "environment" });
       });
     }
-
-    let currentZoom = 1.0;
 
     function launchCamera(config) {
       if (html5QrScanner) {
         try { html5QrScanner.stop(); } catch(e) {}
       }
 
-      // Configure HTML5 QR Code with native hardware acceleration and pure QR focus
       const scannerOpts = {
-        formatsToSupport: [ 0 ], // 0 = Html5QrcodeSupportedFormats.QR_CODE (Pure QR mode)
+        formatsToSupport: [ 0 ], // 0 = Html5QrcodeSupportedFormats.QR_CODE
         experimentalFeatures: {
           useBarCodeDetectorIfSupported: true
         },
@@ -662,31 +779,33 @@
       };
       html5QrScanner = new Html5Qrcode("reader", scannerOpts);
 
-      // Build HD camera constraints (1080p / 720p with continuous auto-focus)
-      let cameraConstraint = config;
+      // Mobile-safe constraints (iOS Safari & Android):
+      // NEVER specify min: 1280 or min: 720 (causes OverconstrainedError on iPhone portrait)
+      let cameraConstraint;
       if (typeof config === 'string') {
         cameraConstraint = {
           deviceId: { exact: config },
-          width: { min: 1280, ideal: 1920 },
-          height: { min: 720, ideal: 1080 },
-          advanced: [{ focusMode: "continuous" }]
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         };
-      } else if (typeof config === 'object') {
+      } else if (typeof config === 'object' && config.facingMode) {
         cameraConstraint = {
-          facingMode: config.facingMode || { ideal: "environment" },
-          width: { min: 1280, ideal: 1920 },
-          height: { min: 720, ideal: 1080 },
-          advanced: [{ focusMode: "continuous" }]
+          facingMode: config.facingMode,
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        };
+      } else {
+        cameraConstraint = {
+          facingMode: { ideal: "environment" },
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         };
       }
 
+      // Full-frame scanning (qrbox is omitted):
+      // Allows QR codes printed small, at the bottom, or off-center to decode anywhere on screen!
       const scanConfig = {
-        fps: 20, // 20 FPS for responsive small QR detection
-        qrbox: function(viewfinderWidth, viewfinderHeight) {
-          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-          const edge = Math.max(220, Math.floor(minEdge * 0.8));
-          return { width: edge, height: edge };
-        },
+        fps: 20,
         aspectRatio: 1.0,
         disableFlip: false
       };
@@ -697,20 +816,24 @@
         onScanSuccess,
         () => {}
       ).then(() => {
-        if (currentZoom > 1.0) {
-          applyZoom(currentZoom);
-        }
+        onCameraReady();
       }).catch(err => {
-        console.warn('High-res camera start failed, falling back to basic camera config:', err);
+        console.warn('High-res camera start failed, retrying with basic config:', err);
+        const fallbackConstraint = (typeof config === 'string')
+          ? { deviceId: { exact: config } }
+          : { facingMode: "environment" };
+
         html5QrScanner.start(
-          config,
+          fallbackConstraint,
           scanConfig,
           onScanSuccess,
           () => {}
         ).then(() => {
-          if (currentZoom > 1.0) applyZoom(currentZoom);
+          onCameraReady();
         }).catch(err2 => {
-          document.getElementById('cam-fallback').classList.remove('hidden');
+          console.error('All camera start attempts failed:', err2);
+          const fallback = document.getElementById('cam-fallback');
+          if (fallback) fallback.classList.remove('hidden');
         });
       });
     }
@@ -732,14 +855,14 @@
         }
       });
 
-      // 1. Try Hardware Camera Zoom
-      if (html5QrScanner) {
+      // 1. Try Hardware Camera Zoom (Chrome / Android)
+      if (html5QrScanner && html5QrScanner.applyVideoConstraints) {
         html5QrScanner.applyVideoConstraints({
           advanced: [{ zoom: level }]
         }).then(() => {
           resetCssZoom();
         }).catch(() => {
-          // 2. Fallback to digital CSS zoom
+          // 2. Fallback to digital CSS zoom (iOS Safari)
           applyCssZoom(level);
         });
       } else {
@@ -764,7 +887,16 @@
     }
 
     function switchCamera() {
-      if (!camerasList || camerasList.length <= 1) return;
+      if (!camerasList || camerasList.length <= 1) {
+        if (currentCameraFacing === 'user') {
+          currentCameraFacing = 'environment';
+          launchCamera({ facingMode: "environment" });
+        } else {
+          currentCameraFacing = 'user';
+          launchCamera({ facingMode: "user" });
+        }
+        return;
+      }
       const idx = camerasList.findIndex(c => c.id === currentCameraId);
       const nextIdx = (idx + 1) % camerasList.length;
       currentCameraId = camerasList[nextIdx].id;
@@ -1188,6 +1320,13 @@
           updateSyncUI(engine);
         });
       }
+
+      // iOS Safari gesture auto-unpause listener
+      ['touchstart', 'touchend', 'click'].forEach(evt => {
+        document.addEventListener(evt, () => {
+          ensureVideoPlaying();
+        }, { passive: true });
+      });
     });
   </script>
 </body>
