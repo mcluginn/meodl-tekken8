@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Engineering Day • Sports Court Scanner (Basketball & Volleyball)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+            },
+            colors: {
+              obsidian: '#09090b',
+              cardBg: '#111317'
+            }
+          }
+        }
+      };
+    }
+  </script>
+
+  <!-- Local Standalone Libraries with Resilient Fallback -->
+  <script src="./assets/html5-qrcode.min.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/html5-qrcode.min.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/meodl_data.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_data.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/engday_attendance.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #09090b;
+      color: #f4f4f5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      touch-action: manipulation;
+    }
+    #reader video {
+      object-fit: cover !important;
+      border-radius: 1rem !important;
+    }
+    .scan-reticle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 220px;
+      height: 220px;
+      pointer-events: none;
+      box-shadow: 0 0 0 4000px rgba(9, 9, 11, 0.65);
+      border-radius: 1.25rem;
+    }
+    .reticle-corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-color: #f59e0b;
+    }
+    .top-left { top: -2px; left: -2px; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 12px; }
+    .top-right { top: -2px; right: -2px; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 12px; }
+    .bottom-left { bottom: -2px; left: -2px; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 12px; }
+    .bottom-right { bottom: -2px; right: -2px; border-bottom-width: 4px; border-right-width: 4px; border-bottom-right-radius: 12px; }
+    
+    @keyframes laserSweep {
+      0% { top: 6%; opacity: 0.3; }
+      50% { opacity: 0.95; }
+      100% { top: 94%; opacity: 0.3; }
+    }
+    .laser-line {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #f59e0b, #ef4444, transparent);
+      box-shadow: 0 0 14px #f59e0b;
+      animation: laserSweep 2s ease-in-out infinite alternate;
+    }
+
+    /* Custom horizontal scroll bar */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-obsidian text-zinc-100 flex flex-col min-h-screen">
+
+  <!-- =========================================================================
+       TOP NAVIGATION BAR
+       ========================================================================= -->
+  <header class="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/80 px-3 py-2.5">
+    <div class="max-w-md mx-auto flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <a href="engday_attendance.html" class="p-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white" title="Master Dashboard">
+          📊
+        </a>
+        <div class="truncate">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-black tracking-wider text-amber-400 uppercase">ENGINEERING DAY</span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-950/80 text-amber-300 border border-amber-800 font-bold">SPORTS</span>
+          </div>
+          <h1 class="text-sm font-bold text-white truncate">Court In / Out Scanner</h1>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 shrink-0">
+        <!-- Rapid Mode Toggle -->
+        <button id="btn-rapid-mode" onclick="toggleRapidMode()" class="px-2 py-1 rounded-lg text-[10px] font-bold border transition-colors flex items-center gap-1 bg-zinc-900 border-zinc-700 text-zinc-400 hover:text-amber-400" title="Toggle Rapid Instant Check-In/Out Mode">
+          <span>⚡ Rapid:</span>
+          <span id="rapid-status-label" class="text-zinc-500">OFF</span>
+        </button>
+
+        <!-- Sound Toggle -->
+        <button id="btn-audio" onclick="toggleAudio()" class="p-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-amber-400 hover:text-white text-xs" title="Toggle Audio Beeps">
+          🔔
+        </button>
+      </div>
+    </div>
+
+    <!-- =======================================================================
+         INTERACTIVE GAME SELECTOR TABS (6 GAMES)
+         ======================================================================= -->
+    <div class="max-w-md mx-auto mt-2 pt-2 border-t border-zinc-800/60">
+      <div class="flex items-center justify-between text-[11px] mb-1.5 text-zinc-400 px-0.5 font-medium">
+        <span>Select Active Game Session:</span>
+        <span id="header-time-clock" class="font-mono text-zinc-500 text-[10px]">--:--</span>
+      </div>
+      <div id="game-tabs-container" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       ACTIVE SESSION HERO STRIP
+       ========================================================================= -->
+  <section class="max-w-md mx-auto w-full px-3 pt-2">
+    <div id="active-session-banner" class="p-2.5 rounded-xl bg-amber-950/40 border border-amber-500/40 flex items-center justify-between gap-2 shadow-inner">
+      <div class="flex items-center gap-2 min-w-0">
+        <span id="active-game-icon" class="text-2xl shrink-0">🏀</span>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <span id="active-game-name" class="text-xs font-black text-amber-300 uppercase tracking-wide truncate">Basketball Game 1</span>
+            <span id="active-game-badge" class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-900/60 text-amber-200 border border-amber-700">9:00 AM – 9:50 AM</span>
+          </div>
+          <p id="active-game-court" class="text-[10px] text-zinc-400">Basketball Court • Entry / Exit Gate</p>
+        </div>
+      </div>
+      <div class="text-right shrink-0">
+        <div class="text-[9px] uppercase tracking-wider text-zinc-400 font-semibold">Inside Court</div>
+        <div id="active-game-inside-count" class="text-base font-black text-white font-mono">0</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       MAIN SCANNER VIEWPORT
+       ========================================================================= -->
+  <main class="flex-1 max-w-md mx-auto w-full px-3 py-2 flex flex-col gap-2.5">
+    
+    <!-- Camera Viewport Card -->
+    <div class="relative w-full aspect-square bg-zinc-950 rounded-2xl overflow-hidden border border-zinc-800 shadow-2xl flex items-center justify-center">
+      <div id="reader" class="w-full h-full"></div>
+      
+      <!-- Overlay Reticle -->
+      <div class="scan-reticle">
+        <div class="reticle-corner top-left"></div>
+        <div class="reticle-corner top-right"></div>
+        <div class="reticle-corner bottom-left"></div>
+        <div class="reticle-corner bottom-right"></div>
+        <div class="laser-line"></div>
+      </div>
+
+      <!-- Controls Overlay: Flash & Flip -->
+      <div class="absolute top-3 right-3 flex items-center gap-2 z-20">
+        <button id="btn-torch" onclick="toggleTorch()" class="p-2.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-black/80 transition-all text-xs" title="Toggle Flashlight">
+          🔦
+        </button>
+        <button onclick="switchCamera()" class="p-2.5 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-black/80 transition-all text-xs" title="Switch Camera">
+          🔄
+        </button>
+      </div>
+
+      <!-- Camera Error Fallback Message -->
+      <div id="cam-fallback" class="absolute inset-0 bg-zinc-950 flex flex-col items-center justify-center p-6 text-center z-30 hidden">
+        <div class="w-12 h-12 rounded-2xl bg-amber-950/60 border border-amber-800 flex items-center justify-center text-amber-400 text-xl mb-3">
+          📷
+        </div>
+        <h3 class="text-sm font-bold text-white mb-1">Camera Stream Inactive</h3>
+        <p id="cam-fallback-msg" class="text-xs text-zinc-400 mb-4 max-w-xs">Camera blocked or permissions denied. Use manual lookup or image upload below.</p>
+        <button onclick="startScanner()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-all">
+          Retry Camera
+        </button>
+      </div>
+    </div>
+
+    <!-- Manual Code Input & Image Upload Card -->
+    <div class="p-2.5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col gap-2">
+      <div class="flex items-center gap-1.5">
+        <div class="relative flex-1">
+          <input 
+            type="text" 
+            id="manual-code-input" 
+            placeholder="Search MEODL-0001 or Name..." 
+            class="w-full bg-zinc-900 border border-zinc-700/80 rounded-xl px-3 py-2 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 transition-colors uppercase"
+            onkeydown="if(event.key==='Enter') processManualInput()"
+          />
+        </div>
+        <button onclick="processManualInput()" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-colors">
+          Verify
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between pt-1 border-t border-zinc-900 text-[10px] text-zinc-400">
+        <span>Lost QR Card? Search by student code or full name.</span>
+        <label class="cursor-pointer text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1">
+          <span>🖼️ Upload Photo</span>
+          <input type="file" accept="image/*" class="hidden" onchange="scanImageFile(event)">
+        </label>
+      </div>
+    </div>
+
+    <!-- =======================================================================
+         RECENT SCANS FOR ACTIVE GAME
+         ======================================================================= -->
+    <div class="flex-1 flex flex-col min-h-0 bg-zinc-950/80 rounded-2xl border border-zinc-800/80 p-3">
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+          <h2 class="text-xs font-bold text-zinc-200">Recent Court Activity</h2>
+        </div>
+        <span id="recent-game-badge" class="text-[10px] font-mono text-zinc-500">🏀 BB1</span>
+      </div>
+
+      <!-- Scans List Container -->
+      <div id="recent-scans-list" class="space-y-1.5 overflow-y-auto max-h-48 pr-0.5 text-xs">
+        <p class="text-center text-zinc-500 py-3 text-[11px]">No activity recorded yet for this game.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =========================================================================
+       BOTTOM STATUS STRIP
+       ========================================================================= -->
+  <footer class="sticky bottom-0 z-30 bg-zinc-950/95 border-t border-zinc-800/80 px-3 py-2 text-[10px] flex items-center justify-between text-zinc-500">
+    <div class="flex items-center gap-1.5 truncate">
+      <span id="sync-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span id="sync-text" class="truncate">Offline Engine Ready</span>
+      <span id="sync-pending-badge" class="hidden px-1.5 py-0.2 rounded bg-amber-950 text-amber-400 font-mono text-[9px] border border-amber-800">0 pending</span>
+    </div>
+
+    <div class="flex items-center gap-2 shrink-0">
+      <a href="scanner.html" class="text-zinc-400 hover:text-zinc-200 underline">
+        MEODL Venue Scanner →
+      </a>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       VERIFICATION & ACTION MODAL
+       ========================================================================= -->
+  <div id="verify-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 hidden transition-opacity">
+    <div class="w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl flex flex-col gap-3.5 max-h-[90vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-3 min-w-0">
+          <div id="modal-avatar" class="w-12 h-12 rounded-2xl bg-amber-950/80 border border-amber-700/80 text-amber-300 font-black text-lg flex items-center justify-center shrink-0">
+            ST
+          </div>
+          <div class="min-w-0">
+            <h3 id="modal-student-name" class="text-base font-bold text-white truncate">STUDENT NAME</h3>
+            <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+              <span id="modal-student-code" class="text-xs font-mono text-zinc-400">MEODL-0000</span>
+              <span id="modal-team-badge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-950 text-red-300 border border-red-800">RANKINE</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="closeVerifyModal()" class="p-1 rounded-lg text-zinc-500 hover:text-white text-base">
+          ✕
+        </button>
+      </div>
+
+      <!-- Current Session Status Pill -->
+      <div class="p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800 flex items-center justify-between">
+        <div>
+          <span class="text-[10px] text-zinc-400 uppercase font-semibold block">Target Session</span>
+          <span id="modal-session-title" class="text-xs font-bold text-white">🏀 Basketball Game 1</span>
+        </div>
+        <div id="modal-game-status" class="px-3 py-1 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-300 border border-zinc-700">
+          ⚪ NOT CHECKED IN
+        </div>
+      </div>
+
+      <!-- Primary Action Button (Check-In or Check-Out) -->
+      <div class="flex flex-col gap-2">
+        <button id="btn-primary-action" onclick="executePrimaryAction()" class="w-full py-3.5 rounded-2xl text-white font-bold text-sm uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-2">
+          🟢 Confirm Check-In
+        </button>
+
+        <!-- Optional Check-Out Reason Selector -->
+        <div id="checkout-reason-container" class="hidden flex items-center gap-1.5 text-xs">
+          <span class="text-zinc-500 text-[10px] shrink-0">Exit Note:</span>
+          <select id="checkout-reason-select" class="flex-1 bg-zinc-900 border border-zinc-800 text-zinc-300 text-[11px] rounded-lg px-2 py-1.5 focus:outline-none focus:border-amber-500">
+            <option value="Game Concluded">Game Concluded</option>
+            <option value="Substituted / Bench">Substituted / Bench</option>
+            <option value="Rest / Water Break">Rest / Water Break</option>
+            <option value="Leaving Court Area">Leaving Court Area</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Multi-Game Overview Matrix for this Student -->
+      <div class="border-t border-zinc-900 pt-3">
+        <div class="text-[11px] font-bold text-zinc-300 mb-2 flex items-center justify-between">
+          <span>Tournament Attendance Matrix</span>
+          <span id="modal-games-attended-counter" class="text-amber-400 font-mono text-[10px]">0/6 Games</span>
+        </div>
+        <div id="modal-games-grid" class="grid grid-cols-2 gap-1.5 text-[11px]">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- Prior Session Timeline for this Game -->
+      <div class="border-t border-zinc-900 pt-2.5">
+        <div class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1.5">Game Activity Log</div>
+        <div id="modal-history-timeline" class="space-y-1 max-h-28 overflow-y-auto text-[11px]">
+          <p class="text-center text-zinc-500 py-1 text-[10px]">No scans recorded yet for this student.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Staff PIN Authorization Modal -->
+  <div id="staff-auth-modal" class="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
+    <div class="max-w-xs w-full bg-zinc-900 border border-zinc-800 p-6 rounded-3xl text-center shadow-2xl">
+      <div class="w-12 h-12 rounded-2xl bg-amber-950/80 border border-amber-800 flex items-center justify-center mx-auto mb-3 text-amber-400 text-xl font-bold">
+        🔒
+      </div>
+      <h3 class="text-base font-bold text-white mb-1">Staff Authorization</h3>
+      <p class="text-xs text-zinc-400 mb-4">Enter Staff PIN to activate court scanner</p>
+      <input 
+        type="password" 
+        id="staff-pin-input" 
+        maxlength="8" 
+        placeholder="PIN" 
+        class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-center text-lg tracking-widest text-white mb-3 focus:outline-none focus:border-amber-500"
+        onkeydown="if(event.key==='Enter') verifyStaffPin()"
+      />
+      <p id="staff-pin-error" class="text-[11px] text-red-400 mb-3 hidden">Incorrect PIN. Try default MEODL PIN.</p>
+      <button onclick="verifyStaffPin()" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs uppercase tracking-wider">
+        Unlock Scanner
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       CLIENT APPLICATION LOGIC
+       ========================================================================= -->
+  <script>
+    let html5QrScanner = null;
+    let camerasList = [];
+    let currentCameraId = null;
+    let activeScannedStudent = null;
+    let rapidModeEnabled = false;
+    let audioEnabled = true;
+    let audioCtx = null;
+
+    // Web Audio Synthesizer Beeps
+    function playBeep(type) {
+      if (!audioEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+        if (type === 'check_in') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, now); // A5
+          osc.frequency.setValueAtTime(1320, now + 0.08); // E6
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+          osc.start();
+          osc.stop(now + 0.25);
+        } else if (type === 'check_out') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(740, now);
+          osc.frequency.setValueAtTime(554, now + 0.09);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc.start();
+          osc.stop(now + 0.3);
+        } else if (type === 'error') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(250, now);
+          osc.frequency.setValueAtTime(180, now + 0.12);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+          osc.start();
+          osc.stop(now + 0.35);
+        }
+      } catch(e) {}
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      document.getElementById('btn-audio').textContent = audioEnabled ? '🔔' : '🔕';
+      document.getElementById('btn-audio').classList.toggle('text-amber-400', audioEnabled);
+      document.getElementById('btn-audio').classList.toggle('text-zinc-500', !audioEnabled);
+    }
+
+    function toggleRapidMode() {
+      rapidModeEnabled = !rapidModeEnabled;
+      const btn = document.getElementById('btn-rapid-mode');
+      const label = document.getElementById('rapid-status-label');
+      if (rapidModeEnabled) {
+        btn.className = 'px-2 py-1 rounded-lg text-[10px] font-bold border transition-colors flex items-center gap-1 bg-amber-950 border-amber-600 text-amber-300';
+        label.textContent = 'ON';
+        label.className = 'text-amber-400 font-black';
+      } else {
+        btn.className = 'px-2 py-1 rounded-lg text-[10px] font-bold border transition-colors flex items-center gap-1 bg-zinc-900 border-zinc-700 text-zinc-400 hover:text-amber-400';
+        label.textContent = 'OFF';
+        label.className = 'text-zinc-500';
+      }
+    }
+
+    // Security Gate
+    function isStaffAuthenticated() {
+      return localStorage.getItem('ENGDAY_STAFF_AUTH') === 'true' || sessionStorage.getItem('ENGDAY_STAFF_AUTH') === 'true';
+    }
+
+    function checkStaffAuth() {
+      if (isStaffAuthenticated()) {
+        const modal = document.getElementById('staff-auth-modal');
+        if (modal) modal.classList.add('hidden');
+        startScanner();
+      } else {
+        const modal = document.getElementById('staff-auth-modal');
+        if (modal) modal.classList.remove('hidden');
+        setTimeout(() => document.getElementById('staff-pin-input')?.focus(), 150);
+      }
+    }
+
+    function verifyStaffPin() {
+      const pin = (document.getElementById('staff-pin-input')?.value || '').trim();
+      if (pin === '2026' || pin.toUpperCase() === 'MEODL' || pin.toUpperCase() === 'ENGDAY') {
+        localStorage.setItem('ENGDAY_STAFF_AUTH', 'true');
+        sessionStorage.setItem('ENGDAY_STAFF_AUTH', 'true');
+        document.getElementById('staff-auth-modal').classList.add('hidden');
+        startScanner();
+      } else {
+        const err = document.getElementById('staff-pin-error');
+        if (err) err.classList.remove('hidden');
+      }
+    }
+
+    // Game Tabs Initialization
+    function renderGameTabs() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const games = window.ENGDAY_ATTENDANCE.games;
+      const activeGame = window.ENGDAY_ATTENDANCE.getActiveGame();
+      const stats = window.ENGDAY_ATTENDANCE.calculateStats();
+      const container = document.getElementById('game-tabs-container');
+      if (!container) return;
+
+      container.innerHTML = games.map(g => {
+        const isActive = g.id === activeGame.id;
+        const gStats = stats.allGamesStats[g.id] || { insideCount: 0 };
+        const activeClass = isActive 
+          ? 'bg-amber-600 text-white border-amber-500 shadow-md shadow-amber-950 font-bold scale-[1.02]' 
+          : 'bg-zinc-900/90 text-zinc-400 border-zinc-800 hover:border-zinc-700 hover:text-zinc-200';
+
+        return `
+          <button onclick="selectActiveGame('${g.id}')" class="px-2.5 py-1.5 rounded-xl border text-[11px] flex items-center gap-1.5 shrink-0 transition-all ${activeClass}">
+            <span>${g.icon}</span>
+            <span class="whitespace-nowrap">${g.shortName}</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[9px] font-mono ${isActive ? 'bg-amber-950/80 text-amber-200' : 'bg-zinc-800 text-zinc-400'}">
+              ${gStats.insideCount}
+            </span>
+          </button>
+        `;
+      }).join('');
+
+      // Update Session Banner
+      document.getElementById('active-game-icon').textContent = activeGame.icon;
+      document.getElementById('active-game-name').textContent = activeGame.name;
+      document.getElementById('active-game-badge').textContent = activeGame.timeSlot;
+      document.getElementById('active-game-court').textContent = `${activeGame.court} • Court Entry / Exit`;
+      const currentStats = stats.allGamesStats[activeGame.id] || { insideCount: 0 };
+      document.getElementById('active-game-inside-count').textContent = currentStats.insideCount;
+      document.getElementById('recent-game-badge').textContent = `${activeGame.icon} ${activeGame.shortName}`;
+
+      renderRecentScans();
+    }
+
+    function selectActiveGame(gameId) {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      window.ENGDAY_ATTENDANCE.setActiveGame(gameId);
+      renderGameTabs();
+    }
+
+    // Camera Lifecycle
+    function startScanner() {
+      if (typeof Html5Qrcode === 'undefined') {
+        setTimeout(startScanner, 200);
+        return;
+      }
+
+      Html5Qrcode.getCameras().then(devices => {
+        camerasList = devices;
+        if (devices && devices.length) {
+          const backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('rear') || d.label.toLowerCase().includes('environment'));
+          const selected = backCam ? backCam.id : devices[0].id;
+          currentCameraId = selected;
+          launchCamera(selected);
+        } else {
+          launchCamera({ facingMode: "environment" });
+        }
+      }).catch(err => {
+        launchCamera({ facingMode: "environment" });
+      });
+    }
+
+    function launchCamera(config) {
+      if (html5QrScanner) {
+        try { html5QrScanner.stop(); } catch(e) {}
+      }
+
+      html5QrScanner = new Html5Qrcode("reader");
+      const scanConfig = {
+        fps: 15,
+        qrbox: { width: 220, height: 220 },
+        aspectRatio: 1.0
+      };
+
+      html5QrScanner.start(
+        config,
+        scanConfig,
+        onScanSuccess,
+        () => {}
+      ).catch(err => {
+        document.getElementById('cam-fallback').classList.remove('hidden');
+      });
+    }
+
+    function switchCamera() {
+      if (!camerasList || camerasList.length <= 1) return;
+      const idx = camerasList.findIndex(c => c.id === currentCameraId);
+      const nextIdx = (idx + 1) % camerasList.length;
+      currentCameraId = camerasList[nextIdx].id;
+      launchCamera(currentCameraId);
+    }
+
+    let torchOn = false;
+    function toggleTorch() {
+      if (!html5QrScanner) return;
+      torchOn = !torchOn;
+      html5QrScanner.applyVideoConstraints({ advanced: [{ torch: torchOn }] }).catch(() => {});
+    }
+
+    // QR Payload Processing
+    let lastScanTime = 0;
+    function onScanSuccess(decodedText) {
+      const now = Date.now();
+      if (now - lastScanTime < 1500) return; // Debounce 1.5s
+      lastScanTime = now;
+      handleScanPayload(decodedText);
+    }
+
+    function handleScanPayload(payload) {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const res = window.ENGDAY_ATTENDANCE.resolveScanPayload(payload);
+      if (!res.success) {
+        playBeep('error');
+        alert(res.message || 'Invalid QR code.');
+        return;
+      }
+
+      const student = res.student;
+      const activeGame = window.ENGDAY_ATTENDANCE.getActiveGame();
+      const statusInGame = (student.games[activeGame.id] && student.games[activeGame.id].status) || 'OUTSIDE';
+
+      if (rapidModeEnabled) {
+        // Instant toggle
+        if (statusInGame === 'OUTSIDE') {
+          window.ENGDAY_ATTENDANCE.recordCheckIn(student.id, activeGame.id, { performedBy: 'Marshal (Rapid)' });
+          playBeep('check_in');
+        } else {
+          window.ENGDAY_ATTENDANCE.recordCheckOut(student.id, activeGame.id, { performedBy: 'Marshal (Rapid)', reason: 'Rapid Scan Exit' });
+          playBeep('check_out');
+        }
+        renderGameTabs();
+        return;
+      }
+
+      // Standard Mode: Open Verification Modal
+      if (statusInGame === 'INSIDE') playBeep('check_in');
+      else playBeep('check_out');
+      showVerificationModal(student);
+    }
+
+    function processManualInput() {
+      const input = document.getElementById('manual-code-input');
+      const val = input.value.trim();
+      if (!val) return;
+      handleScanPayload(val);
+      input.value = '';
+    }
+
+    function scanImageFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!html5QrScanner) html5QrScanner = new Html5Qrcode("reader");
+      html5QrScanner.scanFile(file, true)
+        .then(text => onScanSuccess(text))
+        .catch(() => {
+          playBeep('error');
+          alert('Could not detect QR code in selected image.');
+        });
+    }
+
+    // Verification Modal Controller
+    function showVerificationModal(student) {
+      activeScannedStudent = student;
+      const activeGame = window.ENGDAY_ATTENDANCE.getActiveGame();
+      const gRecord = student.games[activeGame.id] || { status: 'OUTSIDE' };
+
+      document.getElementById('modal-student-name').textContent = student.name;
+      document.getElementById('modal-student-code').textContent = student.studentCode;
+
+      // Initials avatar
+      const parts = student.name.split(/[\s,]+/);
+      const initials = parts.slice(0, 2).map(p => p[0] || '').join('').toUpperCase();
+      document.getElementById('modal-avatar').textContent = initials || 'ST';
+
+      // Team Badge
+      const teamBadge = document.getElementById('modal-team-badge');
+      teamBadge.textContent = student.teamName || student.team.toUpperCase();
+      const teamColors = {
+        rankine: 'bg-red-950 text-red-300 border-red-800',
+        otto: 'bg-amber-950 text-amber-300 border-amber-800',
+        brayton: 'bg-cyan-950 text-cyan-300 border-cyan-800',
+        diesel: 'bg-emerald-950 text-emerald-300 border-emerald-800'
+      };
+      teamBadge.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${teamColors[student.team] || teamColors.rankine}`;
+
+      // Target Session
+      document.getElementById('modal-session-title').textContent = `${activeGame.icon} ${activeGame.name}`;
+
+      // Game Status & Action Button
+      const statusEl = document.getElementById('modal-game-status');
+      const actionBtn = document.getElementById('btn-primary-action');
+      const reasonContainer = document.getElementById('checkout-reason-container');
+
+      if (gRecord.status === 'INSIDE') {
+        const timeIn = gRecord.displayCheckIn || (gRecord.checkInTime ? window.formatManilaTime(gRecord.checkInTime) : '');
+        statusEl.textContent = `🟢 INSIDE COURT (${timeIn})`;
+        statusEl.className = 'px-3 py-1 rounded-xl text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-700';
+
+        actionBtn.textContent = `🔴 Confirm Check-Out (${activeGame.shortName})`;
+        actionBtn.className = 'w-full py-3.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-sm uppercase tracking-wider shadow-lg shadow-red-950 transition-all';
+        reasonContainer.classList.remove('hidden');
+      } else {
+        statusEl.textContent = '⚪ OUTSIDE COURT';
+        statusEl.className = 'px-3 py-1 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 border border-zinc-700';
+
+        actionBtn.textContent = `🟢 Confirm Check-In (${activeGame.shortName})`;
+        actionBtn.className = 'w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm uppercase tracking-wider shadow-lg shadow-emerald-950 transition-all';
+        reasonContainer.classList.add('hidden');
+      }
+
+      // Multi-Game Overview Grid for Student
+      let attendedCount = 0;
+      const games = window.ENGDAY_ATTENDANCE.games;
+      const gridContainer = document.getElementById('modal-games-grid');
+      gridContainer.innerHTML = games.map(g => {
+        const gr = student.games[g.id] || {};
+        const isCurrent = g.id === activeGame.id;
+        let badge = '⚪';
+        let statusText = 'Not joined';
+        let border = isCurrent ? 'border-amber-500/80 bg-amber-950/20' : 'border-zinc-800/80 bg-zinc-900/60';
+
+        if (gr.visits > 0) attendedCount++;
+
+        if (gr.status === 'INSIDE') {
+          badge = '🟢 IN';
+          statusText = gr.displayCheckIn || '--:--';
+          border = 'border-emerald-600/60 bg-emerald-950/30';
+        } else if (gr.visits > 0) {
+          badge = '🔴 OUT';
+          statusText = gr.displayCheckOut || 'Finished';
+          border = 'border-zinc-700 bg-zinc-900/80';
+        }
+
+        return `
+          <div class="p-2 rounded-xl border ${border} flex items-center justify-between">
+            <span class="font-medium text-zinc-300 truncate">${g.icon} ${g.shortName}</span>
+            <span class="text-[10px] font-mono text-zinc-400 font-bold">${badge}</span>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('modal-games-attended-counter').textContent = `${attendedCount}/6 Games`;
+
+      // Timeline for this Game
+      const timelineEl = document.getElementById('modal-history-timeline');
+      window.ENGDAY_ATTENDANCE.getStudentHistory(student.id, activeGame.id).then(history => {
+        if (!history || !history.length) {
+          timelineEl.innerHTML = '<p class="text-center text-zinc-500 py-1 text-[10px]">No prior scan events for this game.</p>';
+          return;
+        }
+        timelineEl.innerHTML = history.map(h => {
+          const isCheckIn = h.action === 'check_in';
+          const badge = isCheckIn ? '🟢 IN' : '🔴 OUT';
+          const time = h.displayTime || '--:--';
+          return `
+            <div class="flex items-center justify-between p-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-[10px]">
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold">${badge}</span>
+                <span class="font-mono text-zinc-300">${time}</span>
+                <span class="text-zinc-500">${h.reason || ''}</span>
+              </div>
+              <span class="text-zinc-500 font-mono">${h.performedBy || 'Marshal'}</span>
+            </div>
+          `;
+        }).join('');
+      });
+
+      document.getElementById('verify-modal').classList.remove('hidden');
+    }
+
+    function closeVerifyModal() {
+      document.getElementById('verify-modal').classList.add('hidden');
+      activeScannedStudent = null;
+    }
+
+    function executePrimaryAction() {
+      if (!activeScannedStudent || !window.ENGDAY_ATTENDANCE) return;
+      const student = activeScannedStudent;
+      const activeGame = window.ENGDAY_ATTENDANCE.getActiveGame();
+      const gRecord = student.games[activeGame.id] || { status: 'OUTSIDE' };
+
+      if (gRecord.status === 'INSIDE') {
+        const reason = document.getElementById('checkout-reason-select').value;
+        window.ENGDAY_ATTENDANCE.recordCheckOut(student.id, activeGame.id, { performedBy: 'Marshal Gate', reason: reason });
+        playBeep('check_out');
+      } else {
+        window.ENGDAY_ATTENDANCE.recordCheckIn(student.id, activeGame.id, { performedBy: 'Marshal Gate' });
+        playBeep('check_in');
+      }
+
+      closeVerifyModal();
+      renderGameTabs();
+    }
+
+    // Recent Scans Feed
+    function renderRecentScans() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const activeGame = window.ENGDAY_ATTENDANCE.getActiveGame();
+      const listEl = document.getElementById('recent-scans-list');
+      if (!listEl) return;
+
+      window.ENGDAY_ATTENDANCE.getRecentScans(activeGame.id, 15).then(scans => {
+        if (!scans || !scans.length) {
+          listEl.innerHTML = `<p class="text-center text-zinc-500 py-3 text-[11px]">No activity recorded yet for ${activeGame.name}.</p>`;
+          return;
+        }
+
+        listEl.innerHTML = scans.map(s => {
+          const isCheckIn = s.action === 'check_in';
+          const badgeClass = isCheckIn ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-red-950 text-red-300 border-red-800';
+          const badgeText = isCheckIn ? 'CHECK IN' : 'CHECK OUT';
+          const sub = s.reason ? ` • ${s.reason}` : '';
+
+          return `
+            <div class="flex items-center justify-between p-2 rounded-xl bg-zinc-900/80 border border-zinc-800">
+              <div class="min-w-0 pr-2">
+                <div class="flex items-center gap-1.5 truncate">
+                  <span class="text-zinc-200 font-bold truncate text-[11px]">${s.studentName || s.studentCode}</span>
+                  <span class="text-[9px] text-zinc-500">(${s.studentCode})</span>
+                </div>
+                <p class="text-[10px] text-zinc-400 truncate">${s.displayTime || ''}${sub}</p>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[9px] font-bold border ${badgeClass} shrink-0">
+                ${badgeText}
+              </span>
+            </div>
+          `;
+        }).join('');
+      });
+    }
+
+    // Live Manila Clock
+    function updateLiveClock() {
+      const el = document.getElementById('header-time-clock');
+      if (el) {
+        el.textContent = new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      }
+    }
+
+    // Sync Status Indicator
+    function updateSyncUI(engine) {
+      if (!engine) return;
+      const dot = document.getElementById('sync-dot');
+      const text = document.getElementById('sync-text');
+      const badge = document.getElementById('sync-pending-badge');
+
+      if (engine.pendingCount > 0) {
+        badge.classList.remove('hidden');
+        badge.textContent = `${engine.pendingCount} pending sync`;
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      if (engine.serverOnline) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500';
+        text.textContent = 'Server Connected (Live Sync)';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-cyan-500';
+        text.textContent = 'Offline Engine (Zero Latency)';
+      }
+    }
+
+    // Boot
+    document.addEventListener('DOMContentLoaded', () => {
+      checkStaffAuth();
+      renderGameTabs();
+      setInterval(updateLiveClock, 1000);
+      updateLiveClock();
+
+      if (window.ENGDAY_ATTENDANCE) {
+        window.ENGDAY_ATTENDANCE.subscribe(engine => {
+          renderGameTabs();
+          updateSyncUI(engine);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

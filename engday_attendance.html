@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Engineering Day 2026 • Sports Attendance Dashboard (Basketball & Volleyball)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    if (window.tailwind) {
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+            },
+            colors: {
+              obsidian: '#09090b',
+              cardBg: '#111317'
+            }
+          }
+        }
+      };
+    }
+  </script>
+
+  <!-- Local Standalone Libraries with Resilient Fallback -->
+  <script src="./assets/meodl_data.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_data.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/engday_attendance.js"></script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #09090b;
+      color: #f4f4f5;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-obsidian text-zinc-100 flex flex-col min-h-screen">
+
+  <!-- =========================================================================
+       TOP GLOBAL HEADER & NAVIGATION
+       ========================================================================= -->
+  <header class="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800/80 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-amber-950/80 border border-amber-600/80 flex items-center justify-center text-amber-400 font-black text-xl shadow-lg shadow-amber-950/40">
+          ⚙️
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-black tracking-widest text-amber-400 uppercase">ENGINEERING DAY 2026</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800">SPORTS ATTENDANCE</span>
+          </div>
+          <h1 class="text-base sm:text-lg font-black text-white tracking-tight">Basketball & Volleyball Attendance Center</h1>
+        </div>
+      </div>
+
+      <!-- Actions & Status Strip -->
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <!-- Live Manila Clock -->
+        <div class="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 font-mono text-xs text-zinc-300 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+          <span id="live-manila-clock">--:--:--</span>
+          <span class="text-[10px] text-zinc-500">PST</span>
+        </div>
+
+        <!-- Scanner Launcher -->
+        <a href="engday_scanner.html" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-amber-950">
+          <span>📲</span>
+          <span>Open Court Scanner</span>
+        </a>
+
+        <!-- Return to MEODL Main Hub -->
+        <a href="index.html" class="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-semibold text-xs border border-zinc-700 transition-colors" title="View MEODL Tournament Hub">
+          MEODL Hub ↗
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN DASHBOARD CONTAINER
+       ========================================================================= -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 py-6 space-y-6">
+
+    <!-- OVERVIEW STATS CARDS (4 TILES) -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <!-- Total Students -->
+      <div class="p-4 rounded-2xl bg-zinc-950 border border-zinc-800/80 flex flex-col justify-between">
+        <span class="text-xs text-zinc-400 font-medium uppercase tracking-wider">Total Registered</span>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="stat-total-students" class="text-2xl sm:text-3xl font-black text-white font-mono">175</span>
+          <span class="text-xs text-zinc-500">Students</span>
+        </div>
+        <p class="text-[11px] text-zinc-500 mt-1">4 Official ME Teams</p>
+      </div>
+
+      <!-- Unique Attendees -->
+      <div class="p-4 rounded-2xl bg-zinc-950 border border-zinc-800/80 flex flex-col justify-between">
+        <span class="text-xs text-amber-400 font-medium uppercase tracking-wider">Attended Games</span>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="stat-unique-attendees" class="text-2xl sm:text-3xl font-black text-amber-300 font-mono">0</span>
+          <span id="stat-participation-pct" class="text-xs text-amber-400/80 font-bold font-mono">0%</span>
+        </div>
+        <p class="text-[11px] text-zinc-500 mt-1">At least 1 game scanned</p>
+      </div>
+
+      <!-- Currently Inside Court -->
+      <div class="p-4 rounded-2xl bg-zinc-950 border border-emerald-900/60 bg-emerald-950/20 flex flex-col justify-between">
+        <span class="text-xs text-emerald-400 font-medium uppercase tracking-wider">Currently In Courts</span>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="stat-currently-inside" class="text-2xl sm:text-3xl font-black text-emerald-300 font-mono">0</span>
+          <span class="text-xs text-emerald-500">Active</span>
+        </div>
+        <p class="text-[11px] text-emerald-500/80 mt-1">Live court head-count</p>
+      </div>
+
+      <!-- Total Game Sessions Scanned -->
+      <div class="p-4 rounded-2xl bg-zinc-950 border border-zinc-800/80 flex flex-col justify-between">
+        <span class="text-xs text-cyan-400 font-medium uppercase tracking-wider">Total Check-Ins</span>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="stat-total-checkins" class="text-2xl sm:text-3xl font-black text-cyan-300 font-mono">0</span>
+          <span class="text-xs text-cyan-500">Scans</span>
+        </div>
+        <p class="text-[11px] text-zinc-500 mt-1">Across all 6 games</p>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         THE 6 GAMES SESSIONS GRID
+         ======================================================================= -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
+            <span>🏆</span>
+            <span>Sports Sessions Overview (6 Games)</span>
+          </h2>
+          <p class="text-xs text-zinc-400">Independent check-in and check-out monitored for each match</p>
+        </div>
+        
+        <!-- Filter Pills for Sessions -->
+        <div class="flex items-center gap-1.5 text-xs">
+          <button onclick="setGameFilter('all')" id="filter-pill-all" class="px-2.5 py-1 rounded-lg font-bold bg-amber-600 text-white">All (6)</button>
+          <button onclick="setGameFilter('basketball')" id="filter-pill-bb" class="px-2.5 py-1 rounded-lg font-medium bg-zinc-900 text-zinc-400 hover:text-white">🏀 Basketball (3)</button>
+          <button onclick="setGameFilter('volleyball')" id="filter-pill-vb" class="px-2.5 py-1 rounded-lg font-medium bg-zinc-900 text-zinc-400 hover:text-white">🏐 Volleyball (3)</button>
+        </div>
+      </div>
+
+      <!-- 6 Session Cards -->
+      <div id="games-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         TEAM PARTICIPATION & LEADERBOARD BREAKDOWN
+         ======================================================================= -->
+    <section class="p-4 sm:p-5 rounded-2xl bg-zinc-950 border border-zinc-800/80 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+            <span>📊</span>
+            <span>Team Attendance & Spirit Leaderboard</span>
+          </h2>
+          <p class="text-xs text-zinc-400">Turnout rate of Rankine, Otto, Brayton, and Diesel across all sports matches</p>
+        </div>
+      </div>
+
+      <div id="teams-leaderboard-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         MASTER ROSTER & DETAILED ATTENDANCE MATRIX TABLE
+         ======================================================================= -->
+    <section class="p-4 sm:p-5 rounded-2xl bg-zinc-950 border border-zinc-800/80 space-y-4">
+      
+      <!-- Table Controls Bar -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex items-center gap-2 flex-1 max-w-md">
+          <div class="relative w-full">
+            <input 
+              type="text" 
+              id="student-search-input" 
+              placeholder="Search by student name or MEODL code..." 
+              class="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+              oninput="renderMasterTable()"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Filter by Team -->
+          <select id="team-filter-select" onchange="renderMasterTable()" class="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500">
+            <option value="all">All Teams (4)</option>
+            <option value="rankine">Team Rankine</option>
+            <option value="otto">Team Otto</option>
+            <option value="brayton">Team Brayton</option>
+            <option value="diesel">Team Diesel</option>
+          </select>
+
+          <!-- Filter by Status -->
+          <select id="status-filter-select" onchange="renderMasterTable()" class="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500">
+            <option value="all">All Students (175)</option>
+            <option value="inside_any">Currently Inside Any Court</option>
+            <option value="attended_any">Attended At Least 1 Game</option>
+            <option value="none">No Scans Recorded Yet</option>
+          </select>
+
+          <!-- Export Actions -->
+          <div class="flex items-center gap-1.5">
+            <button onclick="downloadCSVReport()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-bold transition-colors flex items-center gap-1.5" title="Export CSV Report">
+              <span>📥 CSV</span>
+            </button>
+            <button onclick="downloadJSONBackup()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-bold transition-colors flex items-center gap-1.5" title="Export Complete JSON Backup">
+              <span>💾 Backup</span>
+            </button>
+            <button onclick="window.print()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-bold transition-colors flex items-center gap-1.5" title="Print Referee Sheet">
+              <span>🖨️ Print</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Responsive Table Container -->
+      <div class="overflow-x-auto rounded-xl border border-zinc-800/80">
+        <table class="w-full text-left text-xs whitespace-nowrap">
+          <thead class="bg-zinc-900/90 text-zinc-400 uppercase font-mono text-[10px] border-b border-zinc-800">
+            <tr>
+              <th class="py-3 px-3">Student</th>
+              <th class="py-3 px-3">Team</th>
+              <th class="py-3 px-3 text-center">🏀 BB Game 1</th>
+              <th class="py-3 px-3 text-center">🏀 BB Game 2</th>
+              <th class="py-3 px-3 text-center">🏀 BB Game 3</th>
+              <th class="py-3 px-3 text-center">🏐 VB Game 1</th>
+              <th class="py-3 px-3 text-center">🏐 VB Game 2</th>
+              <th class="py-3 px-3 text-center">🏐 VB Game 3</th>
+              <th class="py-3 px-3 text-center">Total</th>
+              <th class="py-3 px-3 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="master-table-body" class="divide-y divide-zinc-900 font-mono">
+            <!-- Injected via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Pagination / Counter Footer -->
+      <div class="flex items-center justify-between text-xs text-zinc-500 pt-1">
+        <span id="table-record-count">Showing 175 of 175 students</span>
+        <div class="flex items-center gap-2">
+          <span>🟢 Inside Court</span>
+          <span>🔴 Checked Out</span>
+          <span>⚪ Not Joined</span>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       STUDENT MULTI-GAME AUDIT LOG & MANUAL OVERRIDE MODAL
+       ========================================================================= -->
+  <div id="student-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-lg bg-zinc-950 border border-zinc-800 rounded-3xl p-6 shadow-2xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-3">
+          <div id="sm-avatar" class="w-12 h-12 rounded-2xl bg-amber-950 border border-amber-700 text-amber-300 font-black text-lg flex items-center justify-center shrink-0">
+            ST
+          </div>
+          <div>
+            <h3 id="sm-name" class="text-base font-bold text-white">STUDENT FULL NAME</h3>
+            <div class="flex items-center gap-2 mt-0.5">
+              <span id="sm-code" class="text-xs font-mono text-zinc-400">MEODL-0000</span>
+              <span id="sm-team" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-red-950 text-red-300 border border-red-800">TEAM RANKINE</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="closeStudentModal()" class="p-1 rounded-lg text-zinc-500 hover:text-white text-base">✕</button>
+      </div>
+
+      <!-- Multi-Game Status Cards Grid with One-Tap Manual Override -->
+      <div>
+        <div class="text-xs font-bold text-zinc-300 uppercase tracking-wider mb-2">Game Attendance Status & Override</div>
+        <div id="sm-games-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Complete Scan Event Audit Trail -->
+      <div class="border-t border-zinc-900 pt-3">
+        <div class="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Activity Timeline</div>
+        <div id="sm-timeline" class="space-y-1.5 max-h-40 overflow-y-auto text-xs">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       DASHBOARD SCRIPT CONTROLLER
+       ========================================================================= -->
+  <script>
+    let activeGameFilter = 'all'; // 'all' | 'basketball' | 'volleyball'
+
+    // Update Manila Clock
+    function updateClock() {
+      const el = document.getElementById('live-manila-clock');
+      if (el) {
+        el.textContent = new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+      }
+    }
+
+    function setGameFilter(filter) {
+      activeGameFilter = filter;
+      document.getElementById('filter-pill-all').className = filter === 'all' ? 'px-2.5 py-1 rounded-lg font-bold bg-amber-600 text-white' : 'px-2.5 py-1 rounded-lg font-medium bg-zinc-900 text-zinc-400 hover:text-white';
+      document.getElementById('filter-pill-bb').className = filter === 'basketball' ? 'px-2.5 py-1 rounded-lg font-bold bg-amber-600 text-white' : 'px-2.5 py-1 rounded-lg font-medium bg-zinc-900 text-zinc-400 hover:text-white';
+      document.getElementById('filter-pill-vb').className = filter === 'volleyball' ? 'px-2.5 py-1 rounded-lg font-bold bg-amber-600 text-white' : 'px-2.5 py-1 rounded-lg font-medium bg-zinc-900 text-zinc-400 hover:text-white';
+      renderGameCards();
+    }
+
+    // Render 6 Game Session Cards
+    function renderGameCards() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const games = window.ENGDAY_ATTENDANCE.games;
+      const stats = window.ENGDAY_ATTENDANCE.calculateStats();
+      const container = document.getElementById('games-cards-grid');
+      if (!container) return;
+
+      const filteredGames = games.filter(g => {
+        if (activeGameFilter === 'basketball') return g.sport === 'basketball';
+        if (activeGameFilter === 'volleyball') return g.sport === 'volleyball';
+        return true;
+      });
+
+      container.innerHTML = filteredGames.map(g => {
+        const gs = stats.allGamesStats[g.id] || { totalCheckIns: 0, insideCount: 0, outsideCount: 0, byTeam: {} };
+        const totalIn = gs.insideCount || 0;
+        const totalCheck = gs.totalCheckIns || 0;
+
+        return `
+          <div class="p-4 rounded-2xl bg-zinc-950 border border-zinc-800/90 hover:border-zinc-700 transition-all shadow-lg flex flex-col justify-between gap-3">
+            <div>
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl">${g.icon}</span>
+                  <div>
+                    <h3 class="text-sm font-bold text-white">${g.name}</h3>
+                    <p class="text-[10px] text-zinc-400">${g.timeSlot} • ${g.court}</p>
+                  </div>
+                </div>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${g.badgeClass}">
+                  ${totalIn > 0 ? '🟢 LIVE' : '⚪ IDLE'}
+                </span>
+              </div>
+
+              <!-- Key Metrics -->
+              <div class="grid grid-cols-3 gap-2 mt-3.5 pt-3 border-t border-zinc-900 text-center font-mono">
+                <div class="p-2 rounded-xl bg-zinc-900/60">
+                  <span class="text-[9px] uppercase text-zinc-500 font-semibold block">Inside</span>
+                  <span class="text-base font-black text-emerald-400">${totalIn}</span>
+                </div>
+                <div class="p-2 rounded-xl bg-zinc-900/60">
+                  <span class="text-[9px] uppercase text-zinc-500 font-semibold block">Total In</span>
+                  <span class="text-base font-black text-amber-400">${totalCheck}</span>
+                </div>
+                <div class="p-2 rounded-xl bg-zinc-900/60">
+                  <span class="text-[9px] uppercase text-zinc-500 font-semibold block">Out</span>
+                  <span class="text-base font-black text-zinc-400">${gs.outsideCount || 0}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Team Breakdown Mini Bars -->
+            <div class="pt-2 border-t border-zinc-900/80 space-y-1">
+              <div class="flex justify-between text-[10px] text-zinc-500">
+                <span>Team Representation</span>
+                <span>R | O | B | D</span>
+              </div>
+              <div class="h-2 rounded-full bg-zinc-900 overflow-hidden flex">
+                <div style="width: ${getBarPct(gs.byTeam.rankine?.total, totalCheck)}%" class="bg-red-600" title="Rankine: ${gs.byTeam.rankine?.total || 0}"></div>
+                <div style="width: ${getBarPct(gs.byTeam.otto?.total, totalCheck)}%" class="bg-amber-500" title="Otto: ${gs.byTeam.otto?.total || 0}"></div>
+                <div style="width: ${getBarPct(gs.byTeam.brayton?.total, totalCheck)}%" class="bg-cyan-500" title="Brayton: ${gs.byTeam.brayton?.total || 0}"></div>
+                <div style="width: ${getBarPct(gs.byTeam.diesel?.total, totalCheck)}%" class="bg-emerald-500" title="Diesel: ${gs.byTeam.diesel?.total || 0}"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getBarPct(val, total) {
+      if (!val || !total) return 0;
+      return Math.round((val / total) * 100);
+    }
+
+    // Render Global Stats
+    function renderGlobalStats() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const stats = window.ENGDAY_ATTENDANCE.calculateStats();
+
+      document.getElementById('stat-total-students').textContent = stats.totalStudents;
+      document.getElementById('stat-unique-attendees').textContent = stats.totalUniqueAttendees;
+      document.getElementById('stat-participation-pct').textContent = `${stats.participationRate}%`;
+
+      let insideTotal = 0;
+      let checkInsTotal = 0;
+      Object.values(stats.allGamesStats).forEach(s => {
+        insideTotal += s.insideCount || 0;
+        checkInsTotal += s.totalCheckIns || 0;
+      });
+
+      document.getElementById('stat-currently-inside').textContent = insideTotal;
+      document.getElementById('stat-total-checkins').textContent = checkInsTotal;
+
+      renderTeamsLeaderboard(stats);
+    }
+
+    // Render Team Leaderboard Cards
+    function renderTeamsLeaderboard(stats) {
+      const container = document.getElementById('teams-leaderboard-container');
+      if (!container) return;
+
+      const teamsData = [
+        { id: 'rankine', name: 'Team Rankine', hex: '#ef4444', border: 'border-red-900/60', bg: 'bg-red-950/20', badge: 'bg-red-950 text-red-300' },
+        { id: 'otto', name: 'Team Otto', hex: '#f59e0b', border: 'border-amber-900/60', bg: 'bg-amber-950/20', badge: 'bg-amber-950 text-amber-300' },
+        { id: 'brayton', name: 'Team Brayton', hex: '#06b6d4', border: 'border-cyan-900/60', bg: 'bg-cyan-950/20', badge: 'bg-cyan-950 text-cyan-300' },
+        { id: 'diesel', name: 'Team Diesel', hex: '#10b981', border: 'border-emerald-900/60', bg: 'bg-emerald-950/20', badge: 'bg-emerald-950 text-emerald-300' }
+      ];
+
+      // Sum turnouts
+      const tallies = { rankine: { in: 0, total: 0 }, otto: { in: 0, total: 0 }, brayton: { in: 0, total: 0 }, diesel: { in: 0, total: 0 } };
+      Object.values(stats.allGamesStats).forEach(gs => {
+        ['rankine', 'otto', 'brayton', 'diesel'].forEach(t => {
+          tallies[t].in += gs.byTeam[t]?.inside || 0;
+          tallies[t].total += gs.byTeam[t]?.total || 0;
+        });
+      });
+
+      container.innerHTML = teamsData.map(t => {
+        const d = tallies[t.id];
+        return `
+          <div class="p-3 rounded-xl border ${t.border} ${t.bg} flex items-center justify-between">
+            <div>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${t.badge}">${t.name}</span>
+              <div class="text-[11px] text-zinc-400 mt-1">Total: <strong class="text-white">${d.total}</strong> scans</div>
+            </div>
+            <div class="text-right">
+              <span class="text-xs text-emerald-400 font-bold block">${d.in} Inside</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render Master Roster Table
+    function renderMasterTable() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const allStudents = Object.values(window.ENGDAY_ATTENDANCE.state.students || {});
+      const games = window.ENGDAY_ATTENDANCE.games;
+      const search = (document.getElementById('student-search-input')?.value || '').trim().toLowerCase();
+      const teamFilter = document.getElementById('team-filter-select')?.value || 'all';
+      const statusFilter = document.getElementById('status-filter-select')?.value || 'all';
+      const tbody = document.getElementById('master-table-body');
+      if (!tbody) return;
+
+      // Filter Students
+      const filtered = allStudents.filter(s => {
+        // Team filter
+        if (teamFilter !== 'all' && s.team !== teamFilter) return false;
+
+        // Search filter
+        if (search) {
+          const matchName = (s.name || '').toLowerCase().includes(search);
+          const matchCode = (s.studentCode || '').toLowerCase().includes(search);
+          if (!matchName && !matchCode) return false;
+        }
+
+        // Status filter
+        if (statusFilter === 'inside_any') {
+          const isInsideAny = games.some(g => s.games[g.id]?.status === 'INSIDE');
+          if (!isInsideAny) return false;
+        } else if (statusFilter === 'attended_any') {
+          const attendedAny = games.some(g => (s.games[g.id]?.visits || 0) > 0);
+          if (!attendedAny) return false;
+        } else if (statusFilter === 'none') {
+          const attendedAny = games.some(g => (s.games[g.id]?.visits || 0) > 0);
+          if (attendedAny) return false;
+        }
+
+        return true;
+      });
+
+      document.getElementById('table-record-count').textContent = `Showing ${filtered.length} of ${allStudents.length} students`;
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="10" class="py-6 text-center text-zinc-500 font-sans">No matching students found for current filters.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(s => {
+        const teamColors = {
+          rankine: 'bg-red-950 text-red-300 border-red-800',
+          otto: 'bg-amber-950 text-amber-300 border-amber-800',
+          brayton: 'bg-cyan-950 text-cyan-300 border-cyan-800',
+          diesel: 'bg-emerald-950 text-emerald-300 border-emerald-800'
+        };
+
+        let attendedCount = 0;
+        const gameCells = games.map(g => {
+          const gr = s.games[g.id] || {};
+          let badge = '<span class="text-zinc-600 font-mono">⚪</span>';
+          if (gr.visits > 0) attendedCount++;
+
+          if (gr.status === 'INSIDE') {
+            const t = gr.displayCheckIn || '--:--';
+            badge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-800" title="In: ${t}">🟢 ${t}</span>`;
+          } else if (gr.visits > 0) {
+            const t = gr.displayCheckOut || 'Out';
+            badge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-zinc-900 text-zinc-400 border border-zinc-700" title="Checked Out: ${t}">🔴 ${t}</span>`;
+          }
+
+          return `<td class="py-2.5 px-3 text-center">${badge}</td>`;
+        }).join('');
+
+        return `
+          <tr class="hover:bg-zinc-900/50 transition-colors">
+            <td class="py-2.5 px-3">
+              <div class="flex items-center gap-2">
+                <span class="text-zinc-400 font-mono text-[11px]">${s.studentCode}</span>
+                <span class="text-white font-medium font-sans truncate max-w-xs">${s.name}</span>
+              </div>
+            </td>
+            <td class="py-2.5 px-3">
+              <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${teamColors[s.team] || teamColors.rankine}">
+                ${s.team}
+              </span>
+            </td>
+            ${gameCells}
+            <td class="py-2.5 px-3 text-center font-bold ${attendedCount > 0 ? 'text-amber-400' : 'text-zinc-500'}">
+              ${attendedCount}/6
+            </td>
+            <td class="py-2.5 px-3 text-right">
+              <button onclick="openStudentModal('${s.id}')" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-bold transition-colors">
+                Audit / Override
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // Student Modal Controller
+    let activeModalStudentId = null;
+    function openStudentModal(studentId) {
+      activeModalStudentId = studentId;
+      const s = window.ENGDAY_ATTENDANCE.getStudentById(studentId);
+      if (!s) return;
+
+      document.getElementById('sm-name').textContent = s.name;
+      document.getElementById('sm-code').textContent = s.studentCode;
+      document.getElementById('sm-team').textContent = s.teamName || s.team.toUpperCase();
+
+      const parts = s.name.split(/[\s,]+/);
+      const initials = parts.slice(0, 2).map(p => p[0] || '').join('').toUpperCase();
+      document.getElementById('sm-avatar').textContent = initials || 'ST';
+
+      // Games Grid
+      const games = window.ENGDAY_ATTENDANCE.games;
+      const grid = document.getElementById('sm-games-grid');
+      grid.innerHTML = games.map(g => {
+        const gr = s.games[g.id] || { status: 'OUTSIDE' };
+        const isInside = gr.status === 'INSIDE';
+
+        return `
+          <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <span class="text-xs font-bold text-white block truncate">${g.icon} ${g.name}</span>
+              <span class="text-[10px] text-zinc-400 font-mono">
+                ${isInside ? '🟢 In: ' + (gr.displayCheckIn || '--:--') : (gr.visits > 0 ? '🔴 Out: ' + (gr.displayCheckOut || '--:--') : '⚪ Not Checked In')}
+              </span>
+            </div>
+            <button onclick="toggleStudentGameStatus('${s.id}', '${g.id}', '${isInside ? 'OUTSIDE' : 'INSIDE'}')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border transition-colors shrink-0 ${isInside ? 'bg-red-950 text-red-300 border-red-800 hover:bg-red-900' : 'bg-emerald-950 text-emerald-300 border-emerald-800 hover:bg-emerald-900'}">
+              ${isInside ? 'Check Out' : 'Check In'}
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      // Timeline
+      const timeline = document.getElementById('sm-timeline');
+      window.ENGDAY_ATTENDANCE.getStudentHistory(s.id).then(history => {
+        if (!history || !history.length) {
+          timeline.innerHTML = `<p class="text-center text-zinc-500 py-2 text-[11px]">No scans recorded yet for this student.</p>`;
+          return;
+        }
+
+        timeline.innerHTML = history.map(h => {
+          const isCheckIn = h.action === 'check_in';
+          return `
+            <div class="flex items-center justify-between p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-[11px]">
+              <div>
+                <span class="font-bold ${isCheckIn ? 'text-emerald-400' : 'text-rose-400'}">${isCheckIn ? '🟢 IN' : '🔴 OUT'}</span>
+                <span class="text-zinc-300 font-bold ml-1">${h.gameName}</span>
+                <span class="text-zinc-500 text-[10px] block">${h.displayDate} • ${h.displayTime} (${h.reason || 'Normal Scan'})</span>
+              </div>
+              <span class="text-zinc-500 font-mono text-[10px]">${h.performedBy || 'Marshal'}</span>
+            </div>
+          `;
+        }).join('');
+      });
+
+      document.getElementById('student-modal').classList.remove('hidden');
+    }
+
+    function closeStudentModal() {
+      document.getElementById('student-modal').classList.add('hidden');
+      activeModalStudentId = null;
+    }
+
+    function toggleStudentGameStatus(studentId, gameId, newStatus) {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      window.ENGDAY_ATTENDANCE.manualOverride(studentId, gameId, newStatus, {
+        performedBy: 'Dashboard Admin',
+        reason: `Admin toggle to ${newStatus}`
+      });
+      openStudentModal(studentId);
+      renderGameCards();
+      renderGlobalStats();
+      renderMasterTable();
+    }
+
+    // Export Helpers
+    function downloadCSVReport() {
+      if (window.ENGDAY_ATTENDANCE) window.ENGDAY_ATTENDANCE.downloadCSV();
+    }
+
+    function downloadJSONBackup() {
+      if (window.ENGDAY_ATTENDANCE) window.ENGDAY_ATTENDANCE.downloadJSON();
+    }
+
+    // Boot
+    document.addEventListener('DOMContentLoaded', () => {
+      setInterval(updateClock, 1000);
+      updateClock();
+
+      renderGameCards();
+      renderGlobalStats();
+      renderMasterTable();
+
+      if (window.ENGDAY_ATTENDANCE) {
+        window.ENGDAY_ATTENDANCE.subscribe(() => {
+          renderGameCards();
+          renderGlobalStats();
+          renderMasterTable();
+          if (activeModalStudentId) openStudentModal(activeModalStudentId);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

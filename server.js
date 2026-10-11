@@ -13,6 +13,8 @@ const IS_VERCEL = Boolean(process.env.VERCEL);
 const DATA_DIR = IS_VERCEL ? '/tmp' : __dirname;
 const EVENTS_FILE = path.join(DATA_DIR, 'attendance_events.json');
 const STATE_FILE = path.join(DATA_DIR, 'attendance_state.json');
+const ENGDAY_EVENTS_FILE = path.join(DATA_DIR, 'engday_attendance_events.json');
+const ENGDAY_STATE_FILE = path.join(DATA_DIR, 'engday_attendance_state.json');
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -182,6 +184,183 @@ if (!attendanceState || !attendanceState.students || Object.keys(attendanceState
     lastUpdated: new Date().toISOString()
   };
   try { atomicWriteJson(STATE_FILE, attendanceState); } catch(e) {}
+}
+
+// -------------------------------------------------------------------------
+// ENGINEERING DAY 2026 (SPORTS ATTENDANCE: 3 BASKETBALL + 3 VOLLEYBALL)
+// -------------------------------------------------------------------------
+const ENGDAY_GAMES_LIST = ['bb1', 'bb2', 'bb3', 'vb1', 'vb2', 'vb3'];
+
+function buildDefaultEngDayRoster() {
+  const baseStudents = buildDefaultStudentsRoster();
+  const students = {};
+  for (const [id, s] of Object.entries(baseStudents)) {
+    const gm = {};
+    ENGDAY_GAMES_LIST.forEach(g => {
+      gm[g] = {
+        gameId: g,
+        status: 'OUTSIDE',
+        lastAction: null,
+        checkInTime: null,
+        checkOutTime: null,
+        displayCheckIn: null,
+        displayCheckOut: null,
+        visits: 0,
+        history: []
+      };
+    });
+    students[id] = {
+      id: s.id,
+      name: s.name,
+      team: s.team,
+      teamName: s.teamName,
+      studentCode: s.studentCode,
+      games: gm
+    };
+  }
+  return students;
+}
+
+let engdayEvents = safeReadJson(ENGDAY_EVENTS_FILE, getBundledJson('./engday_attendance_events.json', []));
+let engdayEventsMap = new Map();
+engdayEvents.forEach(ev => {
+  if (ev && ev.eventId) engdayEventsMap.set(ev.eventId, ev);
+});
+
+let engdayState = safeReadJson(ENGDAY_STATE_FILE, getBundledJson('./engday_attendance_state.json', null));
+if (!engdayState || !engdayState.students || Object.keys(engdayState.students).length === 0) {
+  engdayState = {
+    students: buildDefaultEngDayRoster(),
+    version: 1,
+    lastUpdated: new Date().toISOString()
+  };
+  try { atomicWriteJson(ENGDAY_STATE_FILE, engdayState); } catch(e) {}
+}
+
+function rederiveEngDayStudentState(student, studentEvents) {
+  const sorted = studentEvents.slice().sort(compareEvents);
+  const updated = {
+    ...student,
+    games: {}
+  };
+  ENGDAY_GAMES_LIST.forEach(g => {
+    updated.games[g] = {
+      gameId: g,
+      status: 'OUTSIDE',
+      lastAction: null,
+      checkInTime: null,
+      checkOutTime: null,
+      displayCheckIn: null,
+      displayCheckOut: null,
+      visits: 0,
+      history: []
+    };
+  });
+
+  for (const ev of sorted) {
+    const gId = ev.gameId;
+    if (!updated.games[gId]) continue;
+    const gRecord = updated.games[gId];
+    const action = String(ev.action || '').toLowerCase();
+    const timeStr = formatManilaTime(ev.occurredAt);
+
+    if (action === 'check_in') {
+      gRecord.status = 'INSIDE';
+      gRecord.lastAction = 'check_in';
+      gRecord.checkInTime = ev.occurredAt;
+      gRecord.displayCheckIn = timeStr;
+      gRecord.visits = (gRecord.visits || 0) + 1;
+      gRecord.history.push({
+        eventId: ev.eventId,
+        action: 'check_in',
+        timestamp: ev.occurredAt,
+        displayTime: timeStr,
+        performedBy: ev.marshalId,
+        court: ev.court,
+        deviceId: ev.deviceId
+      });
+    } else if (action === 'check_out') {
+      gRecord.status = 'OUTSIDE';
+      gRecord.lastAction = 'check_out';
+      gRecord.checkOutTime = ev.occurredAt;
+      gRecord.displayCheckOut = timeStr;
+      gRecord.history.push({
+        eventId: ev.eventId,
+        action: 'check_out',
+        timestamp: ev.occurredAt,
+        displayTime: timeStr,
+        performedBy: ev.marshalId,
+        court: ev.court,
+        deviceId: ev.deviceId,
+        reason: ev.reason
+      });
+    } else if (action === 'manual_override') {
+      const isInside = ev.reason && ev.reason.includes('INSIDE');
+      gRecord.status = isInside ? 'INSIDE' : 'OUTSIDE';
+      gRecord.lastAction = isInside ? 'check_in' : 'check_out';
+      if (isInside) {
+        gRecord.checkInTime = ev.occurredAt;
+        gRecord.displayCheckIn = timeStr;
+        gRecord.visits = (gRecord.visits || 0) + 1;
+      } else {
+        gRecord.checkOutTime = ev.occurredAt;
+        gRecord.displayCheckOut = timeStr;
+      }
+      gRecord.history.push({
+        eventId: ev.eventId,
+        action: 'manual_override',
+        timestamp: ev.occurredAt,
+        displayTime: timeStr,
+        performedBy: ev.marshalId,
+        reason: ev.reason
+      });
+    }
+  }
+
+  return updated;
+}
+
+function calculateEngDayStats() {
+  const students = Object.values(engdayState.students || {});
+  const totalStudents = students.length;
+  const gameStats = {};
+  ENGDAY_GAMES_LIST.forEach(g => {
+    gameStats[g] = {
+      totalCheckIns: 0,
+      insideCount: 0,
+      outsideCount: 0,
+      byTeam: {
+        rankine: { inside: 0, total: 0 },
+        otto: { inside: 0, total: 0 },
+        brayton: { inside: 0, total: 0 },
+        diesel: { inside: 0, total: 0 }
+      }
+    };
+  });
+
+  let totalUniqueAttendees = 0;
+  students.forEach(s => {
+    let attendedAny = false;
+    ENGDAY_GAMES_LIST.forEach(g => {
+      const gr = s.games && s.games[g];
+      const st = gameStats[g];
+      const teamKey = s.team || 'rankine';
+      if (gr && gr.visits > 0) {
+        st.totalCheckIns++;
+        attendedAny = true;
+        if (st.byTeam[teamKey]) st.byTeam[teamKey].total++;
+      }
+      if (gr && gr.status === 'INSIDE') {
+        st.insideCount++;
+        if (st.byTeam[teamKey]) st.byTeam[teamKey].inside++;
+      } else if (gr && gr.visits > 0) {
+        st.outsideCount++;
+      }
+    });
+    if (attendedAny) totalUniqueAttendees++;
+  });
+
+  return { totalStudents, totalUniqueAttendees, gameStats };
 }
 
 // Deterministic event ordering comparator
@@ -626,6 +805,185 @@ export async function handleRequest(req, res) {
         message: 'Attendance reset successful',
         serverTime: new Date().toISOString(),
         stats: calculateAttendanceStats()
+      });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: err.message });
+    }
+  }
+
+  // -----------------------------------------------------------------------
+  // ENGINEERING DAY 2026 ATTENDANCE API ENDPOINTS
+  // -----------------------------------------------------------------------
+  if (reqPath === '/api/engday/attendance/health' && req.method === 'GET') {
+    return sendJson(res, 200, {
+      ok: true,
+      serverTime: new Date().toISOString(),
+      eventsCount: engdayEvents.length,
+      totalStudents: Object.keys(engdayState.students || {}).length,
+      games: ENGDAY_GAMES_LIST
+    });
+  }
+
+  if (reqPath === '/api/engday/attendance/state' && req.method === 'GET') {
+    return sendJson(res, 200, {
+      ok: true,
+      serverTime: new Date().toISOString(),
+      students: engdayState.students,
+      stats: calculateEngDayStats(),
+      version: engdayState.version || 1,
+      lastUpdated: engdayState.lastUpdated
+    });
+  }
+
+  if (reqPath === '/api/engday/attendance/events' && req.method === 'GET') {
+    const gameId = urlParams.get('gameId');
+    const since = urlParams.get('since');
+    let results = engdayEvents;
+    if (gameId) {
+      results = results.filter(e => e.gameId === gameId);
+    }
+    if (since) {
+      const sinceDate = new Date(since).getTime();
+      if (!isNaN(sinceDate)) {
+        results = results.filter(e => new Date(e.occurredAt || 0).getTime() > sinceDate);
+      }
+    }
+    const limit = parseInt(urlParams.get('limit') || '500', 10);
+    if (results.length > limit) {
+      results = results.slice(-limit);
+    }
+    return sendJson(res, 200, {
+      ok: true,
+      events: results,
+      total: engdayEvents.length,
+      serverTime: new Date().toISOString()
+    });
+  }
+
+  if (reqPath === '/api/engday/attendance/sync' && req.method === 'POST') {
+    try {
+      const payload = await parseJsonBody(req);
+      const incoming = Array.isArray(payload.events) ? payload.events : [];
+      const deviceId = payload.deviceId || 'UNKNOWN_DEVICE';
+
+      const accepted = [];
+      const duplicate = [];
+      const rejected = [];
+      const affectedStudentIds = new Set();
+
+      for (const ev of incoming) {
+        if (!ev || typeof ev !== 'object') {
+          rejected.push({ eventId: ev?.eventId || 'unknown', reason: 'Invalid event object' });
+          continue;
+        }
+
+        const eventId = String(ev.eventId || '').trim();
+        const studentId = String(ev.studentId || '').trim();
+        const gameId = String(ev.gameId || '').trim();
+        const action = String(ev.action || '').trim().toLowerCase();
+
+        // Validation
+        if (!eventId) {
+          rejected.push({ eventId: 'missing', reason: 'Missing eventId' });
+          continue;
+        }
+        if (!studentId || !engdayState.students[studentId]) {
+          rejected.push({ eventId, reason: `Unknown studentId: ${studentId}` });
+          continue;
+        }
+        if (!gameId || !ENGDAY_GAMES_LIST.includes(gameId)) {
+          rejected.push({ eventId, reason: `Invalid or missing gameId: ${gameId}` });
+          continue;
+        }
+        if (!['check_in', 'check_out', 'manual_override'].includes(action)) {
+          rejected.push({ eventId, reason: `Invalid action: ${action}` });
+          continue;
+        }
+        if (!ev.occurredAt || isNaN(new Date(ev.occurredAt).getTime())) {
+          rejected.push({ eventId, reason: 'Invalid or missing occurredAt ISO timestamp' });
+          continue;
+        }
+
+        // Idempotency check
+        if (engdayEventsMap.has(eventId)) {
+          duplicate.push(eventId);
+          continue;
+        }
+
+        // Valid new event
+        const normalized = {
+          eventId: eventId,
+          gameId: gameId,
+          studentId: studentId,
+          action: action,
+          occurredAt: new Date(ev.occurredAt).toISOString(),
+          deviceId: String(ev.deviceId || deviceId),
+          marshalId: String(ev.marshalId || 'Marshal'),
+          court: String(ev.court || 'Court'),
+          sessionId: String(ev.sessionId || 'engday_session'),
+          localSequence: typeof ev.localSequence === 'number' ? ev.localSequence : 1,
+          createdAt: ev.createdAt ? new Date(ev.createdAt).toISOString() : new Date().toISOString(),
+          reason: ev.reason || null,
+          method: ev.method || 'qr_scan',
+          studentName: engdayState.students[studentId].name,
+          studentCode: engdayState.students[studentId].studentCode,
+          team: engdayState.students[studentId].team
+        };
+
+        engdayEvents.push(normalized);
+        engdayEventsMap.set(eventId, normalized);
+        accepted.push(eventId);
+        affectedStudentIds.add(studentId);
+      }
+
+      if (accepted.length > 0) {
+        for (const stId of affectedStudentIds) {
+          const studentAllEvents = engdayEvents.filter(e => e.studentId === stId);
+          const defaultStudent = buildDefaultEngDayRoster()[stId];
+          engdayState.students[stId] = rederiveEngDayStudentState(defaultStudent, studentAllEvents);
+        }
+        engdayState.version = (engdayState.version || 1) + 1;
+        engdayState.lastUpdated = new Date().toISOString();
+
+        atomicWriteJson(ENGDAY_EVENTS_FILE, engdayEvents);
+        atomicWriteJson(ENGDAY_STATE_FILE, engdayState);
+      }
+
+      return sendJson(res, 200, {
+        ok: true,
+        accepted: accepted,
+        duplicate: duplicate,
+        rejected: rejected,
+        serverTime: new Date().toISOString(),
+        version: engdayState.version || 1,
+        stats: calculateEngDayStats()
+      });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: err.message });
+    }
+  }
+
+  if (reqPath === '/api/engday/attendance/reset' && req.method === 'POST') {
+    try {
+      const payload = await parseJsonBody(req);
+      if (payload.confirmation !== 'RESET_ENGDAY_ATTENDANCE') {
+        return sendJson(res, 400, { ok: false, error: 'Confirmation required: RESET_ENGDAY_ATTENDANCE' });
+      }
+
+      engdayEvents = [];
+      engdayEventsMap.clear();
+      engdayState.students = buildDefaultEngDayRoster();
+      engdayState.version = (engdayState.version || 1) + 1;
+      engdayState.lastUpdated = new Date().toISOString();
+
+      atomicWriteJson(ENGDAY_EVENTS_FILE, engdayEvents);
+      atomicWriteJson(ENGDAY_STATE_FILE, engdayState);
+
+      return sendJson(res, 200, {
+        ok: true,
+        message: 'Engineering Day attendance reset successful',
+        serverTime: new Date().toISOString(),
+        stats: calculateEngDayStats()
       });
     } catch (err) {
       return sendJson(res, 500, { ok: false, error: err.message });

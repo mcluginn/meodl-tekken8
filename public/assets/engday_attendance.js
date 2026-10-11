@@ -1,0 +1,1261 @@
+/* =========================================================================
+   ENGINEERING DAY 2026 — SPORTS ATTENDANCE SYSTEM
+   Basketball (3 Games) & Volleyball (3 Games) Court Attendance Engine
+   Architecture:
+   - Per-Game Independent In & Out Tracking (BB1, BB2, BB3, VB1, VB2, VB3)
+   - Real-Time QR Code Resolution with Existing Student Passes (MEODL-0001..0175)
+   - Philippine Standard Time (Asia/Manila, UTC+8) Enforced Timestamps
+   - Offline-First Distributed Synchronization & IndexedDB Persistence
+   - Court Density & Multi-Device Marshal Reconciliation
+   - CSV / Excel / JSON Export per Game or Entire Tournament
+   ========================================================================= */
+
+(function(window) {
+  'use strict';
+
+  const STORAGE_KEY = 'ENGDAY_ATTENDANCE_STATE_V1';
+  const CONFIG_STORAGE_KEY = 'ENGDAY_ATTENDANCE_CONFIG_V1';
+  const DB_NAME = 'ENGDAY_ATTENDANCE_DB_V1';
+  const DB_VERSION = 1;
+  const DOMAIN_BASE = 'https://meodl.uphsd/engday/attendance';
+
+  // -------------------------------------------------------------------------
+  // 1. AUTHORITATIVE GAMES SPECIFICATION
+  // -------------------------------------------------------------------------
+  const ENGDAY_GAMES = [
+    {
+      id: 'bb1',
+      sport: 'basketball',
+      gameNum: 1,
+      name: 'Basketball Game 1',
+      shortName: 'BB Game 1',
+      court: 'Basketball Court',
+      timeSlot: '9:00 AM – 9:50 AM',
+      icon: '🏀',
+      color: 'amber',
+      accentHex: '#f59e0b',
+      borderClass: 'border-amber-500/50',
+      bgClass: 'bg-amber-950/40',
+      badgeClass: 'bg-amber-950 text-amber-300 border-amber-800'
+    },
+    {
+      id: 'bb2',
+      sport: 'basketball',
+      gameNum: 2,
+      name: 'Basketball Game 2',
+      shortName: 'BB Game 2',
+      court: 'Basketball Court',
+      timeSlot: '9:50 AM – 10:40 AM',
+      icon: '🏀',
+      color: 'orange',
+      accentHex: '#f97316',
+      borderClass: 'border-orange-500/50',
+      bgClass: 'bg-orange-950/40',
+      badgeClass: 'bg-orange-950 text-orange-300 border-orange-800'
+    },
+    {
+      id: 'bb3',
+      sport: 'basketball',
+      gameNum: 3,
+      name: 'Basketball Game 3',
+      shortName: 'BB Game 3',
+      court: 'Basketball Court',
+      timeSlot: '10:40 AM – 11:30 AM',
+      icon: '🏀',
+      color: 'red',
+      accentHex: '#ef4444',
+      borderClass: 'border-red-500/50',
+      bgClass: 'bg-red-950/40',
+      badgeClass: 'bg-red-950 text-red-300 border-red-800'
+    },
+    {
+      id: 'vb1',
+      sport: 'volleyball',
+      gameNum: 1,
+      name: 'Volleyball Game 1',
+      shortName: 'VB Game 1',
+      court: 'Volleyball Court',
+      timeSlot: '1:00 PM – 2:00 PM',
+      icon: '🏐',
+      color: 'cyan',
+      accentHex: '#06b6d4',
+      borderClass: 'border-cyan-500/50',
+      bgClass: 'bg-cyan-950/40',
+      badgeClass: 'bg-cyan-950 text-cyan-300 border-cyan-800'
+    },
+    {
+      id: 'vb2',
+      sport: 'volleyball',
+      gameNum: 2,
+      name: 'Volleyball Game 2',
+      shortName: 'VB Game 2',
+      court: 'Volleyball Court',
+      timeSlot: '2:00 PM – 3:00 PM',
+      icon: '🏐',
+      color: 'sky',
+      accentHex: '#0ea5e9',
+      borderClass: 'border-sky-500/50',
+      bgClass: 'bg-sky-950/40',
+      badgeClass: 'bg-sky-950 text-sky-300 border-sky-800'
+    },
+    {
+      id: 'vb3',
+      sport: 'volleyball',
+      gameNum: 3,
+      name: 'Volleyball Game 3',
+      shortName: 'VB Game 3',
+      court: 'Volleyball Court',
+      timeSlot: '3:00 PM – 4:00 PM',
+      icon: '🏐',
+      color: 'emerald',
+      accentHex: '#10b981',
+      borderClass: 'border-emerald-500/50',
+      bgClass: 'bg-emerald-950/40',
+      badgeClass: 'bg-emerald-950 text-emerald-300 border-emerald-800'
+    }
+  ];
+
+  // -------------------------------------------------------------------------
+  // 2. PHILIPPINE TIME FORMATTING HELPERS (ASIA/MANILA)
+  // -------------------------------------------------------------------------
+  function formatManilaTime(dateOrIso, options = {}) {
+    if (!dateOrIso) return '--:--';
+    const d = (dateOrIso instanceof Date) ? dateOrIso : new Date(dateOrIso);
+    if (isNaN(d.getTime())) return String(dateOrIso);
+    try {
+      return d.toLocaleTimeString('en-US', {
+        timeZone: 'Asia/Manila',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+        ...options
+      });
+    } catch (e) {
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true, ...options });
+    }
+  }
+
+  function formatManilaDate(dateOrIso, options = {}) {
+    if (!dateOrIso) return '';
+    const d = (dateOrIso instanceof Date) ? dateOrIso : new Date(dateOrIso);
+    if (isNaN(d.getTime())) return '';
+    try {
+      return d.toLocaleDateString('en-US', {
+        timeZone: 'Asia/Manila',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        ...options
+      });
+    } catch (e) {
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric', ...options });
+    }
+  }
+
+  function generateUUID() {
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
+      try { return window.crypto.randomUUID(); } catch (e) {}
+    }
+    return 'eng_evt_' + Date.now() + '_' + Math.random().toString(36).substring(2, 10);
+  }
+
+  // -------------------------------------------------------------------------
+  // 3. OFFLINE INDEXEDDB PERSISTENCE LAYER
+  // -------------------------------------------------------------------------
+  class EngDayIndexedDB {
+    constructor() {
+      this.db = null;
+      this.readyPromise = this.init();
+    }
+
+    init() {
+      if (typeof window === 'undefined' || !window.indexedDB) {
+        return Promise.resolve(null);
+      }
+      return new Promise((resolve) => {
+        try {
+          const req = window.indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('attendanceEvents')) {
+              const evStore = db.createObjectStore('attendanceEvents', { keyPath: 'eventId' });
+              evStore.createIndex('gameId', 'gameId', { unique: false });
+              evStore.createIndex('studentId', 'studentId', { unique: false });
+              evStore.createIndex('occurredAt', 'occurredAt', { unique: false });
+            }
+            if (!db.objectStoreNames.contains('syncQueue')) {
+              db.createObjectStore('syncQueue', { keyPath: 'eventId' });
+            }
+            if (!db.objectStoreNames.contains('attendanceSnapshot')) {
+              db.createObjectStore('attendanceSnapshot', { keyPath: 'id' });
+            }
+          };
+          req.onsuccess = (e) => {
+            this.db = e.target.result;
+            resolve(this.db);
+          };
+          req.onerror = () => {
+            console.warn('[EngDay DB] Failed to open IndexedDB, falling back to localStorage');
+            resolve(null);
+          };
+        } catch (err) {
+          resolve(null);
+        }
+      });
+    }
+
+    async saveEvent(event) {
+      await this.readyPromise;
+      if (!this.db) {
+        let events = this.getAllEventsFromLocalStorage();
+        if (!events.some(e => e.eventId === event.eventId)) {
+          events.push(event);
+          localStorage.setItem('ENGDAY_EVENTS_FALLBACK_V1', JSON.stringify(events));
+        }
+        return;
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['attendanceEvents'], 'readwrite');
+          tx.objectStore('attendanceEvents').put(event);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    async getAllEvents() {
+      await this.readyPromise;
+      if (!this.db) {
+        return this.getAllEventsFromLocalStorage();
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['attendanceEvents'], 'readonly');
+          const store = tx.objectStore('attendanceEvents');
+          const req = store.getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => resolve(this.getAllEventsFromLocalStorage());
+        } catch (e) {
+          resolve(this.getAllEventsFromLocalStorage());
+        }
+      });
+    }
+
+    async enqueuePending(event) {
+      await this.readyPromise;
+      if (!this.db) {
+        let q = this.getQueueFromLocalStorage();
+        if (!q.some(e => e.eventId === event.eventId)) {
+          q.push(event);
+          this.saveQueueToLocalStorage(q);
+        }
+        return;
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['syncQueue'], 'readwrite');
+          tx.objectStore('syncQueue').put(event);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    async getPendingQueue() {
+      await this.readyPromise;
+      if (!this.db) {
+        return this.getQueueFromLocalStorage();
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['syncQueue'], 'readonly');
+          const req = tx.objectStore('syncQueue').getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => resolve(this.getQueueFromLocalStorage());
+        } catch (e) {
+          resolve(this.getQueueFromLocalStorage());
+        }
+      });
+    }
+
+    async markEventsSynced(eventIds) {
+      await this.readyPromise;
+      if (!eventIds || !eventIds.length) return;
+      const idSet = new Set(eventIds);
+      if (!this.db) {
+        let q = this.getQueueFromLocalStorage();
+        q = q.filter(e => !idSet.has(e.eventId));
+        this.saveQueueToLocalStorage(q);
+        return;
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['attendanceEvents', 'syncQueue'], 'readwrite');
+          const qStore = tx.objectStore('syncQueue');
+          const evStore = tx.objectStore('attendanceEvents');
+          eventIds.forEach(id => {
+            qStore.delete(id);
+            const getReq = evStore.get(id);
+            getReq.onsuccess = () => {
+              const ev = getReq.result;
+              if (ev) {
+                ev.synced = true;
+                evStore.put(ev);
+              }
+            };
+          });
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    async deleteEvent(eventId) {
+      await this.readyPromise;
+      if (!this.db) {
+        let events = this.getAllEventsFromLocalStorage().filter(e => e.eventId !== eventId);
+        localStorage.setItem('ENGDAY_EVENTS_FALLBACK_V1', JSON.stringify(events));
+        let q = this.getQueueFromLocalStorage().filter(e => e.eventId !== eventId);
+        this.saveQueueToLocalStorage(q);
+        return;
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['attendanceEvents', 'syncQueue'], 'readwrite');
+          tx.objectStore('attendanceEvents').delete(eventId);
+          tx.objectStore('syncQueue').delete(eventId);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    async clearAll() {
+      await this.readyPromise;
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem('ENGDAY_EVENTS_FALLBACK_V1');
+          localStorage.removeItem('ENGDAY_QUEUE_FALLBACK_V1');
+        }
+      } catch (e) {}
+      if (!this.db) return;
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['attendanceEvents', 'syncQueue', 'attendanceSnapshot'], 'readwrite');
+          tx.objectStore('attendanceEvents').clear();
+          tx.objectStore('syncQueue').clear();
+          tx.objectStore('attendanceSnapshot').clear();
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    getAllEventsFromLocalStorage() {
+      try {
+        const raw = localStorage.getItem('ENGDAY_EVENTS_FALLBACK_V1');
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) { return []; }
+    }
+
+    getQueueFromLocalStorage() {
+      try {
+        const raw = localStorage.getItem('ENGDAY_QUEUE_FALLBACK_V1');
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) { return []; }
+    }
+
+    saveQueueToLocalStorage(q) {
+      try {
+        localStorage.setItem('ENGDAY_QUEUE_FALLBACK_V1', JSON.stringify(q));
+      } catch (e) {}
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // 4. MAIN ENGINEERING DAY SPORTS ATTENDANCE ENGINE
+  // -------------------------------------------------------------------------
+  class EngDayAttendanceEngine {
+    constructor() {
+      this.games = ENGDAY_GAMES;
+      this.activeGameId = 'bb1'; // Default to Basketball Game 1
+      this.db = new EngDayIndexedDB();
+      this.deviceId = this.getOrCreateDeviceId();
+      this.localSequence = 1;
+
+      this.config = {
+        serverUrl: (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '',
+        syncIntervalMs: 5000,
+        syncEnabled: true,
+        autoSuggestGameByTime: true
+      };
+
+      this.state = {
+        students: {},
+        activeGameId: 'bb1',
+        auditLog: [],
+        version: 1,
+        lastUpdated: new Date().toISOString()
+      };
+
+      this.listeners = new Set();
+      this.syncTimer = null;
+      this.isSyncing = false;
+      this.pendingCount = 0;
+      this.lastSyncTime = null;
+      this.serverOnline = false;
+
+      this.loadConfig();
+      this.load();
+      this.autoSelectGameByTime();
+      this.startSyncLoop();
+    }
+
+    getOrCreateDeviceId() {
+      try {
+        if (typeof localStorage !== 'undefined') {
+          let dev = localStorage.getItem('ENGDAY_DEVICE_ID');
+          if (!dev) {
+            dev = 'MARSHAL-ENG-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            localStorage.setItem('ENGDAY_DEVICE_ID', dev);
+          }
+          return dev;
+        }
+      } catch (e) {}
+      return 'MARSHAL-ENG-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    }
+
+    loadConfig() {
+      try {
+        if (typeof localStorage !== 'undefined') {
+          const raw = localStorage.getItem(CONFIG_STORAGE_KEY);
+          if (raw) Object.assign(this.config, JSON.parse(raw));
+        }
+      } catch (e) {}
+    }
+
+    saveConfig() {
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(this.config));
+        }
+      } catch (e) {}
+    }
+
+    getActiveGame() {
+      return this.games.find(g => g.id === this.activeGameId) || this.games[0];
+    }
+
+    setActiveGame(gameId) {
+      const found = this.games.find(g => g.id === gameId);
+      if (found) {
+        this.activeGameId = gameId;
+        this.state.activeGameId = gameId;
+        if (typeof localStorage !== 'undefined') {
+          try { localStorage.setItem('ENGDAY_ACTIVE_GAME', gameId); } catch(e) {}
+        }
+        this.notify();
+      }
+      return this.getActiveGame();
+    }
+
+    autoSelectGameByTime() {
+      try {
+        if (typeof localStorage !== 'undefined') {
+          const stored = localStorage.getItem('ENGDAY_ACTIVE_GAME');
+          if (stored && this.games.some(g => g.id === stored)) {
+            this.activeGameId = stored;
+            this.state.activeGameId = stored;
+            return;
+          }
+        }
+      } catch(e) {}
+
+      // Suggest based on current Philippine hour
+      const now = new Date();
+      // Format current hour in Manila
+      const manilaHourStr = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Manila', hour: 'numeric', hour12: false });
+      const hour = parseInt(manilaHourStr, 10);
+      const minute = now.getMinutes();
+      const timeVal = hour * 60 + minute;
+
+      // BB1: 9:00 - 9:50 (540 - 590)
+      // BB2: 9:50 - 10:40 (590 - 640)
+      // BB3: 10:40 - 11:30 (640 - 690)
+      // VB1: 13:00 - 14:00 (780 - 840)
+      // VB2: 14:00 - 15:00 (840 - 900)
+      // VB3: 15:00 - 16:00 (900 - 960)
+      if (timeVal >= 540 && timeVal < 590) this.activeGameId = 'bb1';
+      else if (timeVal >= 590 && timeVal < 640) this.activeGameId = 'bb2';
+      else if (timeVal >= 640 && timeVal < 720) this.activeGameId = 'bb3';
+      else if (timeVal >= 780 && timeVal < 840) this.activeGameId = 'vb1';
+      else if (timeVal >= 840 && timeVal < 900) this.activeGameId = 'vb2';
+      else if (timeVal >= 900) this.activeGameId = 'vb3';
+      else this.activeGameId = 'bb1';
+
+      this.state.activeGameId = this.activeGameId;
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. STATE INITIALIZATION & ROSTER SEEDING
+    // -------------------------------------------------------------------------
+    load() {
+      try {
+        if (typeof localStorage !== 'undefined') {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.students && Object.keys(parsed.students).length > 0) {
+              this.state = parsed;
+              this.reconcileStudentGamesStructure();
+              this.updatePendingCount();
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[EngDay] Attendance state load warning:', e);
+      }
+      this.initDefaultRoster();
+      this.updatePendingCount();
+    }
+
+    save() {
+      try {
+        this.state.version = (this.state.version || 1) + 1;
+        this.state.lastUpdated = new Date().toISOString();
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+        }
+      } catch (e) {
+        console.error('[EngDay] Save error:', e);
+      }
+      this.notify();
+    }
+
+    createEmptyGamesRecord() {
+      const records = {};
+      this.games.forEach(g => {
+        records[g.id] = {
+          gameId: g.id,
+          status: 'OUTSIDE', // 'INSIDE' | 'OUTSIDE'
+          lastAction: null,   // 'check_in' | 'check_out'
+          checkInTime: null,
+          checkOutTime: null,
+          displayCheckIn: null,
+          displayCheckOut: null,
+          visits: 0,
+          history: []
+        };
+      });
+      return records;
+    }
+
+    initDefaultRoster() {
+      const data = (typeof window !== 'undefined' && window.MEODL_DATA) ? window.MEODL_DATA : {};
+      const teams = data.teams || [
+        { id: 'rankine', name: 'TEAM RANKINE' },
+        { id: 'otto', name: 'TEAM OTTO' },
+        { id: 'brayton', name: 'TEAM BRAYTON' },
+        { id: 'diesel', name: 'TEAM DIESEL' }
+      ];
+      const rosters = data.rosters || {};
+
+      const students = {};
+      let studentIndex = 1;
+
+      teams.forEach(team => {
+        const members = rosters[team.id.toUpperCase()] || [];
+        members.forEach(name => {
+          const code = 'MEODL-' + String(studentIndex).padStart(4, '0');
+          const id = 'student-' + String(studentIndex).padStart(4, '0');
+
+          students[id] = {
+            id: id,
+            name: name,
+            team: team.id,
+            teamName: team.name,
+            studentCode: code,
+            games: this.createEmptyGamesRecord()
+          };
+          studentIndex++;
+        });
+      });
+
+      this.state.students = students;
+      this.state.auditLog = [];
+      this.save();
+    }
+
+    reconcileStudentGamesStructure() {
+      if (!this.state.students) return;
+      Object.values(this.state.students).forEach(s => {
+        if (!s.games) s.games = {};
+        this.games.forEach(g => {
+          if (!s.games[g.id]) {
+            s.games[g.id] = {
+              gameId: g.id,
+              status: 'OUTSIDE',
+              lastAction: null,
+              checkInTime: null,
+              checkOutTime: null,
+              displayCheckIn: null,
+              displayCheckOut: null,
+              visits: 0,
+              history: []
+            };
+          }
+        });
+      });
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. QR SCAN & STUDENT LOOKUP
+    // -------------------------------------------------------------------------
+    getStudentById(id) {
+      return this.state.students[id] || null;
+    }
+
+    getStudentByCode(code) {
+      if (!code) return null;
+      const clean = String(code).trim().toUpperCase();
+      return Object.values(this.state.students).find(s => (s.studentCode || '').toUpperCase() === clean) || null;
+    }
+
+    resolveScanPayload(payload) {
+      if (!payload) return { error: 'EMPTY_PAYLOAD', message: 'No QR data received.' };
+
+      let raw = String(payload).trim();
+      let code = null;
+
+      if (raw.includes('code=')) {
+        try {
+          const url = new URL(raw, 'https://meodl.uphsd');
+          code = url.searchParams.get('code');
+        } catch (e) {
+          const match = raw.match(/code=([a-zA-Z0-9_-]+)/);
+          if (match) code = match[1];
+        }
+      } else if (raw.startsWith('MEODL-') || raw.startsWith('meodl-')) {
+        code = raw.toUpperCase();
+      }
+
+      let student = null;
+      if (code) student = this.getStudentByCode(code);
+
+      // If token passed or raw URL match, also check MEODL student token if available
+      if (!student && window.MEODL_ATTENDANCE && typeof window.MEODL_ATTENDANCE.resolveScanPayload === 'function') {
+        const meodlRes = window.MEODL_ATTENDANCE.resolveScanPayload(payload);
+        if (meodlRes && meodlRes.student) {
+          student = this.getStudentById(meodlRes.student.id) || this.getStudentByCode(meodlRes.student.studentCode);
+        }
+      }
+
+      if (!student) {
+        // Fallback: match by student number in raw text
+        const numMatch = raw.match(/\d{4}/);
+        if (numMatch) {
+          student = this.getStudentByCode('MEODL-' + numMatch[0]);
+        }
+      }
+
+      if (!student) {
+        return {
+          error: 'NOT_FOUND',
+          message: '❌ QR NOT REGISTERED\nThis QR code does not match any registered Engineering student.'
+        };
+      }
+
+      const activeGame = this.getActiveGame();
+      const gameRecord = student.games[activeGame.id] || { status: 'OUTSIDE' };
+
+      return {
+        success: true,
+        student: student,
+        activeGame: activeGame,
+        gameRecord: gameRecord,
+        statusInGame: gameRecord.status || 'OUTSIDE'
+      };
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. RECORD CHECK-IN & CHECK-OUT (PER-GAME ISOLATED)
+    // -------------------------------------------------------------------------
+    createAttendanceEvent(student, gameId, action, options = {}) {
+      const now = new Date();
+      const isoTime = now.toISOString();
+      const game = this.games.find(g => g.id === gameId) || this.getActiveGame();
+
+      return {
+        eventId: generateUUID(),
+        gameId: game.id,
+        gameName: game.name,
+        sport: game.sport,
+        studentId: student.id,
+        studentCode: student.studentCode,
+        studentName: student.name,
+        team: student.team,
+        action: action, // 'check_in' | 'check_out' | 'manual_override'
+        occurredAt: isoTime,
+        displayTime: formatManilaTime(now),
+        displayDate: formatManilaDate(now),
+        deviceId: this.deviceId,
+        marshalId: options.performedBy || 'Court Marshal',
+        court: game.court,
+        method: options.method || 'qr_scan',
+        reason: options.reason || null,
+        note: options.note || null,
+        localSequence: this.localSequence++,
+        synced: false
+      };
+    }
+
+    recordCheckIn(studentId, gameId = null, options = {}) {
+      const student = this.getStudentById(studentId);
+      if (!student) return { success: false, error: 'Student not found' };
+
+      const gId = gameId || this.activeGameId;
+      const game = this.games.find(g => g.id === gId) || this.getActiveGame();
+      if (!student.games[gId]) student.games[gId] = { status: 'OUTSIDE', visits: 0, history: [] };
+
+      const gRecord = student.games[gId];
+      const event = this.createAttendanceEvent(student, gId, 'check_in', options);
+
+      gRecord.status = 'INSIDE';
+      gRecord.lastAction = 'check_in';
+      gRecord.checkInTime = event.occurredAt;
+      gRecord.displayCheckIn = event.displayTime;
+      gRecord.visits = (gRecord.visits || 0) + 1;
+
+      const historyItem = {
+        eventId: event.eventId,
+        action: 'check_in',
+        gameId: gId,
+        gameName: game.name,
+        timestamp: event.occurredAt,
+        displayTime: event.displayTime,
+        performedBy: event.marshalId,
+        method: event.method,
+        court: event.court
+      };
+
+      if (!gRecord.history) gRecord.history = [];
+      gRecord.history.unshift(historyItem);
+
+      // Audit log entry
+      if (!this.state.auditLog) this.state.auditLog = [];
+      this.state.auditLog.unshift({
+        id: 'log_' + event.eventId,
+        eventId: event.eventId,
+        gameId: gId,
+        gameName: game.name,
+        studentId: student.id,
+        studentCode: student.studentCode,
+        studentName: student.name,
+        team: student.team,
+        action: 'check_in',
+        displayTime: event.displayTime,
+        timestamp: event.occurredAt,
+        performedBy: event.marshalId,
+        method: event.method,
+        court: event.court
+      });
+      if (this.state.auditLog.length > 500) this.state.auditLog.length = 500;
+
+      this.save();
+      this.db.saveEvent(event);
+      this.db.enqueuePending(event);
+      this.updatePendingCount();
+
+      return {
+        success: true,
+        action: 'check_in',
+        student: student,
+        game: game,
+        event: event,
+        message: `🟢 Checked IN to ${game.name}`
+      };
+    }
+
+    recordCheckOut(studentId, gameId = null, options = {}) {
+      const student = this.getStudentById(studentId);
+      if (!student) return { success: false, error: 'Student not found' };
+
+      const gId = gameId || this.activeGameId;
+      const game = this.games.find(g => g.id === gId) || this.getActiveGame();
+      if (!student.games[gId]) student.games[gId] = { status: 'OUTSIDE', visits: 0, history: [] };
+
+      const gRecord = student.games[gId];
+      const event = this.createAttendanceEvent(student, gId, 'check_out', options);
+
+      gRecord.status = 'OUTSIDE';
+      gRecord.lastAction = 'check_out';
+      gRecord.checkOutTime = event.occurredAt;
+      gRecord.displayCheckOut = event.displayTime;
+
+      const historyItem = {
+        eventId: event.eventId,
+        action: 'check_out',
+        gameId: gId,
+        gameName: game.name,
+        timestamp: event.occurredAt,
+        displayTime: event.displayTime,
+        performedBy: event.marshalId,
+        method: event.method,
+        court: event.court,
+        reason: options.reason || 'Game Concluded'
+      };
+
+      if (!gRecord.history) gRecord.history = [];
+      gRecord.history.unshift(historyItem);
+
+      // Audit log entry
+      if (!this.state.auditLog) this.state.auditLog = [];
+      this.state.auditLog.unshift({
+        id: 'log_' + event.eventId,
+        eventId: event.eventId,
+        gameId: gId,
+        gameName: game.name,
+        studentId: student.id,
+        studentCode: student.studentCode,
+        studentName: student.name,
+        team: student.team,
+        action: 'check_out',
+        displayTime: event.displayTime,
+        timestamp: event.occurredAt,
+        performedBy: event.marshalId,
+        method: event.method,
+        court: event.court,
+        reason: options.reason || 'Game Concluded'
+      });
+      if (this.state.auditLog.length > 500) this.state.auditLog.length = 500;
+
+      this.save();
+      this.db.saveEvent(event);
+      this.db.enqueuePending(event);
+      this.updatePendingCount();
+
+      return {
+        success: true,
+        action: 'check_out',
+        student: student,
+        game: game,
+        event: event,
+        message: `🔴 Checked OUT of ${game.name}`
+      };
+    }
+
+    manualOverride(studentId, gameId, newStatus, options = {}) {
+      const student = this.getStudentById(studentId);
+      if (!student) return { success: false, error: 'Student not found' };
+
+      const gId = gameId || this.activeGameId;
+      const game = this.games.find(g => g.id === gId) || this.getActiveGame();
+      if (!student.games[gId]) student.games[gId] = { status: 'OUTSIDE', visits: 0, history: [] };
+
+      const gRecord = student.games[gId];
+      const action = newStatus === 'INSIDE' ? 'check_in' : 'check_out';
+      const event = this.createAttendanceEvent(student, gId, 'manual_override', {
+        ...options,
+        method: 'manual_override',
+        reason: options.reason || `Manual override to ${newStatus}`
+      });
+
+      gRecord.status = newStatus;
+      gRecord.lastAction = action;
+      if (newStatus === 'INSIDE') {
+        gRecord.checkInTime = event.occurredAt;
+        gRecord.displayCheckIn = event.displayTime;
+        gRecord.visits = (gRecord.visits || 0) + 1;
+      } else {
+        gRecord.checkOutTime = event.occurredAt;
+        gRecord.displayCheckOut = event.displayTime;
+      }
+
+      const historyItem = {
+        eventId: event.eventId,
+        action: 'manual_override',
+        newStatus: newStatus,
+        gameId: gId,
+        gameName: game.name,
+        timestamp: event.occurredAt,
+        displayTime: event.displayTime,
+        performedBy: options.performedBy || 'Staff Admin',
+        reason: options.reason || `Status set to ${newStatus}`
+      };
+
+      if (!gRecord.history) gRecord.history = [];
+      gRecord.history.unshift(historyItem);
+
+      this.save();
+      this.db.saveEvent(event);
+      this.db.enqueuePending(event);
+      this.updatePendingCount();
+
+      return { success: true, student: student, game: game };
+    }
+
+    async deleteScanEvent(eventId) {
+      await this.db.deleteEvent(eventId);
+      // Remove from audit log
+      if (this.state.auditLog) {
+        this.state.auditLog = this.state.auditLog.filter(l => l.eventId !== eventId);
+      }
+      // Re-derive student state for that game
+      await this.rederiveAllStatesFromDb();
+      this.save();
+      return true;
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. MULTI-DEVICE EVENT RE-DERIVATION
+    // -------------------------------------------------------------------------
+    async rederiveAllStatesFromDb() {
+      const allEvents = await this.db.getAllEvents();
+      // Sort chronologically
+      allEvents.sort((a, b) => new Date(a.occurredAt) - new Date(b.occurredAt));
+
+      // Reset all students
+      Object.values(this.state.students).forEach(s => {
+        s.games = this.createEmptyGamesRecord();
+      });
+
+      for (const ev of allEvents) {
+        const student = this.state.students[ev.studentId];
+        if (!student) continue;
+        const gId = ev.gameId;
+        if (!student.games[gId]) continue;
+
+        const gRecord = student.games[gId];
+        const timeStr = formatManilaTime(ev.occurredAt);
+
+        if (ev.action === 'check_in') {
+          gRecord.status = 'INSIDE';
+          gRecord.lastAction = 'check_in';
+          gRecord.checkInTime = ev.occurredAt;
+          gRecord.displayCheckIn = timeStr;
+          gRecord.visits = (gRecord.visits || 0) + 1;
+        } else if (ev.action === 'check_out') {
+          gRecord.status = 'OUTSIDE';
+          gRecord.lastAction = 'check_out';
+          gRecord.checkOutTime = ev.occurredAt;
+          gRecord.displayCheckOut = timeStr;
+        } else if (ev.action === 'manual_override') {
+          const isInside = ev.reason && ev.reason.includes('INSIDE');
+          gRecord.status = isInside ? 'INSIDE' : 'OUTSIDE';
+          gRecord.lastAction = isInside ? 'check_in' : 'check_out';
+          if (isInside) {
+            gRecord.checkInTime = ev.occurredAt;
+            gRecord.displayCheckIn = timeStr;
+          } else {
+            gRecord.checkOutTime = ev.occurredAt;
+            gRecord.displayCheckOut = timeStr;
+          }
+        }
+
+        if (!gRecord.history) gRecord.history = [];
+        gRecord.history.unshift({
+          eventId: ev.eventId,
+          action: ev.action,
+          gameId: gId,
+          timestamp: ev.occurredAt,
+          displayTime: timeStr,
+          performedBy: ev.marshalId,
+          method: ev.method,
+          court: ev.court,
+          reason: ev.reason
+        });
+      }
+
+      this.save();
+    }
+
+    // -------------------------------------------------------------------------
+    // 9. METRICS & ANALYTICS COMPUTATION
+    // -------------------------------------------------------------------------
+    calculateStats(gameIdFilter = null) {
+      const students = Object.values(this.state.students || {});
+      const totalStudents = students.length;
+
+      const gameStats = {};
+      this.games.forEach(g => {
+        gameStats[g.id] = {
+          game: g,
+          totalCheckIns: 0,
+          insideCount: 0,
+          outsideCount: 0,
+          byTeam: {
+            rankine: { inside: 0, total: 0 },
+            otto: { inside: 0, total: 0 },
+            brayton: { inside: 0, total: 0 },
+            diesel: { inside: 0, total: 0 }
+          }
+        };
+      });
+
+      let totalUniqueAttendees = 0;
+
+      students.forEach(s => {
+        let attendedAny = false;
+        this.games.forEach(g => {
+          const gr = s.games[g.id];
+          const st = gameStats[g.id];
+          const teamKey = s.team || 'rankine';
+
+          if (gr && gr.visits > 0) {
+            st.totalCheckIns++;
+            attendedAny = true;
+            if (st.byTeam[teamKey]) st.byTeam[teamKey].total++;
+          }
+          if (gr && gr.status === 'INSIDE') {
+            st.insideCount++;
+            if (st.byTeam[teamKey]) st.byTeam[teamKey].inside++;
+          } else if (gr && gr.visits > 0) {
+            st.outsideCount++;
+          }
+        });
+        if (attendedAny) totalUniqueAttendees++;
+      });
+
+      // Filtered specific stats
+      const targetGameId = gameIdFilter || this.activeGameId;
+      const targetStats = gameStats[targetGameId] || gameStats['bb1'];
+
+      return {
+        totalStudents,
+        totalUniqueAttendees,
+        participationRate: totalStudents > 0 ? Math.round((totalUniqueAttendees / totalStudents) * 100) : 0,
+        activeGame: this.getActiveGame(),
+        activeGameStats: targetStats,
+        allGamesStats: gameStats
+      };
+    }
+
+    async getStudentHistory(studentId, gameIdFilter = null) {
+      const student = this.getStudentById(studentId);
+      if (!student) return [];
+
+      let events = await this.db.getAllEvents();
+      events = events.filter(e => e.studentId === studentId);
+      if (gameIdFilter) events = events.filter(e => e.gameId === gameIdFilter);
+
+      events.sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt));
+
+      return events.map(e => ({
+        eventId: e.eventId,
+        gameId: e.gameId,
+        gameName: e.gameName,
+        action: e.action,
+        timestamp: e.occurredAt,
+        displayTime: formatManilaTime(e.occurredAt),
+        displayDate: formatManilaDate(e.occurredAt),
+        performedBy: e.marshalId,
+        method: e.method,
+        court: e.court,
+        reason: e.reason
+      }));
+    }
+
+    async getRecentScans(gameIdFilter = null, limit = 50) {
+      let events = await this.db.getAllEvents();
+      if (gameIdFilter) events = events.filter(e => e.gameId === gameIdFilter);
+      events.sort((a, b) => new Date(b.occurredAt) - new Date(a.occurredAt));
+      return events.slice(0, limit).map(e => ({
+        ...e,
+        displayTime: formatManilaTime(e.occurredAt),
+        displayDate: formatManilaDate(e.occurredAt)
+      }));
+    }
+
+    // -------------------------------------------------------------------------
+    // 10. EXPORT & BACKUP (CSV & JSON)
+    // -------------------------------------------------------------------------
+    exportCSV(gameIdFilter = null) {
+      const students = Object.values(this.state.students || {});
+      const targetGames = gameIdFilter ? this.games.filter(g => g.id === gameIdFilter) : this.games;
+
+      let csv = 'Student ID,Full Name,Team,Team Name';
+      targetGames.forEach(g => {
+        csv += `,${g.shortName} Status,${g.shortName} Check-In,${g.shortName} Check-Out,${g.shortName} Visits`;
+      });
+      csv += ',Total Games Attended\r\n';
+
+      students.forEach(s => {
+        let attendedCount = 0;
+        let row = `"${s.studentCode}","${s.name}","${s.team.toUpperCase()}","${s.teamName}"`;
+
+        targetGames.forEach(g => {
+          const gr = s.games[g.id] || {};
+          const status = gr.status || 'OUTSIDE';
+          const inTime = gr.displayCheckIn || (gr.checkInTime ? formatManilaTime(gr.checkInTime) : '');
+          const outTime = gr.displayCheckOut || (gr.checkOutTime ? formatManilaTime(gr.checkOutTime) : '');
+          const visits = gr.visits || 0;
+          if (visits > 0) attendedCount++;
+
+          row += `,"${status}","${inTime}","${outTime}",${visits}`;
+        });
+
+        row += `,${attendedCount}\r\n`;
+        csv += row;
+      });
+
+      return csv;
+    }
+
+    downloadCSV(gameIdFilter = null) {
+      const csv = this.exportCSV(gameIdFilter);
+      const tag = gameIdFilter ? `_${gameIdFilter.toUpperCase()}` : '_ALL_GAMES';
+      const filename = `EngineeringDay_Sports_Attendance${tag}_${new Date().toISOString().slice(0,10)}.csv`;
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    exportJSON() {
+      return JSON.stringify({
+        exportedAt: new Date().toISOString(),
+        deviceId: this.deviceId,
+        state: this.state
+      }, null, 2);
+    }
+
+    downloadJSON() {
+      const json = this.exportJSON();
+      const filename = `EngineeringDay_Sports_Attendance_Backup_${new Date().toISOString().slice(0,10)}.json`;
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // -------------------------------------------------------------------------
+    // 11. BACKGROUND SYNC CLIENT
+    // -------------------------------------------------------------------------
+    startSyncLoop() {
+      if (typeof window === 'undefined' || typeof setInterval === 'undefined') return;
+      if (this.syncTimer && typeof clearInterval !== 'undefined') clearInterval(this.syncTimer);
+      this.syncTimer = setInterval(() => {
+        if (this.config.syncEnabled) this.syncWithServer();
+      }, this.config.syncIntervalMs);
+    }
+
+    async updatePendingCount() {
+      try {
+        const queue = await this.db.getPendingQueue();
+        this.pendingCount = queue.length;
+      } catch (e) {
+        this.pendingCount = 0;
+      }
+      this.notify();
+    }
+
+    async syncWithServer() {
+      if (this.isSyncing) return;
+      this.isSyncing = true;
+
+      try {
+        const queue = await this.db.getPendingQueue();
+        const base = this.config.serverUrl || (typeof window !== 'undefined' && window.location && window.location.origin ? window.location.origin : '');
+
+        // 1. Flush local outbox queue to server
+        if (queue.length > 0) {
+          const res = await fetch(`${base}/api/engday/attendance/sync`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ deviceId: this.deviceId, events: queue })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            const syncedIds = [...(data.accepted || []), ...(data.duplicate || [])];
+            await this.db.markEventsSynced(syncedIds);
+            this.serverOnline = true;
+          } else {
+            this.serverOnline = false;
+          }
+        }
+
+        // 2. Fetch latest server state & reconcile
+        const stateRes = await fetch(`${base}/api/engday/attendance/state`, {
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (stateRes.ok) {
+          const serverState = await stateRes.json();
+          this.serverOnline = true;
+          this.lastSyncTime = formatManilaTime(new Date());
+
+          if (serverState.students && (!this.state.version || serverState.version > this.state.version)) {
+            this.state.students = serverState.students;
+            this.state.version = serverState.version;
+            this.save();
+          }
+        }
+      } catch (err) {
+        this.serverOnline = false;
+      } finally {
+        await this.updatePendingCount();
+        this.isSyncing = false;
+        this.notify();
+      }
+    }
+
+    subscribe(fn) {
+      this.listeners.add(fn);
+      return () => this.listeners.delete(fn);
+    }
+
+    notify() {
+      this.listeners.forEach(fn => {
+        try { fn(this); } catch(e) {}
+      });
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // GLOBAL EXPORTS
+  // -------------------------------------------------------------------------
+  const root = (typeof window !== 'undefined') ? window : ((typeof global !== 'undefined') ? global : this);
+  root.ENGDAY_GAMES = ENGDAY_GAMES;
+  root.EngDayAttendanceEngine = EngDayAttendanceEngine;
+  root.formatManilaTime = formatManilaTime;
+  root.formatManilaDate = formatManilaDate;
+
+  if (typeof window !== 'undefined') {
+    try {
+      root.ENGDAY_ATTENDANCE = new EngDayAttendanceEngine();
+    } catch (e) {
+      console.warn('[EngDay] Auto-instantiation deferred:', e);
+    }
+  }
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      ENGDAY_GAMES,
+      EngDayAttendanceEngine,
+      formatManilaTime,
+      formatManilaDate
+    };
+  }
+
+})(typeof window !== 'undefined' ? window : (typeof global !== 'undefined' ? global : this));
