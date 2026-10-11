@@ -122,6 +122,27 @@ assert(csv.includes('BB 1 (CE vs ME) Status'), 'CSV contains BB 1 (CE vs ME) col
 assert(csv.includes('VB 1 (CPE/ECE vs ME) Status'), 'CSV contains VB 1 (CPE/ECE vs ME) column');
 assert(csv.includes(testStudent.studentCode), 'CSV contains test student record');
 
+// Test 11: JSON export
+const jsonStr = engine.exportJSON();
+assert(typeof jsonStr === 'string' && jsonStr.length > 500, 'JSON export generates complete valid string');
+const parsedBackup = JSON.parse(jsonStr);
+assert(parsedBackup.state && parsedBackup.state.students, 'JSON backup contains full student state');
+assert(parsedBackup.state.students[testStudent.id].games.vb_g1.status === 'INSIDE', 'JSON backup reflects up-to-the-second scan states');
+
+// Test 12: Direct Local File Handle integration
+let mockDiskBuffer = '';
+const mockHandle = {
+  name: 'EngDay_Backup_Test.json',
+  createWritable: async () => ({
+    write: async (content) => { mockDiskBuffer = content; },
+    close: async () => {}
+  })
+};
+engine.setLocalFileHandle(mockHandle);
+assert(engine.getLocalFileHandle() === mockHandle, 'Local file handle registered');
+await engine.writeToLocalFileHandle();
+assert(mockDiskBuffer.length > 500 && mockDiskBuffer.includes('student-0001'), 'Wrote backup directly to mock local disk handle');
+
 console.log('----------------------------------------------------');
 console.log(`TOTAL TESTS: ${passed + failed} | PASSED: ${passed} | FAILED: ${failed}`);
 if (failed === 0) {

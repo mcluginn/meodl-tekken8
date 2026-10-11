@@ -124,6 +124,12 @@
         <button id="btn-audio" onclick="toggleAudio()" class="p-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-amber-400 hover:text-white text-xs" title="Toggle Audio Beeps">
           🔔
         </button>
+
+        <!-- Local Backup & Auto-Save Options Button -->
+        <button id="btn-backup-menu" onclick="openBackupModal()" class="p-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-amber-400 hover:text-white text-xs relative transition-colors" title="Local Backup & Auto-Save Options">
+          💾
+          <span id="auto-backup-indicator" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border border-zinc-950" title="Auto-backup active"></span>
+        </button>
       </div>
     </div>
 
@@ -367,6 +373,89 @@
   </div>
 
   <!-- =========================================================================
+       LOCAL BACKUP & AUTO-SAVE MODAL
+       ========================================================================= -->
+  <div id="backup-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-sm bg-zinc-950 border border-zinc-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-4 text-xs font-mono max-h-[90vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-zinc-800/80">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-950/80 border border-amber-800 flex items-center justify-center text-amber-400 text-sm font-bold">
+            💾
+          </div>
+          <div>
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider font-sans">Local Backup & Auto-Save</h3>
+            <p class="text-[10px] text-zinc-400 font-sans">Engineering Day Attendance Protection</p>
+          </div>
+        </div>
+        <button onclick="closeBackupModal()" class="p-1 text-zinc-500 hover:text-white text-sm">✕</button>
+      </div>
+
+      <!-- Current Local Storage Status Badge -->
+      <div class="p-3 rounded-2xl bg-zinc-900/80 border border-emerald-900/60 bg-emerald-950/20 flex items-start gap-2.5 font-sans">
+        <span class="text-base">🟢</span>
+        <div>
+          <div class="font-bold text-emerald-300 text-[11px]">Instant Local Device Storage: ACTIVE</div>
+          <p class="text-[10px] text-zinc-400 mt-0.5 leading-relaxed">
+            Every single scan is <strong>already saved locally</strong> in your device's IndexedDB and LocalStorage automatically. It survives offline mode, browser refresh, and tab closure.
+          </p>
+        </div>
+      </div>
+
+      <!-- 1-Tap Manual Export Buttons -->
+      <div class="space-y-2">
+        <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold block">1-Tap Instant Backup:</span>
+        <div class="grid grid-cols-2 gap-2 font-sans">
+          <button onclick="downloadJsonBackup()" class="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors">
+            <span>📄</span> JSON Backup
+          </button>
+          <button onclick="downloadCsvBackup()" class="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors">
+            <span>📊</span> CSV Sheet
+          </button>
+        </div>
+      </div>
+
+      <!-- Auto-Download on Scan Configuration -->
+      <div class="space-y-2 pt-2 border-t border-zinc-900 font-sans">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold font-mono">Auto-Download on Scan:</span>
+          <span id="auto-backup-current-badge" class="text-[10px] font-mono font-bold text-amber-400">OFF</span>
+        </div>
+        <p class="text-[10px] text-zinc-400 leading-normal">
+          Optionally trigger an automatic download of a backup file when scanning:
+        </p>
+        <select id="select-auto-backup-mode" onchange="updateAutoBackupSetting()" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
+          <option value="off">⚪ Off (Saves to IndexedDB & LocalStorage only)</option>
+          <option value="every">🟢 Every Single Scan (Downloads file on each scan)</option>
+          <option value="every_5">🟡 Every 5 Scans (Batch download)</option>
+          <option value="every_10">🔵 Every 10 Scans (Batch download)</option>
+        </select>
+      </div>
+
+      <!-- Direct Disk File Auto-Save (File System Access API) -->
+      <div class="space-y-2 pt-2 border-t border-zinc-900 font-sans">
+        <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold font-mono">Direct Hard Drive Link (PC / Chrome):</span>
+        <p class="text-[10px] text-zinc-400 leading-normal">
+          Pick a file on your computer once. Every scan will silently write directly into this file on your hard drive with <em>zero download popups</em>:
+        </p>
+        <div class="flex items-center gap-2">
+          <button onclick="linkDiskBackupFile()" class="flex-1 py-2 px-3 rounded-xl bg-amber-600/90 hover:bg-amber-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors">
+            <span>📁</span> Choose / Link Disk File
+          </button>
+          <button onclick="unlinkDiskBackupFile()" id="btn-unlink-disk" class="hidden p-2 rounded-xl bg-zinc-900 hover:bg-red-950 text-zinc-400 hover:text-red-400 border border-zinc-800 text-xs" title="Unlink file">
+            ✕
+          </button>
+        </div>
+        <div id="disk-file-status" class="text-[10px] font-mono text-zinc-500 truncate">
+          Status: No disk file linked
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================================
        CLIENT APPLICATION LOGIC
        ========================================================================= -->
   <script>
@@ -606,6 +695,7 @@
           window.ENGDAY_ATTENDANCE.recordCheckOut(student.id, activeGame.id, { performedBy: 'Marshal (Rapid)', reason: 'Rapid Scan Exit' });
           playBeep('check_out');
         }
+        triggerAutoBackupOnScan();
         renderGameTabs();
         return;
       }
@@ -766,6 +856,7 @@
         playBeep('check_in');
       }
 
+      triggerAutoBackupOnScan();
       closeVerifyModal();
       renderGameTabs();
     }
@@ -838,12 +929,127 @@
       }
     }
 
+    // =========================================================================
+    // LOCAL BACKUP & AUTO-SAVE CONTROLLER
+    // =========================================================================
+    let autoBackupMode = localStorage.getItem('ENGDAY_AUTO_BACKUP_MODE') || 'off';
+    let scanCountSinceBoot = 0;
+    let linkedDiskHandle = null;
+
+    function openBackupModal() {
+      const sel = document.getElementById('select-auto-backup-mode');
+      if (sel) sel.value = autoBackupMode;
+      updateAutoBackupBadge();
+      updateDiskStatusText();
+      document.getElementById('backup-modal').classList.remove('hidden');
+    }
+
+    function closeBackupModal() {
+      document.getElementById('backup-modal').classList.add('hidden');
+    }
+
+    function updateAutoBackupSetting() {
+      autoBackupMode = document.getElementById('select-auto-backup-mode').value;
+      localStorage.setItem('ENGDAY_AUTO_BACKUP_MODE', autoBackupMode);
+      updateAutoBackupBadge();
+    }
+
+    function updateAutoBackupBadge() {
+      const badge = document.getElementById('auto-backup-current-badge');
+      const ind = document.getElementById('auto-backup-indicator');
+      const labels = {
+        'off': 'OFF',
+        'every': 'EVERY SCAN',
+        'every_5': 'EVERY 5 SCANS',
+        'every_10': 'EVERY 10 SCANS'
+      };
+      if (badge) badge.textContent = labels[autoBackupMode] || 'OFF';
+      const isActive = autoBackupMode !== 'off' || linkedDiskHandle !== null;
+      if (ind) ind.classList.toggle('hidden', !isActive);
+    }
+
+    function updateDiskStatusText() {
+      const statusEl = document.getElementById('disk-file-status');
+      const unlinkBtn = document.getElementById('btn-unlink-disk');
+      if (!statusEl) return;
+      if (linkedDiskHandle) {
+        statusEl.innerHTML = `<span class="text-emerald-400 font-bold">✅ Linked: ${linkedDiskHandle.name}</span>`;
+        if (unlinkBtn) unlinkBtn.classList.remove('hidden');
+      } else {
+        statusEl.textContent = 'Status: No disk file linked';
+        if (unlinkBtn) unlinkBtn.classList.add('hidden');
+      }
+      updateAutoBackupBadge();
+    }
+
+    async function linkDiskBackupFile() {
+      if (!('showSaveFilePicker' in window)) {
+        alert('File System Access API is not supported in this browser. You can still use the 1-Tap Download or Auto-Download options!');
+        return;
+      }
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: `EngineeringDay_Sports_Attendance_Live_${new Date().toISOString().slice(0, 10)}.json`,
+          types: [{
+            description: 'JSON Attendance Backup',
+            accept: { 'application/json': ['.json'] }
+          }]
+        });
+        linkedDiskHandle = handle;
+        if (window.ENGDAY_ATTENDANCE) {
+          window.ENGDAY_ATTENDANCE.setLocalFileHandle(handle);
+          await window.ENGDAY_ATTENDANCE.writeToLocalFileHandle();
+        }
+        updateDiskStatusText();
+        alert(`✅ Linked to "${handle.name}"!\n\nEvery scan will now automatically write directly to this file on your hard drive silently.`);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.warn('Failed to link disk file:', err);
+        }
+      }
+    }
+
+    function unlinkDiskBackupFile() {
+      linkedDiskHandle = null;
+      if (window.ENGDAY_ATTENDANCE) {
+        window.ENGDAY_ATTENDANCE.setLocalFileHandle(null);
+      }
+      updateDiskStatusText();
+    }
+
+    function downloadJsonBackup() {
+      if (window.ENGDAY_ATTENDANCE) {
+        window.ENGDAY_ATTENDANCE.downloadJSON();
+      }
+    }
+
+    function downloadCsvBackup() {
+      if (window.ENGDAY_ATTENDANCE) {
+        window.ENGDAY_ATTENDANCE.downloadCSV();
+      }
+    }
+
+    function triggerAutoBackupOnScan() {
+      scanCountSinceBoot++;
+      
+      // Auto-download check if requested
+      if (autoBackupMode === 'every') {
+        downloadJsonBackup();
+      } else if (autoBackupMode === 'every_5' && scanCountSinceBoot % 5 === 0) {
+        downloadJsonBackup();
+      } else if (autoBackupMode === 'every_10' && scanCountSinceBoot % 10 === 0) {
+        downloadJsonBackup();
+      }
+    }
+
     // Boot
     document.addEventListener('DOMContentLoaded', () => {
       checkStaffAuth();
       renderGameTabs();
       setInterval(updateLiveClock, 1000);
       updateLiveClock();
+      updateAutoBackupBadge();
+      updateDiskStatusText();
 
       if (window.ENGDAY_ATTENDANCE) {
         window.ENGDAY_ATTENDANCE.subscribe(engine => {

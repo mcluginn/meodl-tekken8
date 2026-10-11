@@ -388,6 +388,7 @@
         if (typeof localStorage !== 'undefined') {
           localStorage.removeItem('ENGDAY_EVENTS_FALLBACK_V1');
           localStorage.removeItem('ENGDAY_QUEUE_FALLBACK_V1');
+          localStorage.removeItem('ENGDAY_SNAPSHOT_FALLBACK_V1');
         }
       } catch (e) {}
       if (!this.db) return;
@@ -401,6 +402,58 @@
           tx.onerror = () => resolve();
         } catch (e) {
           resolve();
+        }
+      });
+    }
+
+    async saveSnapshot(state) {
+      await this.readyPromise;
+      if (!this.db) {
+        try {
+          if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('ENGDAY_SNAPSHOT_FALLBACK_V1', JSON.stringify({
+              savedAt: new Date().toISOString(),
+              state: state
+            }));
+          }
+        } catch (e) {}
+        return;
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['attendanceSnapshot'], 'readwrite');
+          tx.objectStore('attendanceSnapshot').put({
+            id: 'latest_state',
+            savedAt: new Date().toISOString(),
+            state: state
+          });
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch (e) {
+          resolve();
+        }
+      });
+    }
+
+    async getLatestSnapshot() {
+      await this.readyPromise;
+      if (!this.db) {
+        try {
+          if (typeof localStorage !== 'undefined') {
+            const raw = localStorage.getItem('ENGDAY_SNAPSHOT_FALLBACK_V1');
+            return raw ? JSON.parse(raw) : null;
+          }
+        } catch (e) {}
+        return null;
+      }
+      return new Promise((resolve) => {
+        try {
+          const tx = this.db.transaction(['attendanceSnapshot'], 'readonly');
+          const req = tx.objectStore('attendanceSnapshot').get('latest_state');
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => resolve(null);
+        } catch (e) {
+          resolve(null);
         }
       });
     }
@@ -577,12 +630,39 @@
       this.updatePendingCount();
     }
 
+    setLocalFileHandle(handle) {
+      this.localFileHandle = handle;
+    }
+
+    getLocalFileHandle() {
+      return this.localFileHandle || null;
+    }
+
+    async writeToLocalFileHandle() {
+      if (!this.localFileHandle) return false;
+      try {
+        const writable = await this.localFileHandle.createWritable();
+        await writable.write(this.exportJSON());
+        await writable.close();
+        return true;
+      } catch (e) {
+        console.warn('[EngDay] Failed to write to local disk handle:', e);
+        return false;
+      }
+    }
+
     save() {
       try {
         this.state.version = (this.state.version || 1) + 1;
         this.state.lastUpdated = new Date().toISOString();
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+        }
+        if (this.db && typeof this.db.saveSnapshot === 'function') {
+          this.db.saveSnapshot(this.state);
+        }
+        if (this.localFileHandle) {
+          this.writeToLocalFileHandle();
         }
       } catch (e) {
         console.error('[EngDay] Save error:', e);
