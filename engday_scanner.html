@@ -312,21 +312,83 @@
   </main>
 
   <!-- =========================================================================
-       BOTTOM STATUS STRIP
+       BOTTOM STATUS STRIP (LIVE CLOUD AUTO-SYNC)
        ========================================================================= -->
-  <footer class="sticky bottom-0 z-30 bg-zinc-950/95 border-t border-zinc-800/80 px-3 py-2 text-[10px] flex items-center justify-between text-zinc-500">
-    <div class="flex items-center gap-1.5 truncate">
-      <span id="sync-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-      <span id="sync-text" class="truncate">Offline Engine Ready</span>
-      <span id="sync-pending-badge" class="hidden px-1.5 py-0.2 rounded bg-amber-950 text-amber-400 font-mono text-[9px] border border-amber-800">0 pending</span>
+  <footer class="sticky bottom-0 z-30 bg-zinc-950/95 border-t border-zinc-800/80 px-3 py-2 text-[10px] flex items-center justify-between text-zinc-400 gap-2">
+    <div class="flex items-center gap-2 min-w-0 truncate">
+      <span id="sync-dot" class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+      <span id="sync-text" class="truncate font-medium text-zinc-200">Auto-Sync Ready</span>
+      <span id="sync-pending-badge" class="hidden px-1.5 py-0.2 rounded bg-amber-950 text-amber-300 font-mono text-[9px] border border-amber-800 shrink-0">0 pending</span>
+      <span id="sync-last-time" class="text-[9px] text-zinc-500 font-mono hidden sm:inline shrink-0"></span>
     </div>
 
-    <div class="flex items-center gap-2 shrink-0">
-      <a href="scanner.html" class="text-zinc-400 hover:text-zinc-200 underline">
-        MEODL Venue Scanner →
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button onclick="triggerManualSync()" id="btn-sync-now" class="px-2 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-200 hover:text-white flex items-center gap-1 transition-colors font-medium text-[10px]" title="Sync immediately with cloud">
+        <span id="sync-icon">🔄</span>
+        <span>Sync Now</span>
+      </button>
+      <button onclick="openServerConfigModal()" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-400 hover:text-amber-400 text-xs transition-colors" title="Server / Cloud Connection Settings">
+        ⚙️
+      </button>
+      <a href="scanner.html" class="text-zinc-500 hover:text-zinc-300 underline ml-1 hidden xs:inline text-[9px]">
+        MEODL →
       </a>
     </div>
   </footer>
+
+  <!-- =========================================================================
+       SERVER / CLOUD SYNC CONFIGURATION MODAL
+       ========================================================================= -->
+  <div id="server-config-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-sm bg-zinc-950 border border-zinc-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-3 font-sans">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">☁️</span>
+          <h3 class="text-sm font-bold text-white">Cloud Auto-Sync Settings</h3>
+        </div>
+        <button onclick="closeServerConfigModal()" class="text-zinc-400 hover:text-white p-1 text-xs">✕</button>
+      </div>
+
+      <p class="text-[11px] text-zinc-400 leading-relaxed">
+        When online, every scan auto-syncs instantly in the background across devices. You can also link a custom cloud backend:
+      </p>
+
+      <div class="space-y-1">
+        <label class="text-[10px] uppercase font-mono text-zinc-400 font-bold">Cloud Server URL (Optional):</label>
+        <input 
+          type="url" 
+          id="setting-server-url" 
+          placeholder="https://your-vercel-domain.vercel.app" 
+          class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+        />
+        <p class="text-[9px] text-zinc-500 font-mono">Leave blank to use current web origin.</p>
+      </div>
+
+      <div class="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-[10px] space-y-1 font-mono text-zinc-400">
+        <div class="flex justify-between">
+          <span>Device ID:</span>
+          <span id="cfg-device-id" class="text-white font-bold">--</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Sync Status:</span>
+          <span id="cfg-sync-status" class="text-amber-400 font-bold">--</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Pending Queue:</span>
+          <span id="cfg-pending-count" class="text-white font-bold">0 events</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 pt-1">
+        <button onclick="saveServerConfig()" class="flex-1 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs transition-colors shadow">
+          Save & Sync Now
+        </button>
+        <button onclick="closeServerConfigModal()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-400 text-xs">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- =========================================================================
        VERIFICATION & ACTION MODAL
@@ -1146,27 +1208,86 @@
       }
     }
 
-    // Sync Status Indicator
+    // Sync Status Indicator & Cloud Auto-Sync
     function updateSyncUI(engine) {
       if (!engine) return;
       const dot = document.getElementById('sync-dot');
       const text = document.getElementById('sync-text');
       const badge = document.getElementById('sync-pending-badge');
+      const icon = document.getElementById('sync-icon');
+      const lastSyncEl = document.getElementById('sync-last-time');
 
-      if (engine.pendingCount > 0) {
-        badge.classList.remove('hidden');
-        badge.textContent = `${engine.pendingCount} pending sync`;
-      } else {
-        badge.classList.add('hidden');
+      if (badge) {
+        if (engine.pendingCount > 0) {
+          badge.classList.remove('hidden');
+          badge.textContent = `${engine.pendingCount} pending`;
+        } else {
+          badge.classList.add('hidden');
+        }
       }
 
-      if (engine.serverOnline) {
-        dot.className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500';
-        text.textContent = 'Server Connected (Live Sync)';
-      } else {
-        dot.className = 'w-2 h-2 rounded-full bg-cyan-500';
-        text.textContent = 'Offline Engine (Zero Latency)';
+      if (lastSyncEl && engine.lastSyncTime) {
+        lastSyncEl.textContent = `Synced ${engine.lastSyncTime}`;
       }
+
+      if (icon) {
+        if (engine.isSyncing) icon.classList.add('animate-spin');
+        else icon.classList.remove('animate-spin');
+      }
+
+      const isOnline = (typeof navigator !== 'undefined') ? navigator.onLine : true;
+
+      if (engine.isSyncing) {
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+        if (text) text.textContent = 'Auto-Syncing Cloud...';
+      } else if (engine.serverOnline) {
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500';
+        if (text) text.textContent = 'Live Cloud Sync (Online)';
+      } else if (!isOnline) {
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-zinc-500';
+        if (text) text.textContent = 'Offline (Auto-Sync Ready)';
+      } else {
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-cyan-400';
+        if (text) text.textContent = 'Online (Zero Latency)';
+      }
+    }
+
+    function triggerManualSync() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const icon = document.getElementById('sync-icon');
+      if (icon) icon.classList.add('animate-spin');
+      window.ENGDAY_ATTENDANCE.syncNow().finally(() => {
+        setTimeout(() => {
+          if (icon) icon.classList.remove('animate-spin');
+        }, 600);
+      });
+    }
+
+    function openServerConfigModal() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const status = window.ENGDAY_ATTENDANCE.getSyncStatus();
+      const devEl = document.getElementById('cfg-device-id');
+      const stEl = document.getElementById('cfg-sync-status');
+      const qEl = document.getElementById('cfg-pending-count');
+      const urlInp = document.getElementById('setting-server-url');
+
+      if (devEl) devEl.textContent = status.deviceId || '--';
+      if (stEl) stEl.textContent = status.serverOnline ? 'Connected (Live Sync)' : (navigator.onLine ? 'Connecting...' : 'Device Offline');
+      if (qEl) qEl.textContent = `${status.pendingCount} events waiting`;
+      if (urlInp) urlInp.value = localStorage.getItem('ENGDAY_SERVER_URL') || '';
+
+      document.getElementById('server-config-modal')?.classList.remove('hidden');
+    }
+
+    function closeServerConfigModal() {
+      document.getElementById('server-config-modal')?.classList.add('hidden');
+    }
+
+    function saveServerConfig() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const url = (document.getElementById('setting-server-url')?.value || '').trim();
+      window.ENGDAY_ATTENDANCE.setServerUrl(url);
+      closeServerConfigModal();
     }
 
     // =========================================================================

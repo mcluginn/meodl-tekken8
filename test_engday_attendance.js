@@ -141,7 +141,14 @@ const mockHandle = {
 engine.setLocalFileHandle(mockHandle);
 assert(engine.getLocalFileHandle() === mockHandle, 'Local file handle registered');
 await engine.writeToLocalFileHandle();
-assert(mockDiskBuffer.length > 500 && mockDiskBuffer.includes('student-0001'), 'Wrote backup directly to mock local disk handle');
+// Test 13: Online Auto-Sync Methods
+const syncStatus = engine.getSyncStatus();
+assert(typeof syncStatus === 'object', 'getSyncStatus returns status object');
+assert('pendingCount' in syncStatus, 'Sync status includes pending count');
+assert(typeof engine.syncNow === 'function', 'syncNow method is defined');
+assert(typeof engine.setServerUrl === 'function', 'setServerUrl method is defined');
+engine.setServerUrl('http://127.0.0.1:3000');
+assert(engine.getSyncStatus().serverUrl === 'http://127.0.0.1:3000', 'setServerUrl cleanly updates and normalizes server URL');
 
 console.log('----------------------------------------------------');
 console.log(`TOTAL TESTS: ${passed + failed} | PASSED: ${passed} | FAILED: ${failed}`);

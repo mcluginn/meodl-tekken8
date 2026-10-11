@@ -1,4 +1,7 @@
 {
   "outputDirectory": "public",
-  "cleanUrls": false
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.js" }
+  ]
 }

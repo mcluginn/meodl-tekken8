@@ -515,7 +515,52 @@
       this.loadConfig();
       this.load();
       this.autoSelectGameByTime();
+      this.initNetworkListeners();
       this.startSyncLoop();
+    }
+
+    initNetworkListeners() {
+      if (typeof window === 'undefined') return;
+
+      // When browser regains internet connectivity -> Auto-sync immediately!
+      window.addEventListener('online', () => {
+        console.log('[EngDay] Network connection restored -> Auto-syncing pending queue...');
+        this.syncWithServer(true);
+      });
+
+      // When browser drops connectivity
+      window.addEventListener('offline', () => {
+        console.log('[EngDay] Network connection lost -> Operating in offline zero-latency mode.');
+        this.serverOnline = false;
+        this.notify();
+      });
+
+      // When screen unlocks / app brought to foreground
+      if (typeof document !== 'undefined') {
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            this.syncWithServer();
+          }
+        });
+      }
+      window.addEventListener('focus', () => {
+        this.syncWithServer();
+      });
+    }
+
+    getApiBaseUrl() {
+      let url = (this.config.serverUrl || '').trim();
+      if (!url) {
+        if (typeof window !== 'undefined' && window.location) {
+          const saved = (typeof localStorage !== 'undefined') ? localStorage.getItem('ENGDAY_SERVER_URL') : null;
+          if (saved && saved.trim()) return saved.trim().replace(/\/$/, '');
+          const host = window.location.hostname;
+          if (host && host.includes('github.io')) return ''; // Static host without API
+          return window.location.origin.replace(/\/$/, '');
+        }
+        return '';
+      }
+      return url.replace(/\/$/, '');
     }
 
     getOrCreateDeviceId() {
@@ -537,6 +582,8 @@
         if (typeof localStorage !== 'undefined') {
           const raw = localStorage.getItem(CONFIG_STORAGE_KEY);
           if (raw) Object.assign(this.config, JSON.parse(raw));
+          const savedUrl = localStorage.getItem('ENGDAY_SERVER_URL');
+          if (savedUrl) this.config.serverUrl = savedUrl.trim();
         }
       } catch (e) {}
     }
@@ -904,6 +951,11 @@
       this.db.enqueuePending(event);
       this.updatePendingCount();
 
+      // Auto-sync immediately when online in the background (zero UI latency)
+      if (this.config.syncEnabled && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
+        this.syncWithServer().catch(() => {});
+      }
+
       return {
         success: true,
         action: 'check_in',
@@ -972,6 +1024,11 @@
       this.db.enqueuePending(event);
       this.updatePendingCount();
 
+      // Auto-sync immediately when online in the background (zero UI latency)
+      if (this.config.syncEnabled && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
+        this.syncWithServer().catch(() => {});
+      }
+
       return {
         success: true,
         action: 'check_out',
@@ -1028,6 +1085,11 @@
       this.db.saveEvent(event);
       this.db.enqueuePending(event);
       this.updatePendingCount();
+
+      // Auto-sync immediately when online in the background (zero UI latency)
+      if (this.config.syncEnabled && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
+        this.syncWithServer().catch(() => {});
+      }
 
       return { success: true, student: student, game: game };
     }
@@ -1286,9 +1348,43 @@
     startSyncLoop() {
       if (typeof window === 'undefined' || typeof setInterval === 'undefined') return;
       if (this.syncTimer && typeof clearInterval !== 'undefined') clearInterval(this.syncTimer);
+      
+      // Heartbeat auto-sync every 4 seconds when online
       this.syncTimer = setInterval(() => {
-        if (this.config.syncEnabled) this.syncWithServer();
-      }, this.config.syncIntervalMs);
+        if (this.config.syncEnabled && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
+          this.syncWithServer();
+        }
+      }, this.config.syncIntervalMs || 4000);
+
+      // Trigger initial background check on startup if online
+      if (typeof navigator === 'undefined' || navigator.onLine !== false) {
+        setTimeout(() => this.syncWithServer(), 800);
+      }
+    }
+
+    syncNow() {
+      return this.syncWithServer(true);
+    }
+
+    setServerUrl(url) {
+      const clean = String(url || '').trim();
+      this.config.serverUrl = clean;
+      this.saveConfig();
+      if (typeof localStorage !== 'undefined') {
+        try { localStorage.setItem('ENGDAY_SERVER_URL', clean); } catch (e) {}
+      }
+      return this.syncNow();
+    }
+
+    getSyncStatus() {
+      return {
+        serverOnline: this.serverOnline,
+        isSyncing: this.isSyncing,
+        pendingCount: this.pendingCount,
+        lastSyncTime: this.lastSyncTime,
+        serverUrl: this.getApiBaseUrl(),
+        deviceId: this.deviceId
+      };
     }
 
     async updatePendingCount() {
@@ -1301,13 +1397,26 @@
       this.notify();
     }
 
-    async syncWithServer() {
+    async syncWithServer(isManual = false) {
       if (this.isSyncing) return;
       this.isSyncing = true;
+      this.notify();
 
       try {
+        // If navigator explicitly reports offline, skip network calls
+        if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+          this.serverOnline = false;
+          return;
+        }
+
         const queue = await this.db.getPendingQueue();
-        const base = this.config.serverUrl || (typeof window !== 'undefined' && window.location && window.location.origin ? window.location.origin : '');
+        const base = this.getApiBaseUrl();
+
+        if (!base) {
+          // No API backend configured (e.g. standalone static mode on GitHub Pages)
+          this.serverOnline = false;
+          return;
+        }
 
         // 1. Flush local outbox queue to server
         if (queue.length > 0) {
@@ -1322,6 +1431,7 @@
             const syncedIds = [...(data.accepted || []), ...(data.duplicate || [])];
             await this.db.markEventsSynced(syncedIds);
             this.serverOnline = true;
+            this.lastSyncTime = formatManilaTime(new Date());
           } else {
             this.serverOnline = false;
           }
@@ -1329,7 +1439,8 @@
 
         // 2. Fetch latest server state & reconcile
         const stateRes = await fetch(`${base}/api/engday/attendance/state`, {
-          headers: { 'Accept': 'application/json' }
+          headers: { 'Accept': 'application/json' },
+          cache: 'no-store'
         });
 
         if (stateRes.ok) {
@@ -1342,6 +1453,8 @@
             this.state.version = serverState.version;
             this.save();
           }
+        } else {
+          if (queue.length === 0) this.serverOnline = false;
         }
       } catch (err) {
         this.serverOnline = false;
