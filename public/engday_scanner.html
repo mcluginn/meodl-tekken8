@@ -420,16 +420,16 @@
       <div class="space-y-2 pt-2 border-t border-zinc-900 font-sans">
         <div class="flex items-center justify-between">
           <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold font-mono">Auto-Download on Scan:</span>
-          <span id="auto-backup-current-badge" class="text-[10px] font-mono font-bold text-amber-400">OFF</span>
+          <span id="auto-backup-current-badge" class="text-[10px] font-mono font-bold text-emerald-400">EVERY SCAN (ACTIVE)</span>
         </div>
         <p class="text-[10px] text-zinc-400 leading-normal">
-          Optionally trigger an automatic download of a backup file when scanning:
+          A JSON backup file will automatically download to your device on every scan:
         </p>
         <select id="select-auto-backup-mode" onchange="updateAutoBackupSetting()" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
-          <option value="off">⚪ Off (Saves to IndexedDB & LocalStorage only)</option>
-          <option value="every">🟢 Every Single Scan (Downloads file on each scan)</option>
+          <option value="every" selected>🟢 Every Single Scan (Auto-download file on each scan)</option>
           <option value="every_5">🟡 Every 5 Scans (Batch download)</option>
           <option value="every_10">🔵 Every 10 Scans (Batch download)</option>
+          <option value="off">⚪ Off (Saves to IndexedDB & LocalStorage only)</option>
         </select>
       </div>
 
@@ -695,7 +695,7 @@
           window.ENGDAY_ATTENDANCE.recordCheckOut(student.id, activeGame.id, { performedBy: 'Marshal (Rapid)', reason: 'Rapid Scan Exit' });
           playBeep('check_out');
         }
-        triggerAutoBackupOnScan();
+        triggerAutoBackupOnScan(student);
         renderGameTabs();
         return;
       }
@@ -856,7 +856,7 @@
         playBeep('check_in');
       }
 
-      triggerAutoBackupOnScan();
+      triggerAutoBackupOnScan(student);
       closeVerifyModal();
       renderGameTabs();
     }
@@ -932,7 +932,7 @@
     // =========================================================================
     // LOCAL BACKUP & AUTO-SAVE CONTROLLER
     // =========================================================================
-    let autoBackupMode = localStorage.getItem('ENGDAY_AUTO_BACKUP_MODE') || 'off';
+    let autoBackupMode = localStorage.getItem('ENGDAY_AUTO_BACKUP_MODE') || 'every';
     let scanCountSinceBoot = 0;
     let linkedDiskHandle = null;
 
@@ -959,11 +959,11 @@
       const ind = document.getElementById('auto-backup-indicator');
       const labels = {
         'off': 'OFF',
-        'every': 'EVERY SCAN',
+        'every': 'EVERY SCAN (ACTIVE)',
         'every_5': 'EVERY 5 SCANS',
         'every_10': 'EVERY 10 SCANS'
       };
-      if (badge) badge.textContent = labels[autoBackupMode] || 'OFF';
+      if (badge) badge.textContent = labels[autoBackupMode] || 'EVERY SCAN (ACTIVE)';
       const isActive = autoBackupMode !== 'off' || linkedDiskHandle !== null;
       if (ind) ind.classList.toggle('hidden', !isActive);
     }
@@ -1017,9 +1017,9 @@
       updateDiskStatusText();
     }
 
-    function downloadJsonBackup() {
+    function downloadJsonBackup(customFilename = null) {
       if (window.ENGDAY_ATTENDANCE) {
-        window.ENGDAY_ATTENDANCE.downloadJSON();
+        window.ENGDAY_ATTENDANCE.downloadJSON(customFilename);
       }
     }
 
@@ -1029,16 +1029,22 @@
       }
     }
 
-    function triggerAutoBackupOnScan() {
+    function triggerAutoBackupOnScan(student = null) {
       scanCountSinceBoot++;
       
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const timeStr = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+      const tag = student ? `_${student.studentCode}` : `_Scan${scanCountSinceBoot}`;
+      const customFilename = `EngineeringDay_Backup_${now.toISOString().slice(0, 10)}_${timeStr}${tag}.json`;
+
       // Auto-download check if requested
       if (autoBackupMode === 'every') {
-        downloadJsonBackup();
+        downloadJsonBackup(customFilename);
       } else if (autoBackupMode === 'every_5' && scanCountSinceBoot % 5 === 0) {
-        downloadJsonBackup();
+        downloadJsonBackup(customFilename);
       } else if (autoBackupMode === 'every_10' && scanCountSinceBoot % 10 === 0) {
-        downloadJsonBackup();
+        downloadJsonBackup(customFilename);
       }
     }
 
