@@ -753,9 +753,10 @@
         if (backCam) {
           currentCameraId = backCam.id;
           launchCamera(backCam.id);
+        } else if (camerasList.length > 0) {
+          currentCameraId = camerasList[0].id;
+          launchCamera(camerasList[0].id);
         } else {
-          // On iOS Safari before permissions are granted, labels are blank.
-          // Requesting { facingMode: "environment" } guarantees the rear camera on iPhone!
           currentCameraId = null;
           launchCamera({ facingMode: "environment" });
         }
@@ -779,52 +780,34 @@
       };
       html5QrScanner = new Html5Qrcode("reader", scannerOpts);
 
-      // Mobile-safe constraints (iOS Safari & Android):
-      // NEVER specify min: 1280 or min: 720 (causes OverconstrainedError on iPhone portrait)
-      let cameraConstraint;
-      if (typeof config === 'string') {
-        cameraConstraint = {
-          deviceId: { exact: config },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        };
-      } else if (typeof config === 'object' && config.facingMode) {
-        cameraConstraint = {
-          facingMode: config.facingMode,
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        };
-      } else {
-        cameraConstraint = {
-          facingMode: { ideal: "environment" },
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        };
-      }
+      // Html5Qrcode requires the first argument to be EITHER a camera ID string
+      // OR an object with exactly 1 key: { facingMode: "environment" }
+      const cameraIdOrConfig = (typeof config === 'string')
+        ? config
+        : (config && config.facingMode ? { facingMode: config.facingMode } : { facingMode: "environment" });
 
-      // Full-frame scanning (qrbox is omitted):
-      // Allows QR codes printed small, at the bottom, or off-center to decode anywhere on screen!
       const scanConfig = {
         fps: 20,
+        qrbox: function(viewfinderWidth, viewfinderHeight) {
+          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+          const edge = Math.max(220, Math.floor(minEdge * 0.85));
+          return { width: edge, height: edge };
+        },
         aspectRatio: 1.0,
         disableFlip: false
       };
 
       html5QrScanner.start(
-        cameraConstraint,
+        cameraIdOrConfig,
         scanConfig,
         onScanSuccess,
         () => {}
       ).then(() => {
         onCameraReady();
       }).catch(err => {
-        console.warn('High-res camera start failed, retrying with basic config:', err);
-        const fallbackConstraint = (typeof config === 'string')
-          ? { deviceId: { exact: config } }
-          : { facingMode: "environment" };
-
+        console.warn('Primary camera start failed, retrying with facingMode:', err);
         html5QrScanner.start(
-          fallbackConstraint,
+          { facingMode: "environment" },
           scanConfig,
           onScanSuccess,
           () => {}
