@@ -1,7 +1,7 @@
 // test_engday_attendance.js
 import fs from 'fs';
 
-console.log('--- TESTING ENGINEERING DAY SPORTS ATTENDANCE SYSTEM ---');
+console.log('--- TESTING ENGINEERING DAY SPORTS ATTENDANCE SYSTEM (7 ME MATCHES) ---');
 
 // Setup browser globals simulation for Node environment
 const store = {};
@@ -59,69 +59,67 @@ function assert(condition, desc) {
   }
 }
 
-// Test 1: 6 Games defined
-assert(Array.isArray(ENGDAY_GAMES) && ENGDAY_GAMES.length === 6, 'Exactly 6 games registered in specification');
-assert(ENGDAY_GAMES.filter(g => g.sport === 'basketball').length === 3, '3 Basketball games defined (BB1, BB2, BB3)');
-assert(ENGDAY_GAMES.filter(g => g.sport === 'volleyball').length === 3, '3 Volleyball games defined (VB1, VB2, VB3)');
+// Test 1: 7 ME Games defined (4 Mixed Volleyball, 3 Men's Basketball)
+assert(Array.isArray(ENGDAY_GAMES) && ENGDAY_GAMES.length === 7, 'Exactly 7 ME games registered in specification');
+assert(ENGDAY_GAMES.filter(g => g.sport === 'volleyball').length === 4, '4 Mixed Volleyball games defined (VB 1, VB 3, VB 6, VB 8)');
+assert(ENGDAY_GAMES.filter(g => g.sport === 'basketball').length === 3, '3 Men\'s Basketball games defined (BB 1, BB 4, BB 6)');
 
 // Test 2: Student roster initialized
 const students = Object.values(engine.state.students);
 assert(students.length === 175, `All 175 students initialized in roster (got ${students.length})`);
 
-// Test 3: Student structure has all 6 games
+// Test 3: Student structure has all 7 games
 const testStudent = students[0];
 assert(testStudent && testStudent.games, 'Student has games attendance container');
-assert(Object.keys(testStudent.games).length === 6, 'Student has records for all 6 games');
-assert(testStudent.games.bb1.status === 'OUTSIDE', 'Student initially outside Basketball Game 1');
-assert(testStudent.games.vb1.status === 'OUTSIDE', 'Student initially outside Volleyball Game 1');
+assert(Object.keys(testStudent.games).length === 7, 'Student has records for all 7 games');
+assert(testStudent.games.bb_g1.status === 'OUTSIDE', 'Student initially outside Basketball Game 1 (bb_g1)');
+assert(testStudent.games.vb_g1.status === 'OUTSIDE', 'Student initially outside Volleyball Game 1 (vb_g1)');
 
-// Test 4: Check-in to Basketball Game 1
-engine.setActiveGame('bb1');
-const checkInRes = engine.recordCheckIn(testStudent.id, 'bb1', { performedBy: 'Marshal Court A' });
+// Test 4: Check-in to Basketball Game 1 (bb_g1)
+engine.setActiveGame('bb_g1');
+const checkInRes = engine.recordCheckIn(testStudent.id, 'bb_g1', { performedBy: 'Marshal Kirstine Ballesteros' });
 assert(checkInRes.success === true, 'Check-in to Basketball Game 1 succeeded');
-assert(testStudent.games.bb1.status === 'INSIDE', 'Student status is INSIDE for Basketball Game 1');
-assert(testStudent.games.bb1.visits === 1, 'Visits incremented to 1 for BB1');
-assert(testStudent.games.bb1.displayCheckIn !== null, 'Display check-in timestamp formatted in Manila time');
+assert(testStudent.games.bb_g1.status === 'INSIDE', 'Student status is INSIDE for Basketball Game 1');
+assert(testStudent.games.bb_g1.visits === 1, 'Visits incremented to 1 for bb_g1');
+assert(testStudent.games.bb_g1.displayCheckIn !== null, 'Display check-in timestamp formatted in Manila time');
 
-// Test 5: Verify per-game isolation: other 5 games remain OUTSIDE
-assert(testStudent.games.bb2.status === 'OUTSIDE', 'Student remains OUTSIDE for Basketball Game 2');
-assert(testStudent.games.bb3.status === 'OUTSIDE', 'Student remains OUTSIDE for Basketball Game 3');
-assert(testStudent.games.vb1.status === 'OUTSIDE', 'Student remains OUTSIDE for Volleyball Game 1');
-assert(testStudent.games.vb2.status === 'OUTSIDE', 'Student remains OUTSIDE for Volleyball Game 2');
-assert(testStudent.games.vb3.status === 'OUTSIDE', 'Student remains OUTSIDE for Volleyball Game 3');
+// Test 5: Verify per-game isolation: other 6 games remain OUTSIDE
+const otherGameIds = ['vb_g1', 'vb_g3', 'vb_g6', 'vb_g8', 'bb_g4', 'bb_g6'];
+const allOthersOutside = otherGameIds.every(gid => testStudent.games[gid].status === 'OUTSIDE');
+assert(allOthersOutside, 'Student remains OUTSIDE for all other 6 matches while INSIDE bb_g1');
 
-// Test 6: Check-out of Basketball Game 1
-const checkOutRes = engine.recordCheckOut(testStudent.id, 'bb1', { reason: 'Game Concluded' });
+// Test 6: Check-out of Basketball Game 1 (bb_g1)
+const checkOutRes = engine.recordCheckOut(testStudent.id, 'bb_g1', { reason: 'Game Concluded' });
 assert(checkOutRes.success === true, 'Check-out of Basketball Game 1 succeeded');
-assert(testStudent.games.bb1.status === 'OUTSIDE', 'Student status is OUTSIDE for Basketball Game 1');
-assert(testStudent.games.bb1.displayCheckOut !== null, 'Display check-out timestamp formatted in Manila time');
+assert(testStudent.games.bb_g1.status === 'OUTSIDE', 'Student status is OUTSIDE for Basketball Game 1');
+assert(testStudent.games.bb_g1.displayCheckOut !== null, 'Display check-out timestamp formatted in Manila time');
 
-// Test 7: Check-in to Volleyball Game 1
-engine.setActiveGame('vb1');
-const vbInRes = engine.recordCheckIn(testStudent.id, 'vb1', { performedBy: 'Marshal Court V' });
+// Test 7: Check-in to Volleyball Game 1 (vb_g1)
+engine.setActiveGame('vb_g1');
+const vbInRes = engine.recordCheckIn(testStudent.id, 'vb_g1', { performedBy: 'Marshal Princess Doroja' });
 assert(vbInRes.success === true, 'Check-in to Volleyball Game 1 succeeded');
-assert(testStudent.games.vb1.status === 'INSIDE', 'Student is INSIDE Volleyball Game 1');
-assert(testStudent.games.bb1.status === 'OUTSIDE', 'Student remains OUTSIDE Basketball Game 1 while INSIDE Volleyball Game 1');
+assert(testStudent.games.vb_g1.status === 'INSIDE', 'Student is INSIDE Volleyball Game 1');
+assert(testStudent.games.bb_g1.status === 'OUTSIDE', 'Student remains OUTSIDE Basketball Game 1 while INSIDE Volleyball Game 1');
 
 // Test 8: QR resolution
 const qrRes = engine.resolveScanPayload(testStudent.studentCode);
 assert(qrRes.success === true, 'Resolves student by studentCode string');
 assert(qrRes.student.id === testStudent.id, 'Resolved student matches ID');
-assert(qrRes.statusInGame === 'INSIDE', 'Returns current status in active game (vb1)');
+assert(qrRes.statusInGame === 'INSIDE', 'Returns current status in active game (vb_g1)');
 
 // Test 9: Stats computation
 const stats = engine.calculateStats();
 assert(stats.totalStudents === 175, 'Stats reports 175 total students');
 assert(stats.totalUniqueAttendees === 1, 'Stats reports 1 unique attendee');
-assert(stats.allGamesStats.bb1.totalCheckIns === 1, 'BB1 has 1 total check-in');
-assert(stats.allGamesStats.bb1.insideCount === 0, 'BB1 has 0 inside count (checked out)');
-assert(stats.allGamesStats.vb1.insideCount === 1, 'VB1 has 1 inside count');
+assert(stats.allGamesStats.bb_g1.totalCheckIns === 1, 'bb_g1 has 1 total check-in');
+assert(stats.allGamesStats.bb_g1.insideCount === 0, 'bb_g1 has 0 inside count (checked out)');
+assert(stats.allGamesStats.vb_g1.insideCount === 1, 'vb_g1 has 1 inside count');
 
 // Test 10: CSV export
 const csv = engine.exportCSV();
 assert(csv.includes('Student ID,Full Name,Team'), 'CSV contains correct header columns');
-assert(csv.includes('BB Game 1 Status'), 'CSV contains BB Game 1 column');
-assert(csv.includes('VB Game 1 Status'), 'CSV contains VB Game 1 column');
+assert(csv.includes('BB 1 (CE vs ME) Status'), 'CSV contains BB 1 (CE vs ME) column');
+assert(csv.includes('VB 1 (CPE/ECE vs ME) Status'), 'CSV contains VB 1 (CPE/ECE vs ME) column');
 assert(csv.includes(testStudent.studentCode), 'CSV contains test student record');
 
 console.log('----------------------------------------------------');

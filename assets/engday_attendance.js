@@ -24,14 +24,18 @@
   // -------------------------------------------------------------------------
   const ENGDAY_GAMES = [
     {
-      id: 'bb1',
-      sport: 'basketball',
+      id: 'vb_g1',
+      sport: 'volleyball',
       gameNum: 1,
-      name: 'Basketball Game 1',
-      shortName: 'BB Game 1',
-      court: 'Basketball Court',
-      timeSlot: '9:00 AM – 9:50 AM',
-      icon: '🏀',
+      name: 'Mixed Volleyball Game 1',
+      shortName: 'VB 1 (CPE/ECE vs ME)',
+      tabName: 'VB 1: CPE/ECE vs ME',
+      matchup: 'CPE/ECE vs. ME',
+      opponent: 'CPE / ECE',
+      court: 'Volleyball Court',
+      timeSlot: '8:00 AM – 8:30 AM',
+      coordinator: 'Princess Fhaye Colline Doroja',
+      icon: '🏐',
       color: 'amber',
       accentHex: '#f59e0b',
       borderClass: 'border-amber-500/50',
@@ -39,14 +43,18 @@
       badgeClass: 'bg-amber-950 text-amber-300 border-amber-800'
     },
     {
-      id: 'bb2',
-      sport: 'basketball',
-      gameNum: 2,
-      name: 'Basketball Game 2',
-      shortName: 'BB Game 2',
-      court: 'Basketball Court',
-      timeSlot: '9:50 AM – 10:40 AM',
-      icon: '🏀',
+      id: 'vb_g3',
+      sport: 'volleyball',
+      gameNum: 3,
+      name: 'Mixed Volleyball Game 3',
+      shortName: 'VB 3 (EE vs ME)',
+      tabName: 'VB 3: EE vs ME',
+      matchup: 'EE vs. ME',
+      opponent: 'EE (Electrical)',
+      court: 'Volleyball Court',
+      timeSlot: '9:00 AM – 9:30 AM',
+      coordinator: 'Princess Fhaye Colline Doroja',
+      icon: '🏐',
       color: 'orange',
       accentHex: '#f97316',
       borderClass: 'border-orange-500/50',
@@ -54,29 +62,56 @@
       badgeClass: 'bg-orange-950 text-orange-300 border-orange-800'
     },
     {
-      id: 'bb3',
-      sport: 'basketball',
-      gameNum: 3,
-      name: 'Basketball Game 3',
-      shortName: 'BB Game 3',
-      court: 'Basketball Court',
-      timeSlot: '10:40 AM – 11:30 AM',
-      icon: '🏀',
-      color: 'red',
-      accentHex: '#ef4444',
-      borderClass: 'border-red-500/50',
-      bgClass: 'bg-red-950/40',
-      badgeClass: 'bg-red-950 text-red-300 border-red-800'
+      id: 'vb_g6',
+      sport: 'volleyball',
+      gameNum: 6,
+      name: 'Mixed Volleyball Game 6',
+      shortName: 'VB 6 (IE vs ME)',
+      tabName: 'VB 6: IE vs ME',
+      matchup: 'IE vs. ME',
+      opponent: 'IE (Industrial)',
+      court: 'Volleyball Court',
+      timeSlot: '10:30 AM – 11:00 AM',
+      coordinator: 'Princess Fhaye Colline Doroja',
+      icon: '🏐',
+      color: 'yellow',
+      accentHex: '#eab308',
+      borderClass: 'border-yellow-500/50',
+      bgClass: 'bg-yellow-950/40',
+      badgeClass: 'bg-yellow-950 text-yellow-300 border-yellow-800'
     },
     {
-      id: 'vb1',
+      id: 'vb_g8',
       sport: 'volleyball',
-      gameNum: 1,
-      name: 'Volleyball Game 1',
-      shortName: 'VB Game 1',
+      gameNum: 8,
+      name: 'Mixed Volleyball Game 8',
+      shortName: 'VB 8 (CE vs ME)',
+      tabName: 'VB 8: CE vs ME',
+      matchup: 'CE vs. ME',
+      opponent: 'CE (Civil)',
       court: 'Volleyball Court',
-      timeSlot: '1:00 PM – 2:00 PM',
+      timeSlot: '11:30 AM – 12:00 NN',
+      coordinator: 'Princess Fhaye Colline Doroja',
       icon: '🏐',
+      color: 'rose',
+      accentHex: '#f43f5e',
+      borderClass: 'border-rose-500/50',
+      bgClass: 'bg-rose-950/40',
+      badgeClass: 'bg-rose-950 text-rose-300 border-rose-800'
+    },
+    {
+      id: 'bb_g1',
+      sport: 'basketball',
+      gameNum: 1,
+      name: 'Men\'s Basketball Game 1',
+      shortName: 'BB 1 (CE vs ME)',
+      tabName: 'BB 1: CE vs ME',
+      matchup: 'CE vs. ME',
+      opponent: 'CE (Civil)',
+      court: 'Basketball Court',
+      timeSlot: '1:00 PM – 2:00 PM',
+      coordinator: 'Kirstine Doll Ballesteros',
+      icon: '🏀',
       color: 'cyan',
       accentHex: '#06b6d4',
       borderClass: 'border-cyan-500/50',
@@ -84,14 +119,18 @@
       badgeClass: 'bg-cyan-950 text-cyan-300 border-cyan-800'
     },
     {
-      id: 'vb2',
-      sport: 'volleyball',
-      gameNum: 2,
-      name: 'Volleyball Game 2',
-      shortName: 'VB Game 2',
-      court: 'Volleyball Court',
-      timeSlot: '2:00 PM – 3:00 PM',
-      icon: '🏐',
+      id: 'bb_g4',
+      sport: 'basketball',
+      gameNum: 4,
+      name: 'Men\'s Basketball Game 4',
+      shortName: 'BB 4 (ME vs EE)',
+      tabName: 'BB 4: ME vs EE',
+      matchup: 'ME vs. EE',
+      opponent: 'EE (Electrical)',
+      court: 'Basketball Court',
+      timeSlot: '4:00 PM – 5:00 PM',
+      coordinator: 'Kirstine Doll Ballesteros',
+      icon: '🏀',
       color: 'sky',
       accentHex: '#0ea5e9',
       borderClass: 'border-sky-500/50',
@@ -99,14 +138,18 @@
       badgeClass: 'bg-sky-950 text-sky-300 border-sky-800'
     },
     {
-      id: 'vb3',
-      sport: 'volleyball',
-      gameNum: 3,
-      name: 'Volleyball Game 3',
-      shortName: 'VB Game 3',
-      court: 'Volleyball Court',
-      timeSlot: '3:00 PM – 4:00 PM',
-      icon: '🏐',
+      id: 'bb_g6',
+      sport: 'basketball',
+      gameNum: 6,
+      name: 'Men\'s Basketball Game 6',
+      shortName: 'BB 6 (IE vs ME)',
+      tabName: 'BB 6: IE vs ME',
+      matchup: 'IE vs. ME',
+      opponent: 'IE (Industrial)',
+      court: 'Basketball Court',
+      timeSlot: '6:00 PM – 7:00 PM',
+      coordinator: 'Kirstine Doll Ballesteros',
+      icon: '🏀',
       color: 'emerald',
       accentHex: '#10b981',
       borderClass: 'border-emerald-500/50',
@@ -389,7 +432,7 @@
   class EngDayAttendanceEngine {
     constructor() {
       this.games = ENGDAY_GAMES;
-      this.activeGameId = 'bb1'; // Default to Basketball Game 1
+      this.activeGameId = 'vb_g1'; // Default to First Game: Mixed Volleyball Game 1
       this.db = new EngDayIndexedDB();
       this.deviceId = this.getOrCreateDeviceId();
       this.localSequence = 1;
@@ -403,7 +446,7 @@
 
       this.state = {
         students: {},
-        activeGameId: 'bb1',
+        activeGameId: 'vb_g1',
         auditLog: [],
         version: 1,
         lastUpdated: new Date().toISOString()
@@ -490,19 +533,22 @@
       const minute = now.getMinutes();
       const timeVal = hour * 60 + minute;
 
-      // BB1: 9:00 - 9:50 (540 - 590)
-      // BB2: 9:50 - 10:40 (590 - 640)
-      // BB3: 10:40 - 11:30 (640 - 690)
-      // VB1: 13:00 - 14:00 (780 - 840)
-      // VB2: 14:00 - 15:00 (840 - 900)
-      // VB3: 15:00 - 16:00 (900 - 960)
-      if (timeVal >= 540 && timeVal < 590) this.activeGameId = 'bb1';
-      else if (timeVal >= 590 && timeVal < 640) this.activeGameId = 'bb2';
-      else if (timeVal >= 640 && timeVal < 720) this.activeGameId = 'bb3';
-      else if (timeVal >= 780 && timeVal < 840) this.activeGameId = 'vb1';
-      else if (timeVal >= 840 && timeVal < 900) this.activeGameId = 'vb2';
-      else if (timeVal >= 900) this.activeGameId = 'vb3';
-      else this.activeGameId = 'bb1';
+      // Official ESC ME Games Schedule:
+      // vb_g1 (8:00 AM – 8:30 AM): CPE/ECE vs ME
+      // vb_g3 (9:00 AM – 9:30 AM): EE vs ME
+      // vb_g6 (10:30 AM – 11:00 AM): IE vs ME
+      // vb_g8 (11:30 AM – 12:00 NN): CE vs ME
+      // bb_g1 (1:00 PM – 2:00 PM): CE vs ME
+      // bb_g4 (4:00 PM – 5:00 PM): ME vs EE
+      // bb_g6 (6:00 PM – 7:00 PM): IE vs ME
+      if (timeVal < 525) this.activeGameId = 'vb_g1';
+      else if (timeVal >= 525 && timeVal < 600) this.activeGameId = 'vb_g3';
+      else if (timeVal >= 600 && timeVal < 675) this.activeGameId = 'vb_g6';
+      else if (timeVal >= 675 && timeVal < 750) this.activeGameId = 'vb_g8';
+      else if (timeVal >= 750 && timeVal < 930) this.activeGameId = 'bb_g1';
+      else if (timeVal >= 930 && timeVal < 1050) this.activeGameId = 'bb_g4';
+      else if (timeVal >= 1050) this.activeGameId = 'bb_g6';
+      else this.activeGameId = 'vb_g1';
 
       this.state.activeGameId = this.activeGameId;
     }
@@ -1030,7 +1076,7 @@
 
       // Filtered specific stats
       const targetGameId = gameIdFilter || this.activeGameId;
-      const targetStats = gameStats[targetGameId] || gameStats['bb1'];
+      const targetStats = gameStats[targetGameId] || gameStats['vb_g1'] || Object.values(gameStats)[0];
 
       return {
         totalStudents,

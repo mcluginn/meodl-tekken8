@@ -187,9 +187,9 @@ if (!attendanceState || !attendanceState.students || Object.keys(attendanceState
 }
 
 // -------------------------------------------------------------------------
-// ENGINEERING DAY 2026 (SPORTS ATTENDANCE: 3 BASKETBALL + 3 VOLLEYBALL)
+// ENGINEERING DAY 2026 (SPORTS ATTENDANCE: 4 VOLLEYBALL + 3 BASKETBALL FOR ME)
 // -------------------------------------------------------------------------
-const ENGDAY_GAMES_LIST = ['bb1', 'bb2', 'bb3', 'vb1', 'vb2', 'vb3'];
+const ENGDAY_GAMES_LIST = ['vb_g1', 'vb_g3', 'vb_g6', 'vb_g8', 'bb_g1', 'bb_g4', 'bb_g6'];
 
 function buildDefaultEngDayRoster() {
   const baseStudents = buildDefaultStudentsRoster();

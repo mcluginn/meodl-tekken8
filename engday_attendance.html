@@ -139,28 +139,28 @@
           <span id="stat-total-checkins" class="text-2xl sm:text-3xl font-black text-cyan-300 font-mono">0</span>
           <span class="text-xs text-cyan-500">Scans</span>
         </div>
-        <p class="text-[11px] text-zinc-500 mt-1">Across all 6 games</p>
+        <p class="text-[11px] text-zinc-500 mt-1">Across all 7 ME games</p>
       </div>
     </section>
 
     <!-- =======================================================================
-         THE 6 GAMES SESSIONS GRID
+         THE 7 ME GAMES SESSIONS GRID
          ======================================================================= -->
     <section class="space-y-3">
       <div class="flex items-center justify-between">
         <div>
           <h2 class="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
             <span>🏆</span>
-            <span>Sports Sessions Overview (6 Games)</span>
+            <span>Sports Sessions Overview (7 ME Games)</span>
           </h2>
           <p class="text-xs text-zinc-400">Independent check-in and check-out monitored for each match</p>
         </div>
         
         <!-- Filter Pills for Sessions -->
         <div class="flex items-center gap-1.5 text-xs">
-          <button onclick="setGameFilter('all')" id="filter-pill-all" class="px-2.5 py-1 rounded-lg font-bold bg-amber-600 text-white">All (6)</button>
+          <button onclick="setGameFilter('all')" id="filter-pill-all" class="px-2.5 py-1 rounded-lg font-bold bg-amber-600 text-white">All (7)</button>
+          <button onclick="setGameFilter('volleyball')" id="filter-pill-vb" class="px-2.5 py-1 rounded-lg font-medium bg-zinc-900 text-zinc-400 hover:text-white">🏐 Volleyball (4)</button>
           <button onclick="setGameFilter('basketball')" id="filter-pill-bb" class="px-2.5 py-1 rounded-lg font-medium bg-zinc-900 text-zinc-400 hover:text-white">🏀 Basketball (3)</button>
-          <button onclick="setGameFilter('volleyball')" id="filter-pill-vb" class="px-2.5 py-1 rounded-lg font-medium bg-zinc-900 text-zinc-400 hover:text-white">🏐 Volleyball (3)</button>
         </div>
       </div>
 
@@ -244,16 +244,17 @@
       <!-- Responsive Table Container -->
       <div class="overflow-x-auto rounded-xl border border-zinc-800/80">
         <table class="w-full text-left text-xs whitespace-nowrap">
-          <thead class="bg-zinc-900/90 text-zinc-400 uppercase font-mono text-[10px] border-b border-zinc-800">
+          <thead id="master-table-head" class="bg-zinc-900/90 text-zinc-400 uppercase font-mono text-[10px] border-b border-zinc-800">
             <tr>
               <th class="py-3 px-3">Student</th>
               <th class="py-3 px-3">Team</th>
-              <th class="py-3 px-3 text-center">🏀 BB Game 1</th>
-              <th class="py-3 px-3 text-center">🏀 BB Game 2</th>
-              <th class="py-3 px-3 text-center">🏀 BB Game 3</th>
-              <th class="py-3 px-3 text-center">🏐 VB Game 1</th>
-              <th class="py-3 px-3 text-center">🏐 VB Game 2</th>
-              <th class="py-3 px-3 text-center">🏐 VB Game 3</th>
+              <th class="py-3 px-3 text-center">🏐 VB 1 (CPE/ECE)</th>
+              <th class="py-3 px-3 text-center">🏐 VB 3 (EE)</th>
+              <th class="py-3 px-3 text-center">🏐 VB 6 (IE)</th>
+              <th class="py-3 px-3 text-center">🏐 VB 8 (CE)</th>
+              <th class="py-3 px-3 text-center">🏀 BB 1 (CE)</th>
+              <th class="py-3 px-3 text-center">🏀 BB 4 (EE)</th>
+              <th class="py-3 px-3 text-center">🏀 BB 6 (IE)</th>
               <th class="py-3 px-3 text-center">Total</th>
               <th class="py-3 px-3 text-right">Action</th>
             </tr>
@@ -342,7 +343,7 @@
       renderGameCards();
     }
 
-    // Render 6 Game Session Cards
+    // Render 7 Game Session Cards
     function renderGameCards() {
       if (!window.ENGDAY_ATTENDANCE) return;
       const games = window.ENGDAY_ATTENDANCE.games;
@@ -368,8 +369,12 @@
                 <div class="flex items-center gap-2">
                   <span class="text-2xl">${g.icon}</span>
                   <div>
-                    <h3 class="text-sm font-bold text-white">${g.name}</h3>
-                    <p class="text-[10px] text-zinc-400">${g.timeSlot} • ${g.court}</p>
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <h3 class="text-sm font-bold text-white">${g.name}</h3>
+                      <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-800/60 font-mono">${g.matchup}</span>
+                    </div>
+                    <p class="text-[10px] text-zinc-400 mt-0.5">${g.timeSlot} • ${g.court}</p>
+                    <p class="text-[9px] text-zinc-500 mt-0.5 truncate">In Charge: ${g.coordinator}</p>
                   </div>
                 </div>
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold ${g.badgeClass}">
@@ -410,6 +415,27 @@
           </div>
         `;
       }).join('');
+    }
+
+    function renderMasterTableHeader() {
+      const thead = document.getElementById('master-table-head');
+      if (!thead || !window.ENGDAY_ATTENDANCE) return;
+      const games = window.ENGDAY_ATTENDANCE.games;
+      const gameHeaders = games.map(g => `
+        <th class="py-3 px-3 text-center" title="${g.name} (${g.matchup}) • ${g.timeSlot}">
+          <span class="block">${g.icon} ${g.tabName || g.shortName}</span>
+          <span class="text-[9px] font-normal text-zinc-400 block font-sans">${g.matchup}</span>
+        </th>
+      `).join('');
+      thead.innerHTML = `
+        <tr>
+          <th class="py-3 px-3">Student</th>
+          <th class="py-3 px-3">Team</th>
+          ${gameHeaders}
+          <th class="py-3 px-3 text-center">Total</th>
+          <th class="py-3 px-3 text-right">Action</th>
+        </tr>
+      `;
     }
 
     function getBarPct(val, total) {
@@ -517,7 +543,7 @@
       document.getElementById('table-record-count').textContent = `Showing ${filtered.length} of ${allStudents.length} students`;
 
       if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="10" class="py-6 text-center text-zinc-500 font-sans">No matching students found for current filters.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="${games.length + 3}" class="py-6 text-center text-zinc-500 font-sans">No matching students found for current filters.</td></tr>`;
         return;
       }
 
@@ -561,7 +587,7 @@
             </td>
             ${gameCells}
             <td class="py-2.5 px-3 text-center font-bold ${attendedCount > 0 ? 'text-amber-400' : 'text-zinc-500'}">
-              ${attendedCount}/6
+              ${attendedCount}/${games.length}
             </td>
             <td class="py-2.5 px-3 text-right">
               <button onclick="openStudentModal('${s.id}')" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-bold transition-colors">
@@ -667,12 +693,14 @@
       setInterval(updateClock, 1000);
       updateClock();
 
+      renderMasterTableHeader();
       renderGameCards();
       renderGlobalStats();
       renderMasterTable();
 
       if (window.ENGDAY_ATTENDANCE) {
         window.ENGDAY_ATTENDANCE.subscribe(() => {
+          renderMasterTableHeader();
           renderGameCards();
           renderGlobalStats();
           renderMasterTable();

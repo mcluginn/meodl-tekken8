@@ -490,7 +490,7 @@
         return `
           <button onclick="selectActiveGame('${g.id}')" class="px-2.5 py-1.5 rounded-xl border text-[11px] flex items-center gap-1.5 shrink-0 transition-all ${activeClass}">
             <span>${g.icon}</span>
-            <span class="whitespace-nowrap">${g.shortName}</span>
+            <span class="whitespace-nowrap font-medium">${g.tabName || g.shortName}</span>
             <span class="px-1.5 py-0.2 rounded-full text-[9px] font-mono ${isActive ? 'bg-amber-950/80 text-amber-200' : 'bg-zinc-800 text-zinc-400'}">
               ${gStats.insideCount}
             </span>
@@ -500,9 +500,9 @@
 
       // Update Session Banner
       document.getElementById('active-game-icon').textContent = activeGame.icon;
-      document.getElementById('active-game-name').textContent = activeGame.name;
+      document.getElementById('active-game-name').textContent = `${activeGame.name} (${activeGame.matchup})`;
       document.getElementById('active-game-badge').textContent = activeGame.timeSlot;
-      document.getElementById('active-game-court').textContent = `${activeGame.court} • Court Entry / Exit`;
+      document.getElementById('active-game-court').textContent = `${activeGame.court} • In Charge: ${activeGame.coordinator || 'Marshal'}`;
       const currentStats = stats.allGamesStats[activeGame.id] || { insideCount: 0 };
       document.getElementById('active-game-inside-count').textContent = currentStats.insideCount;
       document.getElementById('recent-game-badge').textContent = `${activeGame.icon} ${activeGame.shortName}`;
@@ -662,7 +662,7 @@
       teamBadge.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${teamColors[student.team] || teamColors.rankine}`;
 
       // Target Session
-      document.getElementById('modal-session-title').textContent = `${activeGame.icon} ${activeGame.name}`;
+      document.getElementById('modal-session-title').textContent = `${activeGame.icon} ${activeGame.name} (${activeGame.matchup})`;
 
       // Game Status & Action Button
       const statusEl = document.getElementById('modal-game-status');
@@ -717,7 +717,7 @@
         `;
       }).join('');
 
-      document.getElementById('modal-games-attended-counter').textContent = `${attendedCount}/6 Games`;
+      document.getElementById('modal-games-attended-counter').textContent = `${attendedCount}/${games.length} Games`;
 
       // Timeline for this Game
       const timelineEl = document.getElementById('modal-history-timeline');
