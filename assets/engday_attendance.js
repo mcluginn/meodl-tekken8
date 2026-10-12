@@ -1342,6 +1342,99 @@
       }, 5000);
     }
 
+    importJSON(jsonData) {
+      try {
+        let parsed = jsonData;
+        if (typeof jsonData === 'string') {
+          parsed = JSON.parse(jsonData);
+        }
+        if (!parsed || typeof parsed !== 'object') {
+          throw new Error('Invalid JSON data format');
+        }
+
+        // Support both full wrapper { state: { students: ... } } and direct { students: ... }
+        let incomingStudents = null;
+        if (parsed.state && parsed.state.students && typeof parsed.state.students === 'object') {
+          incomingStudents = parsed.state.students;
+        } else if (parsed.students && typeof parsed.students === 'object') {
+          incomingStudents = parsed.students;
+        }
+
+        if (!incomingStudents || Object.keys(incomingStudents).length === 0) {
+          throw new Error('No valid student attendance records found in backup.');
+        }
+
+        if (!this.state.students || Object.keys(this.state.students).length === 0) {
+          this.initDefaultRoster();
+        }
+
+        let mergedScans = 0;
+        let studentsUpdated = 0;
+
+        Object.keys(incomingStudents).forEach(id => {
+          const incoming = incomingStudents[id];
+          if (!this.state.students[id]) {
+            this.state.students[id] = incoming;
+            studentsUpdated++;
+          } else {
+            const current = this.state.students[id];
+            if (incoming.games) {
+              if (!current.games) current.games = this.createEmptyGamesRecord();
+              Object.keys(incoming.games).forEach(gId => {
+                const inGame = incoming.games[gId];
+                const curGame = current.games[gId];
+                if (!curGame) {
+                  current.games[gId] = inGame;
+                  if (inGame.visits > 0 || inGame.status === 'INSIDE') mergedScans++;
+                } else {
+                  // Merge scan state: accept higher visits or active INSIDE status or populated timestamps
+                  const incomingHasScans = (inGame.visits > (curGame.visits || 0)) ||
+                    (inGame.status === 'INSIDE' && curGame.status !== 'INSIDE') ||
+                    (inGame.checkInTime && !curGame.checkInTime);
+
+                  if (incomingHasScans) {
+                    current.games[gId] = { ...curGame, ...inGame };
+                    mergedScans++;
+                  }
+                }
+              });
+            }
+            studentsUpdated++;
+          }
+        });
+
+        // Audit log merge if present
+        if (parsed.state && Array.isArray(parsed.state.auditLog)) {
+          const existingIds = new Set((this.state.auditLog || []).map(a => a.eventId || a.id));
+          parsed.state.auditLog.forEach(item => {
+            const key = item.eventId || item.id;
+            if (!key || !existingIds.has(key)) {
+              if (!this.state.auditLog) this.state.auditLog = [];
+              this.state.auditLog.push(item);
+            }
+          });
+        }
+
+        this.reconcileStudentGamesStructure();
+        this.save();
+        this.notify();
+
+        return {
+          success: true,
+          studentsUpdated,
+          mergedScans,
+          totalStudents: Object.keys(this.state.students).length,
+          timestamp: new Date().toISOString()
+        };
+      } catch (err) {
+        console.error('[EngDay] Failed to import JSON:', err);
+        return {
+          success: false,
+          error: err.message
+        };
+      }
+    }
+
     // -------------------------------------------------------------------------
     // 11. BACKGROUND SYNC CLIENT
     // -------------------------------------------------------------------------

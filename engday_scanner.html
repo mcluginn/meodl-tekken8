@@ -520,16 +520,20 @@
         </div>
       </div>
 
-      <!-- 1-Tap Manual Export Buttons -->
+      <!-- 1-Tap Manual Export & Restore Buttons -->
       <div class="space-y-2">
-        <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold block">1-Tap Instant Backup:</span>
-        <div class="grid grid-cols-2 gap-2 font-sans">
-          <button onclick="downloadJsonBackup()" class="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors">
-            <span>📄</span> JSON Backup
+        <span class="text-[10px] uppercase tracking-wider text-zinc-400 font-bold block">1-Tap Backup & Restore:</span>
+        <div class="grid grid-cols-3 gap-2 font-sans">
+          <button onclick="downloadJsonBackup()" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-[11px] font-bold flex items-center justify-center gap-1 transition-colors" title="Download JSON Backup">
+            <span>📄</span> JSON
           </button>
-          <button onclick="downloadCsvBackup()" class="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors">
-            <span>📊</span> CSV Sheet
+          <button onclick="downloadCsvBackup()" class="p-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-[11px] font-bold flex items-center justify-center gap-1 transition-colors" title="Download CSV Spreadsheet">
+            <span>📊</span> CSV
           </button>
+          <button onclick="triggerRestoreBackupScanner()" class="p-2 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 border border-amber-600/50 text-amber-300 text-[11px] font-bold flex items-center justify-center gap-1 transition-colors" title="Import & Load Backup JSON">
+            <span>📂</span> Load
+          </button>
+          <input type="file" id="scanner-backup-file-input" accept=".json,application/json" class="hidden" onchange="handleRestoreBackupScanner(event)" />
         </div>
       </div>
 
@@ -1388,6 +1392,40 @@
       if (window.ENGDAY_ATTENDANCE) {
         window.ENGDAY_ATTENDANCE.downloadCSV();
       }
+    }
+
+    function triggerRestoreBackupScanner() {
+      const input = document.getElementById('scanner-backup-file-input');
+      if (input) {
+        input.value = '';
+        input.click();
+      }
+    }
+
+    function handleRestoreBackupScanner(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (!file.name.toLowerCase().endsWith('.json')) {
+        alert('Please choose a valid .json attendance backup file.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          if (!window.ENGDAY_ATTENDANCE) return;
+          const res = window.ENGDAY_ATTENDANCE.importJSON(e.target.result);
+          if (res.success) {
+            updateHeaderCounts();
+            alert(`✅ Backup Loaded!\n\nSuccessfully merged ${res.mergedScans} scan(s) across ${res.totalStudents} students.`);
+            closeBackupModal();
+          } else {
+            alert(`❌ Import failed: ${res.error || 'Unknown error'}`);
+          }
+        } catch (err) {
+          alert(`❌ Failed to read backup file: ${err.message}`);
+        }
+      };
+      reader.readAsText(file);
     }
 
     function triggerAutoBackupOnScan(student = null) {

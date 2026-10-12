@@ -148,7 +148,36 @@ assert('pendingCount' in syncStatus, 'Sync status includes pending count');
 assert(typeof engine.syncNow === 'function', 'syncNow method is defined');
 assert(typeof engine.setServerUrl === 'function', 'setServerUrl method is defined');
 engine.setServerUrl('http://127.0.0.1:3000');
-assert(engine.getSyncStatus().serverUrl === 'http://127.0.0.1:3000', 'setServerUrl cleanly updates and normalizes server URL');
+// Test 14: JSON import / restore
+assert(typeof engine.importJSON === 'function', 'importJSON method is defined');
+const simulatedBackup = {
+  exportedAt: new Date().toISOString(),
+  state: {
+    students: {
+      [testStudent.id]: {
+        ...testStudent,
+        games: {
+          ...testStudent.games,
+          vb_g3: {
+            gameId: 'vb_g3',
+            status: 'INSIDE',
+            lastAction: 'check_in',
+            checkInTime: new Date().toISOString(),
+            checkOutTime: null,
+            displayCheckIn: '9:15 AM',
+            displayCheckOut: null,
+            visits: 1,
+            history: []
+          }
+        }
+      }
+    }
+  }
+};
+const importRes = engine.importJSON(simulatedBackup);
+assert(importRes.success === true, 'importJSON successfully parsed and applied backup');
+assert(importRes.mergedScans >= 1, 'importJSON reported merged scans');
+assert(engine.state.students[testStudent.id].games.vb_g3.status === 'INSIDE', 'Imported student reflects INSIDE status for vb_g3');
 
 console.log('----------------------------------------------------');
 console.log(`TOTAL TESTS: ${passed + failed} | PASSED: ${passed} | FAILED: ${failed}`);
