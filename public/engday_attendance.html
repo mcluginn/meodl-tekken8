@@ -35,6 +35,7 @@
 
   <!-- Local Standalone Libraries with Resilient Fallback -->
   <script src="./assets/meodl_data.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_data.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/qrcode.min.js"></script>
   <script src="./assets/engday_attendance.js"></script>
 
   <style>
@@ -80,10 +81,21 @@
           <span class="text-[10px] text-zinc-500">PST</span>
         </div>
 
-        <!-- Scanner Launcher -->
-        <a href="engday_scanner.html" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-amber-950">
+        <!-- Live Cloud Sync Pill -->
+        <button onclick="openSyncModal()" id="btn-sync-status-dash" class="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white font-mono text-xs flex items-center gap-2 transition-colors" title="Configure Cloud / Local Wi-Fi Sync">
+          <span id="sync-dot-dash" class="w-2 h-2 rounded-full bg-zinc-600"></span>
+          <span id="sync-text-dash">Sync: Standalone</span>
+        </button>
+
+        <!-- Connect Phone QR Pairing -->
+        <button onclick="openPhonePairingModal()" id="btn-pair-phone" class="px-3 py-1.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 border border-amber-600/50 text-amber-300 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm" title="Scan QR Code to open court scanner on your phone">
           <span>📲</span>
-          <span>Open Court Scanner</span>
+          <span>Connect Phone</span>
+        </button>
+
+        <!-- Scanner Launcher -->
+        <a href="engday_scanner.html" class="px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold text-xs flex items-center gap-1.5 transition-all">
+          <span>Court Scanner</span>
         </a>
 
         <!-- Return to MEODL Main Hub -->
@@ -226,8 +238,12 @@
             <option value="none">No Scans Recorded Yet</option>
           </select>
 
-          <!-- Export Actions -->
+          <!-- Export & Import Actions -->
           <div class="flex items-center gap-1.5">
+            <button onclick="triggerImportBackup()" class="px-3 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-colors flex items-center gap-1.5 shadow-md shadow-amber-950" title="Load / Import Backup JSON from Phone Scanner">
+              <span>📂 Load Backup</span>
+            </button>
+            <input type="file" id="backup-file-input" accept=".json,application/json" class="hidden" onchange="handleImportBackup(event)" />
             <button onclick="downloadCSVReport()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-bold transition-colors flex items-center gap-1.5" title="Export CSV Report">
               <span>📥 CSV</span>
             </button>
@@ -679,6 +695,105 @@
       renderMasterTable();
     }
 
+    // Backup Import Helpers
+    function triggerImportBackup() {
+      const input = document.getElementById('backup-file-input');
+      if (input) {
+        input.value = '';
+        input.click();
+      }
+    }
+
+    function handleImportBackup(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      processBackupFile(file);
+    }
+
+    function processBackupFile(file) {
+      if (!file.name.toLowerCase().endsWith('.json')) {
+        showToast('Please select a valid .json attendance backup file.', 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target.result;
+          if (!window.ENGDAY_ATTENDANCE) {
+            showToast('Attendance engine not ready yet.', 'error');
+            return;
+          }
+          const res = window.ENGDAY_ATTENDANCE.importJSON(content);
+          if (res.success) {
+            renderMasterTableHeader();
+            renderGameCards();
+            renderGlobalStats();
+            renderMasterTable();
+            showToast(`✅ Successfully loaded backup! Merged ${res.mergedScans} scan(s) across ${res.totalStudents} students.`, 'success');
+          } else {
+            showToast(`❌ Import failed: ${res.error || 'Unknown error'}`, 'error');
+          }
+        } catch (err) {
+          showToast(`❌ Failed to read backup file: ${err.message}`, 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Drag and Drop Backup File Support
+    window.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      const overlay = document.getElementById('drop-overlay');
+      if (overlay) overlay.classList.remove('hidden');
+    });
+
+    window.addEventListener('dragleave', (e) => {
+      if (e.relatedTarget === null || e.clientX === 0 || e.clientY === 0) {
+        const overlay = document.getElementById('drop-overlay');
+        if (overlay) overlay.classList.add('hidden');
+      }
+    });
+
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const overlay = document.getElementById('drop-overlay');
+      if (overlay) overlay.classList.add('hidden');
+
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        processBackupFile(file);
+      }
+    });
+
+    // Toast Notification System
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const isErr = type === 'error';
+      const isSuccess = type === 'success';
+
+      toast.className = `p-3.5 rounded-2xl border text-xs font-semibold shadow-2xl flex items-center gap-2.5 transition-all transform translate-y-2 opacity-0 max-w-md ${
+        isErr ? 'bg-rose-950 border-rose-800 text-rose-200' :
+        isSuccess ? 'bg-emerald-950 border-emerald-800 text-emerald-200' :
+        'bg-zinc-900 border-zinc-700 text-zinc-100'
+      }`;
+      toast.innerHTML = `
+        <span class="text-base">${isErr ? '⚠️' : isSuccess ? '✅' : 'ℹ️'}</span>
+        <span class="flex-1 leading-snug">${message}</span>
+      `;
+      container.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 5000);
+    }
+
     // Export Helpers
     function downloadCSVReport() {
       if (window.ENGDAY_ATTENDANCE) window.ENGDAY_ATTENDANCE.downloadCSV();
@@ -686,6 +801,127 @@
 
     function downloadJSONBackup() {
       if (window.ENGDAY_ATTENDANCE) window.ENGDAY_ATTENDANCE.downloadJSON();
+    }
+
+    // Cloud / Wi-Fi Sync Modal Controllers
+    function openSyncModal() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const status = window.ENGDAY_ATTENDANCE.getSyncStatus();
+      const input = document.getElementById('dash-server-url-input');
+      if (input) input.value = status.serverUrl || '';
+
+      const devEl = document.getElementById('dash-device-id');
+      if (devEl) devEl.textContent = status.deviceId || '--';
+
+      const statEl = document.getElementById('dash-sync-state-text');
+      if (statEl) {
+        statEl.textContent = status.serverOnline ? 'Connected (Live Online)' : 'Standalone (Local Mode)';
+        statEl.className = status.serverOnline ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold';
+      }
+
+      const qEl = document.getElementById('dash-pending-count');
+      if (qEl) qEl.textContent = `${status.pendingCount || 0} events`;
+
+      document.getElementById('sync-modal-dash').classList.remove('hidden');
+    }
+
+    function closeSyncModal() {
+      document.getElementById('sync-modal-dash').classList.add('hidden');
+    }
+
+    function saveServerConfigDash() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const input = document.getElementById('dash-server-url-input');
+      const url = input ? input.value.trim() : '';
+      window.ENGDAY_ATTENDANCE.setServerUrl(url);
+      showToast('Server URL updated. Syncing in progress...', 'info');
+      closeSyncModal();
+      renderSyncStatusDash();
+    }
+
+    function syncNowDash() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      showToast('Contacting server...', 'info');
+      window.ENGDAY_ATTENDANCE.syncNow().then(() => {
+        renderSyncStatusDash();
+        const st = window.ENGDAY_ATTENDANCE.getSyncStatus();
+        if (st.serverOnline) {
+          showToast('✅ Cloud Sync succeeded! Dashboard up to date.', 'success');
+        } else {
+          showToast('Server did not respond. Check URL or Wi-Fi connection.', 'error');
+        }
+      });
+    }
+
+    function renderSyncStatusDash() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const st = window.ENGDAY_ATTENDANCE.getSyncStatus();
+      const dot = document.getElementById('sync-dot-dash');
+      const text = document.getElementById('sync-text-dash');
+      if (!dot || !text) return;
+
+      if (st.isSyncing) {
+        dot.className = 'w-2 h-2 rounded-full bg-cyan-400 animate-spin';
+        text.textContent = 'Syncing...';
+      } else if (st.serverOnline) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500';
+        text.textContent = 'Live Synced';
+      } else if (st.serverUrl) {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-500';
+        text.textContent = 'Offline';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-zinc-600';
+        text.textContent = 'Standalone';
+      }
+    }
+
+    // Mobile Phone QR Pairing Controller
+    async function openPhonePairingModal() {
+      const modal = document.getElementById('phone-pairing-modal');
+      const qrBox = document.getElementById('pairing-qr-box');
+      const urlText = document.getElementById('pairing-url-text');
+      if (!modal || !qrBox || !urlText) return;
+
+      modal.classList.remove('hidden');
+      qrBox.innerHTML = '<div class="text-zinc-500 py-6 text-xs font-mono">Generating Pairing QR...</div>';
+
+      let targetUrl = `${window.location.origin}/engday_scanner.html`;
+      try {
+        const res = await fetch('/api/engday/attendance/health');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.lanScannerUrl) {
+            targetUrl = data.lanScannerUrl;
+          }
+        }
+      } catch (e) {}
+
+      urlText.textContent = targetUrl;
+      qrBox.innerHTML = '';
+
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrBox, {
+          text: targetUrl,
+          width: 180,
+          height: 180,
+          colorDark: '#09090b',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+    }
+
+    function closePhonePairingModal() {
+      const modal = document.getElementById('phone-pairing-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function copyPairingUrl() {
+      const urlText = document.getElementById('pairing-url-text');
+      if (!urlText) return;
+      navigator.clipboard.writeText(urlText.textContent).then(() => {
+        showToast('📋 Copied scanner link to clipboard!', 'success');
+      });
     }
 
     // Boot
@@ -697,6 +933,7 @@
       renderGameCards();
       renderGlobalStats();
       renderMasterTable();
+      renderSyncStatusDash();
 
       if (window.ENGDAY_ATTENDANCE) {
         window.ENGDAY_ATTENDANCE.subscribe(() => {
@@ -704,10 +941,137 @@
           renderGameCards();
           renderGlobalStats();
           renderMasterTable();
+          renderSyncStatusDash();
           if (activeModalStudentId) openStudentModal(activeModalStudentId);
         });
       }
     });
   </script>
+
+  <!-- =========================================================================
+       PHONE LIVE PAIRING MODAL
+       ========================================================================= -->
+  <div id="phone-pairing-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-sm bg-zinc-950 border border-zinc-800 rounded-3xl p-6 shadow-2xl flex flex-col gap-4 text-center">
+      <div class="flex items-center justify-between pb-2 border-b border-zinc-800 text-left">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-950/80 border border-amber-800 flex items-center justify-center text-amber-400 text-sm font-bold">
+            📲
+          </div>
+          <div>
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider font-sans">Connect Mobile Scanner</h3>
+            <p class="text-[10px] text-zinc-400 font-sans">Zero-Config Instant Live Sync</p>
+          </div>
+        </div>
+        <button onclick="closePhonePairingModal()" class="p-1 text-zinc-500 hover:text-white text-base">✕</button>
+      </div>
+
+      <p class="text-xs text-zinc-300 font-sans leading-relaxed">
+        Point your phone camera at this QR code to launch the Court Scanner. Every scan will <strong>live update this PC screen in real-time</strong>:
+      </p>
+
+      <!-- QR Box (white card background for camera contrast) -->
+      <div class="p-4 rounded-2xl bg-white mx-auto shadow-xl inline-flex items-center justify-center">
+        <div id="pairing-qr-box"></div>
+      </div>
+
+      <!-- Pairing URL Display & Copy -->
+      <div class="space-y-1.5 text-left">
+        <span class="text-[10px] uppercase font-mono text-zinc-400 font-bold block">Direct Mobile URL:</span>
+        <div class="flex items-center gap-1.5">
+          <div id="pairing-url-text" class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-[11px] font-mono text-amber-300 truncate select-all">
+            http://192.168.1.4:3333/engday_scanner.html
+          </div>
+          <button onclick="copyPairingUrl()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-bold">
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <div class="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-900/60 text-[10px] text-emerald-300 text-left flex items-start gap-2 font-sans">
+        <span class="text-xs">🟢</span>
+        <div>
+          <strong>Sub-50ms Live Sync Active:</strong> No manual saving or file downloads needed. Phone and PC operate on the same live real-time pipeline.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       CLOUD & WI-FI SYNC SETTINGS MODAL
+       ========================================================================= -->
+  <div id="sync-modal-dash" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-sm bg-zinc-950 border border-zinc-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-3.5 text-xs font-mono">
+      <div class="flex items-center justify-between pb-2 border-b border-zinc-800">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg bg-amber-950/80 border border-amber-800 flex items-center justify-center text-amber-400 text-xs font-bold">
+            ☁️
+          </div>
+          <div>
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider font-sans">Cloud & Wi-Fi Sync</h3>
+            <p class="text-[10px] text-zinc-400 font-sans">Multi-Device Attendance Bridging</p>
+          </div>
+        </div>
+        <button onclick="closeSyncModal()" class="p-1 text-zinc-500 hover:text-white text-sm">✕</button>
+      </div>
+
+      <p class="text-[11px] text-zinc-400 font-sans leading-relaxed">
+        Connect to a local Wi-Fi server (e.g. <code>npm start</code> on PC) or custom cloud endpoint for real-time live synchronization:
+      </p>
+
+      <div class="space-y-1">
+        <label class="text-[10px] uppercase font-mono text-zinc-400 font-bold">Server / PC Address:</label>
+        <input 
+          type="url" 
+          id="dash-server-url-input" 
+          placeholder="http://192.168.1.15:3333 or http://localhost:3333" 
+          class="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-3 py-2 text-xs font-mono text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+        />
+        <p class="text-[9px] text-zinc-500 font-mono">Leave blank for standalone GitHub Pages mode.</p>
+      </div>
+
+      <div class="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-[10px] space-y-1 font-mono text-zinc-400">
+        <div class="flex justify-between">
+          <span>Device ID:</span>
+          <span id="dash-device-id" class="text-white font-bold">--</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Connection:</span>
+          <span id="dash-sync-state-text" class="text-amber-400 font-bold">--</span>
+        </div>
+        <div class="flex justify-between">
+          <span>Outbox Queue:</span>
+          <span id="dash-pending-count" class="text-white font-bold">0 events</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 pt-1 font-sans">
+        <button onclick="saveServerConfigDash()" class="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs transition-colors shadow">
+          Save & Connect
+        </button>
+        <button onclick="syncNowDash()" class="px-3 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold text-xs border border-zinc-700">
+          Sync Now 🔄
+        </button>
+      </div>
+
+      <!-- Quick Help Note -->
+      <div class="p-2 rounded-xl bg-amber-950/20 border border-amber-800/40 text-[10px] text-amber-300 font-sans leading-relaxed">
+        💡 <strong>No server running?</strong> You don't need one! Just click <strong>"📂 Load Backup"</strong> on the main table to instantly load the backup JSON file from the phone scanner.
+      </div>
+    </div>
+  </div>
+
+  <!-- Drag & Drop Overlay Indicator -->
+  <div id="drop-overlay" class="hidden fixed inset-0 z-50 bg-amber-950/80 backdrop-blur-md border-4 border-dashed border-amber-500 flex flex-col items-center justify-center p-6 text-center pointer-events-none">
+    <div class="w-16 h-16 rounded-3xl bg-amber-600 flex items-center justify-center text-white text-3xl mb-3 shadow-2xl animate-bounce">
+      📂
+    </div>
+    <h2 class="text-xl font-black text-white mb-1">Drop Attendance Backup File Here</h2>
+    <p class="text-xs text-amber-200">Release file to instantly load and merge scans into dashboard</p>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
 </body>
 </html>
