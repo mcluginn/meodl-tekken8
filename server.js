@@ -1074,7 +1074,14 @@ export async function handleRequest(req, res) {
 
 const server = http.createServer(handleRequest);
 
-if (!IS_VERCEL) {
+const isDirectExecution = Boolean(
+  process.argv[1] && (
+    process.argv[1].endsWith('server.js') || 
+    fileURLToPath(import.meta.url) === path.resolve(process.argv[1])
+  )
+);
+
+if (isDirectExecution && !IS_VERCEL) {
   server.listen(PORT, () => {
     console.log(`MEODL Esports & Attendance Server active on port ${PORT}:`);
     console.log(`  • Localhost:       http://localhost:${PORT}`);
