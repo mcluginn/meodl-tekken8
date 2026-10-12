@@ -35,6 +35,7 @@
 
   <!-- Local Standalone Libraries with Resilient Fallback -->
   <script src="./assets/meodl_data.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_data.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/qrcode.min.js"></script>
   <script src="./assets/engday_attendance.js"></script>
 
   <style>
@@ -86,10 +87,15 @@
           <span id="sync-text-dash">Sync: Standalone</span>
         </button>
 
-        <!-- Scanner Launcher -->
-        <a href="engday_scanner.html" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-amber-950">
+        <!-- Connect Phone QR Pairing -->
+        <button onclick="openPhonePairingModal()" id="btn-pair-phone" class="px-3 py-1.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 border border-amber-600/50 text-amber-300 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm" title="Scan QR Code to open court scanner on your phone">
           <span>📲</span>
-          <span>Open Court Scanner</span>
+          <span>Connect Phone</span>
+        </button>
+
+        <!-- Scanner Launcher -->
+        <a href="engday_scanner.html" class="px-3.5 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold text-xs flex items-center gap-1.5 transition-all">
+          <span>Court Scanner</span>
         </a>
 
         <!-- Return to MEODL Main Hub -->
@@ -869,6 +875,55 @@
       }
     }
 
+    // Mobile Phone QR Pairing Controller
+    async function openPhonePairingModal() {
+      const modal = document.getElementById('phone-pairing-modal');
+      const qrBox = document.getElementById('pairing-qr-box');
+      const urlText = document.getElementById('pairing-url-text');
+      if (!modal || !qrBox || !urlText) return;
+
+      modal.classList.remove('hidden');
+      qrBox.innerHTML = '<div class="text-zinc-500 py-6 text-xs font-mono">Generating Pairing QR...</div>';
+
+      let targetUrl = `${window.location.origin}/engday_scanner.html`;
+      try {
+        const res = await fetch('/api/engday/attendance/health');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.lanScannerUrl) {
+            targetUrl = data.lanScannerUrl;
+          }
+        }
+      } catch (e) {}
+
+      urlText.textContent = targetUrl;
+      qrBox.innerHTML = '';
+
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrBox, {
+          text: targetUrl,
+          width: 180,
+          height: 180,
+          colorDark: '#09090b',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
+    }
+
+    function closePhonePairingModal() {
+      const modal = document.getElementById('phone-pairing-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function copyPairingUrl() {
+      const urlText = document.getElementById('pairing-url-text');
+      if (!urlText) return;
+      navigator.clipboard.writeText(urlText.textContent).then(() => {
+        showToast('📋 Copied scanner link to clipboard!', 'success');
+      });
+    }
+
     // Boot
     document.addEventListener('DOMContentLoaded', () => {
       setInterval(updateClock, 1000);
@@ -892,6 +947,55 @@
       }
     });
   </script>
+
+  <!-- =========================================================================
+       PHONE LIVE PAIRING MODAL
+       ========================================================================= -->
+  <div id="phone-pairing-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-sm bg-zinc-950 border border-zinc-800 rounded-3xl p-6 shadow-2xl flex flex-col gap-4 text-center">
+      <div class="flex items-center justify-between pb-2 border-b border-zinc-800 text-left">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-amber-950/80 border border-amber-800 flex items-center justify-center text-amber-400 text-sm font-bold">
+            📲
+          </div>
+          <div>
+            <h3 class="text-xs font-bold text-white uppercase tracking-wider font-sans">Connect Mobile Scanner</h3>
+            <p class="text-[10px] text-zinc-400 font-sans">Zero-Config Instant Live Sync</p>
+          </div>
+        </div>
+        <button onclick="closePhonePairingModal()" class="p-1 text-zinc-500 hover:text-white text-base">✕</button>
+      </div>
+
+      <p class="text-xs text-zinc-300 font-sans leading-relaxed">
+        Point your phone camera at this QR code to launch the Court Scanner. Every scan will <strong>live update this PC screen in real-time</strong>:
+      </p>
+
+      <!-- QR Box (white card background for camera contrast) -->
+      <div class="p-4 rounded-2xl bg-white mx-auto shadow-xl inline-flex items-center justify-center">
+        <div id="pairing-qr-box"></div>
+      </div>
+
+      <!-- Pairing URL Display & Copy -->
+      <div class="space-y-1.5 text-left">
+        <span class="text-[10px] uppercase font-mono text-zinc-400 font-bold block">Direct Mobile URL:</span>
+        <div class="flex items-center gap-1.5">
+          <div id="pairing-url-text" class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2 text-[11px] font-mono text-amber-300 truncate select-all">
+            http://192.168.1.4:3333/engday_scanner.html
+          </div>
+          <button onclick="copyPairingUrl()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-bold">
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <div class="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-900/60 text-[10px] text-emerald-300 text-left flex items-start gap-2 font-sans">
+        <span class="text-xs">🟢</span>
+        <div>
+          <strong>Sub-50ms Live Sync Active:</strong> No manual saving or file downloads needed. Phone and PC operate on the same live real-time pipeline.
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- =========================================================================
        CLOUD & WI-FI SYNC SETTINGS MODAL

@@ -537,6 +537,36 @@ function sendJson(res, statusCode, data) {
   res.end(JSON.stringify(data));
 }
 
+// Helper: get primary LAN IPv4 address for instant mobile pairing
+function getPrimaryLanIp() {
+  try {
+    const interfaces = os.networkInterfaces();
+    for (const name of Object.keys(interfaces)) {
+      for (const iface of interfaces[name]) {
+        if (iface.family === 'IPv4' && !iface.internal && !iface.address.startsWith('169.254.')) {
+          return iface.address;
+        }
+      }
+    }
+  } catch (e) {}
+  return 'localhost';
+}
+
+// Live Real-Time SSE clients pool for instant sub-50ms dashboard updates
+const engdaySseClients = new Set();
+
+function broadcastEngDayUpdate() {
+  if (engdaySseClients.size === 0) return;
+  const payload = `data: ${JSON.stringify({ type: 'state_update', state: engdayState, stats: calculateEngDayStats() })}\n\n`;
+  for (const client of engdaySseClients) {
+    try {
+      client.write(payload);
+    } catch (e) {
+      engdaySseClients.delete(client);
+    }
+  }
+}
+
 // Helper: read request body
 function parseJsonBody(req) {
   if (req.body && typeof req.body === 'object') {
@@ -815,13 +845,35 @@ export async function handleRequest(req, res) {
   // ENGINEERING DAY 2026 ATTENDANCE API ENDPOINTS
   // -----------------------------------------------------------------------
   if (reqPath === '/api/engday/attendance/health' && req.method === 'GET') {
+    const primaryIp = getPrimaryLanIp();
     return sendJson(res, 200, {
       ok: true,
       serverTime: new Date().toISOString(),
       eventsCount: engdayEvents.length,
       totalStudents: Object.keys(engdayState.students || {}).length,
-      games: ENGDAY_GAMES_LIST
+      games: ENGDAY_GAMES_LIST,
+      lanIp: primaryIp,
+      lanPort: PORT,
+      lanScannerUrl: `http://${primaryIp}:${PORT}/engday_scanner.html`,
+      lanDashboardUrl: `http://${primaryIp}:${PORT}/engday_attendance.html`,
+      liveSubscribers: engdaySseClients.size
     });
+  }
+
+  // Real-Time Server-Sent Events (SSE) Stream for Instant Live Sync (< 50ms)
+  if (reqPath === '/api/engday/attendance/stream' && req.method === 'GET') {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*'
+    });
+    res.write(`data: ${JSON.stringify({ type: 'init', state: engdayState, stats: calculateEngDayStats() })}\n\n`);
+    engdaySseClients.add(res);
+    req.on('close', () => {
+      engdaySseClients.delete(res);
+    });
+    return;
   }
 
   if (reqPath === '/api/engday/attendance/state' && req.method === 'GET') {
@@ -947,6 +999,7 @@ export async function handleRequest(req, res) {
 
         atomicWriteJson(ENGDAY_EVENTS_FILE, engdayEvents);
         atomicWriteJson(ENGDAY_STATE_FILE, engdayState);
+        broadcastEngDayUpdate();
       }
 
       return sendJson(res, 200, {
@@ -978,6 +1031,7 @@ export async function handleRequest(req, res) {
 
       atomicWriteJson(ENGDAY_EVENTS_FILE, engdayEvents);
       atomicWriteJson(ENGDAY_STATE_FILE, engdayState);
+      broadcastEngDayUpdate();
 
       return sendJson(res, 200, {
         ok: true,

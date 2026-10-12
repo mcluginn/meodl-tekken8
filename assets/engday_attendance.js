@@ -1453,9 +1453,67 @@
       if (typeof navigator === 'undefined' || navigator.onLine !== false) {
         setTimeout(() => this.syncWithServer(), 800);
       }
+      this.initSseStream();
+    }
+
+    initSseStream() {
+      if (typeof window === 'undefined' || typeof EventSource === 'undefined') return;
+      const base = this.getApiBaseUrl();
+      if (!base) {
+        if (this.sseSource) {
+          try { this.sseSource.close(); } catch(e) {}
+          this.sseSource = null;
+        }
+        return;
+      }
+
+      if (this.sseSource) {
+        try { this.sseSource.close(); } catch(e) {}
+        this.sseSource = null;
+      }
+
+      try {
+        const streamUrl = `${base}/api/engday/attendance/stream`;
+        const sse = new EventSource(streamUrl);
+        this.sseSource = sse;
+
+        sse.onopen = () => {
+          this.serverOnline = true;
+          this.notify();
+        };
+
+        sse.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data && data.state && data.state.students) {
+              const incoming = data.state;
+              if (!this.state.version || (incoming.version && incoming.version >= this.state.version)) {
+                this.state.students = incoming.students;
+                this.state.version = incoming.version;
+                this.state.lastUpdated = incoming.lastUpdated || new Date().toISOString();
+                this.serverOnline = true;
+                this.lastSyncTime = formatManilaTime(new Date());
+                this.save();
+                this.notify();
+              }
+            }
+          } catch(err) {
+            console.warn('[EngDay SSE] Parse error:', err);
+          }
+        };
+
+        sse.onerror = () => {
+          if (this.config.syncEnabled) {
+            this.syncWithServer();
+          }
+        };
+      } catch(e) {
+        console.warn('[EngDay SSE] Init error:', e);
+      }
     }
 
     syncNow() {
+      this.initSseStream();
       return this.syncWithServer(true);
     }
 
@@ -1466,6 +1524,7 @@
       if (typeof localStorage !== 'undefined') {
         try { localStorage.setItem('ENGDAY_SERVER_URL', clean); } catch (e) {}
       }
+      this.initSseStream();
       return this.syncNow();
     }
 
