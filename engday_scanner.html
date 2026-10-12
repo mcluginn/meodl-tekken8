@@ -595,7 +595,7 @@
       if (!banner) {
         banner = document.createElement('div');
         banner.id = 'scan-feedback-banner';
-        banner.className = 'fixed top-4 left-3 right-3 z-50 pointer-events-none transition-all duration-300 transform -translate-y-24 opacity-0 max-w-sm mx-auto';
+        banner.className = 'fixed top-4 left-3 right-3 z-50 pointer-events-auto transition-all duration-300 transform -translate-y-28 opacity-0 max-w-sm mx-auto';
         document.body.appendChild(banner);
       }
       
@@ -608,27 +608,36 @@
       const gameLabel = game ? (game.shortName || game.name) : 'Court Match';
       
       banner.innerHTML = `
-        <div class="w-full bg-gradient-to-r ${bgColors} border p-3.5 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 text-white">
-          <div class="text-3xl shrink-0 animate-bounce">${badgeIcon}</div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-0.5">
-              <span class="text-[10px] font-black tracking-widest uppercase bg-black/40 px-2 py-0.5 rounded-full">${actionText}</span>
-              <span class="text-xs font-mono font-bold text-white/90">${student.studentCode || student.id}</span>
+        <div class="w-full bg-gradient-to-r ${bgColors} border p-3.5 rounded-2xl shadow-2xl backdrop-blur-md text-white">
+          <div class="flex items-center gap-3">
+            <div class="text-3xl shrink-0 animate-bounce">${badgeIcon}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="text-[10px] font-black tracking-widest uppercase bg-black/40 px-2 py-0.5 rounded-full">${actionText}</span>
+                <span class="text-xs font-mono font-bold text-white/90">${student.studentCode || student.id}</span>
+              </div>
+              <div class="text-sm font-extrabold truncate text-white drop-shadow">${student.name}</div>
+              <div class="text-xs font-medium text-white/80 truncate">${student.team || ''} • ${gameLabel}</div>
             </div>
-            <div class="text-sm font-extrabold truncate text-white drop-shadow">${student.name}</div>
-            <div class="text-xs font-medium text-white/80 truncate">${student.team || ''} • ${gameLabel}</div>
+          </div>
+          <!-- 1-Tap Save Chip -->
+          <div class="mt-2.5 pt-2 border-t border-white/20 flex items-center justify-between text-[11px]">
+            <span class="text-white/90 font-mono text-[10px]">💾 Auto-Backup</span>
+            <button onclick="downloadJsonBackup()" class="pointer-events-auto px-2.5 py-1 rounded-lg bg-black/50 hover:bg-black/70 border border-white/30 text-white font-bold text-[10px] flex items-center gap-1 active:scale-95 transition-all shadow">
+              <span>📥</span> Save JSON
+            </button>
           </div>
         </div>
       `;
       
-      banner.classList.remove('-translate-y-24', 'opacity-0');
+      banner.classList.remove('-translate-y-28', 'opacity-0');
       banner.classList.add('translate-y-0', 'opacity-100');
       
       if (window._scanBannerTimer) clearTimeout(window._scanBannerTimer);
       window._scanBannerTimer = setTimeout(() => {
         banner.classList.remove('translate-y-0', 'opacity-100');
-        banner.classList.add('-translate-y-24', 'opacity-0');
-      }, 3500);
+        banner.classList.add('-translate-y-28', 'opacity-0');
+      }, 4000);
     }
 
     // Web Audio Synthesizer Beeps
@@ -1352,7 +1361,7 @@
     // =========================================================================
     // LOCAL BACKUP & AUTO-SAVE CONTROLLER
     // =========================================================================
-    let autoBackupMode = localStorage.getItem('ENGDAY_AUTO_BACKUP_MODE') || 'off';
+    let autoBackupMode = localStorage.getItem('ENGDAY_AUTO_BACKUP_MODE') || 'every';
     let scanCountSinceBoot = 0;
     let linkedDiskHandle = null;
 

@@ -1350,15 +1350,24 @@
       const pad = (n) => String(n).padStart(2, '0');
       const timeStr = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
       const filename = customFilename || `EngineeringDay_Sports_Attendance_Backup_${now.toISOString().slice(0, 10)}_${timeStr}.json`;
-      const blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+      
+      // Use application/octet-stream so iOS Safari triggers file save prompt instead of inline render
+      const blob = new Blob([json], { type: 'application/octet-stream' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
+      a.rel = 'noopener';
       document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+
+      try {
+        a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+      } catch (e) {
+        a.click();
+      }
+
       setTimeout(() => {
+        document.body.removeChild(a);
         try { URL.revokeObjectURL(url); } catch(e) {}
       }, 5000);
     }
