@@ -179,6 +179,75 @@ assert(importRes.success === true, 'importJSON successfully parsed and applied b
 assert(importRes.mergedScans >= 1, 'importJSON reported merged scans');
 assert(engine.state.students[testStudent.id].games.vb_g3.status === 'INSIDE', 'Imported student reflects INSIDE status for vb_g3');
 
+// Test 15: Multi-Phone Independent Backup Merge (e.g. Phone A Volleyball + Phone B Basketball)
+const EngDayAttendanceEngine = global.window.EngDayAttendanceEngine;
+const receiverEngine = new EngDayAttendanceEngine();
+receiverEngine.initDefaultRoster();
+
+// Simulate Phone A backup (Marshal at Volleyball Court)
+const phoneABackup = {
+  deviceId: 'PHONE-A-VOLLEYBALL-COURT',
+  state: {
+    students: {
+      'student-0001': {
+        games: {
+          vb_g6: {
+            gameId: 'vb_g6',
+            status: 'INSIDE',
+            lastAction: 'check_in',
+            checkInTime: new Date().toISOString(),
+            displayCheckIn: '10:35 AM',
+            visits: 1
+          }
+        }
+      }
+    }
+  }
+};
+
+// Simulate Phone B backup (Marshal at Basketball Court)
+const phoneBBackup = {
+  deviceId: 'PHONE-B-BASKETBALL-COURT',
+  state: {
+    students: {
+      'student-0001': {
+        games: {
+          bb_g4: {
+            gameId: 'bb_g4',
+            status: 'INSIDE',
+            lastAction: 'check_in',
+            checkInTime: new Date().toISOString(),
+            displayCheckIn: '4:15 PM',
+            visits: 1
+          }
+        }
+      },
+      'student-0002': {
+        games: {
+          bb_g4: {
+            gameId: 'bb_g4',
+            status: 'INSIDE',
+            lastAction: 'check_in',
+            checkInTime: new Date().toISOString(),
+            displayCheckIn: '4:20 PM',
+            visits: 1
+          }
+        }
+      }
+    }
+  }
+};
+
+receiverEngine.importJSON(phoneABackup);
+receiverEngine.importJSON(phoneBBackup);
+
+const s1 = receiverEngine.getStudentById('student-0001');
+const s2 = receiverEngine.getStudentById('student-0002');
+
+assert(s1.games.vb_g6.status === 'INSIDE', 'Multi-phone merge: Phone A Volleyball scan preserved on Student 1');
+assert(s1.games.bb_g4.status === 'INSIDE', 'Multi-phone merge: Phone B Basketball scan added to Student 1 without conflict');
+assert(s2.games.bb_g4.status === 'INSIDE', 'Multi-phone merge: Student 2 Basketball scan from Phone B recorded');
+
 console.log('----------------------------------------------------');
 console.log(`TOTAL TESTS: ${passed + failed} | PASSED: ${passed} | FAILED: ${failed}`);
 if (failed === 0) {
