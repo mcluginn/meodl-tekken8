@@ -939,9 +939,19 @@ export async function handleRequest(req, res) {
           rejected.push({ eventId: 'missing', reason: 'Missing eventId' });
           continue;
         }
-        if (!studentId || !engdayState.students[studentId]) {
-          rejected.push({ eventId, reason: `Unknown studentId: ${studentId}` });
-          continue;
+        let validStudentId = studentId;
+        if (!validStudentId || !engdayState.students[validStudentId]) {
+          const match = Object.values(engdayState.students).find(s => 
+            (s.studentCode && s.studentCode.toUpperCase() === String(studentId || ev.studentCode || '').toUpperCase()) ||
+            (s.id && s.id.toLowerCase() === String(studentId || '').toLowerCase())
+          );
+          if (match) {
+            validStudentId = match.id;
+            ev.studentId = match.id;
+          } else {
+            rejected.push({ eventId, reason: `Unknown studentId: ${studentId}` });
+            continue;
+          }
         }
         if (!gameId || !ENGDAY_GAMES_LIST.includes(gameId)) {
           rejected.push({ eventId, reason: `Invalid or missing gameId: ${gameId}` });
@@ -966,7 +976,7 @@ export async function handleRequest(req, res) {
         const normalized = {
           eventId: eventId,
           gameId: gameId,
-          studentId: studentId,
+          studentId: validStudentId,
           action: action,
           occurredAt: new Date(ev.occurredAt).toISOString(),
           deviceId: String(ev.deviceId || deviceId),
@@ -977,15 +987,15 @@ export async function handleRequest(req, res) {
           createdAt: ev.createdAt ? new Date(ev.createdAt).toISOString() : new Date().toISOString(),
           reason: ev.reason || null,
           method: ev.method || 'qr_scan',
-          studentName: engdayState.students[studentId].name,
-          studentCode: engdayState.students[studentId].studentCode,
-          team: engdayState.students[studentId].team
+          studentName: engdayState.students[validStudentId].name,
+          studentCode: engdayState.students[validStudentId].studentCode,
+          team: engdayState.students[validStudentId].team
         };
 
         engdayEvents.push(normalized);
         engdayEventsMap.set(eventId, normalized);
         accepted.push(eventId);
-        affectedStudentIds.add(studentId);
+        affectedStudentIds.add(validStudentId);
       }
 
       if (accepted.length > 0) {
