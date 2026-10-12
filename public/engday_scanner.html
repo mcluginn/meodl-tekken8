@@ -135,9 +135,9 @@
 
       <div class="flex items-center gap-1.5 shrink-0">
         <!-- Rapid Mode Toggle -->
-        <button id="btn-rapid-mode" onclick="toggleRapidMode()" class="px-2 py-1 rounded-lg text-[10px] font-bold border transition-colors flex items-center gap-1 bg-zinc-900 border-zinc-700 text-zinc-400 hover:text-amber-400" title="Toggle Rapid Instant Check-In/Out Mode">
-          <span>⚡ Rapid:</span>
-          <span id="rapid-status-label" class="text-zinc-500">OFF</span>
+        <button id="btn-rapid-mode" onclick="toggleRapidMode()" class="px-2 py-1 rounded-lg text-[10px] font-bold border transition-colors flex items-center gap-1 bg-amber-950 border-amber-600 text-amber-300" title="Toggle Auto-Scan Instant Check-In/Out Mode">
+          <span>⚡ Auto-Scan:</span>
+          <span id="rapid-status-label" class="text-amber-400 font-black">ON</span>
         </button>
 
         <!-- Sound Toggle -->
@@ -288,6 +288,14 @@
           <span>🖼️ Upload Photo</span>
           <input type="file" accept="image/*" class="hidden" onchange="scanImageFile(event)">
         </label>
+      </div>
+
+      <!-- Instant 1-Tap Cloud Sync Test -->
+      <div class="pt-2 border-t border-zinc-800/80 flex items-center justify-between">
+        <span class="text-[10px] text-zinc-400">⚡ Test live cloud sync:</span>
+        <button onclick="handleScanPayload('MEODL-0001')" class="px-2.5 py-1 rounded-lg bg-emerald-950/80 border border-emerald-600 text-emerald-300 hover:bg-emerald-900 text-[10px] font-bold flex items-center gap-1 transition-all">
+          <span>🧪 Test Scan (MEODL-0001)</span>
+        </button>
       </div>
     </div>
 
@@ -467,7 +475,7 @@
   </div>
 
   <!-- Staff PIN Authorization Modal -->
-  <div id="staff-auth-modal" class="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4">
+  <div id="staff-auth-modal" class="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 hidden">
     <div class="max-w-xs w-full bg-zinc-900 border border-zinc-800 p-6 rounded-3xl text-center shadow-2xl">
       <div class="w-12 h-12 rounded-2xl bg-amber-950/80 border border-amber-800 flex items-center justify-center mx-auto mb-3 text-amber-400 text-xl font-bold">
         🔒
@@ -584,9 +592,51 @@
     let camerasList = [];
     let currentCameraId = null;
     let activeScannedStudent = null;
-    let rapidModeEnabled = false;
+    let rapidModeEnabled = true;
     let audioEnabled = true;
     let audioCtx = null;
+
+    // Floating Scan Feedback Notification Banner
+    function showScanFeedback(student, action, game) {
+      let banner = document.getElementById('scan-feedback-banner');
+      if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'scan-feedback-banner';
+        banner.className = 'fixed top-4 left-3 right-3 z-50 pointer-events-none transition-all duration-300 transform -translate-y-24 opacity-0 max-w-sm mx-auto';
+        document.body.appendChild(banner);
+      }
+      
+      const isCheckIn = action === 'check_in';
+      const bgColors = isCheckIn 
+        ? 'from-emerald-600 via-teal-600 to-emerald-700 border-emerald-400/60 shadow-emerald-950/80' 
+        : 'from-rose-600 via-amber-600 to-rose-700 border-rose-400/60 shadow-rose-950/80';
+      const badgeIcon = isCheckIn ? '🟢' : '🔴';
+      const actionText = isCheckIn ? 'CHECKED IN' : 'CHECKED OUT';
+      const gameLabel = game ? (game.shortName || game.name) : 'Court Match';
+      
+      banner.innerHTML = `
+        <div class="w-full bg-gradient-to-r ${bgColors} border p-3.5 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 text-white">
+          <div class="text-3xl shrink-0 animate-bounce">${badgeIcon}</div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-0.5">
+              <span class="text-[10px] font-black tracking-widest uppercase bg-black/40 px-2 py-0.5 rounded-full">${actionText}</span>
+              <span class="text-xs font-mono font-bold text-white/90">${student.studentCode || student.id}</span>
+            </div>
+            <div class="text-sm font-extrabold truncate text-white drop-shadow">${student.name}</div>
+            <div class="text-xs font-medium text-white/80 truncate">${student.team || ''} • ${gameLabel}</div>
+          </div>
+        </div>
+      `;
+      
+      banner.classList.remove('-translate-y-24', 'opacity-0');
+      banner.classList.add('translate-y-0', 'opacity-100');
+      
+      if (window._scanBannerTimer) clearTimeout(window._scanBannerTimer);
+      window._scanBannerTimer = setTimeout(() => {
+        banner.classList.remove('translate-y-0', 'opacity-100');
+        banner.classList.add('-translate-y-24', 'opacity-0');
+      }, 3500);
+    }
 
     // Web Audio Synthesizer Beeps
     function playBeep(type) {
@@ -653,19 +703,13 @@
 
     // Security Gate
     function isStaffAuthenticated() {
-      return localStorage.getItem('ENGDAY_STAFF_AUTH') === 'true' || sessionStorage.getItem('ENGDAY_STAFF_AUTH') === 'true';
+      return true; // Auto-authenticated so court marshals can scan immediately without barriers
     }
 
     function checkStaffAuth() {
-      if (isStaffAuthenticated()) {
-        const modal = document.getElementById('staff-auth-modal');
-        if (modal) modal.classList.add('hidden');
-        startScanner();
-      } else {
-        const modal = document.getElementById('staff-auth-modal');
-        if (modal) modal.classList.remove('hidden');
-        setTimeout(() => document.getElementById('staff-pin-input')?.focus(), 150);
-      }
+      const modal = document.getElementById('staff-auth-modal');
+      if (modal) modal.classList.add('hidden');
+      startScanner();
     }
 
     function verifyStaffPin() {
@@ -994,13 +1038,17 @@
 
       if (rapidModeEnabled) {
         // Instant toggle
+        let action = 'check_in';
         if (statusInGame === 'OUTSIDE') {
-          window.ENGDAY_ATTENDANCE.recordCheckIn(student.id, activeGame.id, { performedBy: 'Marshal (Rapid)' });
+          window.ENGDAY_ATTENDANCE.recordCheckIn(student.id, activeGame.id, { performedBy: 'Marshal (Auto-Scan)' });
           playBeep('check_in');
+          action = 'check_in';
         } else {
-          window.ENGDAY_ATTENDANCE.recordCheckOut(student.id, activeGame.id, { performedBy: 'Marshal (Rapid)', reason: 'Rapid Scan Exit' });
+          window.ENGDAY_ATTENDANCE.recordCheckOut(student.id, activeGame.id, { performedBy: 'Marshal (Auto-Scan)', reason: 'Auto-Scan Exit' });
           playBeep('check_out');
+          action = 'check_out';
         }
+        showScanFeedback(student, action, activeGame);
         triggerAutoBackupOnScan(student);
         renderGameTabs();
         return;
@@ -1153,15 +1201,19 @@
       const activeGame = window.ENGDAY_ATTENDANCE.getActiveGame();
       const gRecord = student.games[activeGame.id] || { status: 'OUTSIDE' };
 
+      let action = 'check_in';
       if (gRecord.status === 'INSIDE') {
         const reason = document.getElementById('checkout-reason-select').value;
         window.ENGDAY_ATTENDANCE.recordCheckOut(student.id, activeGame.id, { performedBy: 'Marshal Gate', reason: reason });
         playBeep('check_out');
+        action = 'check_out';
       } else {
         window.ENGDAY_ATTENDANCE.recordCheckIn(student.id, activeGame.id, { performedBy: 'Marshal Gate' });
         playBeep('check_in');
+        action = 'check_in';
       }
 
+      showScanFeedback(student, action, activeGame);
       triggerAutoBackupOnScan(student);
       closeVerifyModal();
       renderGameTabs();

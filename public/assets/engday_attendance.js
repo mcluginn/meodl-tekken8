@@ -492,7 +492,7 @@
 
       this.config = {
         serverUrl: (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '',
-        syncIntervalMs: 5000,
+        syncIntervalMs: 2000,
         syncEnabled: true,
         autoSuggestGameByTime: true
       };
@@ -510,6 +510,7 @@
       this.isSyncing = false;
       this.pendingCount = 0;
       this.lastSyncTime = null;
+      this.lastSyncedServerVersion = 0;
       this.serverOnline = false;
 
       this.loadConfig();
@@ -555,7 +556,9 @@
           const saved = (typeof localStorage !== 'undefined') ? localStorage.getItem('ENGDAY_SERVER_URL') : null;
           if (saved && saved.trim()) return saved.trim().replace(/\/$/, '');
           const host = window.location.hostname;
-          if (host && host.includes('github.io')) return ''; // Static host without API
+          if (host && host.includes('github.io')) {
+            return 'https://meodl.vercel.app'; // Auto-route static GitHub Pages to live Vercel cloud
+          }
           return window.location.origin.replace(/\/$/, '');
         }
         return '';
@@ -698,9 +701,11 @@
       }
     }
 
-    save() {
+    save(options = {}) {
       try {
-        this.state.version = (this.state.version || 1) + 1;
+        if (!options || !options.preserveVersion) {
+          this.state.version = (this.state.version || 1) + 1;
+        }
         this.state.lastUpdated = new Date().toISOString();
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
@@ -1487,15 +1492,14 @@
             const data = JSON.parse(event.data);
             if (data && data.state && data.state.students) {
               const incoming = data.state;
-              if (!this.state.version || (incoming.version && incoming.version >= this.state.version)) {
-                this.state.students = incoming.students;
-                this.state.version = incoming.version;
-                this.state.lastUpdated = incoming.lastUpdated || new Date().toISOString();
-                this.serverOnline = true;
-                this.lastSyncTime = formatManilaTime(new Date());
-                this.save();
-                this.notify();
-              }
+              const serverVer = incoming.version || 0;
+              this.state.students = incoming.students;
+              this.state.version = serverVer;
+              this.lastSyncedServerVersion = serverVer;
+              this.state.lastUpdated = incoming.lastUpdated || new Date().toISOString();
+              this.serverOnline = true;
+              this.lastSyncTime = formatManilaTime(new Date());
+              this.save({ preserveVersion: true });
             }
           } catch(err) {
             console.warn('[EngDay SSE] Parse error:', err);
@@ -1600,10 +1604,15 @@
           this.serverOnline = true;
           this.lastSyncTime = formatManilaTime(new Date());
 
-          if (serverState.students && (!this.state.version || serverState.version > this.state.version)) {
-            this.state.students = serverState.students;
-            this.state.version = serverState.version;
-            this.save();
+          if (serverState && serverState.students) {
+            const serverVer = serverState.version || 0;
+            const isDiff = serverVer !== this.lastSyncedServerVersion || !this.lastSyncedServerVersion;
+            if (isDiff) {
+              this.state.students = serverState.students;
+              this.state.version = serverVer;
+              this.lastSyncedServerVersion = serverVer;
+              this.save({ preserveVersion: true });
+            }
           }
         } else {
           if (queue.length === 0) this.serverOnline = false;
