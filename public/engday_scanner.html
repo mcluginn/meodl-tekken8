@@ -36,6 +36,7 @@
   <!-- Local Standalone Libraries with Resilient Fallback -->
   <script src="./assets/html5-qrcode.min.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/html5-qrcode.min.js';document.head.appendChild(s);}"></script>
   <script src="./assets/meodl_data.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_data.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/meodl_attendance.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_attendance.js';document.head.appendChild(s);}"></script>
   <script src="./assets/engday_attendance.js"></script>
 
   <style>
@@ -231,25 +232,17 @@
         <button id="zoom-2x" onclick="cycleZoom(2.0)" class="px-2 py-0.5 rounded-lg font-medium text-zinc-300 hover:text-white transition-all" title="2x Zoom for Tiny Codes">2x</button>
       </div>
 
-      <!-- iOS Safari Video Paused Overlay (Tap Anywhere to Resume) -->
-      <div id="video-paused-alert" onclick="ensureVideoPlaying()" class="hidden absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-30 cursor-pointer">
-        <div class="w-14 h-14 rounded-full bg-amber-600 flex items-center justify-center text-white text-2xl mb-2 shadow-xl animate-pulse">
-          ▶
-        </div>
-        <h3 class="text-sm font-bold text-white mb-1">Camera Feed Paused</h3>
-        <p class="text-xs text-amber-300 mb-3 max-w-xs">Tap anywhere to resume live camera scanning</p>
-        <span class="px-3 py-1 rounded-lg bg-zinc-800 text-[10px] text-zinc-300 border border-zinc-700">Tap to Unpause</span>
-      </div>
-
       <!-- Camera Error Fallback Message -->
       <div id="cam-fallback" class="absolute inset-0 bg-zinc-950 flex flex-col items-center justify-center p-6 text-center z-30 hidden">
-        <div class="w-12 h-12 rounded-2xl bg-amber-950/60 border border-amber-800 flex items-center justify-center text-amber-400 text-xl mb-3">
+        <div class="w-14 h-14 rounded-2xl bg-amber-950/80 border border-amber-800 flex items-center justify-center text-amber-400 text-2xl mb-3 shadow-lg">
           📷
         </div>
-        <h3 class="text-sm font-bold text-white mb-1">Camera Stream Inactive</h3>
-        <p id="cam-fallback-msg" class="text-xs text-zinc-400 mb-4 max-w-xs">Camera blocked or permissions denied. Use manual lookup or image upload below.</p>
-        <button onclick="startScanner()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-all">
-          Retry Camera
+        <h3 class="text-sm font-bold text-white mb-1">Camera Permission Needed</h3>
+        <p id="cam-fallback-msg" class="text-xs text-zinc-400 mb-4 max-w-xs leading-relaxed">
+          Tap the button below to allow camera access in Safari:
+        </p>
+        <button onclick="startScanner()" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-white text-xs font-bold uppercase tracking-wider transition-all shadow-lg shadow-amber-950 flex items-center gap-2">
+          <span>📷</span> Tap to Start Camera
         </button>
       </div>
     </div>
@@ -773,56 +766,45 @@
     // =========================================================================
     // CAMERA ENGINE & iOS SAFARI VIDEO GUARDIAN
     // =========================================================================
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     let currentZoom = 1.0;
-    let videoWatcherInterval = null;
     let currentCameraFacing = 'environment';
+    let videoObserver = null;
+
+    function setupVideoInlineAttributes() {
+      const reader = document.getElementById('reader');
+      if (!reader) return;
+      const applyAttrs = () => {
+        const video = reader.querySelector('video');
+        if (video) {
+          video.setAttribute('playsinline', 'true');
+          video.setAttribute('webkit-playsinline', 'true');
+          video.setAttribute('autoplay', 'true');
+          video.setAttribute('muted', 'true');
+          video.playsInline = true;
+          video.muted = true;
+          video.autoplay = true;
+          if (video.hasAttribute('controls')) video.removeAttribute('controls');
+          if (video.paused) {
+            video.play().catch(() => {});
+          }
+        }
+      };
+      applyAttrs();
+      if (!videoObserver) {
+        videoObserver = new MutationObserver(applyAttrs);
+        videoObserver.observe(reader, { childList: true, subtree: true });
+      }
+    }
 
     function ensureVideoPlaying() {
-      const video = document.querySelector("#reader video");
-      if (!video) return;
-
-      // Force WebKit inline and muted attributes so iOS Safari never pauses it
-      video.setAttribute("playsinline", "true");
-      video.setAttribute("webkit-playsinline", "true");
-      video.setAttribute("autoplay", "true");
-      video.setAttribute("muted", "true");
-      if (video.hasAttribute("controls")) video.removeAttribute("controls");
-      video.muted = true;
-      video.playsInline = true;
-      video.autoplay = true;
-
-      if (video.paused) {
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {});
-        }
-      }
-
-      // Sync paused alert UI
-      const pausedAlert = document.getElementById("video-paused-alert");
-      if (pausedAlert) {
-        if (video.paused) {
-          pausedAlert.classList.remove("hidden");
-        } else {
-          pausedAlert.classList.add("hidden");
-        }
-      }
+      setupVideoInlineAttributes();
     }
 
     function onCameraReady() {
       const fallback = document.getElementById('cam-fallback');
       if (fallback) fallback.classList.add('hidden');
-
-      const video = document.querySelector("#reader video");
-      if (video) {
-        ensureVideoPlaying();
-        ['loadedmetadata', 'canplay', 'pause', 'play', 'stalled', 'suspend'].forEach(evtName => {
-          video.addEventListener(evtName, ensureVideoPlaying);
-        });
-      }
-
-      if (videoWatcherInterval) clearInterval(videoWatcherInterval);
-      videoWatcherInterval = setInterval(ensureVideoPlaying, 350);
+      setupVideoInlineAttributes();
 
       // Attempt continuous autofocus post-start if supported (Android / Chrome)
       try {
@@ -838,10 +820,24 @@
         applyZoom(currentZoom);
       }
 
-      // Refresh camera devices list with real labels now that permission is active
-      Html5Qrcode.getCameras().then(devices => {
-        if (devices && devices.length) camerasList = devices;
-      }).catch(() => {});
+      // Populate camera list for toggle button (non-iOS)
+      if (!isIOS) {
+        Html5Qrcode.getCameras().then(devices => {
+          if (devices && devices.length) camerasList = devices;
+        }).catch(() => {});
+      }
+    }
+
+    function stopAndClearScanner() {
+      if (html5QrScanner) {
+        try {
+          if (html5QrScanner.isScanning) {
+            html5QrScanner.stop().catch(() => {});
+          }
+          html5QrScanner.clear();
+        } catch(e) {}
+        html5QrScanner = null;
+      }
     }
 
     function startScanner() {
@@ -853,6 +849,15 @@
         return;
       }
 
+      // On iOS Safari: ALWAYS request facingMode directly!
+      // iOS Safari does not provide camera labels before permission, and specific device IDs cause OverconstrainedError
+      if (isIOS) {
+        currentCameraId = null;
+        launchCamera({ facingMode: "environment" });
+        return;
+      }
+
+      // On Android / Desktop: Check devices and pick rear camera
       Html5Qrcode.getCameras().then(devices => {
         camerasList = devices || [];
         const backCam = camerasList.find(d => {
@@ -863,7 +868,7 @@
         if (backCam) {
           currentCameraId = backCam.id;
           launchCamera(backCam.id);
-        } else if (camerasList.length > 0) {
+        } else if (camerasList.length > 0 && camerasList[0].label) {
           currentCameraId = camerasList[0].id;
           launchCamera(camerasList[0].id);
         } else {
@@ -871,39 +876,34 @@
           launchCamera({ facingMode: "environment" });
         }
       }).catch(err => {
-        console.warn('getCameras error or restricted:', err);
+        console.warn('getCameras fallback to facingMode:', err);
         launchCamera({ facingMode: "environment" });
       });
     }
 
     function launchCamera(config) {
-      if (html5QrScanner) {
-        try { html5QrScanner.stop(); } catch(e) {}
-      }
+      stopAndClearScanner();
 
       const scannerOpts = {
         formatsToSupport: [ 0 ], // 0 = Html5QrcodeSupportedFormats.QR_CODE
         experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true
+          useBarCodeDetectorIfSupported: false // MUST BE FALSE on iOS Safari to avoid native BarcodeDetector fail
         },
         verbose: false
       };
       html5QrScanner = new Html5Qrcode("reader", scannerOpts);
 
-      // Html5Qrcode requires the first argument to be EITHER a camera ID string
-      // OR an object with exactly 1 key: { facingMode: "environment" }
       const cameraIdOrConfig = (typeof config === 'string')
         ? config
         : (config && config.facingMode ? { facingMode: config.facingMode } : { facingMode: "environment" });
 
       const scanConfig = {
-        fps: 20,
+        fps: 25,
         qrbox: function(viewfinderWidth, viewfinderHeight) {
           const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-          const edge = Math.max(220, Math.floor(minEdge * 0.85));
+          const edge = Math.max(200, Math.floor(minEdge * 0.82));
           return { width: edge, height: edge };
         },
-        aspectRatio: 1.0,
         disableFlip: false
       };
 
@@ -915,7 +915,10 @@
       ).then(() => {
         onCameraReady();
       }).catch(err => {
-        console.warn('Primary camera start failed, retrying with facingMode:', err);
+        console.warn('Primary camera start failed, retrying with fresh instance:', err);
+        stopAndClearScanner();
+        html5QrScanner = new Html5Qrcode("reader", scannerOpts);
+
         html5QrScanner.start(
           { facingMode: "environment" },
           scanConfig,
@@ -1349,7 +1352,7 @@
     // =========================================================================
     // LOCAL BACKUP & AUTO-SAVE CONTROLLER
     // =========================================================================
-    let autoBackupMode = localStorage.getItem('ENGDAY_AUTO_BACKUP_MODE') || 'every';
+    let autoBackupMode = localStorage.getItem('ENGDAY_AUTO_BACKUP_MODE') || 'off';
     let scanCountSinceBoot = 0;
     let linkedDiskHandle = null;
 

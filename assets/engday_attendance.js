@@ -816,23 +816,39 @@
 
       let raw = String(payload).trim();
       let code = null;
+      let student = null;
 
-      if (raw.includes('code=')) {
-        try {
-          const url = new URL(raw, 'https://meodl.uphsd');
-          code = url.searchParams.get('code');
-        } catch (e) {
-          const match = raw.match(/code=([a-zA-Z0-9_-]+)/);
-          if (match) code = match[1];
-        }
-      } else if (raw.startsWith('MEODL-') || raw.startsWith('meodl-')) {
+      // 1. Direct MEODL code
+      if (raw.toUpperCase().startsWith('MEODL-')) {
         code = raw.toUpperCase();
       }
 
-      let student = null;
-      if (code) student = this.getStudentByCode(code);
+      // 2. Direct student ID (student-0001)
+      if (raw.toLowerCase().startsWith('student-')) {
+        student = this.getStudentById(raw.toLowerCase());
+      }
 
-      // If token passed or raw URL match, also check MEODL student token if available
+      // 3. URL Query parameters (code=, student=, id=)
+      if (!student) {
+        try {
+          const url = new URL(raw, 'https://meodl.uphsd');
+          const pCode = url.searchParams.get('code') || url.searchParams.get('student') || url.searchParams.get('studentCode');
+          const pId = url.searchParams.get('id') || url.searchParams.get('studentId');
+          if (pCode) code = pCode.toUpperCase();
+          if (pId) student = this.getStudentById(pId.toLowerCase());
+        } catch (e) {
+          const matchCode = raw.match(/(?:code|student|studentCode)=([a-zA-Z0-9_-]+)/i);
+          if (matchCode) code = matchCode[1].toUpperCase();
+          const matchId = raw.match(/(?:id|studentId)=([a-zA-Z0-9_-]+)/i);
+          if (matchId) student = this.getStudentById(matchId[1].toLowerCase());
+        }
+      }
+
+      if (!student && code) {
+        student = this.getStudentByCode(code);
+      }
+
+      // 4. Token delegation to MEODL_ATTENDANCE
       if (!student && window.MEODL_ATTENDANCE && typeof window.MEODL_ATTENDANCE.resolveScanPayload === 'function') {
         const meodlRes = window.MEODL_ATTENDANCE.resolveScanPayload(payload);
         if (meodlRes && meodlRes.student) {
@@ -840,9 +856,9 @@
         }
       }
 
+      // 5. Fallback: match 4-digit number (e.g. MEODL-0033 from 0033)
       if (!student) {
-        // Fallback: match by student number in raw text
-        const numMatch = raw.match(/\d{4}/);
+        const numMatch = raw.match(/\b\d{4}\b/) || raw.match(/\d{4}/);
         if (numMatch) {
           student = this.getStudentByCode('MEODL-' + numMatch[0]);
         }
