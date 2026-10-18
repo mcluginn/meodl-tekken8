@@ -640,19 +640,9 @@
     }
 
     function checkStaffAuth() {
-      if (isStaffAuthenticated()) {
-        const modal = document.getElementById('staff-auth-modal');
-        if (modal) modal.classList.add('hidden');
-        startScanner();
-      } else {
-        const modal = document.getElementById('staff-auth-modal');
-        if (modal) modal.classList.remove('hidden');
-        const err = document.getElementById('staff-pin-error');
-        if (err) err.classList.add('hidden');
-        setTimeout(() => {
-          document.getElementById('staff-pin-input')?.focus();
-        }, 150);
-      }
+      const modal = document.getElementById('staff-auth-modal');
+      if (modal) modal.classList.add('hidden');
+      startScanner();
     }
 
     function verifyStaffPin() {
@@ -730,48 +720,72 @@
     let currentZoom = 1.0;
     let videoWatcherInterval = null;
     let currentCameraFacing = 'environment';
+    let videoObserver = null;
 
-    function ensureVideoPlaying() {
-      const video = document.querySelector("#reader video");
-      if (!video) return;
-
-      // Force WebKit inline and muted attributes so iOS Safari never pauses it
-      video.setAttribute("playsinline", "true");
-      video.setAttribute("webkit-playsinline", "true");
-      video.setAttribute("autoplay", "true");
-      video.setAttribute("muted", "true");
-      if (video.hasAttribute("controls")) video.removeAttribute("controls");
-      video.muted = true;
-      video.playsInline = true;
-      video.autoplay = true;
-
-      if (video.paused) {
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {});
+    function setupVideoInlineAttributes() {
+      const reader = document.getElementById('reader');
+      if (!reader) return;
+      const applyAttrs = () => {
+        const video = reader.querySelector('video');
+        if (video) {
+          video.setAttribute('playsinline', 'true');
+          video.setAttribute('webkit-playsinline', 'true');
+          video.setAttribute('autoplay', 'true');
+          video.setAttribute('muted', 'true');
+          video.playsInline = true;
+          video.muted = true;
+          video.autoplay = true;
+          if (video.hasAttribute('controls')) video.removeAttribute('controls');
+          if (video.paused) {
+            video.play().catch(() => {});
+          }
         }
+      };
+      applyAttrs();
+      if (!videoObserver) {
+        videoObserver = new MutationObserver(applyAttrs);
+        videoObserver.observe(reader, { childList: true, subtree: true });
       }
 
-      // Sync paused alert UI
+      // Add user-gesture tap fallback on reader to instantly start/resume video playback
+      if (!reader.dataset.tapAttached) {
+        reader.dataset.tapAttached = 'true';
+        reader.addEventListener('click', () => {
+          const video = reader.querySelector('video');
+          if (video && video.paused) {
+            video.play().catch(() => {});
+          } else if (!html5QrScanner || !html5QrScanner.isScanning) {
+            startScanner();
+          }
+        });
+      }
+    }
+
+    function ensureVideoPlaying() {
+      setupVideoInlineAttributes();
+      const video = document.querySelector("#reader video");
+      if (video && video.paused) {
+        video.play().catch(() => {});
+      }
       const pausedAlert = document.getElementById("video-paused-alert");
       if (pausedAlert) {
-        if (video.paused) {
-          pausedAlert.classList.remove("hidden");
-        } else {
-          pausedAlert.classList.add("hidden");
-        }
+        pausedAlert.classList.add("hidden");
       }
     }
 
     function onCameraReady() {
       const fallback = document.getElementById('cam-fallback');
       if (fallback) fallback.classList.add('hidden');
+      const pausedAlert = document.getElementById("video-paused-alert");
+      if (pausedAlert) pausedAlert.classList.add("hidden");
+      setupVideoInlineAttributes();
 
       const video = document.querySelector("#reader video");
       if (video) {
-        ensureVideoPlaying();
-        ['loadedmetadata', 'canplay', 'pause', 'play', 'stalled', 'suspend'].forEach(evtName => {
-          video.addEventListener(evtName, ensureVideoPlaying);
+        ['loadedmetadata', 'canplay', 'pause', 'play'].forEach(evtName => {
+          video.addEventListener(evtName, () => {
+            if (video.paused) video.play().catch(() => {});
+          });
         });
         try {
           const stream = video.srcObject;
@@ -785,9 +799,8 @@
       }
 
       if (videoWatcherInterval) clearInterval(videoWatcherInterval);
-      videoWatcherInterval = setInterval(ensureVideoPlaying, 350);
+      videoWatcherInterval = setInterval(ensureVideoPlaying, 1000);
 
-      // Attempt continuous autofocus post-start if supported (Android / Chrome)
       try {
         if (html5QrScanner && html5QrScanner.applyVideoConstraints) {
           html5QrScanner.applyVideoConstraints({
@@ -796,49 +809,38 @@
         }
       } catch(e) {}
 
-      // Re-apply zoom level
       if (currentZoom > 1.0) {
         applyZoom(currentZoom);
       }
 
-      // Refresh camera devices list with real labels now that permission is active
-      Html5Qrcode.getCameras().then(devices => {
-        if (devices && devices.length) camerasList = devices;
-      }).catch(() => {});
+      if (typeof Html5Qrcode.getCameras === 'function') {
+        Html5Qrcode.getCameras().then(devices => {
+          if (devices && devices.length) camerasList = devices;
+        }).catch(() => {});
+      }
     }
 
     // Start Live HTML5 Camera Scanner
     function startScanner() {
       const fallback = document.getElementById('cam-fallback');
       if (fallback) fallback.classList.add('hidden');
+      const pausedAlert = document.getElementById("video-paused-alert");
+      if (pausedAlert) pausedAlert.classList.add("hidden");
 
-      if (!window.Html5Qrcode) {
-        if (fallback) fallback.classList.remove('hidden');
-        document.getElementById('cam-fallback-msg').textContent = 'QR scanning library not available.';
+      if (typeof Html5Qrcode === 'undefined') {
+        setTimeout(startScanner, 200);
         return;
       }
 
-      Html5Qrcode.getCameras().then(devices => {
-        camerasList = devices || [];
-        const backCam = camerasList.find(d => {
-          const lbl = (d.label || '').toLowerCase();
-          return lbl.includes('back') || lbl.includes('rear') || lbl.includes('environment');
-        });
+      // Always launch environment (back) camera directly across mobile devices (iOS Safari & Android)
+      currentCameraId = null;
+      launchCamera({ facingMode: "environment" });
 
-        if (backCam) {
-          currentCameraId = backCam.id;
-          launchCamera(backCam.id);
-        } else if (camerasList.length > 0) {
-          currentCameraId = camerasList[0].id;
-          launchCamera(camerasList[0].id);
-        } else {
-          currentCameraId = null;
-          launchCamera({ facingMode: "environment" });
-        }
-      }).catch(err => {
-        console.warn('Get cameras error:', err);
-        launchCamera({ facingMode: "environment" });
-      });
+      if (typeof Html5Qrcode.getCameras === 'function') {
+        Html5Qrcode.getCameras().then(devices => {
+          if (devices && devices.length) camerasList = devices;
+        }).catch(() => {});
+      }
     }
 
     async function launchCamera(cameraConfig) {
@@ -849,55 +851,54 @@
         torchBtn.className = 'p-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs hover:bg-black/80 transition-colors';
       }
 
+      // CRITICAL: useBarCodeDetectorIfSupported MUST BE FALSE to prevent crashes on iOS Safari & Android WebViews
       const scannerOpts = {
-        formatsToSupport: [ 0 ], // Html5QrcodeSupportedFormats.QR_CODE = 0
+        formatsToSupport: [ 0 ], // 0 = Html5QrcodeSupportedFormats.QR_CODE
         experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true
+          useBarCodeDetectorIfSupported: false
         },
         verbose: false
       };
       html5QrScanner = new Html5Qrcode("reader", scannerOpts);
 
-      // Html5Qrcode requires the first argument to be EITHER a camera ID string
-      // OR an object with exactly 1 key: { facingMode: "environment" }
       const cameraIdOrConfig = (typeof cameraConfig === 'string')
         ? cameraConfig
         : (cameraConfig && cameraConfig.facingMode ? { facingMode: cameraConfig.facingMode } : { facingMode: "environment" });
 
+      // Note: Omit qrbox to scan entire camera viewfinder and prevent fatal "config.qrbox dimensions" exceptions
       const config = {
         fps: 20,
-        qrbox: function(viewfinderWidth, viewfinderHeight) {
-          const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-          const edge = Math.max(220, Math.floor(minEdge * 0.85));
-          return { width: edge, height: edge };
-        },
-        aspectRatio: 1.0,
         disableFlip: false
       };
 
-      html5QrScanner.start(
-        cameraIdOrConfig,
-        config,
-        onScanSuccess,
-        onScanFailure
-      ).then(() => {
+      try {
+        await html5QrScanner.start(cameraIdOrConfig, config, onScanSuccess, onScanFailure);
         onCameraReady();
-      }).catch(err => {
-        console.warn('Primary camera start failed, retrying with facingMode:', err);
-        html5QrScanner.start(
-          { facingMode: "environment" },
-          config,
-          onScanSuccess,
-          onScanFailure
-        ).then(() => {
+      } catch (err1) {
+        console.warn('Primary camera start failed, retrying with facingMode: environment', err1);
+        try {
+          await stopAndClearScanner();
+          html5QrScanner = new Html5Qrcode("reader", scannerOpts);
+          await html5QrScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure);
           onCameraReady();
-        }).catch(err2 => {
-          console.error('All camera start attempts failed:', err2);
-          const fallback = document.getElementById('cam-fallback');
-          if (fallback) fallback.classList.remove('hidden');
-          document.getElementById('cam-fallback-msg').textContent = 'Camera blocked or unavailable. Use manual search below.';
-        });
-      });
+        } catch (err2) {
+          console.warn('Environment facingMode failed, retrying with facingMode: user', err2);
+          try {
+            await stopAndClearScanner();
+            html5QrScanner = new Html5Qrcode("reader", scannerOpts);
+            await html5QrScanner.start({ facingMode: "user" }, config, onScanSuccess, onScanFailure);
+            onCameraReady();
+          } catch (err3) {
+            console.error('All camera launch attempts failed:', err3);
+            const fallback = document.getElementById('cam-fallback');
+            if (fallback) fallback.classList.remove('hidden');
+            const msgEl = document.getElementById('cam-fallback-msg');
+            if (msgEl) {
+              msgEl.textContent = 'Camera blocked or unavailable. Please allow camera in browser address bar.';
+            }
+          }
+        }
+      }
     }
 
     function cycleZoom(level) {
