@@ -187,16 +187,150 @@ if (!attendanceState || !attendanceState.students || Object.keys(attendanceState
 }
 
 // -------------------------------------------------------------------------
-// ENGINEERING DAY 2026 (SPORTS ATTENDANCE: 4 VOLLEYBALL + 3 BASKETBALL FOR ME)
+// ENGINEERING DAYS 2026 — TRACK A (8 MAJOR GATE CHECKPOINTS)
+// UPHSD Calamba • College of Engineering • Oct 19–20, 2026
 // -------------------------------------------------------------------------
-const ENGDAY_GAMES_LIST = ['vb_g1', 'vb_g3', 'vb_g6', 'vb_g8', 'bb_g1', 'bb_g4', 'bb_g6'];
+const SCHEMA_VERSION = '2026.4';
+const ENGDAY_GAMES_LIST = [
+  'd1-reg',
+  'd1-am-block',
+  'd1-pm-block',
+  'd1-finals',
+  'd2-am-palaro',
+  'd2-esports',
+  'd2-pageant',
+  'd2-colorfest'
+];
 
-function buildDefaultEngDayRoster() {
+const DEFAULT_ENGDAY_SESSIONS = [
+  {
+    id: 'd1-reg',
+    shortName: 'D1 REG',
+    name: 'D1 Morning Registration & Opening Program',
+    label: 'D1 Morning Registration & Opening Program',
+    category: 'Day 1 (Oct 19)',
+    sport: 'Day 1 (Oct 19)',
+    date: '2026-10-19',
+    day: 'Day 1',
+    time: '7:30 AM – 8:40 AM',
+    court: 'Gymnasium',
+    location: 'Gymnasium',
+    mode: 'check_in_only',
+    allowExit: false
+  },
+  {
+    id: 'd1-am-block',
+    shortName: 'D1 AM SPORTS',
+    name: 'D1 Morning Sports, Booths & Board Games (WBB, VB, Racket, Chess/Dama)',
+    label: 'D1 Morning Sports, Booths & Board Games (WBB, VB, Racket, Chess/Dama)',
+    category: 'Day 1 (Oct 19)',
+    sport: 'Day 1 (Oct 19)',
+    date: '2026-10-19',
+    day: 'Day 1',
+    time: '8:40 AM – 1:00 PM',
+    court: 'Gymnasium & EE Lab (Rm 115)',
+    location: 'Gymnasium & EE Lab (Rm 115)',
+    mode: 'entry_exit',
+    allowExit: true
+  },
+  {
+    id: 'd1-pm-block',
+    shortName: 'D1 PM BLOCK',
+    name: 'D1 Afternoon Sports, Quiz Bee & Valorant',
+    label: 'D1 Afternoon Sports, Quiz Bee & Valorant',
+    category: 'Day 1 (Oct 19)',
+    sport: 'Day 1 (Oct 19)',
+    date: '2026-10-19',
+    day: 'Day 1',
+    time: '1:00 PM – 5:30 PM',
+    court: 'Gymnasium & ECE Lab (Rm 116)',
+    location: 'Gymnasium & ECE Lab (Rm 116)',
+    mode: 'entry_exit',
+    allowExit: true
+  },
+  {
+    id: 'd1-finals',
+    shortName: 'D1 FINALS',
+    name: 'D1 Finals Night (Volleyball & Basketball Championships)',
+    label: 'D1 Finals Night (Volleyball & Basketball Championships)',
+    category: 'Day 1 (Oct 19)',
+    sport: 'Day 1 (Oct 19)',
+    date: '2026-10-19',
+    day: 'Day 1',
+    time: '5:30 PM – 8:00 PM',
+    court: 'Gymnasium',
+    location: 'Gymnasium',
+    mode: 'entry_exit',
+    allowExit: true
+  },
+  {
+    id: 'd2-am-palaro',
+    shortName: 'D2 PALARO',
+    name: 'D2 Morning Registration, Palarong Pinoy & Booths',
+    label: 'D2 Morning Registration, Palarong Pinoy & Booths',
+    category: 'Day 2 (Oct 20)',
+    sport: 'Day 2 (Oct 20)',
+    date: '2026-10-20',
+    day: 'Day 2',
+    time: '8:00 AM – 12:00 NN',
+    court: 'Gymnasium / Oval',
+    location: 'Gymnasium / Oval',
+    mode: 'entry_exit',
+    allowExit: true
+  },
+  {
+    id: 'd2-esports',
+    shortName: 'D2 ESPORTS',
+    name: 'D2 E-Sports Tournaments (MLBB, CODM, Magic Chess, Tekken)',
+    label: 'D2 E-Sports Tournaments (MLBB, CODM, Magic Chess, Tekken)',
+    category: 'Day 2 (Oct 20)',
+    sport: 'Day 2 (Oct 20)',
+    date: '2026-10-20',
+    day: 'Day 2',
+    time: '9:30 AM – 2:00 PM',
+    court: 'ECE Room & ME Room',
+    location: 'ECE Room & ME Room',
+    mode: 'entry_exit',
+    allowExit: true
+  },
+  {
+    id: 'd2-pageant',
+    shortName: 'D2 PAGEANT',
+    name: 'D2 Pageant Screening',
+    label: 'D2 Pageant Screening',
+    category: 'Day 2 (Oct 20)',
+    sport: 'Day 2 (Oct 20)',
+    date: '2026-10-20',
+    day: 'Day 2',
+    time: '1:00 PM – 3:00 PM',
+    court: 'Room 218',
+    location: 'Room 218',
+    mode: 'entry_exit',
+    allowExit: true
+  },
+  {
+    id: 'd2-colorfest',
+    shortName: 'D2 COLORFEST',
+    name: 'D2 College Hours, Awarding & Colorfest / Rave',
+    label: 'D2 College Hours, Awarding & Colorfest / Rave',
+    category: 'Day 2 (Oct 20)',
+    sport: 'Day 2 (Oct 20)',
+    date: '2026-10-20',
+    day: 'Day 2',
+    time: '3:00 PM – 8:00 PM',
+    court: 'Gymnasium',
+    location: 'Gymnasium',
+    mode: 'entry_exit',
+    allowExit: true
+  }
+];
+
+function buildDefaultEngDayRoster(sessionIds = ENGDAY_GAMES_LIST) {
   const baseStudents = buildDefaultStudentsRoster();
   const students = {};
   for (const [id, s] of Object.entries(baseStudents)) {
     const gm = {};
-    ENGDAY_GAMES_LIST.forEach(g => {
+    sessionIds.forEach(g => {
       gm[g] = {
         gameId: g,
         status: 'OUTSIDE',
@@ -221,6 +355,29 @@ function buildDefaultEngDayRoster() {
   return students;
 }
 
+function ensureStudentsHaveSessions(studentsMap, sessionIds = ENGDAY_GAMES_LIST) {
+  if (!studentsMap || typeof studentsMap !== 'object') return buildDefaultEngDayRoster(sessionIds);
+  Object.values(studentsMap).forEach(s => {
+    if (!s.games || typeof s.games !== 'object') s.games = {};
+    sessionIds.forEach(gId => {
+      if (!s.games[gId]) {
+        s.games[gId] = {
+          gameId: gId,
+          status: 'OUTSIDE',
+          lastAction: null,
+          checkInTime: null,
+          checkOutTime: null,
+          displayCheckIn: null,
+          displayCheckOut: null,
+          visits: 0,
+          history: []
+        };
+      }
+    });
+  });
+  return studentsMap;
+}
+
 let engdayEvents = safeReadJson(ENGDAY_EVENTS_FILE, getBundledJson('./engday_attendance_events.json', []));
 let engdayEventsMap = new Map();
 engdayEvents.forEach(ev => {
@@ -229,21 +386,100 @@ engdayEvents.forEach(ev => {
 
 let engdayState = safeReadJson(ENGDAY_STATE_FILE, getBundledJson('./engday_attendance_state.json', null));
 if (!engdayState || !engdayState.students || Object.keys(engdayState.students).length === 0) {
+  const defaultStudents = buildDefaultEngDayRoster();
   engdayState = {
-    students: buildDefaultEngDayRoster(),
+    schemaVersion: SCHEMA_VERSION,
+    activeEventId: 'engday_2026',
+    eventsCatalog: {
+      engday_2026: {
+        id: 'engday_2026',
+        schemaVersion: SCHEMA_VERSION,
+        title: 'ENGINEERING DAYS 2026',
+        subtitle: 'UPHSD Calamba • College of Engineering (Oct 19–20, 2026)',
+        venueName: 'Gymnasium / Oval & Engineering Labs',
+        staffPin: '2026',
+        sessions: DEFAULT_ENGDAY_SESSIONS,
+        students: defaultStudents,
+        updatedAt: new Date().toISOString()
+      }
+    },
+    students: defaultStudents,
     version: 1,
     lastUpdated: new Date().toISOString()
   };
   try { atomicWriteJson(ENGDAY_STATE_FILE, engdayState); } catch(e) {}
+} else {
+  if (!engdayState.activeEventId) engdayState.activeEventId = 'engday_2026';
+  if (!engdayState.eventsCatalog || typeof engdayState.eventsCatalog !== 'object') {
+    engdayState.eventsCatalog = {
+      engday_2026: {
+        id: 'engday_2026',
+        schemaVersion: SCHEMA_VERSION,
+        title: 'ENGINEERING DAYS 2026',
+        subtitle: 'UPHSD Calamba • College of Engineering (Oct 19–20, 2026)',
+        venueName: 'Gymnasium / Oval & Engineering Labs',
+        staffPin: '2026',
+        sessions: DEFAULT_ENGDAY_SESSIONS,
+        students: ensureStudentsHaveSessions(engdayState.students, ENGDAY_GAMES_LIST),
+        updatedAt: engdayState.lastUpdated || new Date().toISOString()
+      }
+    };
+  }
+  // Force migration to SCHEMA_VERSION = '2026.4' if cached state used older 7-game basketball schedule
+  const defaultEvt = engdayState.eventsCatalog.engday_2026;
+  const hasLegacyGames = defaultEvt && Array.isArray(defaultEvt.sessions) && defaultEvt.sessions.some(
+    s => s && (String(s.id).startsWith('vb_') || String(s.id).startsWith('bb_'))
+  );
+  if (engdayState.schemaVersion !== SCHEMA_VERSION || !defaultEvt || defaultEvt.schemaVersion !== SCHEMA_VERSION || hasLegacyGames) {
+    engdayState.schemaVersion = SCHEMA_VERSION;
+    const preservedStudents = ensureStudentsHaveSessions(
+      (defaultEvt && defaultEvt.students && Object.keys(defaultEvt.students).length > 0)
+        ? defaultEvt.students
+        : engdayState.students,
+      ENGDAY_GAMES_LIST
+    );
+    engdayState.eventsCatalog.engday_2026 = {
+      ...(defaultEvt || {}),
+      id: 'engday_2026',
+      schemaVersion: SCHEMA_VERSION,
+      title: 'ENGINEERING DAYS 2026',
+      subtitle: 'UPHSD Calamba • College of Engineering (Oct 19–20, 2026)',
+      venueName: 'Gymnasium / Oval & Engineering Labs',
+      staffPin: (defaultEvt && defaultEvt.staffPin) || '2026',
+      sessions: (!hasLegacyGames && defaultEvt && Array.isArray(defaultEvt.sessions) && defaultEvt.sessions.length > 0)
+        ? defaultEvt.sessions
+        : DEFAULT_ENGDAY_SESSIONS,
+      students: preservedStudents,
+      updatedAt: new Date().toISOString()
+    };
+    if (engdayState.activeEventId === 'engday_2026') {
+      engdayState.students = preservedStudents;
+    }
+    try { atomicWriteJson(ENGDAY_STATE_FILE, engdayState); } catch(e) {}
+  }
 }
 
-function rederiveEngDayStudentState(student, studentEvents) {
+function getActiveSessionIdsForEvent(eventKey = 'engday_2026') {
+  const evt = engdayState.eventsCatalog && engdayState.eventsCatalog[eventKey];
+  if (evt && Array.isArray(evt.sessions) && evt.sessions.length > 0) {
+    return evt.sessions.map(s => s.id).filter(Boolean);
+  }
+  return ENGDAY_GAMES_LIST.slice();
+}
+
+function rederiveEngDayStudentState(student, studentEvents, sessionIds = ENGDAY_GAMES_LIST) {
   const sorted = studentEvents.slice().sort(compareEvents);
+  const allGameKeys = new Set([
+    ...sessionIds,
+    ...Object.keys(student.games || {}),
+    ...sorted.map(e => e.gameId).filter(Boolean)
+  ]);
+
   const updated = {
     ...student,
     games: {}
   };
-  ENGDAY_GAMES_LIST.forEach(g => {
+  allGameKeys.forEach(g => {
     updated.games[g] = {
       gameId: g,
       status: 'OUTSIDE',
@@ -259,7 +495,20 @@ function rederiveEngDayStudentState(student, studentEvents) {
 
   for (const ev of sorted) {
     const gId = ev.gameId;
-    if (!updated.games[gId]) continue;
+    if (!gId) continue;
+    if (!updated.games[gId]) {
+      updated.games[gId] = {
+        gameId: gId,
+        status: 'OUTSIDE',
+        lastAction: null,
+        checkInTime: null,
+        checkOutTime: null,
+        displayCheckIn: null,
+        displayCheckOut: null,
+        visits: 0,
+        history: []
+      };
+    }
     const gRecord = updated.games[gId];
     const action = String(ev.action || '').toLowerCase();
     const timeStr = formatManilaTime(ev.occurredAt);
@@ -320,16 +569,26 @@ function rederiveEngDayStudentState(student, studentEvents) {
   return updated;
 }
 
-function calculateEngDayStats() {
-  const students = Object.values(engdayState.students || {});
+function calculateEngDayStats(eventKey = null) {
+  const targetKey = eventKey || engdayState.activeEventId || 'engday_2026';
+  const evtObj = engdayState.eventsCatalog && engdayState.eventsCatalog[targetKey];
+  const studentsMap = (evtObj && evtObj.students) ? evtObj.students : (engdayState.students || {});
+  const students = Object.values(studentsMap);
   const totalStudents = students.length;
+  const sessionIds = getActiveSessionIdsForEvent(targetKey);
   const gameStats = {};
-  ENGDAY_GAMES_LIST.forEach(g => {
+  sessionIds.forEach(g => {
     gameStats[g] = {
       totalCheckIns: 0,
       insideCount: 0,
       outsideCount: 0,
       byTeam: {
+        ie: { inside: 0, total: 0 },
+        me: { inside: 0, total: 0 },
+        ce: { inside: 0, total: 0 },
+        ee: { inside: 0, total: 0 },
+        ece: { inside: 0, total: 0 },
+        cpe: { inside: 0, total: 0 },
         rankine: { inside: 0, total: 0 },
         otto: { inside: 0, total: 0 },
         brayton: { inside: 0, total: 0 },
@@ -341,18 +600,20 @@ function calculateEngDayStats() {
   let totalUniqueAttendees = 0;
   students.forEach(s => {
     let attendedAny = false;
-    ENGDAY_GAMES_LIST.forEach(g => {
+    sessionIds.forEach(g => {
       const gr = s.games && s.games[g];
       const st = gameStats[g];
-      const teamKey = s.team || 'rankine';
+      if (!st) return;
+      const teamKey = String(s.team || 'general').toLowerCase();
+      if (!st.byTeam[teamKey]) st.byTeam[teamKey] = { inside: 0, total: 0 };
       if (gr && gr.visits > 0) {
         st.totalCheckIns++;
         attendedAny = true;
-        if (st.byTeam[teamKey]) st.byTeam[teamKey].total++;
+        st.byTeam[teamKey].total++;
       }
       if (gr && gr.status === 'INSIDE') {
         st.insideCount++;
-        if (st.byTeam[teamKey]) st.byTeam[teamKey].inside++;
+        st.byTeam[teamKey].inside++;
       } else if (gr && gr.visits > 0) {
         st.outsideCount++;
       }
@@ -557,7 +818,14 @@ const engdaySseClients = new Set();
 
 function broadcastEngDayUpdate() {
   if (engdaySseClients.size === 0) return;
-  const payload = `data: ${JSON.stringify({ type: 'state_update', state: engdayState, stats: calculateEngDayStats() })}\n\n`;
+  const activeKey = engdayState.activeEventId || 'engday_2026';
+  const activeEventsCount = engdayEvents.filter(e => (e.eventKey || 'engday_2026') === activeKey).length;
+  const stateWithMeta = {
+    ...engdayState,
+    schemaVersion: SCHEMA_VERSION,
+    eventsCount: activeEventsCount
+  };
+  const payload = `data: ${JSON.stringify({ type: 'state_update', state: stateWithMeta, stats: calculateEngDayStats() })}\n\n`;
   for (const client of engdaySseClients) {
     try {
       client.write(payload);
@@ -846,12 +1114,14 @@ export async function handleRequest(req, res) {
   // -----------------------------------------------------------------------
   if (reqPath === '/api/engday/attendance/health' && req.method === 'GET') {
     const primaryIp = getPrimaryLanIp();
+    const activeKey = engdayState.activeEventId || 'engday_2026';
     return sendJson(res, 200, {
       ok: true,
       serverTime: new Date().toISOString(),
+      activeEventId: activeKey,
       eventsCount: engdayEvents.length,
       totalStudents: Object.keys(engdayState.students || {}).length,
-      games: ENGDAY_GAMES_LIST,
+      games: getActiveSessionIdsForEvent(activeKey),
       lanIp: primaryIp,
       lanPort: PORT,
       lanScannerUrl: `http://${primaryIp}:${PORT}/engday_scanner.html`,
@@ -862,13 +1132,19 @@ export async function handleRequest(req, res) {
 
   // Real-Time Server-Sent Events (SSE) Stream for Instant Live Sync (< 50ms)
   if (reqPath === '/api/engday/attendance/stream' && req.method === 'GET') {
+    const activeKey = engdayState.activeEventId || 'engday_2026';
+    const activeEventsCount = engdayEvents.filter(e => (e.eventKey || 'engday_2026') === activeKey).length;
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache, no-transform',
       'Connection': 'keep-alive',
       'Access-Control-Allow-Origin': '*'
     });
-    res.write(`data: ${JSON.stringify({ type: 'init', state: engdayState, stats: calculateEngDayStats() })}\n\n`);
+    res.write(`data: ${JSON.stringify({
+      type: 'init',
+      state: { ...engdayState, schemaVersion: SCHEMA_VERSION, eventsCount: activeEventsCount },
+      stats: calculateEngDayStats()
+    })}\n\n`);
     engdaySseClients.add(res);
     req.on('close', () => {
       engdaySseClients.delete(res);
@@ -877,20 +1153,95 @@ export async function handleRequest(req, res) {
   }
 
   if (reqPath === '/api/engday/attendance/state' && req.method === 'GET') {
+    const reqEventKey = urlParams.get('eventKey') || engdayState.activeEventId || 'engday_2026';
+    const evtObj = engdayState.eventsCatalog && engdayState.eventsCatalog[reqEventKey];
+    const studentsMap = (evtObj && evtObj.students) ? evtObj.students : engdayState.students;
+    const activeEventsCount = engdayEvents.filter(e => (e.eventKey || 'engday_2026') === reqEventKey).length;
     return sendJson(res, 200, {
       ok: true,
       serverTime: new Date().toISOString(),
-      students: engdayState.students,
-      stats: calculateEngDayStats(),
+      schemaVersion: SCHEMA_VERSION,
+      activeEventId: engdayState.activeEventId || 'engday_2026',
+      eventsCatalog: engdayState.eventsCatalog || {},
+      students: studentsMap,
+      stats: calculateEngDayStats(reqEventKey),
+      eventsCount: activeEventsCount,
+      totalEventsCount: engdayEvents.length,
       version: engdayState.version || 1,
       lastUpdated: engdayState.lastUpdated
     });
   }
 
+  if (reqPath === '/api/engday/attendance/config' && req.method === 'POST') {
+    try {
+      const payload = await parseJsonBody(req);
+      if (!engdayState.eventsCatalog) engdayState.eventsCatalog = {};
+
+      if (payload.event && payload.event.id) {
+        const evtId = String(payload.event.id).trim();
+        const existingEvt = engdayState.eventsCatalog[evtId] || {};
+        const mergedStudents = {
+          ...(existingEvt.students || {}),
+          ...(payload.event.students || {})
+        };
+
+        // Re-derive student states from server event history for this eventKey while preserving any richer incoming client state
+        const sessionIds = Array.isArray(payload.event.sessions) && payload.event.sessions.length > 0
+          ? payload.event.sessions.map(s => s.id)
+          : getActiveSessionIdsForEvent(evtId);
+
+        for (const [stId, stObj] of Object.entries(mergedStudents)) {
+          const stEvents = engdayEvents.filter(e => e.studentId === stId && (e.eventKey || 'engday_2026') === evtId);
+          if (stEvents.length > 0) {
+            mergedStudents[stId] = rederiveEngDayStudentState(stObj, stEvents, sessionIds);
+          } else {
+            ensureStudentsHaveSessions({ [stId]: stObj }, sessionIds);
+          }
+        }
+
+        engdayState.eventsCatalog[evtId] = {
+          ...existingEvt,
+          ...payload.event,
+          schemaVersion: SCHEMA_VERSION,
+          students: mergedStudents,
+          updatedAt: new Date().toISOString()
+        };
+      }
+
+      if (payload.activeEventId && engdayState.eventsCatalog[payload.activeEventId]) {
+        engdayState.activeEventId = payload.activeEventId;
+        engdayState.students = engdayState.eventsCatalog[payload.activeEventId].students || {};
+      } else if (payload.event && payload.event.id === engdayState.activeEventId) {
+        engdayState.students = engdayState.eventsCatalog[payload.event.id].students || {};
+      }
+
+      engdayState.schemaVersion = SCHEMA_VERSION;
+      engdayState.version = (engdayState.version || 1) + 1;
+      engdayState.lastUpdated = new Date().toISOString();
+
+      atomicWriteJson(ENGDAY_STATE_FILE, engdayState);
+      broadcastEngDayUpdate();
+
+      return sendJson(res, 200, {
+        ok: true,
+        schemaVersion: SCHEMA_VERSION,
+        activeEventId: engdayState.activeEventId,
+        version: engdayState.version,
+        serverTime: new Date().toISOString()
+      });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: err.message });
+    }
+  }
+
   if (reqPath === '/api/engday/attendance/events' && req.method === 'GET') {
     const gameId = urlParams.get('gameId');
+    const eventKey = urlParams.get('eventKey');
     const since = urlParams.get('since');
     let results = engdayEvents;
+    if (eventKey) {
+      results = results.filter(e => (e.eventKey || 'engday_2026') === eventKey);
+    }
     if (gameId) {
       results = results.filter(e => e.gameId === gameId);
     }
@@ -917,11 +1268,12 @@ export async function handleRequest(req, res) {
       const payload = await parseJsonBody(req);
       const incoming = Array.isArray(payload.events) ? payload.events : [];
       const deviceId = payload.deviceId || 'UNKNOWN_DEVICE';
+      const reqActiveEventId = payload.activeEventId || engdayState.activeEventId || 'engday_2026';
 
       const accepted = [];
       const duplicate = [];
       const rejected = [];
-      const affectedStudentIds = new Set();
+      const affectedByEventAndStudent = new Map();
 
       for (const ev of incoming) {
         if (!ev || typeof ev !== 'object') {
@@ -930,31 +1282,17 @@ export async function handleRequest(req, res) {
         }
 
         const eventId = String(ev.eventId || '').trim();
+        const eventKey = String(ev.eventKey || reqActiveEventId || 'engday_2026').trim();
         const studentId = String(ev.studentId || '').trim();
         const gameId = String(ev.gameId || '').trim();
         const action = String(ev.action || '').trim().toLowerCase();
 
-        // Validation
         if (!eventId) {
           rejected.push({ eventId: 'missing', reason: 'Missing eventId' });
           continue;
         }
-        let validStudentId = studentId;
-        if (!validStudentId || !engdayState.students[validStudentId]) {
-          const match = Object.values(engdayState.students).find(s => 
-            (s.studentCode && s.studentCode.toUpperCase() === String(studentId || ev.studentCode || '').toUpperCase()) ||
-            (s.id && s.id.toLowerCase() === String(studentId || '').toLowerCase())
-          );
-          if (match) {
-            validStudentId = match.id;
-            ev.studentId = match.id;
-          } else {
-            rejected.push({ eventId, reason: `Unknown studentId: ${studentId}` });
-            continue;
-          }
-        }
-        if (!gameId || !ENGDAY_GAMES_LIST.includes(gameId)) {
-          rejected.push({ eventId, reason: `Invalid or missing gameId: ${gameId}` });
+        if (!gameId) {
+          rejected.push({ eventId, reason: 'Missing gameId / sessionId' });
           continue;
         }
         if (!['check_in', 'check_out', 'manual_override'].includes(action)) {
@@ -966,15 +1304,56 @@ export async function handleRequest(req, res) {
           continue;
         }
 
+        // Ensure event entry exists in eventsCatalog
+        if (!engdayState.eventsCatalog) engdayState.eventsCatalog = {};
+        if (!engdayState.eventsCatalog[eventKey]) {
+          engdayState.eventsCatalog[eventKey] = {
+            id: eventKey,
+            title: eventKey === 'engday_2026' ? 'Engineering Day 2026' : eventKey,
+            students: eventKey === 'engday_2026' ? (engdayState.students || buildDefaultEngDayRoster()) : {},
+            sessions: [],
+            updatedAt: new Date().toISOString()
+          };
+        }
+        const targetEvt = engdayState.eventsCatalog[eventKey];
+        if (!targetEvt.students) targetEvt.students = {};
+
+        let validStudentId = studentId;
+        if (!validStudentId || !targetEvt.students[validStudentId]) {
+          const match = Object.values(targetEvt.students).find(s =>
+            (s.studentCode && s.studentCode.toUpperCase() === String(studentId || ev.studentCode || '').toUpperCase()) ||
+            (s.id && s.id.toLowerCase() === String(studentId || '').toLowerCase())
+          );
+          if (match) {
+            validStudentId = match.id;
+            ev.studentId = match.id;
+          } else if (studentId || ev.studentCode) {
+            // Auto-register dynamically imported student so custom roster scans are never rejected!
+            validStudentId = studentId || ('stu_' + String(ev.studentCode).toLowerCase().replace(/[^a-z0-9]+/g, '_'));
+            targetEvt.students[validStudentId] = {
+              id: validStudentId,
+              name: ev.studentName || ev.studentCode || validStudentId,
+              team: String(ev.team || 'general').toLowerCase(),
+              teamName: ev.teamName || String(ev.team || 'GENERAL').toUpperCase(),
+              studentCode: String(ev.studentCode || validStudentId).toUpperCase(),
+              games: {}
+            };
+          } else {
+            rejected.push({ eventId, reason: `Unknown studentId: ${studentId}` });
+            continue;
+          }
+        }
+
         // Idempotency check
         if (engdayEventsMap.has(eventId)) {
           duplicate.push(eventId);
           continue;
         }
 
-        // Valid new event
+        const studentRef = targetEvt.students[validStudentId];
         const normalized = {
           eventId: eventId,
+          eventKey: eventKey,
           gameId: gameId,
           studentId: validStudentId,
           action: action,
@@ -987,22 +1366,33 @@ export async function handleRequest(req, res) {
           createdAt: ev.createdAt ? new Date(ev.createdAt).toISOString() : new Date().toISOString(),
           reason: ev.reason || null,
           method: ev.method || 'qr_scan',
-          studentName: engdayState.students[validStudentId].name,
-          studentCode: engdayState.students[validStudentId].studentCode,
-          team: engdayState.students[validStudentId].team
+          studentName: studentRef.name,
+          studentCode: studentRef.studentCode,
+          team: studentRef.team
         };
 
         engdayEvents.push(normalized);
         engdayEventsMap.set(eventId, normalized);
         accepted.push(eventId);
-        affectedStudentIds.add(validStudentId);
+        affectedByEventAndStudent.set(`${eventKey}|${validStudentId}`, { eventKey, studentId: validStudentId });
       }
 
       if (accepted.length > 0) {
-        for (const stId of affectedStudentIds) {
-          const studentAllEvents = engdayEvents.filter(e => e.studentId === stId);
-          const defaultStudent = buildDefaultEngDayRoster()[stId];
-          engdayState.students[stId] = rederiveEngDayStudentState(defaultStudent, studentAllEvents);
+        for (const { eventKey, studentId } of affectedByEventAndStudent.values()) {
+          const targetEvt = engdayState.eventsCatalog[eventKey];
+          if (!targetEvt || !targetEvt.students) continue;
+          const studentAllEvents = engdayEvents.filter(
+            e => e.studentId === studentId && (e.eventKey || 'engday_2026') === eventKey
+          );
+          const baseStudent = targetEvt.students[studentId] || buildDefaultEngDayRoster()[studentId];
+          const sessionIds = getActiveSessionIdsForEvent(eventKey);
+          if (baseStudent) {
+            targetEvt.students[studentId] = rederiveEngDayStudentState(baseStudent, studentAllEvents, sessionIds);
+          }
+          targetEvt.updatedAt = new Date().toISOString();
+          if (eventKey === (engdayState.activeEventId || 'engday_2026')) {
+            engdayState.students = targetEvt.students;
+          }
         }
         engdayState.version = (engdayState.version || 1) + 1;
         engdayState.lastUpdated = new Date().toISOString();
@@ -1019,7 +1409,7 @@ export async function handleRequest(req, res) {
         rejected: rejected,
         serverTime: new Date().toISOString(),
         version: engdayState.version || 1,
-        stats: calculateEngDayStats()
+        stats: calculateEngDayStats(reqActiveEventId)
       });
     } catch (err) {
       return sendJson(res, 500, { ok: false, error: err.message });
@@ -1033,9 +1423,38 @@ export async function handleRequest(req, res) {
         return sendJson(res, 400, { ok: false, error: 'Confirmation required: RESET_ENGDAY_ATTENDANCE' });
       }
 
-      engdayEvents = [];
+      const targetEventKey = payload.eventKey || engdayState.activeEventId || 'engday_2026';
+      const sessionFilter = payload.sessionId || null;
+
+      // Filter out only events matching targetEventKey (and optional sessionFilter)
+      engdayEvents = engdayEvents.filter(e => {
+        const ek = e.eventKey || 'engday_2026';
+        if (ek !== targetEventKey) return true;
+        if (sessionFilter && e.gameId !== sessionFilter) return true;
+        return false;
+      });
       engdayEventsMap.clear();
-      engdayState.students = buildDefaultEngDayRoster();
+      engdayEvents.forEach(ev => {
+        if (ev && ev.eventId) engdayEventsMap.set(ev.eventId, ev);
+      });
+
+      const sessionIds = getActiveSessionIdsForEvent(targetEventKey);
+      const evtObj = engdayState.eventsCatalog && engdayState.eventsCatalog[targetEventKey];
+
+      if (evtObj && evtObj.students && payload.keepRoster !== false) {
+        Object.keys(evtObj.students).forEach(stId => {
+          const remaining = engdayEvents.filter(e => e.studentId === stId && (e.eventKey || 'engday_2026') === targetEventKey);
+          evtObj.students[stId] = rederiveEngDayStudentState(evtObj.students[stId], remaining, sessionIds);
+        });
+        evtObj.updatedAt = new Date().toISOString();
+        if (targetEventKey === (engdayState.activeEventId || 'engday_2026')) {
+          engdayState.students = evtObj.students;
+        }
+      } else if (targetEventKey === 'engday_2026') {
+        engdayState.students = buildDefaultEngDayRoster(sessionIds);
+        if (evtObj) evtObj.students = engdayState.students;
+      }
+
       engdayState.version = (engdayState.version || 1) + 1;
       engdayState.lastUpdated = new Date().toISOString();
 
@@ -1045,9 +1464,9 @@ export async function handleRequest(req, res) {
 
       return sendJson(res, 200, {
         ok: true,
-        message: 'Engineering Day attendance reset successful',
+        message: `Attendance reset successful for ${targetEventKey}`,
         serverTime: new Date().toISOString(),
-        stats: calculateEngDayStats()
+        stats: calculateEngDayStats(targetEventKey)
       });
     } catch (err) {
       return sendJson(res, 500, { ok: false, error: err.message });

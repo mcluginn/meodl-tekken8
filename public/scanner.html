@@ -677,12 +677,24 @@
       }
     }
 
+    async function stopAndClearScanner() {
+      if (!html5QrScanner) return;
+      const inst = html5QrScanner;
+      html5QrScanner = null;
+      try {
+        if (inst.isScanning) {
+          await inst.stop();
+        }
+      } catch (e) {}
+      try {
+        inst.clear();
+      } catch (e) {}
+    }
+
     function lockScanner() {
       localStorage.removeItem('MEODL_STAFF_AUTH');
       sessionStorage.removeItem('MEODL_STAFF_AUTH');
-      if (html5QrScanner) {
-        try { html5QrScanner.stop(); } catch(e) {}
-      }
+      stopAndClearScanner();
       checkStaffAuth();
     }
 
@@ -696,6 +708,10 @@
         window.MEODL_ATTENDANCE.subscribe(() => {
           updateStatsUI();
           renderRecentActivity();
+          if (activeScannedStudent && !document.getElementById('verify-modal')?.classList.contains('hidden')) {
+            const fresh = window.MEODL_ATTENDANCE.getStudentById(activeScannedStudent.id);
+            if (fresh) showVerificationModal(fresh, window.MEODL_ATTENDANCE.isOverdue ? window.MEODL_ATTENDANCE.isOverdue(fresh) : false);
+          }
         });
         window.MEODL_ATTENDANCE.subscribeSyncStatus(renderSyncStatusUI);
       }
@@ -757,6 +773,15 @@
         ['loadedmetadata', 'canplay', 'pause', 'play', 'stalled', 'suspend'].forEach(evtName => {
           video.addEventListener(evtName, ensureVideoPlaying);
         });
+        try {
+          const stream = video.srcObject;
+          const track = stream && stream.getVideoTracks ? stream.getVideoTracks()[0] : null;
+          if (track && track.getSettings) {
+            const settings = track.getSettings();
+            if (settings.deviceId) currentCameraId = settings.deviceId;
+            if (settings.facingMode) currentCameraFacing = settings.facingMode;
+          }
+        } catch (e) {}
       }
 
       if (videoWatcherInterval) clearInterval(videoWatcherInterval);
@@ -816,9 +841,12 @@
       });
     }
 
-    function launchCamera(cameraConfig) {
-      if (html5QrScanner) {
-        try { html5QrScanner.stop(); } catch(e) {}
+    async function launchCamera(cameraConfig) {
+      await stopAndClearScanner();
+      torchOn = false;
+      const torchBtn = document.getElementById('btn-torch');
+      if (torchBtn) {
+        torchBtn.className = 'p-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs hover:bg-black/80 transition-colors';
       }
 
       const scannerOpts = {
@@ -932,7 +960,7 @@
         return;
       }
       const idx = camerasList.findIndex(c => c.id === currentCameraId);
-      const nextIdx = (idx + 1) % camerasList.length;
+      const nextIdx = idx >= 0 ? (idx + 1) % camerasList.length : 0;
       currentCameraId = camerasList[nextIdx].id;
       launchCamera(currentCameraId);
     }
@@ -958,13 +986,26 @@
 
     // Process Scanned QR
     let lastScanTime = 0;
-    function onScanSuccess(decodedText) {
-      const now = Date.now();
-      // Debounce rapid repeated triggers (1.5s)
-      if (now - lastScanTime < 1500) return;
-      lastScanTime = now;
+    let lastScanPayload = '';
+    function isAnyModalBlockingScan() {
+      const modals = ['verify-modal', 'checkout-modal', 'staff-auth-modal', 'device-settings-modal'];
+      return modals.some(id => {
+        const el = document.getElementById(id);
+        return el && !el.classList.contains('hidden');
+      });
+    }
 
-      handleScanPayload(decodedText);
+    function onScanSuccess(decodedText) {
+      if (isAnyModalBlockingScan()) return;
+      const now = Date.now();
+      const clean = String(decodedText || '').trim();
+      if (!clean) return;
+      if (clean === lastScanPayload && (now - lastScanTime < 3500)) return;
+      if (now - lastScanTime < 450) return;
+      lastScanTime = now;
+      lastScanPayload = clean;
+
+      handleScanPayload(clean);
     }
 
     function onScanFailure(error) {
@@ -994,41 +1035,57 @@
     }
 
     function scanImageFile(e) {
-      const file = e.target.files[0];
+      const file = e.target.files && e.target.files[0];
       if (!file) return;
 
-      if (!html5QrScanner) html5QrScanner = new Html5Qrcode("reader");
-      html5QrScanner.scanFile(file, true)
-        .then(decodedText => onScanSuccess(decodedText))
+      let offscreen = document.getElementById('qr-file-offscreen-reader');
+      if (!offscreen) {
+        offscreen = document.createElement('div');
+        offscreen.id = 'qr-file-offscreen-reader';
+        offscreen.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:300px;height:300px;overflow:hidden;pointer-events:none;';
+        document.body.appendChild(offscreen);
+      }
+      const fileScanner = new Html5Qrcode('qr-file-offscreen-reader');
+      fileScanner.scanFile(file, false)
+        .then(decodedText => {
+          try { fileScanner.clear(); } catch (err) {}
+          handleScanPayload(decodedText);
+        })
         .catch(err => {
+          try { fileScanner.clear(); } catch (e2) {}
           playBeep('error');
           alert('Could not detect QR code in selected image.');
+        })
+        .finally(() => {
+          e.target.value = '';
         });
     }
 
     // Modal Presentation
     function showVerificationModal(student, isOverdue) {
+      if (!student) return;
       activeScannedStudent = student;
       const modal = document.getElementById('verify-modal');
       
-      document.getElementById('modal-student-name').textContent = student.name;
-      document.getElementById('modal-student-code').textContent = student.studentCode;
+      document.getElementById('modal-student-name').textContent = student.name || 'Unknown Student';
+      document.getElementById('modal-student-code').textContent = student.studentCode || student.id || '';
 
       // Initials Avatar
-      const parts = student.name.split(/[\s,]+/);
+      const parts = String(student.name || 'ST').split(/[\s,]+/);
       const initials = parts.slice(0, 2).map(p => p[0] || '').join('');
       document.getElementById('modal-avatar').textContent = initials.toUpperCase() || 'ST';
 
       // Team Badge
       const teamBadge = document.getElementById('modal-team-badge');
-      teamBadge.textContent = student.teamName || ('TEAM ' + student.team.toUpperCase());
+      const teamKey = String(student.team || 'rankine').toLowerCase();
+      teamBadge.textContent = student.teamName || ('TEAM ' + teamKey.toUpperCase());
       const teamStyles = {
         rankine: 'bg-red-950/90 text-red-300 border border-red-700/80',
         otto: 'bg-amber-950/90 text-amber-300 border border-amber-700/80',
         brayton: 'bg-cyan-950/90 text-cyan-300 border border-cyan-700/80',
         diesel: 'bg-emerald-950/90 text-emerald-300 border border-emerald-700/80'
       };
-      teamBadge.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase ${teamStyles[student.team] || teamStyles.rankine}`;
+      teamBadge.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase ${teamStyles[teamKey] || teamStyles.rankine}`;
 
       // Overdue Tag
       const overdueTag = document.getElementById('modal-overdue-tag');
@@ -1125,13 +1182,15 @@
 
     function executePrimaryAction() {
       if (!activeScannedStudent || !window.MEODL_ATTENDANCE) return;
+      const fresh = window.MEODL_ATTENDANCE.getStudentById(activeScannedStudent.id) || activeScannedStudent;
+      activeScannedStudent = fresh;
 
-      if (activeScannedStudent.status === 'INSIDE') {
+      if (fresh.status === 'INSIDE') {
         // Open checkout reason
         openCheckoutReasonDrawer();
       } else {
         // Perform Check-in
-        window.MEODL_ATTENDANCE.recordCheckIn(activeScannedStudent.id, {
+        window.MEODL_ATTENDANCE.recordCheckIn(fresh.id, {
           performedBy: 'Gate Scanner',
           method: 'qr_scan'
         });
@@ -1363,8 +1422,8 @@
       if (updated) {
         showVerificationModal(updated, window.MEODL_ATTENDANCE.isOverdue(updated));
       }
-      updateLiveStats();
-      renderRecentScansFeed();
+      updateStatsUI();
+      renderRecentActivity();
       alert(`Attendance cleared for ${studentName}`);
     }
 
@@ -1380,8 +1439,8 @@
           showVerificationModal(updated, window.MEODL_ATTENDANCE.isOverdue(updated));
         }
       }
-      updateLiveStats();
-      renderRecentScansFeed();
+      updateStatsUI();
+      renderRecentActivity();
     }
 
     async function confirmResetAllAttendanceFromScanner() {
@@ -1392,8 +1451,8 @@
         return;
       }
       await window.MEODL_ATTENDANCE.resetAllAttendance();
-      updateLiveStats();
-      renderRecentScansFeed();
+      updateStatsUI();
+      renderRecentActivity();
       closeVerifyModal();
       alert('All attendance records have been reset.');
     }

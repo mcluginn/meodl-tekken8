@@ -1,1 +1,40 @@
-[]
+[
+  {
+    "eventId": "eng_evt_25ea4d78-1816-467f-8552-8b57eca4a22a",
+    "eventKey": "engday_2026",
+    "gameId": "d1-reg",
+    "studentId": "custom_stu_999",
+    "action": "check_in",
+    "occurredAt": "2026-10-18T07:14:24.533Z",
+    "deviceId": "MARSHAL-ENG-RQAWTP",
+    "marshalId": "Gate Marshal",
+    "court": "Gymnasium",
+    "sessionId": "engday_session",
+    "localSequence": 1,
+    "createdAt": "2026-10-18T07:14:24.558Z",
+    "reason": null,
+    "method": "qr_scan",
+    "studentName": "DELA CRUZ, ENGR",
+    "studentCode": "2026-CPE-999",
+    "team": "cpe"
+  },
+  {
+    "eventId": "eng_evt_efdb408e-c57c-4e36-883a-cb7e004a98c2",
+    "eventKey": "engday_2026",
+    "gameId": "d1-am-block",
+    "studentId": "custom_stu_999",
+    "action": "check_in",
+    "occurredAt": "2026-10-18T07:14:24.535Z",
+    "deviceId": "MARSHAL-ENG-RQAWTP",
+    "marshalId": "Gate Marshal",
+    "court": "Gymnasium & EE Lab (Rm 115)",
+    "sessionId": "engday_session",
+    "localSequence": 1,
+    "createdAt": "2026-10-18T07:14:24.558Z",
+    "reason": null,
+    "method": "qr_scan",
+    "studentName": "DELA CRUZ, ENGR",
+    "studentCode": "2026-CPE-999",
+    "team": "cpe"
+  }
+]
