@@ -12,6 +12,7 @@
 (function(window) {
   'use strict';
 
+  const ROSTER_SEED_KEY = 'ENGDAY_ROSTER_2026_411_V2';
   const STORAGE_KEY = 'MEODL_ATTENDANCE_STATE_V1';
   const CONFIG_STORAGE_KEY = 'MEODL_ATTENDANCE_CONFIG_V1';
   const DB_NAME = 'MEODL_ATTENDANCE_DB_V1';
@@ -650,10 +651,18 @@
     init() {
       try {
         if (typeof localStorage !== 'undefined') {
+          const seedKey = localStorage.getItem('MEODL_ROSTER_SEED_KEY');
+          if (seedKey !== ROSTER_SEED_KEY) {
+            console.log('[MEODL] Bumping roster seed to', ROSTER_SEED_KEY);
+            localStorage.setItem('MEODL_ROSTER_SEED_KEY', ROSTER_SEED_KEY);
+            this.initDefaultRoster();
+            this.updatePendingCount();
+            return;
+          }
           const saved = localStorage.getItem(STORAGE_KEY);
           if (saved) {
             const parsed = JSON.parse(saved);
-            if (parsed && parsed.students && Object.keys(parsed.students).length > 0) {
+            if (parsed && parsed.students && Object.keys(parsed.students).length >= 400) {
               this.state = parsed;
               this.reconcileRoster();
               this.updatePendingCount();
@@ -671,10 +680,11 @@
     initDefaultRoster() {
       const data = (typeof window !== 'undefined' && window.MEODL_DATA) ? window.MEODL_DATA : {};
       const teams = data.teams || [
-        { id: 'rankine', name: 'TEAM RANKINE' },
-        { id: 'otto', name: 'TEAM OTTO' },
-        { id: 'brayton', name: 'TEAM BRAYTON' },
-        { id: 'diesel', name: 'TEAM DIESEL' }
+        { id: 'ee', name: 'TEAM EE', shortCode: 'EE' },
+        { id: 'cpe', name: 'TEAM CPE', shortCode: 'CPE' },
+        { id: 'ece', name: 'TEAM ECE', shortCode: 'ECE' },
+        { id: 'ie', name: 'TEAM IE', shortCode: 'IE' },
+        { id: 'ce', name: 'TEAM CE', shortCode: 'CE' }
       ];
       const rosters = data.rosters || {};
 
@@ -682,16 +692,19 @@
       let studentIndex = 1;
 
       teams.forEach(team => {
-        const members = rosters[team.id.toUpperCase()] || [];
-        members.forEach(name => {
-          const code = 'MEODL-' + String(studentIndex).padStart(4, '0');
-          const id = 'student-' + String(studentIndex).padStart(4, '0');
+        const teamKey = (team.shortCode || team.id).toUpperCase();
+        const members = rosters[teamKey] || rosters[team.id.toUpperCase()] || [];
+        members.forEach((item, idx) => {
+          const isObj = typeof item === 'object' && item !== null;
+          const name = isObj ? item.name : item;
+          const code = (isObj && item.code) ? item.code : (teamKey + '-' + String(idx + 1).padStart(3, '0'));
+          const id = 'student-' + code.toLowerCase().replace(/[^a-z0-9]+/g, '_');
           const token = deterministicToken(studentIndex, team.id);
 
           students[id] = {
             id: id,
             name: name,
-            team: team.id,
+            team: team.id.toLowerCase(),
             teamName: team.name,
             studentCode: code,
             activeToken: token,
@@ -725,16 +738,19 @@
       let changed = false;
 
       teams.forEach(team => {
-        const members = rosters[team.id.toUpperCase()] || [];
-        members.forEach(name => {
-          const id = 'student-' + String(studentIndex).padStart(4, '0');
+        const teamKey = (team.shortCode || team.id).toUpperCase();
+        const members = rosters[teamKey] || rosters[team.id.toUpperCase()] || [];
+        members.forEach((item, idx) => {
+          const isObj = typeof item === 'object' && item !== null;
+          const name = isObj ? item.name : item;
+          const code = (isObj && item.code) ? item.code : (teamKey + '-' + String(idx + 1).padStart(3, '0'));
+          const id = 'student-' + code.toLowerCase().replace(/[^a-z0-9]+/g, '_');
           if (!this.state.students[id]) {
-            const code = 'MEODL-' + String(studentIndex).padStart(4, '0');
             const token = deterministicToken(studentIndex, team.id);
             this.state.students[id] = {
               id: id,
               name: name,
-              team: team.id,
+              team: team.id.toLowerCase(),
               teamName: team.name,
               studentCode: code,
               activeToken: token,

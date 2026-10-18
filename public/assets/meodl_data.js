@@ -58,6 +58,11 @@ const TEAM_ASSETS = {
 function getTeamKey(name) {
   if (!name) return null;
   const s = String(name).toUpperCase();
+  if (s === 'EE' || s.includes('ELECTRICAL')) return 'ee';
+  if (s === 'CPE' || s.includes('COMPUTER')) return 'cpe';
+  if (s === 'ECE' || s.includes('ELECTRONICS')) return 'ece';
+  if (s === 'IE' || s.includes('INDUSTRIAL')) return 'ie';
+  if (s === 'CE' || s.includes('CIVIL')) return 'ce';
   if (s.includes('RANKINE')) return 'rankine';
   if (s.includes('OTTO')) return 'otto';
   if (s.includes('BRAYTON')) return 'brayton';
@@ -183,237 +188,3782 @@ window.getTeamKey = getTeamKey;
 window.assetFallback = assetFallback;
 
 window.MEODL_DATA = {
+  "rosterSeedKey": "ENGDAY_ROSTER_2026_411_V2",
   "teams": [
     {
-      "id": "rankine",
-      "name": "TEAM RANKINE",
-      "color": "crimson",
-      "hex": "#ef4444",
-      "badgeBg": "bg-red-950/80",
-      "badgeText": "text-red-400",
-      "badgeBorder": "border-red-700/80",
-      "icon": "🔥",
-      "count": 55
+        "id": "ee",
+        "name": "ELECTRICAL ENGINEERING",
+        "shortCode": "EE",
+        "color": "emerald",
+        "hex": "#10b981",
+        "badgeBg": "bg-emerald-950/80",
+        "badgeText": "text-emerald-400",
+        "badgeBorder": "border-emerald-700/80",
+        "icon": "⚡",
+        "count": 92
     },
     {
-      "id": "otto",
-      "name": "TEAM OTTO",
-      "color": "amber",
-      "hex": "#f59e0b",
-      "badgeBg": "bg-amber-950/80",
-      "badgeText": "text-amber-400",
-      "badgeBorder": "border-amber-700/80",
-      "icon": "⚡",
-      "count": 36
+        "id": "cpe",
+        "name": "COMPUTER ENGINEERING",
+        "shortCode": "CPE",
+        "color": "sky",
+        "hex": "#0ea5e9",
+        "badgeBg": "bg-sky-950/80",
+        "badgeText": "text-sky-400",
+        "badgeBorder": "border-sky-700/80",
+        "icon": "💻",
+        "count": 60
     },
     {
-      "id": "brayton",
-      "name": "TEAM BRAYTON",
-      "color": "cyan",
-      "hex": "#06b6d4",
-      "badgeBg": "bg-cyan-950/80",
-      "badgeText": "text-cyan-400",
-      "badgeBorder": "border-cyan-700/80",
-      "icon": "🌪️",
-      "count": 33
+        "id": "ece",
+        "name": "ELECTRONICS ENGINEERING",
+        "shortCode": "ECE",
+        "color": "violet",
+        "hex": "#8b5cf6",
+        "badgeBg": "bg-violet-950/80",
+        "badgeText": "text-violet-400",
+        "badgeBorder": "border-violet-700/80",
+        "icon": "📡",
+        "count": 10
     },
     {
-      "id": "diesel",
-      "name": "TEAM DIESEL",
-      "color": "emerald",
-      "hex": "#10b981",
-      "badgeBg": "bg-emerald-950/80",
-      "badgeText": "text-emerald-400",
-      "badgeBorder": "border-emerald-700/80",
-      "icon": "⚙️",
-      "count": 51
+        "id": "ie",
+        "name": "INDUSTRIAL ENGINEERING",
+        "shortCode": "IE",
+        "color": "amber",
+        "hex": "#f59e0b",
+        "badgeBg": "bg-amber-950/80",
+        "badgeText": "text-amber-400",
+        "badgeBorder": "border-amber-700/80",
+        "icon": "🏭",
+        "count": 97
+    },
+    {
+        "id": "ce",
+        "name": "CIVIL ENGINEERING",
+        "shortCode": "CE",
+        "color": "cyan",
+        "hex": "#06b6d4",
+        "badgeBg": "bg-cyan-950/80",
+        "badgeText": "text-cyan-400",
+        "badgeBorder": "border-cyan-700/80",
+        "icon": "🏗️",
+        "count": 152
     }
-  ],
+],
   "rosters": {
-    "RANKINE": [
-      "ABSALUD, EDWARD KEEN TAGLE",
-      "ALMORO, STEPHEN NASH GACILLOS",
-      "ASPERIN, ENRIQUE ACLAN",
-      "AUSTRIA, ANDREA RIVERA",
-      "BANATIN, CRISTOFF JIMSON TEJERO",
-      "BARBA III, DANILO MAYLON",
-      "BOLA, AR-JAMES REMOROZA",
-      "CAGANAN, JOHN CEDRIC TAMAYO",
-      "CARANDANG, GABRIEL FLORES",
-      "CHAMIAN, BRADEN CHOZAS",
-      "CONTRERAS, KENDRICK ZABDIEL RECIO",
-      "CREMEN, AMIR MCKALE DEL SOL",
-      "DE JESUS, JOHN JERNIECHO TABUYO",
-      "DEBLOLS, REDD YUAN MERILLES",
-      "DIZON, LEE JHUDIEL ANGARA",
-      "ECHAPARE, PRINCE MEINARD MARCELLANA",
-      "ETORMA, CHRIS ADVIEN LIBELO",
-      "FLORES, HABIB DHEREX",
-      "FONTANILLA, LORDRYAN CLYDE MORANTE",
-      "GALANG, MARK KIRBY MORES",
-      "GARCELLANO, AUDREY CALVIN PRADO",
-      "GARCIA, JOHN LEMUEL",
-      "GARCIA, KERBY ORUGA",
-      "GERVACIO, LJ DENISSE HERNANDEZ",
-      "GRATE, STOFFEL JASEN PERALTA",
-      "ILARDE, RAISEL BORROMEO",
-      "JUAN, MARK CLARENCE HIPOS",
-      "LAFORTEZA, SAMANTHA NICOLE GLIPONEO",
-      "LAIT, MARWELL SELWIN JABONILLO",
-      "LEONOR, JOHN ROVEE VERGARA",
-      "MAGHANOY, DAVID JAN RUZZEL BUMAGAT",
-      "MALIPOL, CARL JEAN NOEL LARIOS",
-      "MALLARI, LOUISE ANDREY DACLIZON",
-      "MANALASTAS, JAMES SERDAN",
-      "MANALO, CHARLES JOSEPH GAMBOA",
-      "MONTERO, JOSHUA TAPIA",
-      "ORENSE, EMIL GABRIEL MANGILIN",
-      "PACLIBAR, JOHN MICHAEL VILLARAZA",
-      "PALICPIC, CHRIS JERICO MIRANDA",
-      "PUA, LIAM AKIEM CARASUS",
-      "PUBLICO, JOHN MICHAEL BANAAG",
-      "PULGAR, ROWEN VICTOR CUBILE",
-      "QUIRANTE, SHIANELA BALANAY",
-      "RIPO, RENZ ALJUN DOMINGUEZ",
-      "SALIBA, GIAN KARLO BRAGADO",
-      "SAN PASCUAL, JAMES DOMINIC TADONG",
-      "SANTOS, KARL ANGELO DIAGO",
-      "TALASTASIN, ALHJHON ANCHETA",
-      "TAYAG, JAYSON BARQUILLA",
-      "TEJERO, ARCH RYLER LOZADA",
-      "TIZON, THEO DAN GHERICK MERALPES",
-      "TULUD, MARCOS JOHN BONSO",
-      "TURAJA, VIEN XYRILLE SANGALANG",
-      "VILLAPANDO, RUSSEL THOMSON C.",
-      "ZUÑIGA, KENNETH JOHN RIVEL"
+    "EE": [
+        "ABAD, EARL JOHN A.",
+        "ABOCEJO, KING CHRISTOPHER",
+        "ABUDA, RUPERTH KNIE P.",
+        "ALANIB, RYLE BASTY B.",
+        "ALVAREZ, EVANN C.",
+        "ANACION, RHAINE DOMINIC D.",
+        "ANDAYA, JOHN MICHAEL L.",
+        "ANDRADA, JOSE ANDREI P.",
+        "ARANDIA, JOHN ANSELLE M.",
+        "ASCAÑO, RHICO S.",
+        "ASTROLABIO, RHAY JUSTIN P.",
+        "ATIENZA, PAUL JERICO H.",
+        "BAHOY, DWIGHT IVAN V.",
+        "BERMUDEZ, MARK LEO M.",
+        "BONCAJES, ROB MARTIN A.",
+        "CABARLES, TYRON Q.",
+        "CAJUCOM, BRYAN JAMES M.",
+        "CALMA, WENDELL D.",
+        "CANTARA, CHILVERT REIN C.",
+        "CARMONA, LEE ROUAN C.",
+        "CHAVEZ, JOHN DAVID B.",
+        "COMMINS, FRANCHESKA MAE A.",
+        "CRISTOBAL, CHRISTOPHER Y.",
+        "CUIZON, ALEXANDER D.",
+        "DALISAY, RANIEL T.",
+        "DAMAYO, CHRISTOPHER DANIELLE C.",
+        "DAPADAP, JOSHUA NAHIL N.",
+        "DATUS, RAIN R.",
+        "DE LEON, RITCH GERMAINE M.",
+        "DELA CRUZ, JOHN JOSEPH R.",
+        "DELOS REYES, JEROME V.",
+        "DELOS REYES, MARK STEPHEN B.",
+        "DULAY, GEIBRIEL RENE P.",
+        "ENDRINAL, EMMANUEL H.",
+        "EREJIAS, JOHN MARK M.",
+        "EUGENIO, JOHN MICHAEL A.",
+        "FAELMARIN, JHON AX'L F.",
+        "FLORES, NORIEL A.",
+        "FLORES, RHONA LYN R.",
+        "FLORIDO, DUSTINE ANGELO M.",
+        "GADAZA, JOSE GABRIEL B.",
+        "GALLEGO, HARIS JHON S.",
+        "GAYOSA, KHENA KATLEEN G.",
+        "GERODIAS, BRENT GERSON A.",
+        "GOMEZ, MA. ALSHICA K.",
+        "GONZALES, SEAN ALLEN M.",
+        "GUIRUELA, JAMES L.",
+        "HASHIM, BRINLY HAMIM M.",
+        "HERNANDEZ, JAY CYRIL C.",
+        "HERNANDEZ, SAM ANDREI V.",
+        "IBARROLA, HANS KEN M.",
+        "JUANICO, NYNGEL S.",
+        "LACORTE, CRIS JASON M.",
+        "LAYACAN, VHEA EDRICH M.",
+        "LEGASPI, ULYCES P.",
+        "LOPEZ, CHARLES ROBERT L.",
+        "LUMBRES, DUSTIN M.",
+        "MACALALAD, FRANS RYLCO C.",
+        "MAGSOMBOL, JAMES RYAN J.",
+        "MALABAG, JOHN MICHAEL B.",
+        "MALANA, ROSSETTE NATHALIE A.",
+        "MALOLOY-ON, DEFFERSON JOHN T.",
+        "MAÑOBRA, LORENZO A.",
+        "MAPUTE, CHRIS CORNELL F.",
+        "MICA, CLARK DUSTIN COSME D.",
+        "MILCA, JERALD O.",
+        "MONDIA, JOHN VINCENT M.",
+        "MORAN, MARK NIÑO A.",
+        "MOSCA, JAMESTEVE SEAN G.",
+        "NUNO, ROYD ALFONSO M.",
+        "OPULENCIA, AARON ALLEXIS S.",
+        "ORTEGA, JAMES V.",
+        "ORTIZ, PAULA EUNISE A.",
+        "PABALATE, RHED S.",
+        "PAMPLONA, NELO DRIX T.",
+        "PANARIGAN, KARLO P.",
+        "PANER, ORLANDO GABRIEL C.",
+        "PATARAY, EUNICE L.",
+        "PECAYO, RHIANE MAE L.",
+        "PEDRAJA, JOMARI D.",
+        "PEREZ, JARED ELWOOD P.",
+        "PIOQUINTO, ELREY D.",
+        "PIZARRA, DOMAR A.",
+        "RAMILO, DRACIR JOSH G.",
+        "SALIBA, DEROSS D.",
+        "SANTOS, RAFAEL P.",
+        "SOLATORIO, JOHN JETRO C.",
+        "TABAMO, EJ GODWIN B.",
+        "TORIAGA, KURT LOUISE M.",
+        "URRIZA, BRYLLE KRISTEN A.",
+        "VILLARE, RYE LEE E.",
+        "YABUT, CRISENCIO JR. P."
     ],
-    "OTTO": [
-      "ABERDE, NOMEL ACE CERBO",
-      "ALGIRE, JEROME DAVE DEVOMA",
-      "ALMORO, AERON JAMES PALENTINOS",
-      "ASI, JOSH EROLD GOPOLLA",
-      "CANA, AARON JAY CONDALOR",
-      "CONTRERAS, CHAUNCEY DRE MALAPITAN",
-      "DELA VIÑA, RHYME SOLAMO",
-      "ELAURIA, JYMNASH CZAR ENDOZO",
-      "ERJAS, CARL ANTHONY LAMAR",
-      "ESPINA, CARL DUSTIN INOC",
-      "GARCIA, JAMES ANDREW",
-      "GAVINO, JHON RAVEN",
-      "GLIPONEO, PRINCESS KYLE GUIM",
-      "HERNANDEZ, NATHANIEL TUÑACAO",
-      "HODRIAL, ALLEN VINCE CEDRO",
-      "LACORTE, JOHN LAWRENCE DELATADO",
-      "LIMBO, MARK REGIE ASISTIDO",
-      "LLAMZON, ZYMON HILL PASCUAL",
-      "MANZANILLA, BRIXTER JOSEPH GONZALES",
-      "MATUNDAN, KHAEOUS AERAY COLLADO",
-      "MIRASOL, MARTIN NEIL LAQUINDANUM",
-      "NERO, GABBIELLE CACAL",
-      "NUNO, RON EXEQUIEL",
-      "OBLIPIAS, ZIGGY SABDAO",
-      "OLINO, JOPETH ORBESO",
-      "OLIQUINO, CHRISTIAN ARROYO",
-      "ONTE, RAFAEL PAMPLONA",
-      "PEÑA, CARLOS MIGUEL ANTIDO",
-      "PRADO, JOHN LENRICK TABERNILLA",
-      "QUILAO, LORD JOHN LUMACAD",
-      "REAL, JILLIAN CAÑUBAS",
-      "RUTAQUIO, BENEDICT GUCILATAR",
-      "SALON, JAN MIKHAIL FORTUNO",
-      "SANTOS, KARYLLE JOY SADIA",
-      "TAGUIAM, JAE HARVEY BALASTA",
-      "TALATALA, REIN EISEN BANDOLA"
+    "CPE": [
+        "AMICAN, GABRIEL EMMANUEL B.",
+        "ANDAYA, SEAN COLLIN S.",
+        "ARQUILLO, MARK P.",
+        "ARROCO, DAVID SZUIN R.",
+        "BALBUENA, EDUARDO III J.",
+        "BARBON, ANNE KIRSTEN V.",
+        "BARCELLANO, MAR JOSEF V.",
+        "BEGAS, JAYCEL NIEL C.",
+        "BIESCAS, REYSSA JEAN D.",
+        "BITANA, MARK EDRIAN J.",
+        "BUSTAMANTE, DANIEL JOHN T.",
+        "CAMACHO, BERNARD JOEY B.",
+        "CAMBEL, KIRSTEN M.",
+        "CANTALEJO, KAIDE M.",
+        "CASTILLO, CHINI MARIELLI",
+        "CENA, LEO M.",
+        "CESAR, KLYDE GABRIEL A.",
+        "CLARO, SHAWN ROMINICK T.",
+        "CONEJARES, RODCORT ELVEN V.",
+        "DE JESUS, KENNETH G.",
+        "DOLLETON, DWAYNE KENSHIN R.",
+        "DOMINGO, JOSE URBANO B.",
+        "DULLAS, CHARLES EZEKIEL F.",
+        "DY, LEIGH ICEN G.",
+        "ESCULTURA, PRINCE ERROLL M.",
+        "ESTEBAN, JEANE ANDREI C.",
+        "GALOYO, IRIS L.",
+        "GARCIA, JUSTIN ADRIENN P.",
+        "KODAKA, KIAN KENTA D.",
+        "LLANETA, JOHN VINCENT M.",
+        "LLANETA, KENJIE-LIM A.",
+        "MAALINDOG, ALAN PAUL C.",
+        "MAGNO, DAN LLOYD L.",
+        "MALABANAN, JUSTINE RALPH B.",
+        "MANE, FRANCINE JADE G.",
+        "MEDINA, ALLAEN MARK S.",
+        "NAGPALA, EERSEL ANDREY V.",
+        "OCASLA, NORMAN DAVID J.",
+        "OLIVAR, CHRISTIAN JOSH D.",
+        "OPULENCIA, ALLEXASHEENA DEINNE S.",
+        "ORDANZA, JAMEZ IVAN V.",
+        "PADUA, RHIANA ASHLEY G.",
+        "PALISOC, MARK ELEAZAR M.",
+        "PALOMO, CHARLEMAGNE B.",
+        "PEDRIGAL, MARGARETE JANE PAULEY D.",
+        "PETATE, KARL JANSEN S.",
+        "PETATE, KIERVY R.",
+        "RAFA, RAFAEL ALEX A.",
+        "REGASPI, MARY MARGARETTE D.",
+        "RUANTO, RANIELLE JEDD R.",
+        "SANTIAGO, ULRICA LORAINE D.",
+        "SASPA, ASHLEY KHATE R.",
+        "SERRANA, JESSIE B.",
+        "TAN, SIMON M.",
+        "TOLENTINO, BENJAMIN M.",
+        "TORALES, REUEL ANNE A.",
+        "TORRES, JOSHUA ALLEN D.",
+        "VIVAS, BENEDICT MIGUEL C.",
+        "YANSON, RANDEL C.",
+        "ZARSUELO, JOHN GAVERIEL D."
     ],
-    "BRAYTON": [
-      "ALVAREZ, VANNA JENILLE ROCCO",
-      "ARGAÑOSA, RYU EMANUEL DELA CRUZ",
-      "BAÑEZ, JOSEL DE CASTRO",
-      "BARLETA, BRYANT DOCTORA",
-      "BENGCO, EPHRAIM RICK REYES",
-      "CABUCO, ZEDRICK CABANIG",
-      "CAJUCOM, AEROL JOHN MARASIGAN",
-      "CARLOS, KING ARDEE NHEL FLORES",
-      "CATLI, JIJAH KARAN CAAGBAY",
-      "DADIS, JARUZZ LANCELOT LAXAMANA",
-      "DANTE, KEN-ZY RACHO",
-      "DE JURAS, IVAN DICHOSO",
-      "DELA ROSA, KEN ALVIN ULEP",
-      "DIMAPILIS, EIDRIAN ROA",
-      "ESTRELLADO, GABRIELLE LANCE MALALUAN",
-      "GLOVO, RISTY AGULLANO",
-      "MARTINEZ, JAY MAR ROMERO",
-      "MEJILLA, JEDIMAR MAGLANGIT",
-      "MERABE, PRINCE ANDEL RODRIGUEZ",
-      "MILAR, EARL JOHN FEDILES",
-      "MIRONES, GIANN CARLO ORTIZ",
-      "OCBINA, ANTHONY REYES",
-      "OPINIO, EDMEL JOHN CONDE",
-      "PEREY, LUIS EMMANUEL MARASIGAN",
-      "QUILITIS, VINCE ALJOE ROBLES",
-      "RECIO, JHEZRIEL EDWARD FLORES",
-      "REYES, LEILA MAY LABACO",
-      "SANDOVAL, EDWARD SOLOMON ALVAREZ",
-      "SEÑEREZ, KYLE CYRIS LLANTO",
-      "TAJAO, PAUL ALDREY BARENG",
-      "TORRES, JAMES CARLOS LAGDAAN",
-      "VASQUEZ, JEPTHAH AGUILA",
-      "YABUT, ASHLEY KURT BERMILLO"
+    "ECE": [
+        "MARQUEZ, GISELLE A.",
+        "GUANIESO, ANGELLIC RENANELYN O.",
+        "CAMAT, RENUARD A.",
+        "ALKHATIB, SAMER B.",
+        "OPULENCIA, MARIA GEE-ANNE P.",
+        "GAMITIN, JOMAR GABRIEL B.",
+        "PAGUINTO, OLIEMAR LEINER P.",
+        "MARASIGAN, JERICHO MIGUEL R.",
+        "GUERRERO, OWEN DOMINIC V.",
+        "MENOR, ANGELO C."
     ],
-    "DIESEL": [
-      "AÑONUEVO, CHRIS",
-      "ATIENZA, MATHEW GARCIA",
-      "BALLESTEROS, MARK ANDERSEN TANDOC",
-      "BANDIOLA, JOHN MARC TORRES",
-      "BARCARSE, SEALTIEL UZZIEL LEGASPI",
-      "BARONIA, JOHN RICHIE DIAZ",
-      "BAYLON, JUSTINE IAN BANAWA",
-      "CAGANAN, JOHN CEDRIC TAMAYO",
-      "CALARA, TYRON JOEL VINOYA",
-      "CAPERARE, CYRUS CESAR MAGAHIS",
-      "CARANIWAN, RHODYLIE KIANA LUNA",
-      "CAYAYAN, LANCE RUSSEL SUMICAD",
-      "CEDALLA, JOHN LESTER HERNANDEZ",
-      "CONVENTO, ADRIAN JAMES LADIA",
-      "DE MESA, ANNA LOREN TUSCANO",
-      "DE TORRES, JAMES IMMANUEL ASILO",
-      "DELA CRUZ, JOHN RINGGO ADELINO",
-      "DELA TORRE, JERALD ROBEL",
-      "DESCALLAR, JOHN PAUL TRAJANO",
-      "ELEFANE, DANAH VALERIE MORALES",
-      "ENRIQUEZ, RAE SHERIZ NECESITO",
-      "EVASCO, ONIMUS AMIR SANCHEZ",
-      "FAJARDO, KING ZHAREN MAMALAYAN",
-      "FAMINIAL, EARL VINCENT MAZO",
-      "FERNANDEZ, NATHANIEL FRANCISCO",
-      "FRANCISCO, RIDJY VILLARIN",
-      "GALANG, KOBIE CONSTANTINE CAPILOS",
-      "JAVIER, DENZEL JOHN LIMSON",
-      "LABRADOR, JOHN PAUL PLASTINAA",
-      "LUMINATE, JIETHER SALMORIN",
-      "MADRONA, CARLOS MIGUEL BANAL",
-      "MAÑEBO, KEITH RUSSELL ALVAREZ",
-      "MARAÑA, RICK JAMES EVANGELISTA",
-      "MARASIGAN, KEMP JOHN RACEL RAMOS",
-      "MESINA, CEDRICK BALLARAN",
-      "MOLDEZ, CARMELO CUNANAN",
-      "ORENSE, EMIL GABRIEL MANGILIN",
-      "PADUGA, EARL JUSTINE ESPELETA",
-      "PAMPLONA, JAMES ADRIAN ENRIQUEZ",
-      "PAYO, DYLAN ATIENZA",
-      "PAYO, PATRICK DANIEL CASTILLO",
-      "QUINTOS, LANCE KENNETH VICTA",
-      "RAMOS, RED MATTHEW DE LEON",
-      "RAPSING, EARL CONTRERAS",
-      "RODIS, CLIFFORD ULLYSSES CASTOR",
-      "SONGALLA, EZEKIEL JENNEL PENIDA",
-      "STEVENS, GILBERT CARAAN",
-      "SUYAT, RYAN BANCORO",
-      "TALAY, SIMON JOHN ASISTORES",
-      "TAN, TYRON JAMES",
-      "VILLACERAN, EMMUEL ROI RIVERA"
+    "IE": [
+        "ABAD, JUDITH MARIAN SILVA",
+        "AGUILAR, RUSSEL ALLEN CASTILLO",
+        "BALLEZA, BRUNZON ANSANO",
+        "BAUTISTA, MA. CHARICE JAYONA",
+        "CANATUAN, YSABELA MERCADO",
+        "CICERON, HANS GABRIEL CONJARES",
+        "CONSIGNADO, KASSANDRA SARMIENTO",
+        "DE LEON, YANZ MARLOU BAYBAY",
+        "ELISAN, JOSHUA BRYCE OLINARES",
+        "ESTRADA, JERILOU MAE NAZARETH",
+        "FRANCISCO, ANDRES LUIS MADEJA",
+        "HALILI, MARK CLARENCE ALDABE",
+        "IYOG, HANNAH MEKIE SHANE JUNGAY",
+        "KODAKA, KYLE KENYA DELUANA",
+        "LARINO, JOANA SOPHIA BEATRICE REYEG",
+        "LECHUGA, CASSANDRA SHANEYA MANINGAS",
+        "LEGASPI, TRAVIS MATHEW PARO",
+        "MALLORCA, ANTON JOSEPH NARVAEZ",
+        "NIEM, JARED CIRENE GOLE",
+        "OCAMPO, RENZO HADI",
+        "PADIT, ANDREI ANG",
+        "PALIZA, PATRICK ANJELLO SOLINAP",
+        "RAÑOLA, PRINCESS ARIANI ROXAS",
+        "ROSALES, LOUISE ALLEN BALBIN",
+        "SOJOR, ALBERT MARCELO",
+        "VALIÑA, ANGELA CLAIRE PERILLO",
+        "BANTOC, VINCE LYNDON ABENDAN",
+        "BESAS, CHEN ZHEN LUMACANG",
+        "DOROJA, PRINCESS FHAYE COLLINE TAMONDONG",
+        "FRANCISCO, DERRICK GABRIEL ESCONDO",
+        "GALINDEZ, JOHN PAUL JAVIER",
+        "GARDAYA, PRINCESS JANEL DE OCAMPO",
+        "GUELAS, MARK KRISTIAN ROMEO DUSONG",
+        "IMSON, CHRISTIAN SIMON OLIVEROS",
+        "JAYME, PRINCESS MAE MANAIG",
+        "MALABANAN, ALJON RAMOS",
+        "MALATE, LUJILL DYLAN SEÑORISES",
+        "MANNAN, ABDULHAFIDZ MAUJOD",
+        "MILANES, SHANE SALIBIO",
+        "NAVARRO, NEON GENESIS DE CASTRO",
+        "NOBLEFRANCA, VARY ALEM CANDELARIA",
+        "OQUERIA, CAMILLE ANNE CANLOBO",
+        "ORELLANES, JOHN MARK BATASINGEN",
+        "PACALDO, JHAYSAMEL ALALIM",
+        "PINEDA, KIENNA DENISE ORUGA",
+        "RAMILO, JONAIRA MARI LUCIDO",
+        "RIVERA, RALPH HENRY CAAGBAY",
+        "ROBLES, MARK ANDREI BANIGO-OS",
+        "SUAREZ, KEN DELA CRUZ",
+        "SUATING, DARVIE ANGELO DELA PEÑA",
+        "ATENCIO, IRISH MAE ADRIATICO",
+        "BAUTISTA, MAURHIZ LIRA",
+        "BONIFACIO, MARC ANTHONY PEREZ",
+        "BUSTAMANTE, ZYRUS DIMAANO",
+        "CASAJE, PRINCESS JANE DEQUIÑA",
+        "DALIS, LESTER MARU CABRERA",
+        "DE LA CRUZ, CHRISTIAN EARL MANANGAN",
+        "DELA TORRE, ANGELICA FAYE TUBILLO",
+        "JACINTO, GILLIANE MARGARETTE CREDO",
+        "LAOMOC, JANSENN LOU DIMALALUAN",
+        "LUBATON, ALTHEA FEI MOLINTAPANG",
+        "LUMBRES, JENELLE MANIMTIM",
+        "MALBAS, MARJORI DAUSON",
+        "MANUEL, CARL JUSTIN BUENA",
+        "MARIANO, IVAN CLARK JORISH MENDOZA",
+        "MARIANO, JUAN PAULO MIRASOL",
+        "MATANGUIHAN, KYLA AVILA",
+        "MORADA, MICAIAH GWYNNETH GONZALES",
+        "QUEZON, JOHN ARIEL ROSALES",
+        "RAMIRO, JAYPEE DOMINGO",
+        "RAPAL, KHRISTIAN LEGASPI",
+        "TAYONI, DUSTIN KYLE QUIJADA",
+        "TEMEÑA, MARK ANGELO BOMBITA",
+        "VIDAL, JULIAN VICTOR NARVAEZ",
+        "VILLANUEVA, RALPH CYRIL VIDAERA",
+        "VIZCONDE, ARYZA GRACE ESCOBELLA",
+        "ALCASABAS, JERICHO CRIS ARCEO",
+        "AMPELOQUIO, JOHN ARMIL PILAR",
+        "ANCAYAN, ALLUJ PHILIP BELEN",
+        "BARRIENTOS, VINCENT BACANI",
+        "BARUNDIA, BRYLLE RAPHAEL MANDIGMA",
+        "BAYOT, HELEINA JANE IGUAL",
+        "CABALES, RAYVER JUSTINE NOCHETE",
+        "CABUDSAN, CATHERINE JOY MUSNGI",
+        "DISIMULACION, KIM BRAYN RAMOS",
+        "IBO, JOHN LLOYD FARIÑAS",
+        "LABUTAP, DAVE ALDRIN LARA",
+        "MARQUEZ, ARIES SALUD",
+        "NENENG, FRANKY PARAISO",
+        "PEREZ, ZYREL MANIMTIM",
+        "REGINIO JR., ROLANDO AMPELOQUIO",
+        "RUEDA, MARCUS BELMONTE",
+        "RUEDA, NICOLE BELMONTE",
+        "TIAMSIM, LOREN JADE JANDUSAY",
+        "TORRES, SER JOAQUIN EMMANUEL DELA VEGA",
+        "TUIZA, LANZ ROBLES",
+        "VELASCO, PRINCE CHOLO MASAGNAY"
+    ],
+    "CE": [
+        "ACLAN, SHAYNE PRANCESS E.",
+        "ACULA, MARY HONEY KAYE C.",
+        "AGUANTA, ALYSSA A.",
+        "ALBUFERA, RALF HOMER F.",
+        "ALCANTARA, LIAM GABRIEL L.",
+        "ALMEDA, MARIONNE C.",
+        "ALMONTE, YAEL GABRIEL S.",
+        "AMANTE, CYRA IYA A.",
+        "AMPER, DIVINE JOY B.",
+        "APOSTOL, APPLE-KRIS E.",
+        "AQUINO, JESSA MAE D.",
+        "ARABE, DOMINIC JAMES D.",
+        "ARBO, EVAN JEROME P.",
+        "ASUNCION, KRYSTAL CLAIRE L.",
+        "AVELLANO, FERLIONA C.",
+        "BALDERAMA, CHRISTIAN LLOYD B.",
+        "BALLESTEROS, KIRSTINE DOLL B.",
+        "BANSUELO, SHAINE LARA A.",
+        "BARREDO, JEWEL P.",
+        "BLAZA, ANGELICA LOURINE R.",
+        "BORLAGDATAN, REIGN ASHLEY P.",
+        "BREGANZA, JOHN LOYD R.",
+        "BUENAOBRA, MHICA S.",
+        "BUNDALIAN, KATHLEEN V.",
+        "CACAO, IRISH F.",
+        "CANCEJO, LORIE JANE M.",
+        "CAPIROSO, JEANIE AMBER L.",
+        "CASTRO, JEFFER KERBY M.",
+        "CLEMENTE, LERI ALEXANDRA S.",
+        "CONCEPCION, ROSELYN B.",
+        "CORDETA, LHORENCE BEIN M.",
+        "CORPUZ, JAZMIN MYKHAELA N.",
+        "COSICO, SOPHIA SANE A.",
+        "CRUZ, REI ANNE R.",
+        "CUBE, VAN JUZZEN SENA S.",
+        "CUÑADO, GIAN GABRIEL R.",
+        "DALISAY, APRIL CHARIZ C.",
+        "DALISAY, JOHN CHRIS P.",
+        "DE ALDAY, JOHN FLOYD A.",
+        "DE CASTRO, CHERRYANN L.",
+        "DE JUAN, SHAINE H.",
+        "DE LEON, KIM ALLAINE B.",
+        "DE MESA, LORAINNE P.",
+        "DEGULLADO, ANA MARIE G.",
+        "DELA CRUZ, CZARINAH BEATRICE C.",
+        "DELOS REYES, JOROSS MARK E.",
+        "DEMDAM, MARK GERALD F.",
+        "DICHOSO, JAMES RUSSEL R.",
+        "DOBLES II, ARTURO R.",
+        "DOSADO, CHLOE NICOLE A.",
+        "ENCANTO, GLYCEL R.",
+        "ENCARNACION, JASPER R.",
+        "ENRIQUEZ, MARK DAVE R.",
+        "ESCALANTE, FREDERICK ERVIN ALLEN T.",
+        "ESPINA, VENUS L.",
+        "EVANGELISTA, JOHN DOMINIC B.",
+        "FAMILARAN, PRINCE MHUEL B.",
+        "FERRER, DENNIS PIOLO D.",
+        "FIGUEROA, JUSTIN V.",
+        "FILIO, DANIEL S.",
+        "FLORES, MEL GIBSON L.",
+        "FLORORITA, DHONA MARIE A.",
+        "FRANCISCO, MARC JUSTINE B.",
+        "GALANG, SAMANTHA ADRIENNE Q.",
+        "GALINATO, LORENZO DUSTIN B.",
+        "GALIZA, TRISTAN HARVEY M.",
+        "GARBO, NIRAH S.",
+        "GARCIA, ELISHA RHEIN MULIMBAYAN M.",
+        "GARCIA, FRANCIS P.",
+        "GLINOGA, JHAY EL C.",
+        "GLIPO, CRISTINE NICOLE M.",
+        "GO, MIASHI I.",
+        "GRAPANI, LEEAN MAE T.",
+        "HAEL, MICHAEL CLARK C.",
+        "HAEL, EDMELYN D.",
+        "JAVIER, TRIXIE B.",
+        "JUANANE, LUIS JAN YVES M.",
+        "LABILLES, MARK DARYL R.",
+        "LAGDAMEN, MARK DADEN A.",
+        "LAGOC, EURIELLE CLAIRE L.",
+        "LAGRAZON, GIAN JUDD S.",
+        "LANSANGAN, JOHN DANIEL T.",
+        "LAPITAN, STEPHEN JACOB P.",
+        "LAVENTE, JUDY ANN A.",
+        "LAZARO, JARNIE CARL",
+        "LEYCANO, JAMEROS A.",
+        "LOGO, KERVIN JON N.",
+        "LOPEZ, JOHN CARLO C.",
+        "LOPEZ, JOHN HENRY B.",
+        "LUGTU, CHRYSTAL SAPPHIRE D.",
+        "LULU, AIRA LEI C.",
+        "LUMBRES, JEROME B.",
+        "LUTA, TRISHA SHANE",
+        "MACATOL, KESIA MAE A.",
+        "MAGTAN-AO, LOVELY B.",
+        "MANAIG, KURT ANDREI",
+        "MANAIG, ROBBIE D.",
+        "MARASIGAN, KURT AERRON P.",
+        "MARIANO, JOHN PAUL S.",
+        "MARTEJA, JAMES HECTOR G.",
+        "MAYOLA, JASPER D.",
+        "MELENDREZ, AIRISH JAMES M.",
+        "MENDOZA, ROLDAN L.",
+        "MERAÑA, LORAINE KISHA A.",
+        "MERILLES, JHARED A.",
+        "MERTO, HANNAH CES C.",
+        "MIRANDA, RANIEL Y.",
+        "MORADA, JHANELL SOPHIA B.",
+        "NACARIO, SOFIA MARIE A.",
+        "NAVARRO, GERALD JAMES O.",
+        "NAVARTE, JOSEPH ROEM E.",
+        "OCTAVIO, LEVIN JANE D.",
+        "ORTIZ, ELEUMAR NIMROD ITHEL T.",
+        "PALASIGUE, ANDREI C.",
+        "PANTERIA, SHANELLE B.",
+        "PASATIEMPO, TRICIA N.",
+        "PASTRANA, RENMAR C.",
+        "PEDIDA, KELLY ANNE E.",
+        "PEREZ, CEEJHAE D.",
+        "PEREZ, REAH MAE",
+        "PINEDA, RAISHELL B.",
+        "PISANTE, ERICA A.",
+        "RAFOL, REDGEM M.",
+        "RAMIREZ, JAYCEE D.",
+        "RAMOS, EARL JOSHUA E.",
+        "RAMOS, GLENN LEONARD C.",
+        "RAMOS, JANELLE F.",
+        "REBADEO, JHON RODNEY C.",
+        "REBLORA, JOHN NATHANIEL S.",
+        "REGONDOLA, MARIA ANDREA R.",
+        "RELENTE, JOSH KOJI L.",
+        "RELOJ, KARL ANDREI A.",
+        "REOGO, DRIZELLA JAYNE A.",
+        "RODRIGUEZ, RUSSEL P.",
+        "ROSARIO, LAURENZ JAMES I.",
+        "RUBILLA, VON LAUVIN J.",
+        "SALO, REIN SAM M.",
+        "SALVADOR, CARLOS IVAN N.",
+        "SANDOVAL, JOHN MICHAEL L.",
+        "SARDIDO, LARZ JENRIL R.",
+        "SECRETARIO, ELAIZA M.",
+        "SUBIA, CHIN AIKEE A.",
+        "TABION, RENDEL Q.",
+        "TAHAMIL, ARMANI M.",
+        "TAN, LORENCE DAVID R.",
+        "TEMPLONUEVO, NICOLE G.",
+        "TOLEDO, NICOLE P.",
+        "TORRECAMPO, CHRISTIAN ARON P.",
+        "TORRENDON, JASPHER M.",
+        "VILLA, DAISY ANN S.",
+        "VILLANUEVA, LUIS MIGUEL D.",
+        "YLAGAN, ADRIENNE G."
     ]
+},
+  "students": [
+  {
+    "id": "student-ee_001",
+    "code": "EE-001",
+    "studentCode": "EE-001",
+    "name": "ABAD, EARL JOHN A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
   },
+  {
+    "id": "student-ee_002",
+    "code": "EE-002",
+    "studentCode": "EE-002",
+    "name": "ABOCEJO, KING CHRISTOPHER",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_003",
+    "code": "EE-003",
+    "studentCode": "EE-003",
+    "name": "ABUDA, RUPERTH KNIE P.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_004",
+    "code": "EE-004",
+    "studentCode": "EE-004",
+    "name": "ALANIB, RYLE BASTY B.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_005",
+    "code": "EE-005",
+    "studentCode": "EE-005",
+    "name": "ALVAREZ, EVANN C.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_006",
+    "code": "EE-006",
+    "studentCode": "EE-006",
+    "name": "ANACION, RHAINE DOMINIC D.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_007",
+    "code": "EE-007",
+    "studentCode": "EE-007",
+    "name": "ANDAYA, JOHN MICHAEL L.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_008",
+    "code": "EE-008",
+    "studentCode": "EE-008",
+    "name": "ANDRADA, JOSE ANDREI P.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_009",
+    "code": "EE-009",
+    "studentCode": "EE-009",
+    "name": "ARANDIA, JOHN ANSELLE M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_010",
+    "code": "EE-010",
+    "studentCode": "EE-010",
+    "name": "ASCAÑO, RHICO S.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_011",
+    "code": "EE-011",
+    "studentCode": "EE-011",
+    "name": "ASTROLABIO, RHAY JUSTIN P.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_012",
+    "code": "EE-012",
+    "studentCode": "EE-012",
+    "name": "ATIENZA, PAUL JERICO H.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_013",
+    "code": "EE-013",
+    "studentCode": "EE-013",
+    "name": "BAHOY, DWIGHT IVAN V.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_014",
+    "code": "EE-014",
+    "studentCode": "EE-014",
+    "name": "BERMUDEZ, MARK LEO M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_015",
+    "code": "EE-015",
+    "studentCode": "EE-015",
+    "name": "BONCAJES, ROB MARTIN A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_016",
+    "code": "EE-016",
+    "studentCode": "EE-016",
+    "name": "CABARLES, TYRON Q.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_017",
+    "code": "EE-017",
+    "studentCode": "EE-017",
+    "name": "CAJUCOM, BRYAN JAMES M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_018",
+    "code": "EE-018",
+    "studentCode": "EE-018",
+    "name": "CALMA, WENDELL D.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_019",
+    "code": "EE-019",
+    "studentCode": "EE-019",
+    "name": "CANTARA, CHILVERT REIN C.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_020",
+    "code": "EE-020",
+    "studentCode": "EE-020",
+    "name": "CARMONA, LEE ROUAN C.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_021",
+    "code": "EE-021",
+    "studentCode": "EE-021",
+    "name": "CHAVEZ, JOHN DAVID B.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_022",
+    "code": "EE-022",
+    "studentCode": "EE-022",
+    "name": "COMMINS, FRANCHESKA MAE A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_023",
+    "code": "EE-023",
+    "studentCode": "EE-023",
+    "name": "CRISTOBAL, CHRISTOPHER Y.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_024",
+    "code": "EE-024",
+    "studentCode": "EE-024",
+    "name": "CUIZON, ALEXANDER D.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_025",
+    "code": "EE-025",
+    "studentCode": "EE-025",
+    "name": "DALISAY, RANIEL T.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_026",
+    "code": "EE-026",
+    "studentCode": "EE-026",
+    "name": "DAMAYO, CHRISTOPHER DANIELLE C.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_027",
+    "code": "EE-027",
+    "studentCode": "EE-027",
+    "name": "DAPADAP, JOSHUA NAHIL N.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_028",
+    "code": "EE-028",
+    "studentCode": "EE-028",
+    "name": "DATUS, RAIN R.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_029",
+    "code": "EE-029",
+    "studentCode": "EE-029",
+    "name": "DE LEON, RITCH GERMAINE M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_030",
+    "code": "EE-030",
+    "studentCode": "EE-030",
+    "name": "DELA CRUZ, JOHN JOSEPH R.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_031",
+    "code": "EE-031",
+    "studentCode": "EE-031",
+    "name": "DELOS REYES, JEROME V.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_032",
+    "code": "EE-032",
+    "studentCode": "EE-032",
+    "name": "DELOS REYES, MARK STEPHEN B.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_033",
+    "code": "EE-033",
+    "studentCode": "EE-033",
+    "name": "DULAY, GEIBRIEL RENE P.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_034",
+    "code": "EE-034",
+    "studentCode": "EE-034",
+    "name": "ENDRINAL, EMMANUEL H.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_035",
+    "code": "EE-035",
+    "studentCode": "EE-035",
+    "name": "EREJIAS, JOHN MARK M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_036",
+    "code": "EE-036",
+    "studentCode": "EE-036",
+    "name": "EUGENIO, JOHN MICHAEL A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_037",
+    "code": "EE-037",
+    "studentCode": "EE-037",
+    "name": "FAELMARIN, JHON AX'L F.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_038",
+    "code": "EE-038",
+    "studentCode": "EE-038",
+    "name": "FLORES, NORIEL A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_039",
+    "code": "EE-039",
+    "studentCode": "EE-039",
+    "name": "FLORES, RHONA LYN R.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_040",
+    "code": "EE-040",
+    "studentCode": "EE-040",
+    "name": "FLORIDO, DUSTINE ANGELO M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_041",
+    "code": "EE-041",
+    "studentCode": "EE-041",
+    "name": "GADAZA, JOSE GABRIEL B.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_042",
+    "code": "EE-042",
+    "studentCode": "EE-042",
+    "name": "GALLEGO, HARIS JHON S.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_043",
+    "code": "EE-043",
+    "studentCode": "EE-043",
+    "name": "GAYOSA, KHENA KATLEEN G.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_044",
+    "code": "EE-044",
+    "studentCode": "EE-044",
+    "name": "GERODIAS, BRENT GERSON A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_045",
+    "code": "EE-045",
+    "studentCode": "EE-045",
+    "name": "GOMEZ, MA. ALSHICA K.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_046",
+    "code": "EE-046",
+    "studentCode": "EE-046",
+    "name": "GONZALES, SEAN ALLEN M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_047",
+    "code": "EE-047",
+    "studentCode": "EE-047",
+    "name": "GUIRUELA, JAMES L.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_048",
+    "code": "EE-048",
+    "studentCode": "EE-048",
+    "name": "HASHIM, BRINLY HAMIM M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_049",
+    "code": "EE-049",
+    "studentCode": "EE-049",
+    "name": "HERNANDEZ, JAY CYRIL C.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_050",
+    "code": "EE-050",
+    "studentCode": "EE-050",
+    "name": "HERNANDEZ, SAM ANDREI V.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_051",
+    "code": "EE-051",
+    "studentCode": "EE-051",
+    "name": "IBARROLA, HANS KEN M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_052",
+    "code": "EE-052",
+    "studentCode": "EE-052",
+    "name": "JUANICO, NYNGEL S.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_053",
+    "code": "EE-053",
+    "studentCode": "EE-053",
+    "name": "LACORTE, CRIS JASON M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_054",
+    "code": "EE-054",
+    "studentCode": "EE-054",
+    "name": "LAYACAN, VHEA EDRICH M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_055",
+    "code": "EE-055",
+    "studentCode": "EE-055",
+    "name": "LEGASPI, ULYCES P.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_056",
+    "code": "EE-056",
+    "studentCode": "EE-056",
+    "name": "LOPEZ, CHARLES ROBERT L.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_057",
+    "code": "EE-057",
+    "studentCode": "EE-057",
+    "name": "LUMBRES, DUSTIN M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_058",
+    "code": "EE-058",
+    "studentCode": "EE-058",
+    "name": "MACALALAD, FRANS RYLCO C.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_059",
+    "code": "EE-059",
+    "studentCode": "EE-059",
+    "name": "MAGSOMBOL, JAMES RYAN J.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_060",
+    "code": "EE-060",
+    "studentCode": "EE-060",
+    "name": "MALABAG, JOHN MICHAEL B.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_061",
+    "code": "EE-061",
+    "studentCode": "EE-061",
+    "name": "MALANA, ROSSETTE NATHALIE A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_062",
+    "code": "EE-062",
+    "studentCode": "EE-062",
+    "name": "MALOLOY-ON, DEFFERSON JOHN T.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_063",
+    "code": "EE-063",
+    "studentCode": "EE-063",
+    "name": "MAÑOBRA, LORENZO A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_064",
+    "code": "EE-064",
+    "studentCode": "EE-064",
+    "name": "MAPUTE, CHRIS CORNELL F.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_065",
+    "code": "EE-065",
+    "studentCode": "EE-065",
+    "name": "MICA, CLARK DUSTIN COSME D.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_066",
+    "code": "EE-066",
+    "studentCode": "EE-066",
+    "name": "MILCA, JERALD O.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_067",
+    "code": "EE-067",
+    "studentCode": "EE-067",
+    "name": "MONDIA, JOHN VINCENT M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_068",
+    "code": "EE-068",
+    "studentCode": "EE-068",
+    "name": "MORAN, MARK NIÑO A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_069",
+    "code": "EE-069",
+    "studentCode": "EE-069",
+    "name": "MOSCA, JAMESTEVE SEAN G.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_070",
+    "code": "EE-070",
+    "studentCode": "EE-070",
+    "name": "NUNO, ROYD ALFONSO M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_071",
+    "code": "EE-071",
+    "studentCode": "EE-071",
+    "name": "OPULENCIA, AARON ALLEXIS S.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_072",
+    "code": "EE-072",
+    "studentCode": "EE-072",
+    "name": "ORTEGA, JAMES V.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_073",
+    "code": "EE-073",
+    "studentCode": "EE-073",
+    "name": "ORTIZ, PAULA EUNISE A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_074",
+    "code": "EE-074",
+    "studentCode": "EE-074",
+    "name": "PABALATE, RHED S.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_075",
+    "code": "EE-075",
+    "studentCode": "EE-075",
+    "name": "PAMPLONA, NELO DRIX T.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_076",
+    "code": "EE-076",
+    "studentCode": "EE-076",
+    "name": "PANARIGAN, KARLO P.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_077",
+    "code": "EE-077",
+    "studentCode": "EE-077",
+    "name": "PANER, ORLANDO GABRIEL C.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_078",
+    "code": "EE-078",
+    "studentCode": "EE-078",
+    "name": "PATARAY, EUNICE L.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_079",
+    "code": "EE-079",
+    "studentCode": "EE-079",
+    "name": "PECAYO, RHIANE MAE L.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_080",
+    "code": "EE-080",
+    "studentCode": "EE-080",
+    "name": "PEDRAJA, JOMARI D.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_081",
+    "code": "EE-081",
+    "studentCode": "EE-081",
+    "name": "PEREZ, JARED ELWOOD P.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_082",
+    "code": "EE-082",
+    "studentCode": "EE-082",
+    "name": "PIOQUINTO, ELREY D.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_083",
+    "code": "EE-083",
+    "studentCode": "EE-083",
+    "name": "PIZARRA, DOMAR A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_084",
+    "code": "EE-084",
+    "studentCode": "EE-084",
+    "name": "RAMILO, DRACIR JOSH G.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_085",
+    "code": "EE-085",
+    "studentCode": "EE-085",
+    "name": "SALIBA, DEROSS D.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_086",
+    "code": "EE-086",
+    "studentCode": "EE-086",
+    "name": "SANTOS, RAFAEL P.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_087",
+    "code": "EE-087",
+    "studentCode": "EE-087",
+    "name": "SOLATORIO, JOHN JETRO C.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_088",
+    "code": "EE-088",
+    "studentCode": "EE-088",
+    "name": "TABAMO, EJ GODWIN B.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_089",
+    "code": "EE-089",
+    "studentCode": "EE-089",
+    "name": "TORIAGA, KURT LOUISE M.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_090",
+    "code": "EE-090",
+    "studentCode": "EE-090",
+    "name": "URRIZA, BRYLLE KRISTEN A.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_091",
+    "code": "EE-091",
+    "studentCode": "EE-091",
+    "name": "VILLARE, RYE LEE E.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-ee_092",
+    "code": "EE-092",
+    "studentCode": "EE-092",
+    "name": "YABUT, CRISENCIO JR. P.",
+    "team": "ee",
+    "teamName": "ELECTRICAL ENGINEERING"
+  },
+  {
+    "id": "student-cpe_001",
+    "code": "CPE-001",
+    "studentCode": "CPE-001",
+    "name": "AMICAN, GABRIEL EMMANUEL B.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_002",
+    "code": "CPE-002",
+    "studentCode": "CPE-002",
+    "name": "ANDAYA, SEAN COLLIN S.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_003",
+    "code": "CPE-003",
+    "studentCode": "CPE-003",
+    "name": "ARQUILLO, MARK P.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_004",
+    "code": "CPE-004",
+    "studentCode": "CPE-004",
+    "name": "ARROCO, DAVID SZUIN R.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_005",
+    "code": "CPE-005",
+    "studentCode": "CPE-005",
+    "name": "BALBUENA, EDUARDO III J.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_006",
+    "code": "CPE-006",
+    "studentCode": "CPE-006",
+    "name": "BARBON, ANNE KIRSTEN V.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_007",
+    "code": "CPE-007",
+    "studentCode": "CPE-007",
+    "name": "BARCELLANO, MAR JOSEF V.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_008",
+    "code": "CPE-008",
+    "studentCode": "CPE-008",
+    "name": "BEGAS, JAYCEL NIEL C.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_009",
+    "code": "CPE-009",
+    "studentCode": "CPE-009",
+    "name": "BIESCAS, REYSSA JEAN D.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_010",
+    "code": "CPE-010",
+    "studentCode": "CPE-010",
+    "name": "BITANA, MARK EDRIAN J.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_011",
+    "code": "CPE-011",
+    "studentCode": "CPE-011",
+    "name": "BUSTAMANTE, DANIEL JOHN T.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_012",
+    "code": "CPE-012",
+    "studentCode": "CPE-012",
+    "name": "CAMACHO, BERNARD JOEY B.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_013",
+    "code": "CPE-013",
+    "studentCode": "CPE-013",
+    "name": "CAMBEL, KIRSTEN M.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_014",
+    "code": "CPE-014",
+    "studentCode": "CPE-014",
+    "name": "CANTALEJO, KAIDE M.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_015",
+    "code": "CPE-015",
+    "studentCode": "CPE-015",
+    "name": "CASTILLO, CHINI MARIELLI",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_016",
+    "code": "CPE-016",
+    "studentCode": "CPE-016",
+    "name": "CENA, LEO M.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_017",
+    "code": "CPE-017",
+    "studentCode": "CPE-017",
+    "name": "CESAR, KLYDE GABRIEL A.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_018",
+    "code": "CPE-018",
+    "studentCode": "CPE-018",
+    "name": "CLARO, SHAWN ROMINICK T.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_019",
+    "code": "CPE-019",
+    "studentCode": "CPE-019",
+    "name": "CONEJARES, RODCORT ELVEN V.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_020",
+    "code": "CPE-020",
+    "studentCode": "CPE-020",
+    "name": "DE JESUS, KENNETH G.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_021",
+    "code": "CPE-021",
+    "studentCode": "CPE-021",
+    "name": "DOLLETON, DWAYNE KENSHIN R.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_022",
+    "code": "CPE-022",
+    "studentCode": "CPE-022",
+    "name": "DOMINGO, JOSE URBANO B.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_023",
+    "code": "CPE-023",
+    "studentCode": "CPE-023",
+    "name": "DULLAS, CHARLES EZEKIEL F.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_024",
+    "code": "CPE-024",
+    "studentCode": "CPE-024",
+    "name": "DY, LEIGH ICEN G.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_025",
+    "code": "CPE-025",
+    "studentCode": "CPE-025",
+    "name": "ESCULTURA, PRINCE ERROLL M.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_026",
+    "code": "CPE-026",
+    "studentCode": "CPE-026",
+    "name": "ESTEBAN, JEANE ANDREI C.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_027",
+    "code": "CPE-027",
+    "studentCode": "CPE-027",
+    "name": "GALOYO, IRIS L.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_028",
+    "code": "CPE-028",
+    "studentCode": "CPE-028",
+    "name": "GARCIA, JUSTIN ADRIENN P.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_029",
+    "code": "CPE-029",
+    "studentCode": "CPE-029",
+    "name": "KODAKA, KIAN KENTA D.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_030",
+    "code": "CPE-030",
+    "studentCode": "CPE-030",
+    "name": "LLANETA, JOHN VINCENT M.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_031",
+    "code": "CPE-031",
+    "studentCode": "CPE-031",
+    "name": "LLANETA, KENJIE-LIM A.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_032",
+    "code": "CPE-032",
+    "studentCode": "CPE-032",
+    "name": "MAALINDOG, ALAN PAUL C.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_033",
+    "code": "CPE-033",
+    "studentCode": "CPE-033",
+    "name": "MAGNO, DAN LLOYD L.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_034",
+    "code": "CPE-034",
+    "studentCode": "CPE-034",
+    "name": "MALABANAN, JUSTINE RALPH B.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_035",
+    "code": "CPE-035",
+    "studentCode": "CPE-035",
+    "name": "MANE, FRANCINE JADE G.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_036",
+    "code": "CPE-036",
+    "studentCode": "CPE-036",
+    "name": "MEDINA, ALLAEN MARK S.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_037",
+    "code": "CPE-037",
+    "studentCode": "CPE-037",
+    "name": "NAGPALA, EERSEL ANDREY V.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_038",
+    "code": "CPE-038",
+    "studentCode": "CPE-038",
+    "name": "OCASLA, NORMAN DAVID J.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_039",
+    "code": "CPE-039",
+    "studentCode": "CPE-039",
+    "name": "OLIVAR, CHRISTIAN JOSH D.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_040",
+    "code": "CPE-040",
+    "studentCode": "CPE-040",
+    "name": "OPULENCIA, ALLEXASHEENA DEINNE S.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_041",
+    "code": "CPE-041",
+    "studentCode": "CPE-041",
+    "name": "ORDANZA, JAMEZ IVAN V.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_042",
+    "code": "CPE-042",
+    "studentCode": "CPE-042",
+    "name": "PADUA, RHIANA ASHLEY G.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_043",
+    "code": "CPE-043",
+    "studentCode": "CPE-043",
+    "name": "PALISOC, MARK ELEAZAR M.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_044",
+    "code": "CPE-044",
+    "studentCode": "CPE-044",
+    "name": "PALOMO, CHARLEMAGNE B.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_045",
+    "code": "CPE-045",
+    "studentCode": "CPE-045",
+    "name": "PEDRIGAL, MARGARETE JANE PAULEY D.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_046",
+    "code": "CPE-046",
+    "studentCode": "CPE-046",
+    "name": "PETATE, KARL JANSEN S.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_047",
+    "code": "CPE-047",
+    "studentCode": "CPE-047",
+    "name": "PETATE, KIERVY R.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_048",
+    "code": "CPE-048",
+    "studentCode": "CPE-048",
+    "name": "RAFA, RAFAEL ALEX A.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_049",
+    "code": "CPE-049",
+    "studentCode": "CPE-049",
+    "name": "REGASPI, MARY MARGARETTE D.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_050",
+    "code": "CPE-050",
+    "studentCode": "CPE-050",
+    "name": "RUANTO, RANIELLE JEDD R.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_051",
+    "code": "CPE-051",
+    "studentCode": "CPE-051",
+    "name": "SANTIAGO, ULRICA LORAINE D.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_052",
+    "code": "CPE-052",
+    "studentCode": "CPE-052",
+    "name": "SASPA, ASHLEY KHATE R.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_053",
+    "code": "CPE-053",
+    "studentCode": "CPE-053",
+    "name": "SERRANA, JESSIE B.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_054",
+    "code": "CPE-054",
+    "studentCode": "CPE-054",
+    "name": "TAN, SIMON M.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_055",
+    "code": "CPE-055",
+    "studentCode": "CPE-055",
+    "name": "TOLENTINO, BENJAMIN M.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_056",
+    "code": "CPE-056",
+    "studentCode": "CPE-056",
+    "name": "TORALES, REUEL ANNE A.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_057",
+    "code": "CPE-057",
+    "studentCode": "CPE-057",
+    "name": "TORRES, JOSHUA ALLEN D.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_058",
+    "code": "CPE-058",
+    "studentCode": "CPE-058",
+    "name": "VIVAS, BENEDICT MIGUEL C.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_059",
+    "code": "CPE-059",
+    "studentCode": "CPE-059",
+    "name": "YANSON, RANDEL C.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-cpe_060",
+    "code": "CPE-060",
+    "studentCode": "CPE-060",
+    "name": "ZARSUELO, JOHN GAVERIEL D.",
+    "team": "cpe",
+    "teamName": "COMPUTER ENGINEERING"
+  },
+  {
+    "id": "student-ece_001",
+    "code": "ECE-001",
+    "studentCode": "ECE-001",
+    "name": "MARQUEZ, GISELLE A.",
+    "team": "ece",
+    "teamName": "ELECTRONICS ENGINEERING"
+  },
+  {
+    "id": "student-ece_002",
+    "code": "ECE-002",
+    "studentCode": "ECE-002",
+    "name": "GUANIESO, ANGELLIC RENANELYN O.",
+    "team": "ece",
+    "teamName": "ELECTRONICS ENGINEERING"
+  },
+  {
+    "id": "student-ece_003",
+    "code": "ECE-003",
+    "studentCode": "ECE-003",
+    "name": "CAMAT, RENUARD A.",
+    "team": "ece",
+    "teamName": "ELECTRONICS ENGINEERING"
+  },
+  {
+    "id": "student-ece_004",
+    "code": "ECE-004",
+    "studentCode": "ECE-004",
+    "name": "ALKHATIB, SAMER B.",
+    "team": "ece",
+    "teamName": "ELECTRONICS ENGINEERING"
+  },
+  {
+    "id": "student-ece_005",
+    "code": "ECE-005",
+    "studentCode": "ECE-005",
+    "name": "OPULENCIA, MARIA GEE-ANNE P.",
+    "team": "ece",
+    "teamName": "ELECTRONICS ENGINEERING"
+  },
+  {
+    "id": "student-ece_006",
+    "code": "ECE-006",
+    "studentCode": "ECE-006",
+    "name": "GAMITIN, JOMAR GABRIEL B.",
+    "team": "ece",
+    "teamName": "ELECTRONICS ENGINEERING"
+  },
+  {
+    "id": "student-ece_007",
+    "code": "ECE-007",
+    "studentCode": "ECE-007",
+    "name": "PAGUINTO, OLIEMAR LEINER P.",
+    "team": "ece",
+    "teamName": "ELECTRONICS ENGINEERING"
+  },
+  {
+    "id": "student-ece_008",
+    "code": "ECE-008",
+    "studentCode": "ECE-008",
+    "name": "MARASIGAN, JERICHO MIGUEL R.",
+    "team": "ece",
+    "teamName": "ELECTRONICS ENGINEERING"
+  },
+  {
+    "id": "student-ece_009",
+    "code": "ECE-009",
+    "studentCode": "ECE-009",
+    "name": "GUERRERO, OWEN DOMINIC V.",
+    "team": "ece",
+    "teamName": "ELECTRONICS ENGINEERING"
+  },
+  {
+    "id": "student-ece_010",
+    "code": "ECE-010",
+    "studentCode": "ECE-010",
+    "name": "MENOR, ANGELO C.",
+    "team": "ece",
+    "teamName": "ELECTRONICS ENGINEERING"
+  },
+  {
+    "id": "student-ie_001",
+    "code": "IE-001",
+    "studentCode": "IE-001",
+    "name": "ABAD, JUDITH MARIAN SILVA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_002",
+    "code": "IE-002",
+    "studentCode": "IE-002",
+    "name": "AGUILAR, RUSSEL ALLEN CASTILLO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_003",
+    "code": "IE-003",
+    "studentCode": "IE-003",
+    "name": "BALLEZA, BRUNZON ANSANO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_004",
+    "code": "IE-004",
+    "studentCode": "IE-004",
+    "name": "BAUTISTA, MA. CHARICE JAYONA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_005",
+    "code": "IE-005",
+    "studentCode": "IE-005",
+    "name": "CANATUAN, YSABELA MERCADO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_006",
+    "code": "IE-006",
+    "studentCode": "IE-006",
+    "name": "CICERON, HANS GABRIEL CONJARES",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_007",
+    "code": "IE-007",
+    "studentCode": "IE-007",
+    "name": "CONSIGNADO, KASSANDRA SARMIENTO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_008",
+    "code": "IE-008",
+    "studentCode": "IE-008",
+    "name": "DE LEON, YANZ MARLOU BAYBAY",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_009",
+    "code": "IE-009",
+    "studentCode": "IE-009",
+    "name": "ELISAN, JOSHUA BRYCE OLINARES",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_010",
+    "code": "IE-010",
+    "studentCode": "IE-010",
+    "name": "ESTRADA, JERILOU MAE NAZARETH",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_011",
+    "code": "IE-011",
+    "studentCode": "IE-011",
+    "name": "FRANCISCO, ANDRES LUIS MADEJA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_012",
+    "code": "IE-012",
+    "studentCode": "IE-012",
+    "name": "HALILI, MARK CLARENCE ALDABE",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_013",
+    "code": "IE-013",
+    "studentCode": "IE-013",
+    "name": "IYOG, HANNAH MEKIE SHANE JUNGAY",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_014",
+    "code": "IE-014",
+    "studentCode": "IE-014",
+    "name": "KODAKA, KYLE KENYA DELUANA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_015",
+    "code": "IE-015",
+    "studentCode": "IE-015",
+    "name": "LARINO, JOANA SOPHIA BEATRICE REYEG",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_016",
+    "code": "IE-016",
+    "studentCode": "IE-016",
+    "name": "LECHUGA, CASSANDRA SHANEYA MANINGAS",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_017",
+    "code": "IE-017",
+    "studentCode": "IE-017",
+    "name": "LEGASPI, TRAVIS MATHEW PARO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_018",
+    "code": "IE-018",
+    "studentCode": "IE-018",
+    "name": "MALLORCA, ANTON JOSEPH NARVAEZ",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_019",
+    "code": "IE-019",
+    "studentCode": "IE-019",
+    "name": "NIEM, JARED CIRENE GOLE",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_020",
+    "code": "IE-020",
+    "studentCode": "IE-020",
+    "name": "OCAMPO, RENZO HADI",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_021",
+    "code": "IE-021",
+    "studentCode": "IE-021",
+    "name": "PADIT, ANDREI ANG",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_022",
+    "code": "IE-022",
+    "studentCode": "IE-022",
+    "name": "PALIZA, PATRICK ANJELLO SOLINAP",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_023",
+    "code": "IE-023",
+    "studentCode": "IE-023",
+    "name": "RAÑOLA, PRINCESS ARIANI ROXAS",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_024",
+    "code": "IE-024",
+    "studentCode": "IE-024",
+    "name": "ROSALES, LOUISE ALLEN BALBIN",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_025",
+    "code": "IE-025",
+    "studentCode": "IE-025",
+    "name": "SOJOR, ALBERT MARCELO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_026",
+    "code": "IE-026",
+    "studentCode": "IE-026",
+    "name": "VALIÑA, ANGELA CLAIRE PERILLO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_027",
+    "code": "IE-027",
+    "studentCode": "IE-027",
+    "name": "BANTOC, VINCE LYNDON ABENDAN",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_028",
+    "code": "IE-028",
+    "studentCode": "IE-028",
+    "name": "BESAS, CHEN ZHEN LUMACANG",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_029",
+    "code": "IE-029",
+    "studentCode": "IE-029",
+    "name": "DOROJA, PRINCESS FHAYE COLLINE TAMONDONG",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_030",
+    "code": "IE-030",
+    "studentCode": "IE-030",
+    "name": "FRANCISCO, DERRICK GABRIEL ESCONDO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_031",
+    "code": "IE-031",
+    "studentCode": "IE-031",
+    "name": "GALINDEZ, JOHN PAUL JAVIER",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_032",
+    "code": "IE-032",
+    "studentCode": "IE-032",
+    "name": "GARDAYA, PRINCESS JANEL DE OCAMPO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_033",
+    "code": "IE-033",
+    "studentCode": "IE-033",
+    "name": "GUELAS, MARK KRISTIAN ROMEO DUSONG",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_034",
+    "code": "IE-034",
+    "studentCode": "IE-034",
+    "name": "IMSON, CHRISTIAN SIMON OLIVEROS",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_035",
+    "code": "IE-035",
+    "studentCode": "IE-035",
+    "name": "JAYME, PRINCESS MAE MANAIG",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_036",
+    "code": "IE-036",
+    "studentCode": "IE-036",
+    "name": "MALABANAN, ALJON RAMOS",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_037",
+    "code": "IE-037",
+    "studentCode": "IE-037",
+    "name": "MALATE, LUJILL DYLAN SEÑORISES",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_038",
+    "code": "IE-038",
+    "studentCode": "IE-038",
+    "name": "MANNAN, ABDULHAFIDZ MAUJOD",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_039",
+    "code": "IE-039",
+    "studentCode": "IE-039",
+    "name": "MILANES, SHANE SALIBIO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_040",
+    "code": "IE-040",
+    "studentCode": "IE-040",
+    "name": "NAVARRO, NEON GENESIS DE CASTRO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_041",
+    "code": "IE-041",
+    "studentCode": "IE-041",
+    "name": "NOBLEFRANCA, VARY ALEM CANDELARIA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_042",
+    "code": "IE-042",
+    "studentCode": "IE-042",
+    "name": "OQUERIA, CAMILLE ANNE CANLOBO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_043",
+    "code": "IE-043",
+    "studentCode": "IE-043",
+    "name": "ORELLANES, JOHN MARK BATASINGEN",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_044",
+    "code": "IE-044",
+    "studentCode": "IE-044",
+    "name": "PACALDO, JHAYSAMEL ALALIM",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_045",
+    "code": "IE-045",
+    "studentCode": "IE-045",
+    "name": "PINEDA, KIENNA DENISE ORUGA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_046",
+    "code": "IE-046",
+    "studentCode": "IE-046",
+    "name": "RAMILO, JONAIRA MARI LUCIDO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_047",
+    "code": "IE-047",
+    "studentCode": "IE-047",
+    "name": "RIVERA, RALPH HENRY CAAGBAY",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_048",
+    "code": "IE-048",
+    "studentCode": "IE-048",
+    "name": "ROBLES, MARK ANDREI BANIGO-OS",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_049",
+    "code": "IE-049",
+    "studentCode": "IE-049",
+    "name": "SUAREZ, KEN DELA CRUZ",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_050",
+    "code": "IE-050",
+    "studentCode": "IE-050",
+    "name": "SUATING, DARVIE ANGELO DELA PEÑA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_051",
+    "code": "IE-051",
+    "studentCode": "IE-051",
+    "name": "ATENCIO, IRISH MAE ADRIATICO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_052",
+    "code": "IE-052",
+    "studentCode": "IE-052",
+    "name": "BAUTISTA, MAURHIZ LIRA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_053",
+    "code": "IE-053",
+    "studentCode": "IE-053",
+    "name": "BONIFACIO, MARC ANTHONY PEREZ",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_054",
+    "code": "IE-054",
+    "studentCode": "IE-054",
+    "name": "BUSTAMANTE, ZYRUS DIMAANO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_055",
+    "code": "IE-055",
+    "studentCode": "IE-055",
+    "name": "CASAJE, PRINCESS JANE DEQUIÑA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_056",
+    "code": "IE-056",
+    "studentCode": "IE-056",
+    "name": "DALIS, LESTER MARU CABRERA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_057",
+    "code": "IE-057",
+    "studentCode": "IE-057",
+    "name": "DE LA CRUZ, CHRISTIAN EARL MANANGAN",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_058",
+    "code": "IE-058",
+    "studentCode": "IE-058",
+    "name": "DELA TORRE, ANGELICA FAYE TUBILLO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_059",
+    "code": "IE-059",
+    "studentCode": "IE-059",
+    "name": "JACINTO, GILLIANE MARGARETTE CREDO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_060",
+    "code": "IE-060",
+    "studentCode": "IE-060",
+    "name": "LAOMOC, JANSENN LOU DIMALALUAN",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_061",
+    "code": "IE-061",
+    "studentCode": "IE-061",
+    "name": "LUBATON, ALTHEA FEI MOLINTAPANG",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_062",
+    "code": "IE-062",
+    "studentCode": "IE-062",
+    "name": "LUMBRES, JENELLE MANIMTIM",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_063",
+    "code": "IE-063",
+    "studentCode": "IE-063",
+    "name": "MALBAS, MARJORI DAUSON",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_064",
+    "code": "IE-064",
+    "studentCode": "IE-064",
+    "name": "MANUEL, CARL JUSTIN BUENA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_065",
+    "code": "IE-065",
+    "studentCode": "IE-065",
+    "name": "MARIANO, IVAN CLARK JORISH MENDOZA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_066",
+    "code": "IE-066",
+    "studentCode": "IE-066",
+    "name": "MARIANO, JUAN PAULO MIRASOL",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_067",
+    "code": "IE-067",
+    "studentCode": "IE-067",
+    "name": "MATANGUIHAN, KYLA AVILA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_068",
+    "code": "IE-068",
+    "studentCode": "IE-068",
+    "name": "MORADA, MICAIAH GWYNNETH GONZALES",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_069",
+    "code": "IE-069",
+    "studentCode": "IE-069",
+    "name": "QUEZON, JOHN ARIEL ROSALES",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_070",
+    "code": "IE-070",
+    "studentCode": "IE-070",
+    "name": "RAMIRO, JAYPEE DOMINGO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_071",
+    "code": "IE-071",
+    "studentCode": "IE-071",
+    "name": "RAPAL, KHRISTIAN LEGASPI",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_072",
+    "code": "IE-072",
+    "studentCode": "IE-072",
+    "name": "TAYONI, DUSTIN KYLE QUIJADA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_073",
+    "code": "IE-073",
+    "studentCode": "IE-073",
+    "name": "TEMEÑA, MARK ANGELO BOMBITA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_074",
+    "code": "IE-074",
+    "studentCode": "IE-074",
+    "name": "VIDAL, JULIAN VICTOR NARVAEZ",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_075",
+    "code": "IE-075",
+    "studentCode": "IE-075",
+    "name": "VILLANUEVA, RALPH CYRIL VIDAERA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_076",
+    "code": "IE-076",
+    "studentCode": "IE-076",
+    "name": "VIZCONDE, ARYZA GRACE ESCOBELLA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_077",
+    "code": "IE-077",
+    "studentCode": "IE-077",
+    "name": "ALCASABAS, JERICHO CRIS ARCEO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_078",
+    "code": "IE-078",
+    "studentCode": "IE-078",
+    "name": "AMPELOQUIO, JOHN ARMIL PILAR",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_079",
+    "code": "IE-079",
+    "studentCode": "IE-079",
+    "name": "ANCAYAN, ALLUJ PHILIP BELEN",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_080",
+    "code": "IE-080",
+    "studentCode": "IE-080",
+    "name": "BARRIENTOS, VINCENT BACANI",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_081",
+    "code": "IE-081",
+    "studentCode": "IE-081",
+    "name": "BARUNDIA, BRYLLE RAPHAEL MANDIGMA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_082",
+    "code": "IE-082",
+    "studentCode": "IE-082",
+    "name": "BAYOT, HELEINA JANE IGUAL",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_083",
+    "code": "IE-083",
+    "studentCode": "IE-083",
+    "name": "CABALES, RAYVER JUSTINE NOCHETE",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_084",
+    "code": "IE-084",
+    "studentCode": "IE-084",
+    "name": "CABUDSAN, CATHERINE JOY MUSNGI",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_085",
+    "code": "IE-085",
+    "studentCode": "IE-085",
+    "name": "DISIMULACION, KIM BRAYN RAMOS",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_086",
+    "code": "IE-086",
+    "studentCode": "IE-086",
+    "name": "IBO, JOHN LLOYD FARIÑAS",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_087",
+    "code": "IE-087",
+    "studentCode": "IE-087",
+    "name": "LABUTAP, DAVE ALDRIN LARA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_088",
+    "code": "IE-088",
+    "studentCode": "IE-088",
+    "name": "MARQUEZ, ARIES SALUD",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_089",
+    "code": "IE-089",
+    "studentCode": "IE-089",
+    "name": "NENENG, FRANKY PARAISO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_090",
+    "code": "IE-090",
+    "studentCode": "IE-090",
+    "name": "PEREZ, ZYREL MANIMTIM",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_091",
+    "code": "IE-091",
+    "studentCode": "IE-091",
+    "name": "REGINIO JR., ROLANDO AMPELOQUIO",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_092",
+    "code": "IE-092",
+    "studentCode": "IE-092",
+    "name": "RUEDA, MARCUS BELMONTE",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_093",
+    "code": "IE-093",
+    "studentCode": "IE-093",
+    "name": "RUEDA, NICOLE BELMONTE",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_094",
+    "code": "IE-094",
+    "studentCode": "IE-094",
+    "name": "TIAMSIM, LOREN JADE JANDUSAY",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_095",
+    "code": "IE-095",
+    "studentCode": "IE-095",
+    "name": "TORRES, SER JOAQUIN EMMANUEL DELA VEGA",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_096",
+    "code": "IE-096",
+    "studentCode": "IE-096",
+    "name": "TUIZA, LANZ ROBLES",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ie_097",
+    "code": "IE-097",
+    "studentCode": "IE-097",
+    "name": "VELASCO, PRINCE CHOLO MASAGNAY",
+    "team": "ie",
+    "teamName": "INDUSTRIAL ENGINEERING"
+  },
+  {
+    "id": "student-ce_001",
+    "code": "CE-001",
+    "studentCode": "CE-001",
+    "name": "ACLAN, SHAYNE PRANCESS E.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_002",
+    "code": "CE-002",
+    "studentCode": "CE-002",
+    "name": "ACULA, MARY HONEY KAYE C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_003",
+    "code": "CE-003",
+    "studentCode": "CE-003",
+    "name": "AGUANTA, ALYSSA A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_004",
+    "code": "CE-004",
+    "studentCode": "CE-004",
+    "name": "ALBUFERA, RALF HOMER F.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_005",
+    "code": "CE-005",
+    "studentCode": "CE-005",
+    "name": "ALCANTARA, LIAM GABRIEL L.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_006",
+    "code": "CE-006",
+    "studentCode": "CE-006",
+    "name": "ALMEDA, MARIONNE C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_007",
+    "code": "CE-007",
+    "studentCode": "CE-007",
+    "name": "ALMONTE, YAEL GABRIEL S.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_008",
+    "code": "CE-008",
+    "studentCode": "CE-008",
+    "name": "AMANTE, CYRA IYA A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_009",
+    "code": "CE-009",
+    "studentCode": "CE-009",
+    "name": "AMPER, DIVINE JOY B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_010",
+    "code": "CE-010",
+    "studentCode": "CE-010",
+    "name": "APOSTOL, APPLE-KRIS E.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_011",
+    "code": "CE-011",
+    "studentCode": "CE-011",
+    "name": "AQUINO, JESSA MAE D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_012",
+    "code": "CE-012",
+    "studentCode": "CE-012",
+    "name": "ARABE, DOMINIC JAMES D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_013",
+    "code": "CE-013",
+    "studentCode": "CE-013",
+    "name": "ARBO, EVAN JEROME P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_014",
+    "code": "CE-014",
+    "studentCode": "CE-014",
+    "name": "ASUNCION, KRYSTAL CLAIRE L.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_015",
+    "code": "CE-015",
+    "studentCode": "CE-015",
+    "name": "AVELLANO, FERLIONA C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_016",
+    "code": "CE-016",
+    "studentCode": "CE-016",
+    "name": "BALDERAMA, CHRISTIAN LLOYD B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_017",
+    "code": "CE-017",
+    "studentCode": "CE-017",
+    "name": "BALLESTEROS, KIRSTINE DOLL B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_018",
+    "code": "CE-018",
+    "studentCode": "CE-018",
+    "name": "BANSUELO, SHAINE LARA A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_019",
+    "code": "CE-019",
+    "studentCode": "CE-019",
+    "name": "BARREDO, JEWEL P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_020",
+    "code": "CE-020",
+    "studentCode": "CE-020",
+    "name": "BLAZA, ANGELICA LOURINE R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_021",
+    "code": "CE-021",
+    "studentCode": "CE-021",
+    "name": "BORLAGDATAN, REIGN ASHLEY P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_022",
+    "code": "CE-022",
+    "studentCode": "CE-022",
+    "name": "BREGANZA, JOHN LOYD R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_023",
+    "code": "CE-023",
+    "studentCode": "CE-023",
+    "name": "BUENAOBRA, MHICA S.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_024",
+    "code": "CE-024",
+    "studentCode": "CE-024",
+    "name": "BUNDALIAN, KATHLEEN V.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_025",
+    "code": "CE-025",
+    "studentCode": "CE-025",
+    "name": "CACAO, IRISH F.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_026",
+    "code": "CE-026",
+    "studentCode": "CE-026",
+    "name": "CANCEJO, LORIE JANE M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_027",
+    "code": "CE-027",
+    "studentCode": "CE-027",
+    "name": "CAPIROSO, JEANIE AMBER L.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_028",
+    "code": "CE-028",
+    "studentCode": "CE-028",
+    "name": "CASTRO, JEFFER KERBY M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_029",
+    "code": "CE-029",
+    "studentCode": "CE-029",
+    "name": "CLEMENTE, LERI ALEXANDRA S.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_030",
+    "code": "CE-030",
+    "studentCode": "CE-030",
+    "name": "CONCEPCION, ROSELYN B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_031",
+    "code": "CE-031",
+    "studentCode": "CE-031",
+    "name": "CORDETA, LHORENCE BEIN M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_032",
+    "code": "CE-032",
+    "studentCode": "CE-032",
+    "name": "CORPUZ, JAZMIN MYKHAELA N.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_033",
+    "code": "CE-033",
+    "studentCode": "CE-033",
+    "name": "COSICO, SOPHIA SANE A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_034",
+    "code": "CE-034",
+    "studentCode": "CE-034",
+    "name": "CRUZ, REI ANNE R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_035",
+    "code": "CE-035",
+    "studentCode": "CE-035",
+    "name": "CUBE, VAN JUZZEN SENA S.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_036",
+    "code": "CE-036",
+    "studentCode": "CE-036",
+    "name": "CUÑADO, GIAN GABRIEL R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_037",
+    "code": "CE-037",
+    "studentCode": "CE-037",
+    "name": "DALISAY, APRIL CHARIZ C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_038",
+    "code": "CE-038",
+    "studentCode": "CE-038",
+    "name": "DALISAY, JOHN CHRIS P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_039",
+    "code": "CE-039",
+    "studentCode": "CE-039",
+    "name": "DE ALDAY, JOHN FLOYD A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_040",
+    "code": "CE-040",
+    "studentCode": "CE-040",
+    "name": "DE CASTRO, CHERRYANN L.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_041",
+    "code": "CE-041",
+    "studentCode": "CE-041",
+    "name": "DE JUAN, SHAINE H.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_042",
+    "code": "CE-042",
+    "studentCode": "CE-042",
+    "name": "DE LEON, KIM ALLAINE B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_043",
+    "code": "CE-043",
+    "studentCode": "CE-043",
+    "name": "DE MESA, LORAINNE P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_044",
+    "code": "CE-044",
+    "studentCode": "CE-044",
+    "name": "DEGULLADO, ANA MARIE G.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_045",
+    "code": "CE-045",
+    "studentCode": "CE-045",
+    "name": "DELA CRUZ, CZARINAH BEATRICE C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_046",
+    "code": "CE-046",
+    "studentCode": "CE-046",
+    "name": "DELOS REYES, JOROSS MARK E.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_047",
+    "code": "CE-047",
+    "studentCode": "CE-047",
+    "name": "DEMDAM, MARK GERALD F.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_048",
+    "code": "CE-048",
+    "studentCode": "CE-048",
+    "name": "DICHOSO, JAMES RUSSEL R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_049",
+    "code": "CE-049",
+    "studentCode": "CE-049",
+    "name": "DOBLES II, ARTURO R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_050",
+    "code": "CE-050",
+    "studentCode": "CE-050",
+    "name": "DOSADO, CHLOE NICOLE A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_051",
+    "code": "CE-051",
+    "studentCode": "CE-051",
+    "name": "ENCANTO, GLYCEL R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_052",
+    "code": "CE-052",
+    "studentCode": "CE-052",
+    "name": "ENCARNACION, JASPER R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_053",
+    "code": "CE-053",
+    "studentCode": "CE-053",
+    "name": "ENRIQUEZ, MARK DAVE R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_054",
+    "code": "CE-054",
+    "studentCode": "CE-054",
+    "name": "ESCALANTE, FREDERICK ERVIN ALLEN T.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_055",
+    "code": "CE-055",
+    "studentCode": "CE-055",
+    "name": "ESPINA, VENUS L.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_056",
+    "code": "CE-056",
+    "studentCode": "CE-056",
+    "name": "EVANGELISTA, JOHN DOMINIC B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_057",
+    "code": "CE-057",
+    "studentCode": "CE-057",
+    "name": "FAMILARAN, PRINCE MHUEL B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_058",
+    "code": "CE-058",
+    "studentCode": "CE-058",
+    "name": "FERRER, DENNIS PIOLO D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_059",
+    "code": "CE-059",
+    "studentCode": "CE-059",
+    "name": "FIGUEROA, JUSTIN V.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_060",
+    "code": "CE-060",
+    "studentCode": "CE-060",
+    "name": "FILIO, DANIEL S.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_061",
+    "code": "CE-061",
+    "studentCode": "CE-061",
+    "name": "FLORES, MEL GIBSON L.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_062",
+    "code": "CE-062",
+    "studentCode": "CE-062",
+    "name": "FLORORITA, DHONA MARIE A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_063",
+    "code": "CE-063",
+    "studentCode": "CE-063",
+    "name": "FRANCISCO, MARC JUSTINE B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_064",
+    "code": "CE-064",
+    "studentCode": "CE-064",
+    "name": "GALANG, SAMANTHA ADRIENNE Q.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_065",
+    "code": "CE-065",
+    "studentCode": "CE-065",
+    "name": "GALINATO, LORENZO DUSTIN B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_066",
+    "code": "CE-066",
+    "studentCode": "CE-066",
+    "name": "GALIZA, TRISTAN HARVEY M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_067",
+    "code": "CE-067",
+    "studentCode": "CE-067",
+    "name": "GARBO, NIRAH S.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_068",
+    "code": "CE-068",
+    "studentCode": "CE-068",
+    "name": "GARCIA, ELISHA RHEIN MULIMBAYAN M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_069",
+    "code": "CE-069",
+    "studentCode": "CE-069",
+    "name": "GARCIA, FRANCIS P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_070",
+    "code": "CE-070",
+    "studentCode": "CE-070",
+    "name": "GLINOGA, JHAY EL C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_071",
+    "code": "CE-071",
+    "studentCode": "CE-071",
+    "name": "GLIPO, CRISTINE NICOLE M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_072",
+    "code": "CE-072",
+    "studentCode": "CE-072",
+    "name": "GO, MIASHI I.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_073",
+    "code": "CE-073",
+    "studentCode": "CE-073",
+    "name": "GRAPANI, LEEAN MAE T.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_074",
+    "code": "CE-074",
+    "studentCode": "CE-074",
+    "name": "HAEL, MICHAEL CLARK C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_075",
+    "code": "CE-075",
+    "studentCode": "CE-075",
+    "name": "HAEL, EDMELYN D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_076",
+    "code": "CE-076",
+    "studentCode": "CE-076",
+    "name": "JAVIER, TRIXIE B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_077",
+    "code": "CE-077",
+    "studentCode": "CE-077",
+    "name": "JUANANE, LUIS JAN YVES M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_078",
+    "code": "CE-078",
+    "studentCode": "CE-078",
+    "name": "LABILLES, MARK DARYL R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_079",
+    "code": "CE-079",
+    "studentCode": "CE-079",
+    "name": "LAGDAMEN, MARK DADEN A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_080",
+    "code": "CE-080",
+    "studentCode": "CE-080",
+    "name": "LAGOC, EURIELLE CLAIRE L.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_081",
+    "code": "CE-081",
+    "studentCode": "CE-081",
+    "name": "LAGRAZON, GIAN JUDD S.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_082",
+    "code": "CE-082",
+    "studentCode": "CE-082",
+    "name": "LANSANGAN, JOHN DANIEL T.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_083",
+    "code": "CE-083",
+    "studentCode": "CE-083",
+    "name": "LAPITAN, STEPHEN JACOB P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_084",
+    "code": "CE-084",
+    "studentCode": "CE-084",
+    "name": "LAVENTE, JUDY ANN A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_085",
+    "code": "CE-085",
+    "studentCode": "CE-085",
+    "name": "LAZARO, JARNIE CARL",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_086",
+    "code": "CE-086",
+    "studentCode": "CE-086",
+    "name": "LEYCANO, JAMEROS A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_087",
+    "code": "CE-087",
+    "studentCode": "CE-087",
+    "name": "LOGO, KERVIN JON N.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_088",
+    "code": "CE-088",
+    "studentCode": "CE-088",
+    "name": "LOPEZ, JOHN CARLO C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_089",
+    "code": "CE-089",
+    "studentCode": "CE-089",
+    "name": "LOPEZ, JOHN HENRY B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_090",
+    "code": "CE-090",
+    "studentCode": "CE-090",
+    "name": "LUGTU, CHRYSTAL SAPPHIRE D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_091",
+    "code": "CE-091",
+    "studentCode": "CE-091",
+    "name": "LULU, AIRA LEI C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_092",
+    "code": "CE-092",
+    "studentCode": "CE-092",
+    "name": "LUMBRES, JEROME B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_093",
+    "code": "CE-093",
+    "studentCode": "CE-093",
+    "name": "LUTA, TRISHA SHANE",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_094",
+    "code": "CE-094",
+    "studentCode": "CE-094",
+    "name": "MACATOL, KESIA MAE A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_095",
+    "code": "CE-095",
+    "studentCode": "CE-095",
+    "name": "MAGTAN-AO, LOVELY B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_096",
+    "code": "CE-096",
+    "studentCode": "CE-096",
+    "name": "MANAIG, KURT ANDREI",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_097",
+    "code": "CE-097",
+    "studentCode": "CE-097",
+    "name": "MANAIG, ROBBIE D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_098",
+    "code": "CE-098",
+    "studentCode": "CE-098",
+    "name": "MARASIGAN, KURT AERRON P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_099",
+    "code": "CE-099",
+    "studentCode": "CE-099",
+    "name": "MARIANO, JOHN PAUL S.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_100",
+    "code": "CE-100",
+    "studentCode": "CE-100",
+    "name": "MARTEJA, JAMES HECTOR G.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_101",
+    "code": "CE-101",
+    "studentCode": "CE-101",
+    "name": "MAYOLA, JASPER D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_102",
+    "code": "CE-102",
+    "studentCode": "CE-102",
+    "name": "MELENDREZ, AIRISH JAMES M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_103",
+    "code": "CE-103",
+    "studentCode": "CE-103",
+    "name": "MENDOZA, ROLDAN L.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_104",
+    "code": "CE-104",
+    "studentCode": "CE-104",
+    "name": "MERAÑA, LORAINE KISHA A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_105",
+    "code": "CE-105",
+    "studentCode": "CE-105",
+    "name": "MERILLES, JHARED A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_106",
+    "code": "CE-106",
+    "studentCode": "CE-106",
+    "name": "MERTO, HANNAH CES C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_107",
+    "code": "CE-107",
+    "studentCode": "CE-107",
+    "name": "MIRANDA, RANIEL Y.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_108",
+    "code": "CE-108",
+    "studentCode": "CE-108",
+    "name": "MORADA, JHANELL SOPHIA B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_109",
+    "code": "CE-109",
+    "studentCode": "CE-109",
+    "name": "NACARIO, SOFIA MARIE A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_110",
+    "code": "CE-110",
+    "studentCode": "CE-110",
+    "name": "NAVARRO, GERALD JAMES O.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_111",
+    "code": "CE-111",
+    "studentCode": "CE-111",
+    "name": "NAVARTE, JOSEPH ROEM E.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_112",
+    "code": "CE-112",
+    "studentCode": "CE-112",
+    "name": "OCTAVIO, LEVIN JANE D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_113",
+    "code": "CE-113",
+    "studentCode": "CE-113",
+    "name": "ORTIZ, ELEUMAR NIMROD ITHEL T.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_114",
+    "code": "CE-114",
+    "studentCode": "CE-114",
+    "name": "PALASIGUE, ANDREI C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_115",
+    "code": "CE-115",
+    "studentCode": "CE-115",
+    "name": "PANTERIA, SHANELLE B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_116",
+    "code": "CE-116",
+    "studentCode": "CE-116",
+    "name": "PASATIEMPO, TRICIA N.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_117",
+    "code": "CE-117",
+    "studentCode": "CE-117",
+    "name": "PASTRANA, RENMAR C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_118",
+    "code": "CE-118",
+    "studentCode": "CE-118",
+    "name": "PEDIDA, KELLY ANNE E.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_119",
+    "code": "CE-119",
+    "studentCode": "CE-119",
+    "name": "PEREZ, CEEJHAE D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_120",
+    "code": "CE-120",
+    "studentCode": "CE-120",
+    "name": "PEREZ, REAH MAE",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_121",
+    "code": "CE-121",
+    "studentCode": "CE-121",
+    "name": "PINEDA, RAISHELL B.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_122",
+    "code": "CE-122",
+    "studentCode": "CE-122",
+    "name": "PISANTE, ERICA A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_123",
+    "code": "CE-123",
+    "studentCode": "CE-123",
+    "name": "RAFOL, REDGEM M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_124",
+    "code": "CE-124",
+    "studentCode": "CE-124",
+    "name": "RAMIREZ, JAYCEE D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_125",
+    "code": "CE-125",
+    "studentCode": "CE-125",
+    "name": "RAMOS, EARL JOSHUA E.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_126",
+    "code": "CE-126",
+    "studentCode": "CE-126",
+    "name": "RAMOS, GLENN LEONARD C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_127",
+    "code": "CE-127",
+    "studentCode": "CE-127",
+    "name": "RAMOS, JANELLE F.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_128",
+    "code": "CE-128",
+    "studentCode": "CE-128",
+    "name": "REBADEO, JHON RODNEY C.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_129",
+    "code": "CE-129",
+    "studentCode": "CE-129",
+    "name": "REBLORA, JOHN NATHANIEL S.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_130",
+    "code": "CE-130",
+    "studentCode": "CE-130",
+    "name": "REGONDOLA, MARIA ANDREA R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_131",
+    "code": "CE-131",
+    "studentCode": "CE-131",
+    "name": "RELENTE, JOSH KOJI L.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_132",
+    "code": "CE-132",
+    "studentCode": "CE-132",
+    "name": "RELOJ, KARL ANDREI A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_133",
+    "code": "CE-133",
+    "studentCode": "CE-133",
+    "name": "REOGO, DRIZELLA JAYNE A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_134",
+    "code": "CE-134",
+    "studentCode": "CE-134",
+    "name": "RODRIGUEZ, RUSSEL P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_135",
+    "code": "CE-135",
+    "studentCode": "CE-135",
+    "name": "ROSARIO, LAURENZ JAMES I.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_136",
+    "code": "CE-136",
+    "studentCode": "CE-136",
+    "name": "RUBILLA, VON LAUVIN J.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_137",
+    "code": "CE-137",
+    "studentCode": "CE-137",
+    "name": "SALO, REIN SAM M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_138",
+    "code": "CE-138",
+    "studentCode": "CE-138",
+    "name": "SALVADOR, CARLOS IVAN N.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_139",
+    "code": "CE-139",
+    "studentCode": "CE-139",
+    "name": "SANDOVAL, JOHN MICHAEL L.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_140",
+    "code": "CE-140",
+    "studentCode": "CE-140",
+    "name": "SARDIDO, LARZ JENRIL R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_141",
+    "code": "CE-141",
+    "studentCode": "CE-141",
+    "name": "SECRETARIO, ELAIZA M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_142",
+    "code": "CE-142",
+    "studentCode": "CE-142",
+    "name": "SUBIA, CHIN AIKEE A.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_143",
+    "code": "CE-143",
+    "studentCode": "CE-143",
+    "name": "TABION, RENDEL Q.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_144",
+    "code": "CE-144",
+    "studentCode": "CE-144",
+    "name": "TAHAMIL, ARMANI M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_145",
+    "code": "CE-145",
+    "studentCode": "CE-145",
+    "name": "TAN, LORENCE DAVID R.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_146",
+    "code": "CE-146",
+    "studentCode": "CE-146",
+    "name": "TEMPLONUEVO, NICOLE G.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_147",
+    "code": "CE-147",
+    "studentCode": "CE-147",
+    "name": "TOLEDO, NICOLE P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_148",
+    "code": "CE-148",
+    "studentCode": "CE-148",
+    "name": "TORRECAMPO, CHRISTIAN ARON P.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_149",
+    "code": "CE-149",
+    "studentCode": "CE-149",
+    "name": "TORRENDON, JASPHER M.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_150",
+    "code": "CE-150",
+    "studentCode": "CE-150",
+    "name": "VILLA, DAISY ANN S.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_151",
+    "code": "CE-151",
+    "studentCode": "CE-151",
+    "name": "VILLANUEVA, LUIS MIGUEL D.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  },
+  {
+    "id": "student-ce_152",
+    "code": "CE-152",
+    "studentCode": "CE-152",
+    "name": "YLAGAN, ADRIENNE G.",
+    "team": "ce",
+    "teamName": "CIVIL ENGINEERING"
+  }
+],
   "guidelines": {
     "basketball": {
       "title": "Basketball Guidelines & Rules",

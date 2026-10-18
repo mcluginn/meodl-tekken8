@@ -15,7 +15,7 @@
 (function(window) {
   'use strict';
 
-  const SCHEMA_VERSION = '2026.4';
+  const SCHEMA_VERSION = '2026.5';
   const STORAGE_KEY = 'ENGDAY_ATTENDANCE_STATE_V1';
   const CONFIG_STORAGE_KEY = 'ENGDAY_ATTENDANCE_CONFIG_V1';
   const DB_NAME = 'ENGDAY_ATTENDANCE_DB_V1';
@@ -859,10 +859,11 @@
       const sessions = sessionsList || this.games || ENGDAY_GAMES;
       const data = (typeof window !== 'undefined' && window.MEODL_DATA) ? window.MEODL_DATA : {};
       const teams = data.teams || [
-        { id: 'rankine', name: 'TEAM RANKINE' },
-        { id: 'otto', name: 'TEAM OTTO' },
-        { id: 'brayton', name: 'TEAM BRAYTON' },
-        { id: 'diesel', name: 'TEAM DIESEL' }
+        { id: 'ee', name: 'TEAM EE', shortCode: 'EE' },
+        { id: 'cpe', name: 'TEAM CPE', shortCode: 'CPE' },
+        { id: 'ece', name: 'TEAM ECE', shortCode: 'ECE' },
+        { id: 'ie', name: 'TEAM IE', shortCode: 'IE' },
+        { id: 'ce', name: 'TEAM CE', shortCode: 'CE' }
       ];
       const rosters = data.rosters || {};
 
@@ -870,15 +871,18 @@
       let studentIndex = 1;
 
       teams.forEach(team => {
-        const members = rosters[team.id.toUpperCase()] || [];
-        members.forEach(name => {
-          const code = 'MEODL-' + String(studentIndex).padStart(4, '0');
-          const id = 'student-' + String(studentIndex).padStart(4, '0');
+        const teamKey = (team.shortCode || team.id).toUpperCase();
+        const members = rosters[teamKey] || rosters[team.id.toUpperCase()] || [];
+        members.forEach((item, idx) => {
+          const isObj = typeof item === 'object' && item !== null;
+          const name = isObj ? item.name : item;
+          const code = (isObj && item.code) ? item.code : (teamKey + '-' + String(idx + 1).padStart(3, '0'));
+          const id = 'student-' + code.toLowerCase().replace(/[^a-z0-9]+/g, '_');
 
           students[id] = {
             id: id,
             name: name,
-            team: team.id,
+            team: team.id.toLowerCase(),
             teamName: team.name,
             studentCode: code,
             games: this.createEmptyGamesRecord(sessions)
@@ -902,13 +906,18 @@
           Array.isArray(this.state.auditLog) ? this.state.auditLog : []
         );
       } else {
-        // Force Config Migration (SCHEMA_VERSION = '2026.4') for cached old 7 basketball/volleyball games
+        // Force Config Migration (SCHEMA_VERSION = '2026.5') for cached old sessions or 175-student roster
         const defEvt = this.state.eventsCatalog['engday_2026'];
         const legacyGameIds = new Set(['vb_g1', 'vb_g3', 'vb_g6', 'vb_g8', 'bb_g1', 'bb_g4', 'bb_g6']);
         const hasLegacySessions = Array.isArray(defEvt.sessions) && defEvt.sessions.some(s => legacyGameIds.has(s.id));
+        const hasLegacyRoster = Object.keys(defEvt.students || {}).length < 400;
 
-        if (defEvt.schemaVersion !== SCHEMA_VERSION || hasLegacySessions) {
+        if (defEvt.schemaVersion !== SCHEMA_VERSION || hasLegacySessions || hasLegacyRoster) {
           defEvt.schemaVersion = SCHEMA_VERSION;
+          if (hasLegacyRoster) {
+            defEvt.students = this.buildDefaultStudentsMap(defEvt.sessions);
+            this.state.students = defEvt.students;
+          }
           if (!defEvt.title || defEvt.title === 'Engineering Day 2026') {
             defEvt.title = 'ENGINEERING DAYS 2026';
           }

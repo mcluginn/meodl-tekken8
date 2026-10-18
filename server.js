@@ -104,10 +104,11 @@ function buildDefaultStudentsRoster() {
   const dataPath = path.join(__dirname, 'assets', 'meodl_data.js');
   let rosters = {};
   let teams = [
-    { id: 'rankine', name: 'TEAM RANKINE' },
-    { id: 'otto', name: 'TEAM OTTO' },
-    { id: 'brayton', name: 'TEAM BRAYTON' },
-    { id: 'diesel', name: 'TEAM DIESEL' }
+    { id: 'ee', name: 'TEAM EE', shortCode: 'EE' },
+    { id: 'cpe', name: 'TEAM CPE', shortCode: 'CPE' },
+    { id: 'ece', name: 'TEAM ECE', shortCode: 'ECE' },
+    { id: 'ie', name: 'TEAM IE', shortCode: 'IE' },
+    { id: 'ce', name: 'TEAM CE', shortCode: 'CE' }
   ];
 
   try {
@@ -131,16 +132,19 @@ function buildDefaultStudentsRoster() {
   let studentIndex = 1;
 
   teams.forEach(team => {
-    const members = rosters[team.id.toUpperCase()] || [];
-    members.forEach(name => {
-      const code = 'MEODL-' + String(studentIndex).padStart(4, '0');
-      const id = 'student-' + String(studentIndex).padStart(4, '0');
+    const teamKey = (team.shortCode || team.id).toUpperCase();
+    const members = rosters[teamKey] || rosters[team.id.toUpperCase()] || [];
+    members.forEach((item, idx) => {
+      const isObj = typeof item === 'object' && item !== null;
+      const name = isObj ? item.name : item;
+      const code = (isObj && item.code) ? item.code : (teamKey + '-' + String(idx + 1).padStart(3, '0'));
+      const id = 'student-' + code.toLowerCase().replace(/[^a-z0-9]+/g, '_');
       const token = deterministicToken(studentIndex, team.id);
 
       students[id] = {
         id: id,
         name: name,
-        team: team.id,
+        team: team.id.toLowerCase(),
         teamName: team.name,
         studentCode: code,
         activeToken: token,
@@ -190,7 +194,7 @@ if (!attendanceState || !attendanceState.students || Object.keys(attendanceState
 // ENGINEERING DAYS 2026 — TRACK A (8 MAJOR GATE CHECKPOINTS)
 // UPHSD Calamba • College of Engineering • Oct 19–20, 2026
 // -------------------------------------------------------------------------
-const SCHEMA_VERSION = '2026.4';
+const SCHEMA_VERSION = '2026.5';
 const ENGDAY_GAMES_LIST = [
   'd1-reg',
   'd1-am-block',
