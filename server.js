@@ -1345,6 +1345,8 @@ export async function handleRequest(req, res) {
       stats: calculateEngDayStats(reqEventKey),
       eventsCount: activeEventsCount,
       totalEventsCount: engdayEvents.length,
+      lastHardResetTimestamp: (evtObj && evtObj.lastHardResetTimestamp) || engdayState.lastHardResetTimestamp || null,
+      hardResetSequence: (evtObj && evtObj.hardResetSequence) || engdayState.hardResetSequence || 0,
       lastResetTimestamp: (evtObj && evtObj.lastResetTimestamp) || engdayState.lastResetTimestamp || null,
       resetSequence: (evtObj && evtObj.resetSequence) || engdayState.resetSequence || 0,
       lastPurgeTimestamp: (evtObj && evtObj.lastPurgeTimestamp) || engdayState.lastPurgeTimestamp || null,
@@ -1372,6 +1374,22 @@ export async function handleRequest(req, res) {
         const sessionIds = Array.isArray(payload.event.sessions) && payload.event.sessions.length > 0
           ? payload.event.sessions.map(s => s.id)
           : getActiveSessionIdsForEvent(evtId);
+
+        if (payload.event.lastHardResetTimestamp) {
+          const hardResetTime = new Date(payload.event.lastHardResetTimestamp).getTime();
+          engdayEvents = engdayEvents.filter(e => {
+            if ((e.eventKey || 'engday_2026') !== evtId) return true;
+            return new Date(e.occurredAt || e.time || e.createdAt || 0).getTime() > hardResetTime;
+          });
+          engdayEventsMap.clear();
+          engdayEvents.forEach(ev => {
+            if (ev && ev.eventId) engdayEventsMap.set(ev.eventId, ev);
+          });
+          existingEvt.lastHardResetTimestamp = payload.event.lastHardResetTimestamp;
+          existingEvt.hardResetSequence = payload.event.hardResetSequence || (existingEvt.hardResetSequence || 0) + 1;
+          engdayState.lastHardResetTimestamp = payload.event.lastHardResetTimestamp;
+          engdayState.hardResetSequence = payload.event.hardResetSequence || (engdayState.hardResetSequence || 0) + 1;
+        }
 
         if (payload.event.lastPurgeTimestamp) {
           const purgeTime = new Date(payload.event.lastPurgeTimestamp).getTime();
@@ -1480,6 +1498,82 @@ export async function handleRequest(req, res) {
       const deviceId = payload.deviceId || 'UNKNOWN_DEVICE';
       const reqActiveEventId = payload.activeEventId || engdayState.activeEventId || 'engday_2026';
 
+      // 0. Support direct HARD RESET payload command pushed to /sync
+      if (payload.action === 'HARD_RESET' || payload.hardReset === true) {
+        const targetEventKey = reqActiveEventId || 'engday_2026';
+        const nowIso = payload.lastHardResetTimestamp || payload.resetTimestamp || new Date().toISOString();
+
+        const initialCount = engdayEvents.length;
+        engdayEvents = engdayEvents.filter(e => (e.eventKey || 'engday_2026') !== targetEventKey);
+        engdayEventsMap.clear();
+        engdayEvents.forEach(ev => {
+          if (ev && ev.eventId) engdayEventsMap.set(ev.eventId, ev);
+        });
+
+        engdayState.scanLogs = [];
+        engdayState.auditLog = [];
+        engdayState.attendance = {};
+
+        const sessionIds = getActiveSessionIdsForEvent(targetEventKey);
+        if (!engdayState.eventsCatalog) engdayState.eventsCatalog = {};
+        if (!engdayState.eventsCatalog[targetEventKey]) {
+          engdayState.eventsCatalog[targetEventKey] = {
+            id: targetEventKey,
+            title: targetEventKey === 'engday_2026' ? 'ENGINEERING DAYS 2026' : targetEventKey,
+            students: buildDefaultEngDayRoster(sessionIds),
+            sessions: DEFAULT_ENGDAY_SESSIONS,
+            groups: DEFAULT_ENGDAY_GROUPS,
+            updatedAt: nowIso
+          };
+        }
+        const evtObj = engdayState.eventsCatalog[targetEventKey];
+        if (!evtObj.students) evtObj.students = {};
+        evtObj.scanLogs = [];
+        evtObj.auditLog = [];
+        evtObj.attendance = {};
+        ensureFullMasterRoster(evtObj.students, sessionIds);
+        ensureFullMasterRoster(engdayState.students, ENGDAY_GAMES_LIST);
+
+        Object.keys(evtObj.students).forEach(stId => {
+          evtObj.students[stId] = rederiveEngDayStudentState(evtObj.students[stId], [], sessionIds);
+        });
+        if (targetEventKey === (engdayState.activeEventId || 'engday_2026')) {
+          Object.keys(engdayState.students).forEach(stId => {
+            engdayState.students[stId] = rederiveEngDayStudentState(engdayState.students[stId], [], ENGDAY_GAMES_LIST);
+          });
+        }
+
+        evtObj.lastHardResetTimestamp = nowIso;
+        evtObj.hardResetSequence = (evtObj.hardResetSequence || 0) + 1;
+        evtObj.lastResetTimestamp = nowIso;
+        evtObj.resetSequence = (evtObj.resetSequence || 0) + 1;
+        evtObj.updatedAt = nowIso;
+
+        engdayState.lastHardResetTimestamp = nowIso;
+        engdayState.hardResetSequence = (engdayState.hardResetSequence || 0) + 1;
+        engdayState.lastResetTimestamp = nowIso;
+        engdayState.resetSequence = (engdayState.resetSequence || 0) + 1;
+        engdayState.version = (engdayState.version || 1) + 20;
+        engdayState.lastUpdated = nowIso;
+
+        atomicWriteJson(ENGDAY_EVENTS_FILE, engdayEvents);
+        atomicWriteJson(ENGDAY_STATE_FILE, engdayState);
+        broadcastEngDayUpdate();
+
+        return sendJson(res, 200, {
+          ok: true,
+          action: 'HARD_RESET',
+          message: `Server attendance hard wiped to zero for ${targetEventKey}`,
+          serverTime: nowIso,
+          lastHardResetTimestamp: nowIso,
+          hardResetSequence: engdayState.hardResetSequence,
+          version: engdayState.version,
+          eventsCount: 0,
+          studentsCount: Object.keys(evtObj.students).length,
+          stats: calculateEngDayStats(targetEventKey)
+        });
+      }
+
       const accepted = [];
       const duplicate = [];
       const rejected = [];
@@ -1530,6 +1624,16 @@ export async function handleRequest(req, res) {
         if (!targetEvt.students) targetEvt.students = {};
         ensureFullMasterRoster(targetEvt.students, getActiveSessionIdsForEvent(eventKey));
         ensureFullMasterRoster(engdayState.students, ENGDAY_GAMES_LIST);
+
+        // Discard any incoming events that occurred prior to an intentional hard reset
+        if (targetEvt.lastHardResetTimestamp) {
+          const hardResetTime = new Date(targetEvt.lastHardResetTimestamp).getTime();
+          const evTime = new Date(ev.occurredAt).getTime();
+          if (evTime <= hardResetTime) {
+            duplicate.push(eventId);
+            continue;
+          }
+        }
 
         // Discard any incoming events that occurred prior to an intentional administrative reset
         if (targetEvt.lastResetTimestamp) {
@@ -1729,6 +1833,90 @@ export async function handleRequest(req, res) {
         resetSequence: engdayState.resetSequence,
         version: engdayState.version,
         eventsCount: 0,
+        stats: calculateEngDayStats(targetEventKey)
+      });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: err.message });
+    }
+  }
+
+  if (reqPath === '/api/engday/attendance/hard-reset' && req.method === 'POST') {
+    try {
+      const payload = await parseJsonBody(req);
+      const targetEventKey = payload.eventKey || engdayState.activeEventId || 'engday_2026';
+      const nowIso = payload.resetTimestamp || new Date().toISOString();
+
+      // Wipe all events for targetEventKey or all events if resetAll is true
+      const initialCount = engdayEvents.length;
+      engdayEvents = engdayEvents.filter(e => (e.eventKey || 'engday_2026') !== targetEventKey);
+      engdayEventsMap.clear();
+      engdayEvents.forEach(ev => {
+        if (ev && ev.eventId) engdayEventsMap.set(ev.eventId, ev);
+      });
+
+      // Clear all state-level logs, scanLogs, and attendance maps
+      engdayState.scanLogs = [];
+      engdayState.auditLog = [];
+      engdayState.attendance = {};
+
+      const sessionIds = getActiveSessionIdsForEvent(targetEventKey);
+      if (!engdayState.eventsCatalog) engdayState.eventsCatalog = {};
+      if (!engdayState.eventsCatalog[targetEventKey]) {
+        engdayState.eventsCatalog[targetEventKey] = {
+          id: targetEventKey,
+          title: targetEventKey === 'engday_2026' ? 'ENGINEERING DAYS 2026' : targetEventKey,
+          students: buildDefaultEngDayRoster(sessionIds),
+          sessions: DEFAULT_ENGDAY_SESSIONS,
+          groups: DEFAULT_ENGDAY_GROUPS,
+          updatedAt: nowIso
+        };
+      }
+      const evtObj = engdayState.eventsCatalog[targetEventKey];
+      if (!evtObj.students) evtObj.students = {};
+      evtObj.scanLogs = [];
+      evtObj.auditLog = [];
+      evtObj.attendance = {};
+
+      ensureFullMasterRoster(evtObj.students, sessionIds);
+      ensureFullMasterRoster(engdayState.students, ENGDAY_GAMES_LIST);
+
+      // Reset all student game records to clean OUTSIDE zero-state
+      Object.keys(evtObj.students).forEach(stId => {
+        evtObj.students[stId] = rederiveEngDayStudentState(evtObj.students[stId], [], sessionIds);
+      });
+
+      if (targetEventKey === (engdayState.activeEventId || 'engday_2026')) {
+        Object.keys(engdayState.students).forEach(stId => {
+          engdayState.students[stId] = rederiveEngDayStudentState(engdayState.students[stId], [], ENGDAY_GAMES_LIST);
+        });
+      }
+
+      evtObj.lastHardResetTimestamp = nowIso;
+      evtObj.hardResetSequence = (evtObj.hardResetSequence || 0) + 1;
+      evtObj.lastResetTimestamp = nowIso;
+      evtObj.resetSequence = (evtObj.resetSequence || 0) + 1;
+      evtObj.updatedAt = nowIso;
+
+      engdayState.lastHardResetTimestamp = nowIso;
+      engdayState.hardResetSequence = (engdayState.hardResetSequence || 0) + 1;
+      engdayState.lastResetTimestamp = nowIso;
+      engdayState.resetSequence = (engdayState.resetSequence || 0) + 1;
+      engdayState.version = (engdayState.version || 1) + 20;
+      engdayState.lastUpdated = nowIso;
+
+      atomicWriteJson(ENGDAY_EVENTS_FILE, engdayEvents);
+      atomicWriteJson(ENGDAY_STATE_FILE, engdayState);
+      broadcastEngDayUpdate();
+
+      return sendJson(res, 200, {
+        ok: true,
+        message: `Hard reset completed for ${targetEventKey}. Wiped ${initialCount - engdayEvents.length} events down to zero.`,
+        serverTime: nowIso,
+        lastHardResetTimestamp: nowIso,
+        hardResetSequence: engdayState.hardResetSequence,
+        version: engdayState.version,
+        eventsCount: 0,
+        studentsCount: Object.keys(evtObj.students).length,
         stats: calculateEngDayStats(targetEventKey)
       });
     } catch (err) {

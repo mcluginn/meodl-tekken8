@@ -2786,6 +2786,135 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       return this.resetAllAttendanceData(sessionIdFilter);
     }
 
+    async hardResetAttendanceData(options = {}) {
+      this.ensureEventsCatalogStructure();
+      const targetEventKey = this.activeEventId || 'engday_2026';
+      const evt = this.getActiveEvent();
+      const nowIso = new Date().toISOString();
+
+      // 1. Wipe in-memory and state logs, audit log, and attendance maps
+      this.state.auditLog = [];
+      this.state.scanLogs = [];
+      this.state.attendance = {};
+
+      if (evt) {
+        evt.auditLog = [];
+        evt.scanLogs = [];
+        evt.attendance = {};
+      }
+
+      // 2. Completely reset student records to zero-state (OUTSIDE, 0 visits, null checkin/out, empty history)
+      const targetStudents = this.state.students || {};
+      Object.values(targetStudents).forEach(s => {
+        if (!s) return;
+        s.games = this.createEmptyGamesRecord();
+        s.status = 'OUTSIDE';
+      });
+
+      if (this.state.eventsCatalog && this.state.eventsCatalog[targetEventKey]?.students) {
+        Object.values(this.state.eventsCatalog[targetEventKey].students).forEach(s => {
+          if (!s) return;
+          s.games = this.createEmptyGamesRecord();
+          s.status = 'OUTSIDE';
+        });
+      }
+
+      // 3. Guarantee full ~588-student roster remains 100% intact
+      this.ensureFullMasterRoster(this.state.students);
+      this.reconcileStudentGamesStructure();
+      this.reconcileGroupsFromStudents();
+
+      // 4. Wipe all IndexedDB stores (attendanceEvents, syncQueue, attendanceSnapshot)
+      await this.db.clearAll();
+
+      // 5. Clear localStorage keys
+      if (typeof localStorage !== 'undefined') {
+        try {
+          localStorage.removeItem('ENGDAY_EVENTS_FALLBACK_V1');
+          localStorage.removeItem('ENGDAY_QUEUE_FALLBACK_V1');
+          localStorage.removeItem('ENGDAY_SNAPSHOT_FALLBACK_V1');
+        } catch (e) {}
+      }
+
+      // 6. Update timestamps & sequences
+      this.state.lastHardResetTimestamp = nowIso;
+      this.state.hardResetSequence = (this.state.hardResetSequence || 0) + 1;
+      this.state.lastResetTimestamp = nowIso;
+      this.state.resetSequence = (this.state.resetSequence || 0) + 1;
+      this.state.version = (this.state.version || 1) + 20;
+      this.state.lastUpdated = nowIso;
+      this.lastSyncedServerVersion = this.state.version;
+
+      if (evt) {
+        evt.lastHardResetTimestamp = nowIso;
+        evt.hardResetSequence = this.state.hardResetSequence;
+        evt.lastResetTimestamp = nowIso;
+        evt.resetSequence = this.state.resetSequence;
+        evt.updatedAt = nowIso;
+      }
+
+      // 7. Save locally
+      this.save({ preserveVersion: true });
+      await this.updatePendingCount();
+
+      // 8. Forces a direct payload push to the backend server
+      if (typeof navigator === 'undefined' || navigator.onLine !== false) {
+        try {
+          const resetPayload = {
+            action: 'HARD_RESET',
+            confirmation: 'HARD_RESET_ENGDAY_ATTENDANCE',
+            pin: options.pin || '2026',
+            eventKey: targetEventKey,
+            resetTimestamp: nowIso,
+            hardResetSequence: this.state.hardResetSequence,
+            resetSequence: this.state.resetSequence,
+            students: this.state.students,
+            scanLogs: [],
+            attendance: {}
+          };
+
+          // 8a. Direct push to dedicated /hard-reset endpoint
+          const hardResetUrl = this.resolveApiUrl('/api/engday/attendance/hard-reset');
+          await fetch(hardResetUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(resetPayload)
+          }).catch(() => {});
+
+          // 8b. Push clean event config to /config
+          await this.syncConfigWithServer().catch(() => {});
+
+          // 8c. Push direct empty state / reset command to /sync
+          const syncUrl = this.resolveApiUrl('/api/engday/attendance/sync');
+          await fetch(syncUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              deviceId: this.deviceId,
+              activeEventId: targetEventKey,
+              action: 'HARD_RESET',
+              hardReset: true,
+              lastHardResetTimestamp: nowIso,
+              events: []
+            })
+          }).catch(() => {});
+
+          this.serverOnline = true;
+          this.lastSyncTime = formatManilaTime(new Date());
+        } catch (e) {
+          console.warn('[EngDay Hard Reset] Server sync failed (will retry):', e);
+        }
+      }
+
+      this.notify();
+      return {
+        success: true,
+        timestamp: nowIso,
+        hardResetSequence: this.state.hardResetSequence,
+        studentCount: Object.keys(this.state.students).length
+      };
+    }
+
     async purgeAttendanceBefore(cutoffTimestampOrString = null) {
       this.ensureEventsCatalogStructure();
       const targetEventKey = this.activeEventId || 'engday_2026';
@@ -4353,6 +4482,64 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       const incomingStudents = (serverState.eventsCatalog && serverState.eventsCatalog[this.activeEventId]?.students)
         || (this.activeEventId === 'engday_2026' ? serverState.students : null);
 
+      // Check if server performed an intentional administrative HARD RESET to zero
+      const serverHardResetTime = serverState.lastHardResetTimestamp ? new Date(serverState.lastHardResetTimestamp).getTime() : 0;
+      const localHardResetTime = this.state.lastHardResetTimestamp ? new Date(this.state.lastHardResetTimestamp).getTime() : 0;
+      const isNewServerHardReset = (serverHardResetTime > 0 && serverHardResetTime > localHardResetTime) ||
+        ((serverState.hardResetSequence || 0) > (this.state.hardResetSequence || 0));
+
+      if (isNewServerHardReset) {
+        console.info(`[EngDay Hard Reset] Server broadcasted HARD RESET from ${serverState.lastHardResetTimestamp}. Wiping local cache to 0...`);
+        await this.db.clearAll();
+        if (typeof localStorage !== 'undefined') {
+          try {
+            localStorage.removeItem('ENGDAY_EVENTS_FALLBACK_V1');
+            localStorage.removeItem('ENGDAY_QUEUE_FALLBACK_V1');
+            localStorage.removeItem('ENGDAY_SNAPSHOT_FALLBACK_V1');
+          } catch (e) {}
+        }
+        this.state.auditLog = [];
+        this.state.scanLogs = [];
+        this.state.attendance = {};
+
+        if (incomingStudents && typeof incomingStudents === 'object') {
+          const resetStudents = {};
+          Object.entries(incomingStudents).forEach(([sId, sObj]) => {
+            resetStudents[sId] = {
+              ...sObj,
+              games: this.createEmptyGamesRecord()
+            };
+          });
+          this.state.students = resetStudents;
+          if (this.state.eventsCatalog[this.activeEventId]) {
+            this.state.eventsCatalog[this.activeEventId].students = resetStudents;
+          }
+        } else {
+          Object.values(this.state.students || {}).forEach(s => {
+            if (s) s.games = this.createEmptyGamesRecord();
+          });
+        }
+
+        this.ensureFullMasterRoster(this.state.students);
+        this.reconcileStudentGamesStructure();
+        this.reconcileGroupsFromStudents();
+
+        this.state.lastHardResetTimestamp = serverState.lastHardResetTimestamp;
+        this.state.hardResetSequence = serverState.hardResetSequence || 1;
+        this.state.lastResetTimestamp = serverState.lastHardResetTimestamp;
+        this.state.resetSequence = serverState.hardResetSequence || 1;
+        this.state.version = Math.max(this.state.version || 1, serverVer);
+        this.lastSyncedServerVersion = this.state.version;
+        this.state.lastUpdated = serverState.lastUpdated || new Date().toISOString();
+        this.serverOnline = true;
+        this.lastSyncTime = formatManilaTime(new Date());
+
+        this.save({ preserveVersion: true });
+        await this.updatePendingCount();
+        this.notify();
+        return;
+      }
+
       // Check if server performed an intentional administrative attendance reset to zero
       const serverResetTime = serverState.lastResetTimestamp ? new Date(serverState.lastResetTimestamp).getTime() : 0;
       const localResetTime = this.state.lastResetTimestamp ? new Date(this.state.lastResetTimestamp).getTime() : 0;
@@ -4615,9 +4802,27 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         }
 
         const rawQueue = await this.db.getPendingQueue();
-        const { deduplicated: queue, duplicateIds } = this.deduplicatePendingQueue(rawQueue);
+        const { deduplicated: initialQueue, duplicateIds } = this.deduplicatePendingQueue(rawQueue);
         if (duplicateIds.length > 0) {
           await this.db.markEventsSynced(duplicateIds);
+        }
+
+        // Discard any local queue items that occurred before a hard reset
+        const hardResetCutoff = this.state.lastHardResetTimestamp ? new Date(this.state.lastHardResetTimestamp).getTime() : 0;
+        let queue = initialQueue;
+        if (hardResetCutoff > 0) {
+          const droppedIds = [];
+          queue = initialQueue.filter(ev => {
+            const evTime = new Date(ev.occurredAt || ev.time || 0).getTime();
+            if (evTime <= hardResetCutoff) {
+              droppedIds.push(ev.eventId);
+              return false;
+            }
+            return true;
+          });
+          if (droppedIds.length > 0) {
+            await this.db.markEventsSynced(droppedIds);
+          }
         }
 
         const syncUrl = this.resolveApiUrl('/api/engday/attendance/sync');

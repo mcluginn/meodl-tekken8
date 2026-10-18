@@ -637,6 +637,9 @@
             </div>
             <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
               <div class="flex flex-wrap items-center gap-2">
+                <button onclick="confirmHardResetAllAttendance()" class="px-3 py-2 rounded-xl bg-red-950/90 hover:bg-red-900 border border-red-500 text-red-200 font-bold text-[11px] flex items-center gap-1.5 transition-colors shadow-sm">
+                  ⚠️ HARD RESET: Wipe All Scans to 0
+                </button>
                 <button onclick="confirmResetActiveEventScans()" class="px-3 py-2 rounded-xl bg-red-950/70 hover:bg-red-900/80 border border-red-700/80 text-red-300 font-bold text-[11px] flex items-center gap-1.5 transition-colors">
                   ⚠️ Reset All Attendance Data (Zero Check-Ins)
                 </button>
@@ -1870,6 +1873,28 @@
 
       populateAdminModalData();
       renderAllDashboard();
+    }
+
+    async function confirmHardResetAllAttendance() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const evt = window.ENGDAY_ATTENDANCE.getActiveEvent();
+      const stCount = Object.keys(window.ENGDAY_ATTENDANCE.state.students || {}).length || 588;
+
+      const pin = prompt(`⚠️ HARD RESET: WIPE ALL SCANS TO 0\n\nThis will permanently wipe all scanLogs and attendance records down to 0 across IndexedDB, localStorage, and the backend cloud server.\n\nAll ${stCount} registered students across 6 departments and 8 Track A checkpoints will remain completely intact.\n\nEnter Staff PIN (2026) to execute HARD RESET:`);
+      if (pin === null) return;
+      const expectedPin = String(evt.staffPin || '2026').trim();
+      if (pin.trim() !== expectedPin && pin.trim() !== '2026') {
+        alert('❌ Incorrect Staff PIN. Hard reset cancelled.');
+        return;
+      }
+
+      const ok = confirm(`🚨 FINAL WARNING: HARD RESET ZERO-WIPE\n\nAre you ABSOLUTELY sure you want to completely wipe all scan logs and attendance records to zero for "${evt.title}"?\n\nThis will force all connected marshal phones and the cloud server to overwrite their cache with zero check-ins.\n\nClick OK to proceed with HARD RESET.`);
+      if (!ok) return;
+
+      const res = await window.ENGDAY_ATTENDANCE.hardResetAttendanceData({ pin: pin.trim() });
+      populateAdminModalData();
+      renderAllDashboard();
+      alert(`✅ HARD RESET COMPLETE!\n\nAll historical scan logs and attendance maps have been wiped down to 0.\n\nAll ${stCount} students and 8 sessions are preserved and ready for live check-ins.`);
     }
 
     async function confirmResetActiveEventScans() {
