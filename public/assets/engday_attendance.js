@@ -3041,12 +3041,101 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
 
     exportJSON() {
       this.syncActiveBranchToCatalog();
-      return JSON.stringify({
+
+      const activeEvt = this.getActiveEvent() || {};
+      const masterList = (typeof EDAYS_2026_MASTER_ROSTER !== 'undefined' ? EDAYS_2026_MASTER_ROSTER : []);
+      const masterCodes = new Set(masterList.map(s => String(s.code || s.id || '').toUpperCase()));
+
+      const customStudents = [];
+      const attendance = {};
+
+      Object.values(this.state.students || {}).forEach(s => {
+        const code = String(s.studentCode || s.code || s.id || '').toUpperCase();
+        if (!code) return;
+
+        // Collect custom/imported students not in master seed roster
+        if (masterCodes.size > 0 && !masterCodes.has(code)) {
+          customStudents.push({
+            id: s.id || code,
+            code: s.studentCode || s.code || code,
+            name: s.name,
+            team: s.team,
+            teamName: s.teamName
+          });
+        }
+
+        // Collect attendance ONLY for students who actually have check-in/visit/history data
+        if (s.games && typeof s.games === 'object') {
+          let hasActivity = false;
+          const gamesMap = {};
+          Object.entries(s.games).forEach(([gId, g]) => {
+            if (g && (g.visits > 0 || g.status === 'INSIDE' || g.checkInTime || (g.history && g.history.length > 0))) {
+              hasActivity = true;
+              gamesMap[gId] = {
+                status: g.status || 'OUTSIDE',
+                visits: g.visits || 0,
+                checkInTime: g.checkInTime || null,
+                checkOutTime: g.checkOutTime || null,
+                displayCheckIn: g.displayCheckIn || null,
+                displayCheckOut: g.displayCheckOut || null,
+                history: (g.history || []).map(h => ({
+                  eventId: h.eventId,
+                  action: h.action,
+                  timestamp: h.timestamp,
+                  performedBy: h.performedBy,
+                  court: h.court,
+                  reason: h.reason
+                }))
+              };
+            }
+          });
+          if (hasActivity) {
+            attendance[code] = gamesMap;
+          }
+        }
+      });
+
+      const scanLogs = (this.state.auditLog || []).map(l => ({
+        eventId: l.eventId || l.id,
+        code: l.studentCode || l.studentId,
+        gameId: l.gameId,
+        action: l.action || 'check_in',
+        time: l.timestamp || l.occurredAt,
+        by: l.performedBy || l.marshalId,
+        court: l.court,
+        notes: l.notes || l.reason,
+        name: l.studentName,
+        team: l.team
+      }));
+
+      const compactPayload = {
+        format: 'engday_compact_v2',
+        version: 2,
         exportedAt: new Date().toISOString(),
         deviceId: this.deviceId,
         activeEventId: this.activeEventId,
-        state: this.state
-      }, null, 2);
+        eventConfig: {
+          id: this.activeEventId,
+          title: activeEvt.title,
+          subtitle: activeEvt.subtitle,
+          venueName: activeEvt.venueName,
+          staffPin: activeEvt.staffPin,
+          sessions: (this.games || []).map(g => ({
+            id: g.id,
+            title: g.title,
+            time: g.time,
+            venue: g.venue,
+            icon: g.icon
+          })),
+          groups: activeEvt.groups || []
+        },
+        customStudents,
+        scanLogs,
+        attendance
+      };
+
+      // Minified output: no indentation or extra whitespace (~1.5KB to ~25KB)
+      return JSON.stringify(compactPayload);
     }
 
     downloadJSON(customFilename = null) {
@@ -3101,79 +3190,113 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           throw new Error('Invalid JSON data format');
         }
 
-        // Restore eventsCatalog if included in backup
-        if (parsed.state && parsed.state.eventsCatalog && typeof parsed.state.eventsCatalog === 'object') {
-          Object.entries(parsed.state.eventsCatalog).forEach(([evtId, evtObj]) => {
-            if (!this.state.eventsCatalog[evtId]) {
-              this.state.eventsCatalog[evtId] = evtObj;
-            } else {
-              // Merge sessions
-              if (Array.isArray(evtObj.sessions) && evtObj.sessions.length > 0) {
-                this.state.eventsCatalog[evtId].sessions = evtObj.sessions.map((s, i) => decorateSessionStyle(s, i));
-              }
-              if (Array.isArray(evtObj.groups) && evtObj.groups.length > 0) {
-                this.state.eventsCatalog[evtId].groups = evtObj.groups;
-              }
-            }
-          });
-          if (parsed.activeEventId && this.state.eventsCatalog[parsed.activeEventId]) {
-            this.activeEventId = parsed.activeEventId;
-            this.state.activeEventId = parsed.activeEventId;
-          }
-          this.ensureEventsCatalogStructure();
-        }
-
-        let incomingStudents = null;
-        if (parsed.state && parsed.state.students && typeof parsed.state.students === 'object') {
-          incomingStudents = parsed.state.students;
-        } else if (parsed.students && typeof parsed.students === 'object') {
-          incomingStudents = parsed.students;
-        }
-
-        if (!incomingStudents || Object.keys(incomingStudents).length === 0) {
-          throw new Error('No valid student attendance records found in backup.');
-        }
-
         let mergedScans = 0;
         let studentsUpdated = 0;
         const eventsToQueue = [];
 
-        Object.keys(incomingStudents).forEach(id => {
-          const incoming = incomingStudents[id];
-          if (!this.state.students[id]) {
-            this.state.students[id] = incoming;
-            studentsUpdated++;
-          } else {
-            const current = this.state.students[id];
-            if (incoming.games) {
-              if (!current.games) current.games = this.createEmptyGamesRecord();
-              Object.keys(incoming.games).forEach(gId => {
-                const inGame = incoming.games[gId];
-                const curGame = current.games[gId];
-                if (!curGame) {
-                  current.games[gId] = inGame;
-                  if (inGame.visits > 0 || inGame.status === 'INSIDE') mergedScans++;
-                } else {
-                  const incomingHasScans = (inGame.visits > (curGame.visits || 0)) ||
-                    (inGame.status === 'INSIDE' && curGame.status !== 'INSIDE') ||
-                    (inGame.checkInTime && !curGame.checkInTime);
+        const isCompact = parsed.format === 'engday_compact_v2' || Boolean(parsed.eventConfig || parsed.attendance || parsed.scanLogs);
 
-                  if (incomingHasScans) {
-                    current.games[gId] = { ...curGame, ...inGame };
-                    mergedScans++;
-                  }
+        if (isCompact) {
+          // --- COMPACT FORMAT RESTORE ---
+          if (parsed.eventConfig && typeof parsed.eventConfig === 'object') {
+            const cfg = parsed.eventConfig;
+            const targetEvtId = parsed.activeEventId || cfg.id || this.activeEventId;
+            if (!this.state.eventsCatalog[targetEvtId]) {
+              this.state.eventsCatalog[targetEvtId] = {
+                id: targetEvtId,
+                title: cfg.title || 'Engineering Days 2026',
+                subtitle: cfg.subtitle || '',
+                venueName: cfg.venueName || 'Main Campus Venue',
+                staffPin: cfg.staffPin || '2026',
+                sessions: (cfg.sessions || []).map((s, i) => decorateSessionStyle(s, i)),
+                groups: cfg.groups || []
+              };
+            } else {
+              const curEvt = this.state.eventsCatalog[targetEvtId];
+              if (cfg.title) curEvt.title = cfg.title;
+              if (cfg.venueName) curEvt.venueName = cfg.venueName;
+              if (cfg.staffPin) curEvt.staffPin = cfg.staffPin;
+              if (Array.isArray(cfg.sessions) && cfg.sessions.length > 0) {
+                curEvt.sessions = cfg.sessions.map((s, i) => decorateSessionStyle(s, i));
+              }
+              if (Array.isArray(cfg.groups) && cfg.groups.length > 0) {
+                curEvt.groups = cfg.groups;
+              }
+            }
+            if (targetEvtId && this.state.eventsCatalog[targetEvtId]) {
+              this.activeEventId = targetEvtId;
+              this.state.activeEventId = targetEvtId;
+              this.games = this.state.eventsCatalog[targetEvtId].sessions || this.games;
+            }
+            this.ensureEventsCatalogStructure();
+          }
+
+          // Restore custom students
+          if (Array.isArray(parsed.customStudents)) {
+            parsed.customStudents.forEach(cs => {
+              if (!cs) return;
+              const rawCode = String(cs.code || cs.studentCode || cs.id || '').trim();
+              const codeUpper = rawCode.toUpperCase();
+              if (!codeUpper) return;
+
+              let existing = this.getStudentByCode(codeUpper) || this.getStudentById(codeUpper);
+              if (!existing) {
+                const teamNorm = String(cs.team || 'general').trim().toLowerCase();
+                const teamName = cs.teamName || ('TEAM ' + teamNorm.toUpperCase());
+                this.state.students[codeUpper] = {
+                  id: cs.id || codeUpper,
+                  code: rawCode,
+                  studentCode: rawCode,
+                  name: cs.name || rawCode,
+                  team: teamNorm,
+                  teamName: teamName,
+                  status: 'OUTSIDE',
+                  games: this.createEmptyGamesRecord()
+                };
+                studentsUpdated++;
+              }
+            });
+          }
+
+          // Restore active attendance per student
+          if (parsed.attendance && typeof parsed.attendance === 'object') {
+            Object.entries(parsed.attendance).forEach(([studentKey, gamesMap]) => {
+              if (!gamesMap || typeof gamesMap !== 'object') return;
+              const student = this.getStudentByCode(studentKey) || this.getStudentById(studentKey);
+              if (!student) return;
+
+              if (!student.games) student.games = this.createEmptyGamesRecord();
+              studentsUpdated++;
+
+              Object.entries(gamesMap).forEach(([gId, inGame]) => {
+                if (!inGame) return;
+                const curGame = student.games[gId] || { gameId: gId, status: 'OUTSIDE', visits: 0, history: [] };
+                student.games[gId] = curGame;
+
+                const incomingHasScans = (inGame.visits > (curGame.visits || 0)) ||
+                  (inGame.status === 'INSIDE' && curGame.status !== 'INSIDE') ||
+                  (inGame.checkInTime && !curGame.checkInTime);
+
+                if (incomingHasScans) {
+                  student.games[gId] = {
+                    ...curGame,
+                    ...inGame,
+                    gameId: gId
+                  };
+                  mergedScans++;
                 }
-                if (inGame && Array.isArray(inGame.history)) {
+
+                if (Array.isArray(inGame.history)) {
                   inGame.history.forEach(h => {
                     if (h && h.eventId) {
                       eventsToQueue.push({
                         eventId: h.eventId,
                         eventKey: this.activeEventId,
                         gameId: gId,
-                        studentId: id,
-                        studentCode: incoming.studentCode || current.studentCode,
-                        studentName: incoming.name || current.name,
-                        team: incoming.team || current.team,
+                        studentId: student.id,
+                        studentCode: student.studentCode,
+                        studentName: student.name,
+                        team: student.team,
                         action: h.action || 'check_in',
                         occurredAt: h.timestamp || new Date().toISOString(),
                         marshalId: h.performedBy || 'Backup Restore',
@@ -3184,22 +3307,147 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
                   });
                 }
               });
-            }
-            studentsUpdated++;
+            });
           }
-        });
 
-        if (parsed.state && Array.isArray(parsed.state.auditLog)) {
-          const existingIds = new Set((this.state.auditLog || []).map(a => a.eventId || a.id));
-          parsed.state.auditLog.forEach(item => {
-            const key = item.eventId || item.id;
-            if (!key || !existingIds.has(key)) {
-              if (!this.state.auditLog) this.state.auditLog = [];
-              this.state.auditLog.push(item);
+          // Restore scanLogs / auditLog
+          if (Array.isArray(parsed.scanLogs)) {
+            const existingIds = new Set((this.state.auditLog || []).map(a => a.eventId || a.id));
+            parsed.scanLogs.forEach(l => {
+              const key = l.eventId || l.id;
+              if (key && !existingIds.has(key)) {
+                existingIds.add(key);
+                if (!this.state.auditLog) this.state.auditLog = [];
+                const logEntry = {
+                  id: key,
+                  eventId: key,
+                  studentCode: l.code,
+                  studentId: l.code,
+                  studentName: l.name,
+                  team: l.team,
+                  gameId: l.gameId,
+                  action: l.action || 'check_in',
+                  timestamp: l.time,
+                  occurredAt: l.time,
+                  performedBy: l.by || 'Marshal',
+                  court: l.court || 'Main Venue',
+                  notes: l.notes || null,
+                  displayTime: l.time ? formatManilaTime(l.time) : '--:--'
+                };
+                this.state.auditLog.push(logEntry);
+
+                // If student game record doesn't have check-in recorded, reflect it
+                const student = this.getStudentByCode(l.code) || this.getStudentById(l.code);
+                if (student && student.games && student.games[l.gameId]) {
+                  const gRec = student.games[l.gameId];
+                  if (!gRec.checkInTime && l.action === 'check_in') {
+                    gRec.checkInTime = l.time;
+                    gRec.displayCheckIn = logEntry.displayTime;
+                    gRec.status = 'INSIDE';
+                    gRec.visits = Math.max(gRec.visits || 0, 1);
+                    mergedScans++;
+                  }
+                }
+              }
+            });
+          }
+
+        } else {
+          // --- LEGACY FORMAT RESTORE ---
+          if (parsed.state && parsed.state.eventsCatalog && typeof parsed.state.eventsCatalog === 'object') {
+            Object.entries(parsed.state.eventsCatalog).forEach(([evtId, evtObj]) => {
+              if (!this.state.eventsCatalog[evtId]) {
+                this.state.eventsCatalog[evtId] = evtObj;
+              } else {
+                if (Array.isArray(evtObj.sessions) && evtObj.sessions.length > 0) {
+                  this.state.eventsCatalog[evtId].sessions = evtObj.sessions.map((s, i) => decorateSessionStyle(s, i));
+                }
+                if (Array.isArray(evtObj.groups) && evtObj.groups.length > 0) {
+                  this.state.eventsCatalog[evtId].groups = evtObj.groups;
+                }
+              }
+            });
+            if (parsed.activeEventId && this.state.eventsCatalog[parsed.activeEventId]) {
+              this.activeEventId = parsed.activeEventId;
+              this.state.activeEventId = parsed.activeEventId;
             }
-          });
+            this.ensureEventsCatalogStructure();
+          }
+
+          let incomingStudents = null;
+          if (parsed.state && parsed.state.students && typeof parsed.state.students === 'object') {
+            incomingStudents = parsed.state.students;
+          } else if (parsed.students && typeof parsed.students === 'object') {
+            incomingStudents = parsed.students;
+          }
+
+          if (incomingStudents && typeof incomingStudents === 'object') {
+            Object.keys(incomingStudents).forEach(id => {
+              const incoming = incomingStudents[id];
+              if (!this.state.students[id]) {
+                this.state.students[id] = incoming;
+                studentsUpdated++;
+              } else {
+                const current = this.state.students[id];
+                if (incoming.games) {
+                  if (!current.games) current.games = this.createEmptyGamesRecord();
+                  Object.keys(incoming.games).forEach(gId => {
+                    const inGame = incoming.games[gId];
+                    const curGame = current.games[gId];
+                    if (!curGame) {
+                      current.games[gId] = inGame;
+                      if (inGame.visits > 0 || inGame.status === 'INSIDE') mergedScans++;
+                    } else {
+                      const incomingHasScans = (inGame.visits > (curGame.visits || 0)) ||
+                        (inGame.status === 'INSIDE' && curGame.status !== 'INSIDE') ||
+                        (inGame.checkInTime && !curGame.checkInTime);
+
+                      if (incomingHasScans) {
+                        current.games[gId] = { ...curGame, ...inGame };
+                        mergedScans++;
+                      }
+                    }
+                    if (inGame && Array.isArray(inGame.history)) {
+                      inGame.history.forEach(h => {
+                        if (h && h.eventId) {
+                          eventsToQueue.push({
+                            eventId: h.eventId,
+                            eventKey: this.activeEventId,
+                            gameId: gId,
+                            studentId: id,
+                            studentCode: incoming.studentCode || current.studentCode,
+                            studentName: incoming.name || current.name,
+                            team: incoming.team || current.team,
+                            action: h.action || 'check_in',
+                            occurredAt: h.timestamp || new Date().toISOString(),
+                            marshalId: h.performedBy || 'Backup Restore',
+                            court: h.court || 'Court',
+                            reason: h.reason || null
+                          });
+                        }
+                      });
+                    }
+                  });
+                }
+                studentsUpdated++;
+              }
+            });
+          }
+
+          if (parsed.state && Array.isArray(parsed.state.auditLog)) {
+            const existingIds = new Set((this.state.auditLog || []).map(a => a.eventId || a.id));
+            parsed.state.auditLog.forEach(item => {
+              const key = item.eventId || item.id;
+              if (!key || !existingIds.has(key)) {
+                if (!this.state.auditLog) this.state.auditLog = [];
+                this.state.auditLog.push(item);
+              }
+            });
+          }
         }
 
+        // Finalize state
+        this.ensureFullMasterRoster(this.state.students);
         this.reconcileStudentGamesStructure();
         this.reconcileGroupsFromStudents();
         this.save();
