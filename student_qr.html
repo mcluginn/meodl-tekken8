@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MEODL Student Portal • Personal Attendance QR</title>
+  <title>Engineering Days 2026 • Student Self-Service QR Pass Portal</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -35,9 +35,10 @@
     }
   </script>
 
-  <!-- Local QR Generator and MEODL Data/Attendance Modules with Resilient Multi-Network Fallback -->
+  <!-- Local QR Generator and Data/Attendance Modules with Resilient Multi-Network Fallback -->
   <script src="./assets/qrcode.min.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/qrcode.min.js';document.head.appendChild(s);}"></script>
   <script src="./assets/meodl_data.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_data.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/engday_attendance.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/engday_attendance.js';document.head.appendChild(s);}"></script>
   <script src="./assets/meodl_attendance.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_attendance.js';document.head.appendChild(s);}"></script>
 
   <style>
@@ -60,14 +61,14 @@
   <header class="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800/80 px-4 py-3 shadow-md">
     <div class="max-w-3xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <a href="student.html" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono font-bold text-zinc-300 hover:text-cyan-300 transition-colors">
-          <span>↩</span> MEODL HUB
+        <a href="index.html" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono font-bold text-zinc-300 hover:text-cyan-300 transition-colors">
+          <span>↩</span> MAIN HUB
         </a>
         <div class="flex items-center gap-2">
-          <img src="./assets/mes_logo.png" alt="MES Seal" class="w-8 h-8 rounded-full border border-zinc-700 bg-white/90 p-0.5" />
+          <img src="./assets/esc_logo.jpg" onerror="this.src='./assets/mes_logo.png'" alt="ESC Logo" class="w-8 h-8 rounded-lg object-cover border border-amber-500/40 shadow-sm" />
           <div>
-            <h1 class="text-xs font-bold text-white font-mono tracking-wider">MEODL ATTENDANCE</h1>
-            <p class="text-[10px] text-zinc-400 font-mono">Student Self-Service Portal</p>
+            <h1 class="text-xs font-bold text-white font-mono tracking-wider">ENGINEERING DAYS 2026</h1>
+            <p class="text-[10px] text-zinc-400 font-mono">Student Self-Service QR Pass Portal</p>
           </div>
         </div>
       </div>
@@ -80,11 +81,11 @@
     <!-- Search / Retrieval Form -->
     <div id="lookup-section" class="w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl p-6 shadow-2xl backdrop-blur-md">
       <div class="text-center mb-6">
-        <div class="w-12 h-12 rounded-2xl bg-cyan-950/80 border border-cyan-600/50 flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500/20 to-cyan-500/20 border border-amber-500/30 flex items-center justify-center mx-auto mb-3 text-2xl shadow-inner">
           🪪
         </div>
-        <h2 class="text-lg font-extrabold text-white tracking-wide">Find Your Official QR</h2>
-        <p class="text-xs text-zinc-400 mt-1">Enter your Registration Code or Full Name to access your personal venue pass.</p>
+        <h2 class="text-lg font-extrabold text-white tracking-wide">Find Your Official QR Pass</h2>
+        <p class="text-xs text-zinc-400 mt-1">Search your Name or ID Code across all 6 Engineering programs (CE, CPE, EE, ECE, IE, ME).</p>
       </div>
 
       <form onsubmit="handleLookup(event)" class="space-y-4">
@@ -92,31 +93,48 @@
           <label for="search-input" class="block text-xs font-mono font-semibold text-zinc-300 mb-1.5">
             Student Code or Full Name:
           </label>
-          <input 
-            type="text" 
-            id="search-input" 
-            placeholder="e.g. MEODL-0033 or Paduga" 
-            class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 text-sm font-mono focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-            required
-            autocomplete="off"
-            autofocus
-          />
+          <div class="relative">
+            <input 
+              type="text" 
+              id="search-input" 
+              placeholder="e.g. Garcia, Ramos, EE-001, CE-069..." 
+              class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white placeholder-zinc-500 text-sm font-mono focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              autocomplete="off"
+              autofocus
+              oninput="handleSearchInput(event)"
+            />
+          </div>
         </div>
 
         <button 
           type="submit" 
           class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-mono font-bold tracking-wider uppercase transition-all shadow-lg shadow-cyan-900/40 hover:scale-[1.01]"
         >
-          View My QR Code
+          Search / View QR Pass
         </button>
       </form>
+
+      <!-- Multi-Match Results Container -->
+      <div id="search-results-section" class="hidden mt-4 pt-4 border-t border-zinc-800/80">
+        <div class="flex items-center justify-between mb-2 px-1">
+          <span id="search-results-count" class="text-xs font-mono font-bold text-cyan-400">
+            Matching Students (0)
+          </span>
+          <span class="text-[10px] font-mono text-zinc-400">
+            Tap your name to view QR pass
+          </span>
+        </div>
+        <div id="search-results-list" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
 
       <!-- Error Message -->
       <div id="lookup-error" class="hidden mt-4 p-3 rounded-xl bg-red-950/60 border border-red-800/80 text-red-200 text-xs text-center font-mono"></div>
 
       <!-- Quick hint -->
       <div class="mt-6 pt-4 border-t border-zinc-800/80 text-[11px] text-zinc-500 font-mono text-center">
-        <span>Official registered student athletes only</span>
+        <span>Official Engineering Days 2026 registered participants (588 Students)</span>
       </div>
     </div>
 
@@ -127,10 +145,10 @@
         <!-- Top Card Header -->
         <div class="flex items-center justify-between border-b border-zinc-800 pb-3 mb-4">
           <div class="flex items-center gap-2">
-            <img src="./assets/mes_logo.png" alt="MES Seal" class="w-7 h-7 rounded-full bg-white p-0.5" />
+            <img src="./assets/esc_logo.jpg" onerror="this.src='./assets/mes_logo.png'" alt="ESC Logo" class="w-8 h-8 rounded-lg object-cover border border-amber-500/40 shrink-0" />
             <div>
-              <span class="text-[10px] font-mono tracking-widest text-zinc-400 block uppercase">MEODL 2026</span>
-              <span class="text-xs font-bold text-white font-mono uppercase">Venue Pass</span>
+              <span class="text-[10px] font-mono tracking-widest text-zinc-400 block uppercase">ENGINEERING DAYS 2026</span>
+              <span class="text-xs font-bold text-white font-mono uppercase">Official Venue Pass</span>
             </div>
           </div>
           <span id="card-team-badge" class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase border">
@@ -141,10 +159,10 @@
         <!-- Student Info -->
         <div class="text-center my-3">
           <h3 id="card-student-name" class="text-base font-extrabold text-white tracking-wide font-sans">
-            PADUGA, EARL JUSTIN
+            STUDENT NAME
           </h3>
           <p id="card-student-code" class="text-xs font-mono font-bold text-cyan-400 mt-0.5">
-            MEODL-0033
+            CODE-0000
           </p>
         </div>
 
@@ -157,7 +175,7 @@
         <div class="mt-4 pt-3 border-t border-zinc-850 flex items-center justify-between font-mono text-xs">
           <span class="text-zinc-400 text-[11px]">Venue Status:</span>
           <span id="card-status-badge" class="px-2 py-0.5 rounded text-[11px] font-bold">
-            🔴 OUTSIDE
+            🔴 OUTSIDE VENUE
           </span>
         </div>
 
@@ -199,59 +217,311 @@
 
   <!-- Footer -->
   <footer class="text-center py-4 border-t border-zinc-900 text-zinc-600 font-mono text-[11px]">
-    Mechanical Engineering Society • UPHSD DALTA • MEODL 2026
+    Engineering Student Council • UPHSD DALTA • Engineering Days 2026
   </footer>
 
   <script>
     let currentStudent = null;
 
-    // Check if URL query params have studentCode or token: ?code=MEODL-0033
+    function getDeptStyle(team) {
+      const t = String(team || '').trim().toLowerCase();
+      const styles = {
+        ce: {
+          name: 'CIVIL ENGINEERING',
+          shortCode: 'CE',
+          badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50',
+          borderClass: 'border-cyan-500/60'
+        },
+        cpe: {
+          name: 'COMPUTER ENGINEERING',
+          shortCode: 'CPE',
+          badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-400/50',
+          borderClass: 'border-purple-500/60'
+        },
+        ee: {
+          name: 'ELECTRICAL ENGINEERING',
+          shortCode: 'EE',
+          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/50',
+          borderClass: 'border-amber-500/60'
+        },
+        ece: {
+          name: 'ELECTRONICS ENGINEERING',
+          shortCode: 'ECE',
+          badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-400/50',
+          borderClass: 'border-rose-500/60'
+        },
+        ie: {
+          name: 'INDUSTRIAL ENGINEERING',
+          shortCode: 'IE',
+          badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50',
+          borderClass: 'border-emerald-500/60'
+        },
+        me: {
+          name: 'MECHANICAL ENGINEERING',
+          shortCode: 'ME',
+          badgeClass: 'bg-orange-600/25 text-orange-300 border-orange-500/60',
+          borderClass: 'border-orange-500/60'
+        },
+        // Legacy ME sub-teams
+        rankine: {
+          name: 'TEAM RANKINE',
+          shortCode: 'RANKINE',
+          badgeClass: 'bg-red-500/20 text-red-300 border-red-400/50',
+          borderClass: 'border-red-500/60'
+        },
+        otto: {
+          name: 'TEAM OTTO',
+          shortCode: 'OTTO',
+          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/50',
+          borderClass: 'border-amber-500/60'
+        },
+        brayton: {
+          name: 'TEAM BRAYTON',
+          shortCode: 'BRAYTON',
+          badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50',
+          borderClass: 'border-cyan-500/60'
+        },
+        diesel: {
+          name: 'TEAM DIESEL',
+          shortCode: 'DIESEL',
+          badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50',
+          borderClass: 'border-emerald-500/60'
+        }
+      };
+      return styles[t] || {
+        name: ('TEAM ' + t.toUpperCase()),
+        shortCode: t.toUpperCase() || 'ENG',
+        badgeClass: 'bg-zinc-800 text-zinc-300 border-zinc-700',
+        borderClass: 'border-zinc-700'
+      };
+    }
+
+    function getAllStudents() {
+      // 1. Try ENGDAY_ATTENDANCE
+      if (window.ENGDAY_ATTENDANCE && window.ENGDAY_ATTENDANCE.state && window.ENGDAY_ATTENDANCE.state.students) {
+        const list = Object.values(window.ENGDAY_ATTENDANCE.state.students);
+        if (list.length >= 400) return list;
+      }
+      // 2. Try MEODL_ATTENDANCE
+      if (window.MEODL_ATTENDANCE && typeof window.MEODL_ATTENDANCE.getStudents === 'function') {
+        const list = window.MEODL_ATTENDANCE.getStudents();
+        if (list.length >= 400) return list;
+      }
+      // 3. Try EDAYS_2026_MASTER_ROSTER
+      if (window.EDAYS_2026_MASTER_ROSTER && window.EDAYS_2026_MASTER_ROSTER.length >= 400) {
+        return window.EDAYS_2026_MASTER_ROSTER.map(s => ({
+          id: s.id || s.code,
+          code: s.code || s.id,
+          studentCode: s.code || s.id,
+          name: s.name,
+          team: String(s.team || '').toLowerCase(),
+          teamName: s.teamName || ('TEAM ' + String(s.team || '').toUpperCase()),
+          status: 'OUTSIDE'
+        }));
+      }
+      // 4. Try MEODL_DATA.students
+      if (window.MEODL_DATA && Array.isArray(window.MEODL_DATA.students) && window.MEODL_DATA.students.length >= 400) {
+        return window.MEODL_DATA.students.map(s => ({
+          id: s.id || s.code,
+          code: s.code || s.id,
+          studentCode: s.code || s.id,
+          name: s.name,
+          team: String(s.team || '').toLowerCase(),
+          teamName: s.teamName || ('TEAM ' + String(s.team || '').toUpperCase()),
+          status: 'OUTSIDE'
+        }));
+      }
+      // 5. Fallback to whatever MEODL_ATTENDANCE has
+      if (window.MEODL_ATTENDANCE && typeof window.MEODL_ATTENDANCE.getStudents === 'function') {
+        return window.MEODL_ATTENDANCE.getStudents();
+      }
+      return [];
+    }
+
+    function matchesMultiSearch(student, rawQuery) {
+      if (!student) return false;
+      if (!rawQuery) return true;
+      if (window.ENGDAY_ATTENDANCE && typeof window.ENGDAY_ATTENDANCE.matchesSearch === 'function') {
+        return window.ENGDAY_ATTENDANCE.matchesSearch(student, rawQuery);
+      }
+      if (window.MEODL_ATTENDANCE && typeof window.MEODL_ATTENDANCE.matchesSearch === 'function') {
+        return window.MEODL_ATTENDANCE.matchesSearch(student, rawQuery);
+      }
+      const q = String(rawQuery).trim();
+      if (!q) return true;
+
+      // Allow multi-term separation by commas, slashes, semicolons, or newlines (OR logic)
+      const terms = q.split(/[,/;\n]+/).map(t => t.trim().toUpperCase()).filter(Boolean);
+      if (!terms.length) return true;
+
+      const name = String(student.name || '').toUpperCase();
+      const code = String(student.studentCode || student.code || student.id || '').toUpperCase();
+      const team = String(student.team || '').toUpperCase();
+      const teamName = String(student.teamName || '').toUpperCase();
+      const combined = `${code} ${name} ${team} ${teamName}`;
+
+      return terms.some(term => {
+        const words = term.split(/\s+/).filter(Boolean);
+        if (!words.length) return true;
+        return words.every(w => combined.includes(w));
+      });
+    }
+
+    // Check if URL query params have studentCode or token: ?code=EE-001
     window.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
+      const code = params.get('code') || params.get('id');
+      const name = params.get('name') || params.get('query');
       const token = params.get('token');
       if (code) {
         document.getElementById('search-input').value = code;
-        lookupStudent(code);
+        executeSearch(code, true);
+      } else if (name) {
+        document.getElementById('search-input').value = name;
+        executeSearch(name, false);
       } else if (token) {
-        const student = window.MEODL_ATTENDANCE.getStudentByToken(token);
+        const student = (window.MEODL_ATTENDANCE && window.MEODL_ATTENDANCE.getStudentByToken(token)) ||
+          getAllStudents().find(s => s.activeToken === token);
         if (student) displayStudentCard(student);
       }
     });
 
-    function handleLookup(e) {
-      e.preventDefault();
-      const val = document.getElementById('search-input').value.trim();
-      lookupStudent(val);
+    function handleSearchInput(e) {
+      const q = (e.target.value || '').trim();
+      if (q.length < 2) {
+        hideSearchResults();
+        hideError();
+        return;
+      }
+      executeSearch(q, false);
     }
 
-    function lookupStudent(query) {
+    function handleLookup(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const val = (document.getElementById('search-input')?.value || '').trim();
+      if (!val) {
+        showError('Please enter your Student Code or Name.');
+        return;
+      }
+      executeSearch(val, true);
+    }
+
+    function executeSearch(query, isSubmit) {
+      hideError();
+      const all = getAllStudents();
+
+      if (!all || !all.length) {
+        showError('Participant roster loading, please try again in a moment.');
+        return;
+      }
+
+      const qUpper = query.toUpperCase();
+
+      // 1. Check for exact code match (e.g. CE-069, EE-001, MEODL-0033)
+      const exactCodeMatch = all.find(s => {
+        const c1 = String(s.studentCode || '').toUpperCase();
+        const c2 = String(s.code || '').toUpperCase();
+        const c3 = String(s.id || '').toUpperCase();
+        return c1 === qUpper || c2 === qUpper || c3 === qUpper;
+      });
+
+      if (exactCodeMatch && isSubmit) {
+        hideSearchResults();
+        displayStudentCard(exactCodeMatch);
+        return;
+      }
+
+      // 2. Perform multi-search matching
+      const matches = all.filter(s => matchesMultiSearch(s, query));
+
+      if (matches.length === 1 && isSubmit) {
+        hideSearchResults();
+        displayStudentCard(matches[0]);
+        return;
+      }
+
+      if (matches.length > 0) {
+        renderSearchResults(matches);
+        return;
+      }
+
+      // 0 matches
+      hideSearchResults();
+      if (isSubmit) {
+        showError(`❌ No registered participant matched "${query}". Please check the spelling or verify your Student Code.`);
+      }
+    }
+
+    function renderSearchResults(students) {
+      const listContainer = document.getElementById('search-results-list');
+      const countEl = document.getElementById('search-results-count');
+      const secEl = document.getElementById('search-results-section');
+      if (!listContainer || !secEl || !countEl) return;
+
+      countEl.textContent = `Matching Students (${students.length})`;
+      secEl.classList.remove('hidden');
+
+      listContainer.innerHTML = students.map(s => {
+        const code = s.studentCode || s.code || s.id || '';
+        const dept = getDeptStyle(s.team);
+        return `
+          <div 
+            onclick="selectStudent('${code.replace(/'/g, "\\'")}')" 
+            class="p-2.5 rounded-xl bg-zinc-950/80 hover:bg-zinc-800/90 border border-zinc-800 hover:border-cyan-500/60 transition-all cursor-pointer flex items-center justify-between gap-3 group shadow-sm"
+          >
+            <div class="min-w-0 flex-1">
+              <div class="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors uppercase leading-tight truncate">
+                ${s.name}
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-[11px] font-mono font-bold text-cyan-400">
+                  ${code}
+                </span>
+                <span class="text-[9px] font-mono text-zinc-500">•</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-black uppercase border ${dept.badgeClass}">
+                  ${s.teamName || dept.shortCode}
+                </span>
+              </div>
+            </div>
+            <div class="shrink-0 flex items-center text-xs font-mono font-bold text-zinc-500 group-hover:text-cyan-400">
+              <span>View QR ➔</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectStudent(code) {
+      const all = getAllStudents();
+      const codeUpper = String(code).trim().toUpperCase();
+      const student = all.find(s => {
+        const c1 = String(s.studentCode || '').toUpperCase();
+        const c2 = String(s.code || '').toUpperCase();
+        const c3 = String(s.id || '').toUpperCase();
+        return c1 === codeUpper || c2 === codeUpper || c3 === codeUpper;
+      });
+      if (student) {
+        hideSearchResults();
+        displayStudentCard(student);
+      }
+    }
+
+    function showError(msg) {
       const errEl = document.getElementById('lookup-error');
-      errEl.classList.add('hidden');
-
-      if (!window.MEODL_ATTENDANCE) {
-        errEl.textContent = 'Attendance engine loading, please try again in a moment.';
+      if (errEl) {
+        errEl.textContent = msg;
         errEl.classList.remove('hidden');
-        return;
       }
+    }
 
-      // Try finding by exact student code
-      let student = window.MEODL_ATTENDANCE.getStudentByCode(query);
+    function hideError() {
+      const errEl = document.getElementById('lookup-error');
+      if (errEl) errEl.classList.add('hidden');
+    }
 
-      // Fallback: search by name
-      if (!student) {
-        const clean = query.toLowerCase();
-        const all = window.MEODL_ATTENDANCE.getStudents();
-        student = all.find(s => s.name.toLowerCase().includes(clean));
-      }
-
-      if (!student) {
-        errEl.textContent = '❌ No registered participant matched "' + query + '". Please check the spelling or verify your Student Code.';
-        errEl.classList.remove('hidden');
-        return;
-      }
-
-      displayStudentCard(student);
+    function hideSearchResults() {
+      const secEl = document.getElementById('search-results-section');
+      if (secEl) secEl.classList.add('hidden');
     }
 
     function displayStudentCard(student) {
@@ -262,43 +532,18 @@
       lookupSec.classList.add('hidden');
       cardSec.classList.remove('hidden');
 
-      // Populate text
+      const code = student.studentCode || student.code || student.id || '';
       document.getElementById('card-student-name').textContent = student.name;
-      document.getElementById('card-student-code').textContent = student.studentCode;
+      document.getElementById('card-student-code').textContent = code;
 
-      // Team Badge Colors
+      const dept = getDeptStyle(student.team);
       const teamBadge = document.getElementById('card-team-badge');
-      teamBadge.textContent = student.teamName || ('TEAM ' + student.team.toUpperCase());
+      teamBadge.textContent = student.teamName || ('TEAM ' + dept.shortCode);
+      teamBadge.className = `px-2.5 py-1 rounded-md text-[10px] font-mono font-black uppercase border shadow-sm ${dept.badgeClass}`;
 
-      const teamStyles = {
-        ee: 'bg-emerald-950/80 text-emerald-400 border-emerald-700/80',
-        cpe: 'bg-sky-950/80 text-sky-400 border-sky-700/80',
-        ece: 'bg-violet-950/80 text-violet-400 border-violet-700/80',
-        ie: 'bg-amber-950/80 text-amber-400 border-amber-700/80',
-        ce: 'bg-cyan-950/80 text-cyan-400 border-cyan-700/80',
-        rankine: 'bg-red-950/80 text-red-400 border-red-700/80',
-        otto: 'bg-amber-950/80 text-amber-400 border-amber-700/80',
-        brayton: 'bg-cyan-950/80 text-cyan-400 border-cyan-700/80',
-        diesel: 'bg-emerald-950/80 text-emerald-400 border-emerald-700/80'
-      };
-      teamBadge.className = `px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase border ${teamStyles[student.team.toLowerCase()] || teamStyles[student.team] || teamStyles.rankine}`;
-
-      // Border accent of card
       const cardEl = document.getElementById('printable-card');
-      const borderColors = {
-        ee: 'border-emerald-600/50',
-        cpe: 'border-sky-600/50',
-        ece: 'border-violet-600/50',
-        ie: 'border-amber-600/50',
-        ce: 'border-cyan-600/50',
-        rankine: 'border-red-600/50',
-        otto: 'border-amber-600/50',
-        brayton: 'border-cyan-600/50',
-        diesel: 'border-emerald-600/50'
-      };
-      cardEl.className = `w-full bg-zinc-950 border-2 rounded-2xl overflow-hidden shadow-2xl p-6 relative ${borderColors[student.team.toLowerCase()] || borderColors[student.team] || 'border-cyan-500/50'}`;
+      cardEl.className = `w-full bg-zinc-950 border-2 rounded-2xl overflow-hidden shadow-2xl p-6 relative ${dept.borderClass}`;
 
-      // Status Badge
       const statusBadge = document.getElementById('card-status-badge');
       if (student.status === 'INSIDE') {
         statusBadge.textContent = '🟢 INSIDE VENUE';
@@ -311,7 +556,7 @@
       // Render QR Code (compact, high-contrast, large-module for instant scanning)
       const qrTarget = document.getElementById('qrcode-target');
       qrTarget.innerHTML = '';
-      const payload = student.studentCode || (window.MEODL_ATTENDANCE && window.MEODL_ATTENDANCE.getQRPayload(student)) || '';
+      const payload = code;
 
       if (window.QRCode) {
         new QRCode(qrTarget, {
@@ -329,8 +574,11 @@
       // Populate personal activity history
       const histList = document.getElementById('student-history-list');
       const histCount = document.getElementById('student-history-count');
-      if (histList && window.MEODL_ATTENDANCE && typeof window.MEODL_ATTENDANCE.getStudentHistory === 'function') {
-        window.MEODL_ATTENDANCE.getStudentHistory(student.id).then(history => {
+      const engine = window.ENGDAY_ATTENDANCE || window.MEODL_ATTENDANCE;
+      const studentId = student.id || code;
+
+      if (histList && engine && typeof engine.getStudentHistory === 'function') {
+        engine.getStudentHistory(studentId).then(history => {
           if (histCount) histCount.textContent = `${history.length} event${history.length === 1 ? '' : 's'}`;
           if (!history || !history.length) {
             histList.innerHTML = '<p class="text-center text-zinc-500 py-2 text-[10px]">No scans recorded yet today.</p>';
@@ -361,8 +609,11 @@
     function resetLookup() {
       document.getElementById('card-section').classList.add('hidden');
       document.getElementById('lookup-section').classList.remove('hidden');
-      document.getElementById('search-input').value = '';
-      document.getElementById('search-input').focus();
+      hideSearchResults();
+      hideError();
+      const input = document.getElementById('search-input');
+      input.value = '';
+      input.focus();
     }
   </script>
 </body>

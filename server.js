@@ -261,6 +261,9 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
   return targetStudentsMap;
 }
 
+if (attendanceState && attendanceState.students) {
+  ensureFullMasterRoster(attendanceState.students);
+}
 
 const SCHEMA_VERSION = '2026.5';
 const ROSTER_VERSION = '2026-EDAYS-588';
@@ -993,6 +996,9 @@ export async function handleRequest(req, res) {
   }
 
   if (reqPath === '/api/attendance/state' && req.method === 'GET') {
+    if (attendanceState && attendanceState.students) {
+      ensureFullMasterRoster(attendanceState.students);
+    }
     return sendJson(res, 200, {
       ok: true,
       serverTime: new Date().toISOString(),

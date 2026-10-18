@@ -662,8 +662,9 @@
           const saved = localStorage.getItem(STORAGE_KEY);
           if (saved) {
             const parsed = JSON.parse(saved);
-            if (parsed && parsed.students && Object.keys(parsed.students).length >= 400) {
+            if (parsed && parsed.students) {
               this.state = parsed;
+              this.ensureFullMasterRoster();
               this.reconcileRoster();
               this.updatePendingCount();
               return;
@@ -675,6 +676,63 @@
       }
       this.initDefaultRoster();
       this.updatePendingCount();
+    }
+
+    ensureFullMasterRoster() {
+      if (!this.state.students || typeof this.state.students !== 'object') {
+        this.state.students = {};
+      }
+      if (typeof window !== 'undefined' && typeof window.ensureFullMasterRoster === 'function') {
+        window.ensureFullMasterRoster(this.state.students);
+      }
+      const masterList = (typeof window !== 'undefined' && (window.EDAYS_2026_MASTER_ROSTER || (window.MEODL_DATA && window.MEODL_DATA.students))) || [];
+      if (Array.isArray(masterList) && masterList.length > 0) {
+        masterList.forEach((s, idx) => {
+          const rawCode = String(s.code || s.studentCode || s.id || '').trim();
+          const codeUpper = rawCode.toUpperCase();
+          if (!codeUpper) return;
+
+          let existing = this.state.students[codeUpper] || this.state.students[rawCode];
+          if (!existing) {
+            existing = Object.values(this.state.students).find(st => {
+              const c1 = String(st.studentCode || '').toUpperCase();
+              const c2 = String(st.code || '').toUpperCase();
+              const c3 = String(st.id || '').toUpperCase();
+              return c1 === codeUpper || c2 === codeUpper || c3 === codeUpper;
+            });
+          }
+
+          if (existing) {
+            if (!existing.code) existing.code = rawCode;
+            if (!existing.studentCode) existing.studentCode = rawCode;
+            if (!existing.id) existing.id = rawCode;
+            if (!existing.name && s.name) existing.name = s.name;
+          } else {
+            const teamLower = String(s.team || 'general').trim().toLowerCase();
+            const teamName = s.teamName || ('TEAM ' + teamLower.toUpperCase());
+            const token = deterministicToken(idx + 1, teamLower);
+            this.state.students[codeUpper] = {
+              id: codeUpper,
+              code: rawCode,
+              studentCode: rawCode,
+              name: s.name,
+              team: teamLower,
+              teamName: teamName,
+              activeToken: token,
+              revokedTokens: [],
+              status: 'OUTSIDE',
+              currentAction: null,
+              lastCheckIn: null,
+              lastCheckOut: null,
+              exitReason: null,
+              expectedReturn: null,
+              totalVisits: 0,
+              totalMinutesInside: 0,
+              history: []
+            };
+          }
+        });
+      }
     }
 
     initDefaultRoster() {
@@ -871,21 +929,52 @@
     }
 
     getStudents() {
+      this.ensureFullMasterRoster();
       return Object.values(this.state.students);
     }
 
     getStudentById(id) {
+      this.ensureFullMasterRoster();
       return this.state.students[id] || null;
     }
 
     getStudentByCode(code) {
       if (!code) return null;
+      this.ensureFullMasterRoster();
       const clean = String(code).trim().toUpperCase();
-      return Object.values(this.state.students).find(s => s.studentCode.toUpperCase() === clean) || null;
+      return Object.values(this.state.students).find(s => {
+        const c1 = String(s.studentCode || '').toUpperCase();
+        const c2 = String(s.code || '').toUpperCase();
+        const c3 = String(s.id || '').toUpperCase();
+        return c1 === clean || c2 === clean || c3 === clean;
+      }) || null;
+    }
+
+    matchesSearch(student, rawQuery) {
+      if (!student) return false;
+      if (!rawQuery) return true;
+      const q = String(rawQuery).trim();
+      if (!q) return true;
+
+      const terms = q.split(/[,/;\n]+/).map(t => t.trim().toUpperCase()).filter(Boolean);
+      if (!terms.length) return true;
+
+      const name = String(student.name || '').toUpperCase();
+      const code = String(student.studentCode || student.code || student.id || '').toUpperCase();
+      const team = String(student.team || '').toUpperCase();
+      const teamName = String(student.teamName || '').toUpperCase();
+      const combined = `${code} ${name} ${team} ${teamName}`;
+
+      return terms.some(term => {
+        const words = term.split(/\s+/).filter(Boolean);
+        if (!words.length) return true;
+        return words.every(w => combined.includes(w));
+      });
     }
 
     getStudentByToken(token) {
       if (!token) return null;
+      this.ensureFullMasterRoster();
       const clean = String(token).trim();
       return Object.values(this.state.students).find(s => s.activeToken === clean) || null;
     }
@@ -1641,6 +1730,7 @@
         if (changed) {
           this.save();
         }
+        this.ensureFullMasterRoster();
       } catch (e) {
         console.warn('[AttendanceSync] Reconcile error:', e);
       }
