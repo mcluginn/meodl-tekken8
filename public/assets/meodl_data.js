@@ -2535,14 +2535,7 @@ window.MEODL_DATA = {
       "team": "me",
       "teamName": "ME (Mechanical Engineering)"
     },
-    {
-      "id": "custom_stu_999",
-      "code": "2026-CPE-999",
-      "studentCode": "2026-CPE-999",
-      "name": "DELA CRUZ, ENGR",
-      "team": "cpe",
-      "teamName": "CPE (Computer Engineering)"
-    },
+
     {
       "id": "stu_2026-ece-777",
       "code": "2026-ECE-777",
