@@ -16,6 +16,7 @@
   'use strict';
 
   const SCHEMA_VERSION = '2026.5';
+  const ROSTER_VERSION = '2026-EDAYS-411';
   const STORAGE_KEY = 'ENGDAY_ATTENDANCE_STATE_V1';
   const CONFIG_STORAGE_KEY = 'ENGDAY_ATTENDANCE_CONFIG_V1';
   const DB_NAME = 'ENGDAY_ATTENDANCE_DB_V1';
@@ -858,6 +859,26 @@
     buildDefaultStudentsMap(sessionsList = null) {
       const sessions = sessionsList || this.games || ENGDAY_GAMES;
       const data = (typeof window !== 'undefined' && window.MEODL_DATA) ? window.MEODL_DATA : {};
+      const students = {};
+
+      if (Array.isArray(data.students) && data.students.length >= 411) {
+        data.students.forEach(s => {
+          const code = String(s.code || s.id || '').trim().toUpperCase();
+          const teamLower = String(s.team || 'general').trim().toLowerCase();
+          const teamName = s.teamName || ('TEAM ' + teamLower.toUpperCase());
+          students[code] = {
+            id: code,
+            code: code,
+            studentCode: code,
+            name: s.name,
+            team: teamLower,
+            teamName: teamName,
+            games: this.createEmptyGamesRecord(sessions)
+          };
+        });
+        return students;
+      }
+
       const teams = data.teams || [
         { id: 'ee', name: 'TEAM EE', shortCode: 'EE' },
         { id: 'cpe', name: 'TEAM CPE', shortCode: 'CPE' },
@@ -867,31 +888,86 @@
       ];
       const rosters = data.rosters || {};
 
-      const students = {};
-      let studentIndex = 1;
-
       teams.forEach(team => {
         const teamKey = (team.shortCode || team.id).toUpperCase();
         const members = rosters[teamKey] || rosters[team.id.toUpperCase()] || [];
         members.forEach((item, idx) => {
           const isObj = typeof item === 'object' && item !== null;
           const name = isObj ? item.name : item;
-          const code = (isObj && item.code) ? item.code : (teamKey + '-' + String(idx + 1).padStart(3, '0'));
-          const id = 'student-' + code.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+          const code = (isObj && (item.code || item.id)) ? (item.code || item.id) : (teamKey + '-' + String(idx + 1).padStart(3, '0'));
+          const id = code;
 
           students[id] = {
             id: id,
+            code: code,
+            studentCode: code,
             name: name,
             team: team.id.toLowerCase(),
             teamName: team.name,
-            studentCode: code,
             games: this.createEmptyGamesRecord(sessions)
           };
-          studentIndex++;
         });
       });
 
       return students;
+    }
+
+    checkAndMigrateRoster() {
+      const isMissingEE = !this.state.students || !this.state.students['EE-001'];
+      const isMissingCE = !this.state.students || !this.state.students['CE-001'];
+      const countTooLow = Object.keys(this.state.students || {}).length < 411;
+      const versionMismatch = this.state.rosterVersion !== ROSTER_VERSION;
+
+      if (isMissingEE || isMissingCE || countTooLow || versionMismatch) {
+        console.log(`[EngDay] Auto-migrating roster to ${ROSTER_VERSION} (missingEE: ${isMissingEE}, missingCE: ${isMissingCE}, count: ${Object.keys(this.state.students || {}).length})...`);
+        
+        const defaultStudentsMap = this.buildDefaultStudentsMap(this.games);
+        const catStudents = (this.state.eventsCatalog && this.state.eventsCatalog['engday_2026'] && this.state.eventsCatalog['engday_2026'].students) || {};
+        const existingStudents = { ...catStudents, ...(this.state.students || {}) };
+
+        for (const [code, student] of Object.entries(defaultStudentsMap)) {
+          const existing = existingStudents[code] ||
+            Object.values(existingStudents).find(s =>
+              (s.studentCode && s.studentCode.toUpperCase() === code) ||
+              (s.code && s.code.toUpperCase() === code) ||
+              (s.id && s.id.toUpperCase() === code) ||
+              (s.name && s.name.toUpperCase().trim() === student.name.toUpperCase().trim())
+            );
+
+          if (existing && existing.games && typeof existing.games === 'object') {
+            for (const [gId, gData] of Object.entries(existing.games)) {
+              if (student.games[gId]) {
+                student.games[gId] = {
+                  ...student.games[gId],
+                  ...gData
+                };
+              } else {
+                student.games[gId] = gData;
+              }
+            }
+          }
+        }
+
+        this.state.students = defaultStudentsMap;
+        this.state.rosterVersion = ROSTER_VERSION;
+        this.state.schemaVersion = SCHEMA_VERSION;
+
+        if (this.state.eventsCatalog && this.state.eventsCatalog['engday_2026']) {
+          this.state.eventsCatalog['engday_2026'].students = defaultStudentsMap;
+          this.state.eventsCatalog['engday_2026'].rosterVersion = ROSTER_VERSION;
+          this.state.eventsCatalog['engday_2026'].schemaVersion = SCHEMA_VERSION;
+          this.state.eventsCatalog['engday_2026'].updatedAt = new Date().toISOString();
+        }
+
+        if (typeof localStorage !== 'undefined') {
+          try {
+            localStorage.setItem('ENGDAY_ROSTER_VERSION', ROSTER_VERSION);
+          } catch (e) {}
+        }
+
+        this.save();
+        console.log(`[EngDay] Roster auto-migrated to ${ROSTER_VERSION} with ${Object.keys(this.state.students).length} students.`);
+      }
     }
 
     ensureEventsCatalogStructure() {
@@ -914,9 +990,8 @@
 
         if (defEvt.schemaVersion !== SCHEMA_VERSION || hasLegacySessions || hasLegacyRoster) {
           defEvt.schemaVersion = SCHEMA_VERSION;
-          if (hasLegacyRoster) {
-            defEvt.students = this.buildDefaultStudentsMap(defEvt.sessions);
-            this.state.students = defEvt.students;
+          if (hasLegacyRoster || this.state.rosterVersion !== ROSTER_VERSION) {
+            this.checkAndMigrateRoster();
           }
           if (!defEvt.title || defEvt.title === 'Engineering Day 2026') {
             defEvt.title = 'ENGINEERING DAYS 2026';
@@ -1658,6 +1733,7 @@
                 ...parsed
               };
               this.ensureEventsCatalogStructure();
+              this.checkAndMigrateRoster();
               this.updatePendingCount();
               return;
             }
@@ -1735,6 +1811,7 @@
     initDefaultRoster() {
       const students = this.buildDefaultStudentsMap(this.games);
       this.state.students = students;
+      this.state.rosterVersion = ROSTER_VERSION;
       this.state.auditLog = [];
       this.ensureEventsCatalogStructure();
       this.save();
@@ -1767,15 +1844,26 @@
     // -------------------------------------------------------------------------
     getStudentById(id) {
       if (!id || !this.state.students) return null;
-      if (this.state.students[id]) return this.state.students[id];
-      const lower = String(id).trim().toLowerCase();
-      return Object.values(this.state.students).find(s => String(s.id || '').toLowerCase() === lower) || null;
+      const clean = String(id).trim();
+      const upper = clean.toUpperCase();
+      if (this.state.students[clean]) return this.state.students[clean];
+      if (this.state.students[upper]) return this.state.students[upper];
+      return Object.values(this.state.students).find(s =>
+        (s.id && s.id.toUpperCase() === upper) ||
+        (s.code && s.code.toUpperCase() === upper) ||
+        (s.studentCode && s.studentCode.toUpperCase() === upper)
+      ) || null;
     }
 
     getStudentByCode(code) {
       if (!code || !this.state.students) return null;
       const clean = String(code).trim().toUpperCase();
-      return Object.values(this.state.students).find(s => String(s.studentCode || '').trim().toUpperCase() === clean) || null;
+      if (this.state.students[clean]) return this.state.students[clean];
+      return Object.values(this.state.students).find(s =>
+        (s.studentCode && s.studentCode.trim().toUpperCase() === clean) ||
+        (s.code && s.code.trim().toUpperCase() === clean) ||
+        (s.id && s.id.trim().toUpperCase() === clean)
+      ) || null;
     }
 
     getStudentByName(nameStr) {

@@ -12,7 +12,7 @@
 (function(window) {
   'use strict';
 
-  const ROSTER_SEED_KEY = 'ENGDAY_ROSTER_2026_411_V2';
+  const ROSTER_SEED_KEY = '2026-EDAYS-411';
   const STORAGE_KEY = 'MEODL_ATTENDANCE_STATE_V1';
   const CONFIG_STORAGE_KEY = 'MEODL_ATTENDANCE_CONFIG_V1';
   const DB_NAME = 'MEODL_ATTENDANCE_DB_V1';
@@ -679,34 +679,23 @@
 
     initDefaultRoster() {
       const data = (typeof window !== 'undefined' && window.MEODL_DATA) ? window.MEODL_DATA : {};
-      const teams = data.teams || [
-        { id: 'ee', name: 'TEAM EE', shortCode: 'EE' },
-        { id: 'cpe', name: 'TEAM CPE', shortCode: 'CPE' },
-        { id: 'ece', name: 'TEAM ECE', shortCode: 'ECE' },
-        { id: 'ie', name: 'TEAM IE', shortCode: 'IE' },
-        { id: 'ce', name: 'TEAM CE', shortCode: 'CE' }
-      ];
-      const rosters = data.rosters || {};
-
       const students = {};
       let studentIndex = 1;
 
-      teams.forEach(team => {
-        const teamKey = (team.shortCode || team.id).toUpperCase();
-        const members = rosters[teamKey] || rosters[team.id.toUpperCase()] || [];
-        members.forEach((item, idx) => {
-          const isObj = typeof item === 'object' && item !== null;
-          const name = isObj ? item.name : item;
-          const code = (isObj && item.code) ? item.code : (teamKey + '-' + String(idx + 1).padStart(3, '0'));
-          const id = 'student-' + code.toLowerCase().replace(/[^a-z0-9]+/g, '_');
-          const token = deterministicToken(studentIndex, team.id);
+      if (Array.isArray(data.students) && data.students.length >= 411) {
+        data.students.forEach((s, idx) => {
+          const code = String(s.code || s.id || '').trim().toUpperCase();
+          const teamLower = String(s.team || 'general').trim().toLowerCase();
+          const teamName = s.teamName || ('TEAM ' + teamLower.toUpperCase());
+          const token = deterministicToken(idx + 1, teamLower);
 
-          students[id] = {
-            id: id,
-            name: name,
-            team: team.id.toLowerCase(),
-            teamName: team.name,
+          students[code] = {
+            id: code,
+            code: code,
             studentCode: code,
+            name: s.name,
+            team: teamLower,
+            teamName: teamName,
             activeToken: token,
             revokedTokens: [],
             status: 'OUTSIDE',
@@ -719,11 +708,53 @@
             totalMinutesInside: 0,
             history: []
           };
-          studentIndex++;
         });
-      });
+      } else {
+        const teams = data.teams || [
+          { id: 'ee', name: 'TEAM EE', shortCode: 'EE' },
+          { id: 'cpe', name: 'TEAM CPE', shortCode: 'CPE' },
+          { id: 'ece', name: 'TEAM ECE', shortCode: 'ECE' },
+          { id: 'ie', name: 'TEAM IE', shortCode: 'IE' },
+          { id: 'ce', name: 'TEAM CE', shortCode: 'CE' }
+        ];
+        const rosters = data.rosters || {};
+
+        teams.forEach(team => {
+          const teamKey = (team.shortCode || team.id).toUpperCase();
+          const members = rosters[teamKey] || rosters[team.id.toUpperCase()] || [];
+          members.forEach((item, idx) => {
+            const isObj = typeof item === 'object' && item !== null;
+            const name = isObj ? item.name : item;
+            const code = (isObj && (item.code || item.id)) ? (item.code || item.id) : (teamKey + '-' + String(idx + 1).padStart(3, '0'));
+            const id = code;
+            const token = deterministicToken(studentIndex, team.id);
+
+            students[id] = {
+              id: id,
+              code: code,
+              studentCode: code,
+              name: name,
+              team: team.id.toLowerCase(),
+              teamName: team.name,
+              activeToken: token,
+              revokedTokens: [],
+              status: 'OUTSIDE',
+              currentAction: null,
+              lastCheckIn: null,
+              lastCheckOut: null,
+              exitReason: null,
+              expectedReturn: null,
+              totalVisits: 0,
+              totalMinutesInside: 0,
+              history: []
+            };
+            studentIndex++;
+          });
+        });
+      }
 
       this.state.students = students;
+      this.state.rosterVersion = ROSTER_SEED_KEY;
       this.state.auditLog = [];
       this.save();
     }
@@ -1395,7 +1426,7 @@
 
     getQRPayload(student) {
       if (!student) return '';
-      return student.studentCode || `${DOMAIN_BASE}?token=${student.activeToken}&code=${student.studentCode}`;
+      return student.code || student.studentCode || student.id || '';
     }
 
     // -------------------------------------------------------------------------

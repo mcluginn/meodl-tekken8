@@ -188,7 +188,8 @@ window.getTeamKey = getTeamKey;
 window.assetFallback = assetFallback;
 
 window.MEODL_DATA = {
-  "rosterSeedKey": "ENGDAY_ROSTER_2026_411_V2",
+  "rosterVersion": "2026-EDAYS-411",
+  "rosterSeedKey": "2026-EDAYS-411",
   "teams": [
     {
         "id": "ee",
@@ -676,7 +677,7 @@ window.MEODL_DATA = {
 },
   "students": [
   {
-    "id": "student-ee_001",
+    "id": "EE-001",
     "code": "EE-001",
     "studentCode": "EE-001",
     "name": "ABAD, EARL JOHN A.",
@@ -684,7 +685,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_002",
+    "id": "EE-002",
     "code": "EE-002",
     "studentCode": "EE-002",
     "name": "ABOCEJO, KING CHRISTOPHER",
@@ -692,7 +693,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_003",
+    "id": "EE-003",
     "code": "EE-003",
     "studentCode": "EE-003",
     "name": "ABUDA, RUPERTH KNIE P.",
@@ -700,7 +701,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_004",
+    "id": "EE-004",
     "code": "EE-004",
     "studentCode": "EE-004",
     "name": "ALANIB, RYLE BASTY B.",
@@ -708,7 +709,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_005",
+    "id": "EE-005",
     "code": "EE-005",
     "studentCode": "EE-005",
     "name": "ALVAREZ, EVANN C.",
@@ -716,7 +717,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_006",
+    "id": "EE-006",
     "code": "EE-006",
     "studentCode": "EE-006",
     "name": "ANACION, RHAINE DOMINIC D.",
@@ -724,7 +725,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_007",
+    "id": "EE-007",
     "code": "EE-007",
     "studentCode": "EE-007",
     "name": "ANDAYA, JOHN MICHAEL L.",
@@ -732,7 +733,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_008",
+    "id": "EE-008",
     "code": "EE-008",
     "studentCode": "EE-008",
     "name": "ANDRADA, JOSE ANDREI P.",
@@ -740,7 +741,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_009",
+    "id": "EE-009",
     "code": "EE-009",
     "studentCode": "EE-009",
     "name": "ARANDIA, JOHN ANSELLE M.",
@@ -748,7 +749,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_010",
+    "id": "EE-010",
     "code": "EE-010",
     "studentCode": "EE-010",
     "name": "ASCAÑO, RHICO S.",
@@ -756,7 +757,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_011",
+    "id": "EE-011",
     "code": "EE-011",
     "studentCode": "EE-011",
     "name": "ASTROLABIO, RHAY JUSTIN P.",
@@ -764,7 +765,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_012",
+    "id": "EE-012",
     "code": "EE-012",
     "studentCode": "EE-012",
     "name": "ATIENZA, PAUL JERICO H.",
@@ -772,7 +773,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_013",
+    "id": "EE-013",
     "code": "EE-013",
     "studentCode": "EE-013",
     "name": "BAHOY, DWIGHT IVAN V.",
@@ -780,7 +781,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_014",
+    "id": "EE-014",
     "code": "EE-014",
     "studentCode": "EE-014",
     "name": "BERMUDEZ, MARK LEO M.",
@@ -788,7 +789,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_015",
+    "id": "EE-015",
     "code": "EE-015",
     "studentCode": "EE-015",
     "name": "BONCAJES, ROB MARTIN A.",
@@ -796,7 +797,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_016",
+    "id": "EE-016",
     "code": "EE-016",
     "studentCode": "EE-016",
     "name": "CABARLES, TYRON Q.",
@@ -804,7 +805,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_017",
+    "id": "EE-017",
     "code": "EE-017",
     "studentCode": "EE-017",
     "name": "CAJUCOM, BRYAN JAMES M.",
@@ -812,7 +813,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_018",
+    "id": "EE-018",
     "code": "EE-018",
     "studentCode": "EE-018",
     "name": "CALMA, WENDELL D.",
@@ -820,7 +821,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_019",
+    "id": "EE-019",
     "code": "EE-019",
     "studentCode": "EE-019",
     "name": "CANTARA, CHILVERT REIN C.",
@@ -828,7 +829,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_020",
+    "id": "EE-020",
     "code": "EE-020",
     "studentCode": "EE-020",
     "name": "CARMONA, LEE ROUAN C.",
@@ -836,7 +837,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_021",
+    "id": "EE-021",
     "code": "EE-021",
     "studentCode": "EE-021",
     "name": "CHAVEZ, JOHN DAVID B.",
@@ -844,7 +845,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_022",
+    "id": "EE-022",
     "code": "EE-022",
     "studentCode": "EE-022",
     "name": "COMMINS, FRANCHESKA MAE A.",
@@ -852,7 +853,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_023",
+    "id": "EE-023",
     "code": "EE-023",
     "studentCode": "EE-023",
     "name": "CRISTOBAL, CHRISTOPHER Y.",
@@ -860,7 +861,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_024",
+    "id": "EE-024",
     "code": "EE-024",
     "studentCode": "EE-024",
     "name": "CUIZON, ALEXANDER D.",
@@ -868,7 +869,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_025",
+    "id": "EE-025",
     "code": "EE-025",
     "studentCode": "EE-025",
     "name": "DALISAY, RANIEL T.",
@@ -876,7 +877,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_026",
+    "id": "EE-026",
     "code": "EE-026",
     "studentCode": "EE-026",
     "name": "DAMAYO, CHRISTOPHER DANIELLE C.",
@@ -884,7 +885,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_027",
+    "id": "EE-027",
     "code": "EE-027",
     "studentCode": "EE-027",
     "name": "DAPADAP, JOSHUA NAHIL N.",
@@ -892,7 +893,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_028",
+    "id": "EE-028",
     "code": "EE-028",
     "studentCode": "EE-028",
     "name": "DATUS, RAIN R.",
@@ -900,7 +901,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_029",
+    "id": "EE-029",
     "code": "EE-029",
     "studentCode": "EE-029",
     "name": "DE LEON, RITCH GERMAINE M.",
@@ -908,7 +909,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_030",
+    "id": "EE-030",
     "code": "EE-030",
     "studentCode": "EE-030",
     "name": "DELA CRUZ, JOHN JOSEPH R.",
@@ -916,7 +917,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_031",
+    "id": "EE-031",
     "code": "EE-031",
     "studentCode": "EE-031",
     "name": "DELOS REYES, JEROME V.",
@@ -924,7 +925,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_032",
+    "id": "EE-032",
     "code": "EE-032",
     "studentCode": "EE-032",
     "name": "DELOS REYES, MARK STEPHEN B.",
@@ -932,7 +933,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_033",
+    "id": "EE-033",
     "code": "EE-033",
     "studentCode": "EE-033",
     "name": "DULAY, GEIBRIEL RENE P.",
@@ -940,7 +941,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_034",
+    "id": "EE-034",
     "code": "EE-034",
     "studentCode": "EE-034",
     "name": "ENDRINAL, EMMANUEL H.",
@@ -948,7 +949,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_035",
+    "id": "EE-035",
     "code": "EE-035",
     "studentCode": "EE-035",
     "name": "EREJIAS, JOHN MARK M.",
@@ -956,7 +957,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_036",
+    "id": "EE-036",
     "code": "EE-036",
     "studentCode": "EE-036",
     "name": "EUGENIO, JOHN MICHAEL A.",
@@ -964,7 +965,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_037",
+    "id": "EE-037",
     "code": "EE-037",
     "studentCode": "EE-037",
     "name": "FAELMARIN, JHON AX'L F.",
@@ -972,7 +973,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_038",
+    "id": "EE-038",
     "code": "EE-038",
     "studentCode": "EE-038",
     "name": "FLORES, NORIEL A.",
@@ -980,7 +981,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_039",
+    "id": "EE-039",
     "code": "EE-039",
     "studentCode": "EE-039",
     "name": "FLORES, RHONA LYN R.",
@@ -988,7 +989,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_040",
+    "id": "EE-040",
     "code": "EE-040",
     "studentCode": "EE-040",
     "name": "FLORIDO, DUSTINE ANGELO M.",
@@ -996,7 +997,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_041",
+    "id": "EE-041",
     "code": "EE-041",
     "studentCode": "EE-041",
     "name": "GADAZA, JOSE GABRIEL B.",
@@ -1004,7 +1005,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_042",
+    "id": "EE-042",
     "code": "EE-042",
     "studentCode": "EE-042",
     "name": "GALLEGO, HARIS JHON S.",
@@ -1012,7 +1013,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_043",
+    "id": "EE-043",
     "code": "EE-043",
     "studentCode": "EE-043",
     "name": "GAYOSA, KHENA KATLEEN G.",
@@ -1020,7 +1021,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_044",
+    "id": "EE-044",
     "code": "EE-044",
     "studentCode": "EE-044",
     "name": "GERODIAS, BRENT GERSON A.",
@@ -1028,7 +1029,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_045",
+    "id": "EE-045",
     "code": "EE-045",
     "studentCode": "EE-045",
     "name": "GOMEZ, MA. ALSHICA K.",
@@ -1036,7 +1037,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_046",
+    "id": "EE-046",
     "code": "EE-046",
     "studentCode": "EE-046",
     "name": "GONZALES, SEAN ALLEN M.",
@@ -1044,7 +1045,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_047",
+    "id": "EE-047",
     "code": "EE-047",
     "studentCode": "EE-047",
     "name": "GUIRUELA, JAMES L.",
@@ -1052,7 +1053,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_048",
+    "id": "EE-048",
     "code": "EE-048",
     "studentCode": "EE-048",
     "name": "HASHIM, BRINLY HAMIM M.",
@@ -1060,7 +1061,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_049",
+    "id": "EE-049",
     "code": "EE-049",
     "studentCode": "EE-049",
     "name": "HERNANDEZ, JAY CYRIL C.",
@@ -1068,7 +1069,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_050",
+    "id": "EE-050",
     "code": "EE-050",
     "studentCode": "EE-050",
     "name": "HERNANDEZ, SAM ANDREI V.",
@@ -1076,7 +1077,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_051",
+    "id": "EE-051",
     "code": "EE-051",
     "studentCode": "EE-051",
     "name": "IBARROLA, HANS KEN M.",
@@ -1084,7 +1085,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_052",
+    "id": "EE-052",
     "code": "EE-052",
     "studentCode": "EE-052",
     "name": "JUANICO, NYNGEL S.",
@@ -1092,7 +1093,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_053",
+    "id": "EE-053",
     "code": "EE-053",
     "studentCode": "EE-053",
     "name": "LACORTE, CRIS JASON M.",
@@ -1100,7 +1101,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_054",
+    "id": "EE-054",
     "code": "EE-054",
     "studentCode": "EE-054",
     "name": "LAYACAN, VHEA EDRICH M.",
@@ -1108,7 +1109,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_055",
+    "id": "EE-055",
     "code": "EE-055",
     "studentCode": "EE-055",
     "name": "LEGASPI, ULYCES P.",
@@ -1116,7 +1117,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_056",
+    "id": "EE-056",
     "code": "EE-056",
     "studentCode": "EE-056",
     "name": "LOPEZ, CHARLES ROBERT L.",
@@ -1124,7 +1125,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_057",
+    "id": "EE-057",
     "code": "EE-057",
     "studentCode": "EE-057",
     "name": "LUMBRES, DUSTIN M.",
@@ -1132,7 +1133,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_058",
+    "id": "EE-058",
     "code": "EE-058",
     "studentCode": "EE-058",
     "name": "MACALALAD, FRANS RYLCO C.",
@@ -1140,7 +1141,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_059",
+    "id": "EE-059",
     "code": "EE-059",
     "studentCode": "EE-059",
     "name": "MAGSOMBOL, JAMES RYAN J.",
@@ -1148,7 +1149,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_060",
+    "id": "EE-060",
     "code": "EE-060",
     "studentCode": "EE-060",
     "name": "MALABAG, JOHN MICHAEL B.",
@@ -1156,7 +1157,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_061",
+    "id": "EE-061",
     "code": "EE-061",
     "studentCode": "EE-061",
     "name": "MALANA, ROSSETTE NATHALIE A.",
@@ -1164,7 +1165,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_062",
+    "id": "EE-062",
     "code": "EE-062",
     "studentCode": "EE-062",
     "name": "MALOLOY-ON, DEFFERSON JOHN T.",
@@ -1172,7 +1173,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_063",
+    "id": "EE-063",
     "code": "EE-063",
     "studentCode": "EE-063",
     "name": "MAÑOBRA, LORENZO A.",
@@ -1180,7 +1181,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_064",
+    "id": "EE-064",
     "code": "EE-064",
     "studentCode": "EE-064",
     "name": "MAPUTE, CHRIS CORNELL F.",
@@ -1188,7 +1189,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_065",
+    "id": "EE-065",
     "code": "EE-065",
     "studentCode": "EE-065",
     "name": "MICA, CLARK DUSTIN COSME D.",
@@ -1196,7 +1197,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_066",
+    "id": "EE-066",
     "code": "EE-066",
     "studentCode": "EE-066",
     "name": "MILCA, JERALD O.",
@@ -1204,7 +1205,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_067",
+    "id": "EE-067",
     "code": "EE-067",
     "studentCode": "EE-067",
     "name": "MONDIA, JOHN VINCENT M.",
@@ -1212,7 +1213,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_068",
+    "id": "EE-068",
     "code": "EE-068",
     "studentCode": "EE-068",
     "name": "MORAN, MARK NIÑO A.",
@@ -1220,7 +1221,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_069",
+    "id": "EE-069",
     "code": "EE-069",
     "studentCode": "EE-069",
     "name": "MOSCA, JAMESTEVE SEAN G.",
@@ -1228,7 +1229,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_070",
+    "id": "EE-070",
     "code": "EE-070",
     "studentCode": "EE-070",
     "name": "NUNO, ROYD ALFONSO M.",
@@ -1236,7 +1237,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_071",
+    "id": "EE-071",
     "code": "EE-071",
     "studentCode": "EE-071",
     "name": "OPULENCIA, AARON ALLEXIS S.",
@@ -1244,7 +1245,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_072",
+    "id": "EE-072",
     "code": "EE-072",
     "studentCode": "EE-072",
     "name": "ORTEGA, JAMES V.",
@@ -1252,7 +1253,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_073",
+    "id": "EE-073",
     "code": "EE-073",
     "studentCode": "EE-073",
     "name": "ORTIZ, PAULA EUNISE A.",
@@ -1260,7 +1261,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_074",
+    "id": "EE-074",
     "code": "EE-074",
     "studentCode": "EE-074",
     "name": "PABALATE, RHED S.",
@@ -1268,7 +1269,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_075",
+    "id": "EE-075",
     "code": "EE-075",
     "studentCode": "EE-075",
     "name": "PAMPLONA, NELO DRIX T.",
@@ -1276,7 +1277,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_076",
+    "id": "EE-076",
     "code": "EE-076",
     "studentCode": "EE-076",
     "name": "PANARIGAN, KARLO P.",
@@ -1284,7 +1285,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_077",
+    "id": "EE-077",
     "code": "EE-077",
     "studentCode": "EE-077",
     "name": "PANER, ORLANDO GABRIEL C.",
@@ -1292,7 +1293,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_078",
+    "id": "EE-078",
     "code": "EE-078",
     "studentCode": "EE-078",
     "name": "PATARAY, EUNICE L.",
@@ -1300,7 +1301,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_079",
+    "id": "EE-079",
     "code": "EE-079",
     "studentCode": "EE-079",
     "name": "PECAYO, RHIANE MAE L.",
@@ -1308,7 +1309,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_080",
+    "id": "EE-080",
     "code": "EE-080",
     "studentCode": "EE-080",
     "name": "PEDRAJA, JOMARI D.",
@@ -1316,7 +1317,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_081",
+    "id": "EE-081",
     "code": "EE-081",
     "studentCode": "EE-081",
     "name": "PEREZ, JARED ELWOOD P.",
@@ -1324,7 +1325,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_082",
+    "id": "EE-082",
     "code": "EE-082",
     "studentCode": "EE-082",
     "name": "PIOQUINTO, ELREY D.",
@@ -1332,7 +1333,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_083",
+    "id": "EE-083",
     "code": "EE-083",
     "studentCode": "EE-083",
     "name": "PIZARRA, DOMAR A.",
@@ -1340,7 +1341,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_084",
+    "id": "EE-084",
     "code": "EE-084",
     "studentCode": "EE-084",
     "name": "RAMILO, DRACIR JOSH G.",
@@ -1348,7 +1349,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_085",
+    "id": "EE-085",
     "code": "EE-085",
     "studentCode": "EE-085",
     "name": "SALIBA, DEROSS D.",
@@ -1356,7 +1357,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_086",
+    "id": "EE-086",
     "code": "EE-086",
     "studentCode": "EE-086",
     "name": "SANTOS, RAFAEL P.",
@@ -1364,7 +1365,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_087",
+    "id": "EE-087",
     "code": "EE-087",
     "studentCode": "EE-087",
     "name": "SOLATORIO, JOHN JETRO C.",
@@ -1372,7 +1373,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_088",
+    "id": "EE-088",
     "code": "EE-088",
     "studentCode": "EE-088",
     "name": "TABAMO, EJ GODWIN B.",
@@ -1380,7 +1381,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_089",
+    "id": "EE-089",
     "code": "EE-089",
     "studentCode": "EE-089",
     "name": "TORIAGA, KURT LOUISE M.",
@@ -1388,7 +1389,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_090",
+    "id": "EE-090",
     "code": "EE-090",
     "studentCode": "EE-090",
     "name": "URRIZA, BRYLLE KRISTEN A.",
@@ -1396,7 +1397,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_091",
+    "id": "EE-091",
     "code": "EE-091",
     "studentCode": "EE-091",
     "name": "VILLARE, RYE LEE E.",
@@ -1404,7 +1405,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-ee_092",
+    "id": "EE-092",
     "code": "EE-092",
     "studentCode": "EE-092",
     "name": "YABUT, CRISENCIO JR. P.",
@@ -1412,7 +1413,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRICAL ENGINEERING"
   },
   {
-    "id": "student-cpe_001",
+    "id": "CPE-001",
     "code": "CPE-001",
     "studentCode": "CPE-001",
     "name": "AMICAN, GABRIEL EMMANUEL B.",
@@ -1420,7 +1421,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_002",
+    "id": "CPE-002",
     "code": "CPE-002",
     "studentCode": "CPE-002",
     "name": "ANDAYA, SEAN COLLIN S.",
@@ -1428,7 +1429,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_003",
+    "id": "CPE-003",
     "code": "CPE-003",
     "studentCode": "CPE-003",
     "name": "ARQUILLO, MARK P.",
@@ -1436,7 +1437,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_004",
+    "id": "CPE-004",
     "code": "CPE-004",
     "studentCode": "CPE-004",
     "name": "ARROCO, DAVID SZUIN R.",
@@ -1444,7 +1445,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_005",
+    "id": "CPE-005",
     "code": "CPE-005",
     "studentCode": "CPE-005",
     "name": "BALBUENA, EDUARDO III J.",
@@ -1452,7 +1453,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_006",
+    "id": "CPE-006",
     "code": "CPE-006",
     "studentCode": "CPE-006",
     "name": "BARBON, ANNE KIRSTEN V.",
@@ -1460,7 +1461,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_007",
+    "id": "CPE-007",
     "code": "CPE-007",
     "studentCode": "CPE-007",
     "name": "BARCELLANO, MAR JOSEF V.",
@@ -1468,7 +1469,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_008",
+    "id": "CPE-008",
     "code": "CPE-008",
     "studentCode": "CPE-008",
     "name": "BEGAS, JAYCEL NIEL C.",
@@ -1476,7 +1477,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_009",
+    "id": "CPE-009",
     "code": "CPE-009",
     "studentCode": "CPE-009",
     "name": "BIESCAS, REYSSA JEAN D.",
@@ -1484,7 +1485,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_010",
+    "id": "CPE-010",
     "code": "CPE-010",
     "studentCode": "CPE-010",
     "name": "BITANA, MARK EDRIAN J.",
@@ -1492,7 +1493,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_011",
+    "id": "CPE-011",
     "code": "CPE-011",
     "studentCode": "CPE-011",
     "name": "BUSTAMANTE, DANIEL JOHN T.",
@@ -1500,7 +1501,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_012",
+    "id": "CPE-012",
     "code": "CPE-012",
     "studentCode": "CPE-012",
     "name": "CAMACHO, BERNARD JOEY B.",
@@ -1508,7 +1509,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_013",
+    "id": "CPE-013",
     "code": "CPE-013",
     "studentCode": "CPE-013",
     "name": "CAMBEL, KIRSTEN M.",
@@ -1516,7 +1517,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_014",
+    "id": "CPE-014",
     "code": "CPE-014",
     "studentCode": "CPE-014",
     "name": "CANTALEJO, KAIDE M.",
@@ -1524,7 +1525,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_015",
+    "id": "CPE-015",
     "code": "CPE-015",
     "studentCode": "CPE-015",
     "name": "CASTILLO, CHINI MARIELLI",
@@ -1532,7 +1533,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_016",
+    "id": "CPE-016",
     "code": "CPE-016",
     "studentCode": "CPE-016",
     "name": "CENA, LEO M.",
@@ -1540,7 +1541,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_017",
+    "id": "CPE-017",
     "code": "CPE-017",
     "studentCode": "CPE-017",
     "name": "CESAR, KLYDE GABRIEL A.",
@@ -1548,7 +1549,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_018",
+    "id": "CPE-018",
     "code": "CPE-018",
     "studentCode": "CPE-018",
     "name": "CLARO, SHAWN ROMINICK T.",
@@ -1556,7 +1557,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_019",
+    "id": "CPE-019",
     "code": "CPE-019",
     "studentCode": "CPE-019",
     "name": "CONEJARES, RODCORT ELVEN V.",
@@ -1564,7 +1565,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_020",
+    "id": "CPE-020",
     "code": "CPE-020",
     "studentCode": "CPE-020",
     "name": "DE JESUS, KENNETH G.",
@@ -1572,7 +1573,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_021",
+    "id": "CPE-021",
     "code": "CPE-021",
     "studentCode": "CPE-021",
     "name": "DOLLETON, DWAYNE KENSHIN R.",
@@ -1580,7 +1581,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_022",
+    "id": "CPE-022",
     "code": "CPE-022",
     "studentCode": "CPE-022",
     "name": "DOMINGO, JOSE URBANO B.",
@@ -1588,7 +1589,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_023",
+    "id": "CPE-023",
     "code": "CPE-023",
     "studentCode": "CPE-023",
     "name": "DULLAS, CHARLES EZEKIEL F.",
@@ -1596,7 +1597,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_024",
+    "id": "CPE-024",
     "code": "CPE-024",
     "studentCode": "CPE-024",
     "name": "DY, LEIGH ICEN G.",
@@ -1604,7 +1605,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_025",
+    "id": "CPE-025",
     "code": "CPE-025",
     "studentCode": "CPE-025",
     "name": "ESCULTURA, PRINCE ERROLL M.",
@@ -1612,7 +1613,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_026",
+    "id": "CPE-026",
     "code": "CPE-026",
     "studentCode": "CPE-026",
     "name": "ESTEBAN, JEANE ANDREI C.",
@@ -1620,7 +1621,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_027",
+    "id": "CPE-027",
     "code": "CPE-027",
     "studentCode": "CPE-027",
     "name": "GALOYO, IRIS L.",
@@ -1628,7 +1629,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_028",
+    "id": "CPE-028",
     "code": "CPE-028",
     "studentCode": "CPE-028",
     "name": "GARCIA, JUSTIN ADRIENN P.",
@@ -1636,7 +1637,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_029",
+    "id": "CPE-029",
     "code": "CPE-029",
     "studentCode": "CPE-029",
     "name": "KODAKA, KIAN KENTA D.",
@@ -1644,7 +1645,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_030",
+    "id": "CPE-030",
     "code": "CPE-030",
     "studentCode": "CPE-030",
     "name": "LLANETA, JOHN VINCENT M.",
@@ -1652,7 +1653,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_031",
+    "id": "CPE-031",
     "code": "CPE-031",
     "studentCode": "CPE-031",
     "name": "LLANETA, KENJIE-LIM A.",
@@ -1660,7 +1661,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_032",
+    "id": "CPE-032",
     "code": "CPE-032",
     "studentCode": "CPE-032",
     "name": "MAALINDOG, ALAN PAUL C.",
@@ -1668,7 +1669,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_033",
+    "id": "CPE-033",
     "code": "CPE-033",
     "studentCode": "CPE-033",
     "name": "MAGNO, DAN LLOYD L.",
@@ -1676,7 +1677,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_034",
+    "id": "CPE-034",
     "code": "CPE-034",
     "studentCode": "CPE-034",
     "name": "MALABANAN, JUSTINE RALPH B.",
@@ -1684,7 +1685,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_035",
+    "id": "CPE-035",
     "code": "CPE-035",
     "studentCode": "CPE-035",
     "name": "MANE, FRANCINE JADE G.",
@@ -1692,7 +1693,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_036",
+    "id": "CPE-036",
     "code": "CPE-036",
     "studentCode": "CPE-036",
     "name": "MEDINA, ALLAEN MARK S.",
@@ -1700,7 +1701,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_037",
+    "id": "CPE-037",
     "code": "CPE-037",
     "studentCode": "CPE-037",
     "name": "NAGPALA, EERSEL ANDREY V.",
@@ -1708,7 +1709,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_038",
+    "id": "CPE-038",
     "code": "CPE-038",
     "studentCode": "CPE-038",
     "name": "OCASLA, NORMAN DAVID J.",
@@ -1716,7 +1717,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_039",
+    "id": "CPE-039",
     "code": "CPE-039",
     "studentCode": "CPE-039",
     "name": "OLIVAR, CHRISTIAN JOSH D.",
@@ -1724,7 +1725,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_040",
+    "id": "CPE-040",
     "code": "CPE-040",
     "studentCode": "CPE-040",
     "name": "OPULENCIA, ALLEXASHEENA DEINNE S.",
@@ -1732,7 +1733,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_041",
+    "id": "CPE-041",
     "code": "CPE-041",
     "studentCode": "CPE-041",
     "name": "ORDANZA, JAMEZ IVAN V.",
@@ -1740,7 +1741,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_042",
+    "id": "CPE-042",
     "code": "CPE-042",
     "studentCode": "CPE-042",
     "name": "PADUA, RHIANA ASHLEY G.",
@@ -1748,7 +1749,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_043",
+    "id": "CPE-043",
     "code": "CPE-043",
     "studentCode": "CPE-043",
     "name": "PALISOC, MARK ELEAZAR M.",
@@ -1756,7 +1757,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_044",
+    "id": "CPE-044",
     "code": "CPE-044",
     "studentCode": "CPE-044",
     "name": "PALOMO, CHARLEMAGNE B.",
@@ -1764,7 +1765,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_045",
+    "id": "CPE-045",
     "code": "CPE-045",
     "studentCode": "CPE-045",
     "name": "PEDRIGAL, MARGARETE JANE PAULEY D.",
@@ -1772,7 +1773,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_046",
+    "id": "CPE-046",
     "code": "CPE-046",
     "studentCode": "CPE-046",
     "name": "PETATE, KARL JANSEN S.",
@@ -1780,7 +1781,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_047",
+    "id": "CPE-047",
     "code": "CPE-047",
     "studentCode": "CPE-047",
     "name": "PETATE, KIERVY R.",
@@ -1788,7 +1789,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_048",
+    "id": "CPE-048",
     "code": "CPE-048",
     "studentCode": "CPE-048",
     "name": "RAFA, RAFAEL ALEX A.",
@@ -1796,7 +1797,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_049",
+    "id": "CPE-049",
     "code": "CPE-049",
     "studentCode": "CPE-049",
     "name": "REGASPI, MARY MARGARETTE D.",
@@ -1804,7 +1805,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_050",
+    "id": "CPE-050",
     "code": "CPE-050",
     "studentCode": "CPE-050",
     "name": "RUANTO, RANIELLE JEDD R.",
@@ -1812,7 +1813,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_051",
+    "id": "CPE-051",
     "code": "CPE-051",
     "studentCode": "CPE-051",
     "name": "SANTIAGO, ULRICA LORAINE D.",
@@ -1820,7 +1821,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_052",
+    "id": "CPE-052",
     "code": "CPE-052",
     "studentCode": "CPE-052",
     "name": "SASPA, ASHLEY KHATE R.",
@@ -1828,7 +1829,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_053",
+    "id": "CPE-053",
     "code": "CPE-053",
     "studentCode": "CPE-053",
     "name": "SERRANA, JESSIE B.",
@@ -1836,7 +1837,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_054",
+    "id": "CPE-054",
     "code": "CPE-054",
     "studentCode": "CPE-054",
     "name": "TAN, SIMON M.",
@@ -1844,7 +1845,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_055",
+    "id": "CPE-055",
     "code": "CPE-055",
     "studentCode": "CPE-055",
     "name": "TOLENTINO, BENJAMIN M.",
@@ -1852,7 +1853,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_056",
+    "id": "CPE-056",
     "code": "CPE-056",
     "studentCode": "CPE-056",
     "name": "TORALES, REUEL ANNE A.",
@@ -1860,7 +1861,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_057",
+    "id": "CPE-057",
     "code": "CPE-057",
     "studentCode": "CPE-057",
     "name": "TORRES, JOSHUA ALLEN D.",
@@ -1868,7 +1869,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_058",
+    "id": "CPE-058",
     "code": "CPE-058",
     "studentCode": "CPE-058",
     "name": "VIVAS, BENEDICT MIGUEL C.",
@@ -1876,7 +1877,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_059",
+    "id": "CPE-059",
     "code": "CPE-059",
     "studentCode": "CPE-059",
     "name": "YANSON, RANDEL C.",
@@ -1884,7 +1885,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-cpe_060",
+    "id": "CPE-060",
     "code": "CPE-060",
     "studentCode": "CPE-060",
     "name": "ZARSUELO, JOHN GAVERIEL D.",
@@ -1892,7 +1893,7 @@ window.MEODL_DATA = {
     "teamName": "COMPUTER ENGINEERING"
   },
   {
-    "id": "student-ece_001",
+    "id": "ECE-001",
     "code": "ECE-001",
     "studentCode": "ECE-001",
     "name": "MARQUEZ, GISELLE A.",
@@ -1900,7 +1901,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRONICS ENGINEERING"
   },
   {
-    "id": "student-ece_002",
+    "id": "ECE-002",
     "code": "ECE-002",
     "studentCode": "ECE-002",
     "name": "GUANIESO, ANGELLIC RENANELYN O.",
@@ -1908,7 +1909,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRONICS ENGINEERING"
   },
   {
-    "id": "student-ece_003",
+    "id": "ECE-003",
     "code": "ECE-003",
     "studentCode": "ECE-003",
     "name": "CAMAT, RENUARD A.",
@@ -1916,7 +1917,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRONICS ENGINEERING"
   },
   {
-    "id": "student-ece_004",
+    "id": "ECE-004",
     "code": "ECE-004",
     "studentCode": "ECE-004",
     "name": "ALKHATIB, SAMER B.",
@@ -1924,7 +1925,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRONICS ENGINEERING"
   },
   {
-    "id": "student-ece_005",
+    "id": "ECE-005",
     "code": "ECE-005",
     "studentCode": "ECE-005",
     "name": "OPULENCIA, MARIA GEE-ANNE P.",
@@ -1932,7 +1933,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRONICS ENGINEERING"
   },
   {
-    "id": "student-ece_006",
+    "id": "ECE-006",
     "code": "ECE-006",
     "studentCode": "ECE-006",
     "name": "GAMITIN, JOMAR GABRIEL B.",
@@ -1940,7 +1941,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRONICS ENGINEERING"
   },
   {
-    "id": "student-ece_007",
+    "id": "ECE-007",
     "code": "ECE-007",
     "studentCode": "ECE-007",
     "name": "PAGUINTO, OLIEMAR LEINER P.",
@@ -1948,7 +1949,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRONICS ENGINEERING"
   },
   {
-    "id": "student-ece_008",
+    "id": "ECE-008",
     "code": "ECE-008",
     "studentCode": "ECE-008",
     "name": "MARASIGAN, JERICHO MIGUEL R.",
@@ -1956,7 +1957,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRONICS ENGINEERING"
   },
   {
-    "id": "student-ece_009",
+    "id": "ECE-009",
     "code": "ECE-009",
     "studentCode": "ECE-009",
     "name": "GUERRERO, OWEN DOMINIC V.",
@@ -1964,7 +1965,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRONICS ENGINEERING"
   },
   {
-    "id": "student-ece_010",
+    "id": "ECE-010",
     "code": "ECE-010",
     "studentCode": "ECE-010",
     "name": "MENOR, ANGELO C.",
@@ -1972,7 +1973,7 @@ window.MEODL_DATA = {
     "teamName": "ELECTRONICS ENGINEERING"
   },
   {
-    "id": "student-ie_001",
+    "id": "IE-001",
     "code": "IE-001",
     "studentCode": "IE-001",
     "name": "ABAD, JUDITH MARIAN SILVA",
@@ -1980,7 +1981,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_002",
+    "id": "IE-002",
     "code": "IE-002",
     "studentCode": "IE-002",
     "name": "AGUILAR, RUSSEL ALLEN CASTILLO",
@@ -1988,7 +1989,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_003",
+    "id": "IE-003",
     "code": "IE-003",
     "studentCode": "IE-003",
     "name": "BALLEZA, BRUNZON ANSANO",
@@ -1996,7 +1997,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_004",
+    "id": "IE-004",
     "code": "IE-004",
     "studentCode": "IE-004",
     "name": "BAUTISTA, MA. CHARICE JAYONA",
@@ -2004,7 +2005,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_005",
+    "id": "IE-005",
     "code": "IE-005",
     "studentCode": "IE-005",
     "name": "CANATUAN, YSABELA MERCADO",
@@ -2012,7 +2013,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_006",
+    "id": "IE-006",
     "code": "IE-006",
     "studentCode": "IE-006",
     "name": "CICERON, HANS GABRIEL CONJARES",
@@ -2020,7 +2021,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_007",
+    "id": "IE-007",
     "code": "IE-007",
     "studentCode": "IE-007",
     "name": "CONSIGNADO, KASSANDRA SARMIENTO",
@@ -2028,7 +2029,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_008",
+    "id": "IE-008",
     "code": "IE-008",
     "studentCode": "IE-008",
     "name": "DE LEON, YANZ MARLOU BAYBAY",
@@ -2036,7 +2037,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_009",
+    "id": "IE-009",
     "code": "IE-009",
     "studentCode": "IE-009",
     "name": "ELISAN, JOSHUA BRYCE OLINARES",
@@ -2044,7 +2045,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_010",
+    "id": "IE-010",
     "code": "IE-010",
     "studentCode": "IE-010",
     "name": "ESTRADA, JERILOU MAE NAZARETH",
@@ -2052,7 +2053,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_011",
+    "id": "IE-011",
     "code": "IE-011",
     "studentCode": "IE-011",
     "name": "FRANCISCO, ANDRES LUIS MADEJA",
@@ -2060,7 +2061,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_012",
+    "id": "IE-012",
     "code": "IE-012",
     "studentCode": "IE-012",
     "name": "HALILI, MARK CLARENCE ALDABE",
@@ -2068,7 +2069,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_013",
+    "id": "IE-013",
     "code": "IE-013",
     "studentCode": "IE-013",
     "name": "IYOG, HANNAH MEKIE SHANE JUNGAY",
@@ -2076,7 +2077,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_014",
+    "id": "IE-014",
     "code": "IE-014",
     "studentCode": "IE-014",
     "name": "KODAKA, KYLE KENYA DELUANA",
@@ -2084,7 +2085,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_015",
+    "id": "IE-015",
     "code": "IE-015",
     "studentCode": "IE-015",
     "name": "LARINO, JOANA SOPHIA BEATRICE REYEG",
@@ -2092,7 +2093,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_016",
+    "id": "IE-016",
     "code": "IE-016",
     "studentCode": "IE-016",
     "name": "LECHUGA, CASSANDRA SHANEYA MANINGAS",
@@ -2100,7 +2101,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_017",
+    "id": "IE-017",
     "code": "IE-017",
     "studentCode": "IE-017",
     "name": "LEGASPI, TRAVIS MATHEW PARO",
@@ -2108,7 +2109,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_018",
+    "id": "IE-018",
     "code": "IE-018",
     "studentCode": "IE-018",
     "name": "MALLORCA, ANTON JOSEPH NARVAEZ",
@@ -2116,7 +2117,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_019",
+    "id": "IE-019",
     "code": "IE-019",
     "studentCode": "IE-019",
     "name": "NIEM, JARED CIRENE GOLE",
@@ -2124,7 +2125,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_020",
+    "id": "IE-020",
     "code": "IE-020",
     "studentCode": "IE-020",
     "name": "OCAMPO, RENZO HADI",
@@ -2132,7 +2133,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_021",
+    "id": "IE-021",
     "code": "IE-021",
     "studentCode": "IE-021",
     "name": "PADIT, ANDREI ANG",
@@ -2140,7 +2141,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_022",
+    "id": "IE-022",
     "code": "IE-022",
     "studentCode": "IE-022",
     "name": "PALIZA, PATRICK ANJELLO SOLINAP",
@@ -2148,7 +2149,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_023",
+    "id": "IE-023",
     "code": "IE-023",
     "studentCode": "IE-023",
     "name": "RAÑOLA, PRINCESS ARIANI ROXAS",
@@ -2156,7 +2157,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_024",
+    "id": "IE-024",
     "code": "IE-024",
     "studentCode": "IE-024",
     "name": "ROSALES, LOUISE ALLEN BALBIN",
@@ -2164,7 +2165,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_025",
+    "id": "IE-025",
     "code": "IE-025",
     "studentCode": "IE-025",
     "name": "SOJOR, ALBERT MARCELO",
@@ -2172,7 +2173,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_026",
+    "id": "IE-026",
     "code": "IE-026",
     "studentCode": "IE-026",
     "name": "VALIÑA, ANGELA CLAIRE PERILLO",
@@ -2180,7 +2181,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_027",
+    "id": "IE-027",
     "code": "IE-027",
     "studentCode": "IE-027",
     "name": "BANTOC, VINCE LYNDON ABENDAN",
@@ -2188,7 +2189,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_028",
+    "id": "IE-028",
     "code": "IE-028",
     "studentCode": "IE-028",
     "name": "BESAS, CHEN ZHEN LUMACANG",
@@ -2196,7 +2197,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_029",
+    "id": "IE-029",
     "code": "IE-029",
     "studentCode": "IE-029",
     "name": "DOROJA, PRINCESS FHAYE COLLINE TAMONDONG",
@@ -2204,7 +2205,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_030",
+    "id": "IE-030",
     "code": "IE-030",
     "studentCode": "IE-030",
     "name": "FRANCISCO, DERRICK GABRIEL ESCONDO",
@@ -2212,7 +2213,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_031",
+    "id": "IE-031",
     "code": "IE-031",
     "studentCode": "IE-031",
     "name": "GALINDEZ, JOHN PAUL JAVIER",
@@ -2220,7 +2221,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_032",
+    "id": "IE-032",
     "code": "IE-032",
     "studentCode": "IE-032",
     "name": "GARDAYA, PRINCESS JANEL DE OCAMPO",
@@ -2228,7 +2229,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_033",
+    "id": "IE-033",
     "code": "IE-033",
     "studentCode": "IE-033",
     "name": "GUELAS, MARK KRISTIAN ROMEO DUSONG",
@@ -2236,7 +2237,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_034",
+    "id": "IE-034",
     "code": "IE-034",
     "studentCode": "IE-034",
     "name": "IMSON, CHRISTIAN SIMON OLIVEROS",
@@ -2244,7 +2245,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_035",
+    "id": "IE-035",
     "code": "IE-035",
     "studentCode": "IE-035",
     "name": "JAYME, PRINCESS MAE MANAIG",
@@ -2252,7 +2253,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_036",
+    "id": "IE-036",
     "code": "IE-036",
     "studentCode": "IE-036",
     "name": "MALABANAN, ALJON RAMOS",
@@ -2260,7 +2261,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_037",
+    "id": "IE-037",
     "code": "IE-037",
     "studentCode": "IE-037",
     "name": "MALATE, LUJILL DYLAN SEÑORISES",
@@ -2268,7 +2269,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_038",
+    "id": "IE-038",
     "code": "IE-038",
     "studentCode": "IE-038",
     "name": "MANNAN, ABDULHAFIDZ MAUJOD",
@@ -2276,7 +2277,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_039",
+    "id": "IE-039",
     "code": "IE-039",
     "studentCode": "IE-039",
     "name": "MILANES, SHANE SALIBIO",
@@ -2284,7 +2285,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_040",
+    "id": "IE-040",
     "code": "IE-040",
     "studentCode": "IE-040",
     "name": "NAVARRO, NEON GENESIS DE CASTRO",
@@ -2292,7 +2293,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_041",
+    "id": "IE-041",
     "code": "IE-041",
     "studentCode": "IE-041",
     "name": "NOBLEFRANCA, VARY ALEM CANDELARIA",
@@ -2300,7 +2301,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_042",
+    "id": "IE-042",
     "code": "IE-042",
     "studentCode": "IE-042",
     "name": "OQUERIA, CAMILLE ANNE CANLOBO",
@@ -2308,7 +2309,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_043",
+    "id": "IE-043",
     "code": "IE-043",
     "studentCode": "IE-043",
     "name": "ORELLANES, JOHN MARK BATASINGEN",
@@ -2316,7 +2317,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_044",
+    "id": "IE-044",
     "code": "IE-044",
     "studentCode": "IE-044",
     "name": "PACALDO, JHAYSAMEL ALALIM",
@@ -2324,7 +2325,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_045",
+    "id": "IE-045",
     "code": "IE-045",
     "studentCode": "IE-045",
     "name": "PINEDA, KIENNA DENISE ORUGA",
@@ -2332,7 +2333,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_046",
+    "id": "IE-046",
     "code": "IE-046",
     "studentCode": "IE-046",
     "name": "RAMILO, JONAIRA MARI LUCIDO",
@@ -2340,7 +2341,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_047",
+    "id": "IE-047",
     "code": "IE-047",
     "studentCode": "IE-047",
     "name": "RIVERA, RALPH HENRY CAAGBAY",
@@ -2348,7 +2349,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_048",
+    "id": "IE-048",
     "code": "IE-048",
     "studentCode": "IE-048",
     "name": "ROBLES, MARK ANDREI BANIGO-OS",
@@ -2356,7 +2357,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_049",
+    "id": "IE-049",
     "code": "IE-049",
     "studentCode": "IE-049",
     "name": "SUAREZ, KEN DELA CRUZ",
@@ -2364,7 +2365,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_050",
+    "id": "IE-050",
     "code": "IE-050",
     "studentCode": "IE-050",
     "name": "SUATING, DARVIE ANGELO DELA PEÑA",
@@ -2372,7 +2373,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_051",
+    "id": "IE-051",
     "code": "IE-051",
     "studentCode": "IE-051",
     "name": "ATENCIO, IRISH MAE ADRIATICO",
@@ -2380,7 +2381,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_052",
+    "id": "IE-052",
     "code": "IE-052",
     "studentCode": "IE-052",
     "name": "BAUTISTA, MAURHIZ LIRA",
@@ -2388,7 +2389,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_053",
+    "id": "IE-053",
     "code": "IE-053",
     "studentCode": "IE-053",
     "name": "BONIFACIO, MARC ANTHONY PEREZ",
@@ -2396,7 +2397,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_054",
+    "id": "IE-054",
     "code": "IE-054",
     "studentCode": "IE-054",
     "name": "BUSTAMANTE, ZYRUS DIMAANO",
@@ -2404,7 +2405,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_055",
+    "id": "IE-055",
     "code": "IE-055",
     "studentCode": "IE-055",
     "name": "CASAJE, PRINCESS JANE DEQUIÑA",
@@ -2412,7 +2413,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_056",
+    "id": "IE-056",
     "code": "IE-056",
     "studentCode": "IE-056",
     "name": "DALIS, LESTER MARU CABRERA",
@@ -2420,7 +2421,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_057",
+    "id": "IE-057",
     "code": "IE-057",
     "studentCode": "IE-057",
     "name": "DE LA CRUZ, CHRISTIAN EARL MANANGAN",
@@ -2428,7 +2429,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_058",
+    "id": "IE-058",
     "code": "IE-058",
     "studentCode": "IE-058",
     "name": "DELA TORRE, ANGELICA FAYE TUBILLO",
@@ -2436,7 +2437,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_059",
+    "id": "IE-059",
     "code": "IE-059",
     "studentCode": "IE-059",
     "name": "JACINTO, GILLIANE MARGARETTE CREDO",
@@ -2444,7 +2445,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_060",
+    "id": "IE-060",
     "code": "IE-060",
     "studentCode": "IE-060",
     "name": "LAOMOC, JANSENN LOU DIMALALUAN",
@@ -2452,7 +2453,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_061",
+    "id": "IE-061",
     "code": "IE-061",
     "studentCode": "IE-061",
     "name": "LUBATON, ALTHEA FEI MOLINTAPANG",
@@ -2460,7 +2461,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_062",
+    "id": "IE-062",
     "code": "IE-062",
     "studentCode": "IE-062",
     "name": "LUMBRES, JENELLE MANIMTIM",
@@ -2468,7 +2469,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_063",
+    "id": "IE-063",
     "code": "IE-063",
     "studentCode": "IE-063",
     "name": "MALBAS, MARJORI DAUSON",
@@ -2476,7 +2477,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_064",
+    "id": "IE-064",
     "code": "IE-064",
     "studentCode": "IE-064",
     "name": "MANUEL, CARL JUSTIN BUENA",
@@ -2484,7 +2485,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_065",
+    "id": "IE-065",
     "code": "IE-065",
     "studentCode": "IE-065",
     "name": "MARIANO, IVAN CLARK JORISH MENDOZA",
@@ -2492,7 +2493,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_066",
+    "id": "IE-066",
     "code": "IE-066",
     "studentCode": "IE-066",
     "name": "MARIANO, JUAN PAULO MIRASOL",
@@ -2500,7 +2501,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_067",
+    "id": "IE-067",
     "code": "IE-067",
     "studentCode": "IE-067",
     "name": "MATANGUIHAN, KYLA AVILA",
@@ -2508,7 +2509,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_068",
+    "id": "IE-068",
     "code": "IE-068",
     "studentCode": "IE-068",
     "name": "MORADA, MICAIAH GWYNNETH GONZALES",
@@ -2516,7 +2517,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_069",
+    "id": "IE-069",
     "code": "IE-069",
     "studentCode": "IE-069",
     "name": "QUEZON, JOHN ARIEL ROSALES",
@@ -2524,7 +2525,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_070",
+    "id": "IE-070",
     "code": "IE-070",
     "studentCode": "IE-070",
     "name": "RAMIRO, JAYPEE DOMINGO",
@@ -2532,7 +2533,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_071",
+    "id": "IE-071",
     "code": "IE-071",
     "studentCode": "IE-071",
     "name": "RAPAL, KHRISTIAN LEGASPI",
@@ -2540,7 +2541,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_072",
+    "id": "IE-072",
     "code": "IE-072",
     "studentCode": "IE-072",
     "name": "TAYONI, DUSTIN KYLE QUIJADA",
@@ -2548,7 +2549,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_073",
+    "id": "IE-073",
     "code": "IE-073",
     "studentCode": "IE-073",
     "name": "TEMEÑA, MARK ANGELO BOMBITA",
@@ -2556,7 +2557,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_074",
+    "id": "IE-074",
     "code": "IE-074",
     "studentCode": "IE-074",
     "name": "VIDAL, JULIAN VICTOR NARVAEZ",
@@ -2564,7 +2565,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_075",
+    "id": "IE-075",
     "code": "IE-075",
     "studentCode": "IE-075",
     "name": "VILLANUEVA, RALPH CYRIL VIDAERA",
@@ -2572,7 +2573,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_076",
+    "id": "IE-076",
     "code": "IE-076",
     "studentCode": "IE-076",
     "name": "VIZCONDE, ARYZA GRACE ESCOBELLA",
@@ -2580,7 +2581,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_077",
+    "id": "IE-077",
     "code": "IE-077",
     "studentCode": "IE-077",
     "name": "ALCASABAS, JERICHO CRIS ARCEO",
@@ -2588,7 +2589,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_078",
+    "id": "IE-078",
     "code": "IE-078",
     "studentCode": "IE-078",
     "name": "AMPELOQUIO, JOHN ARMIL PILAR",
@@ -2596,7 +2597,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_079",
+    "id": "IE-079",
     "code": "IE-079",
     "studentCode": "IE-079",
     "name": "ANCAYAN, ALLUJ PHILIP BELEN",
@@ -2604,7 +2605,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_080",
+    "id": "IE-080",
     "code": "IE-080",
     "studentCode": "IE-080",
     "name": "BARRIENTOS, VINCENT BACANI",
@@ -2612,7 +2613,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_081",
+    "id": "IE-081",
     "code": "IE-081",
     "studentCode": "IE-081",
     "name": "BARUNDIA, BRYLLE RAPHAEL MANDIGMA",
@@ -2620,7 +2621,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_082",
+    "id": "IE-082",
     "code": "IE-082",
     "studentCode": "IE-082",
     "name": "BAYOT, HELEINA JANE IGUAL",
@@ -2628,7 +2629,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_083",
+    "id": "IE-083",
     "code": "IE-083",
     "studentCode": "IE-083",
     "name": "CABALES, RAYVER JUSTINE NOCHETE",
@@ -2636,7 +2637,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_084",
+    "id": "IE-084",
     "code": "IE-084",
     "studentCode": "IE-084",
     "name": "CABUDSAN, CATHERINE JOY MUSNGI",
@@ -2644,7 +2645,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_085",
+    "id": "IE-085",
     "code": "IE-085",
     "studentCode": "IE-085",
     "name": "DISIMULACION, KIM BRAYN RAMOS",
@@ -2652,7 +2653,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_086",
+    "id": "IE-086",
     "code": "IE-086",
     "studentCode": "IE-086",
     "name": "IBO, JOHN LLOYD FARIÑAS",
@@ -2660,7 +2661,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_087",
+    "id": "IE-087",
     "code": "IE-087",
     "studentCode": "IE-087",
     "name": "LABUTAP, DAVE ALDRIN LARA",
@@ -2668,7 +2669,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_088",
+    "id": "IE-088",
     "code": "IE-088",
     "studentCode": "IE-088",
     "name": "MARQUEZ, ARIES SALUD",
@@ -2676,7 +2677,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_089",
+    "id": "IE-089",
     "code": "IE-089",
     "studentCode": "IE-089",
     "name": "NENENG, FRANKY PARAISO",
@@ -2684,7 +2685,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_090",
+    "id": "IE-090",
     "code": "IE-090",
     "studentCode": "IE-090",
     "name": "PEREZ, ZYREL MANIMTIM",
@@ -2692,7 +2693,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_091",
+    "id": "IE-091",
     "code": "IE-091",
     "studentCode": "IE-091",
     "name": "REGINIO JR., ROLANDO AMPELOQUIO",
@@ -2700,7 +2701,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_092",
+    "id": "IE-092",
     "code": "IE-092",
     "studentCode": "IE-092",
     "name": "RUEDA, MARCUS BELMONTE",
@@ -2708,7 +2709,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_093",
+    "id": "IE-093",
     "code": "IE-093",
     "studentCode": "IE-093",
     "name": "RUEDA, NICOLE BELMONTE",
@@ -2716,7 +2717,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_094",
+    "id": "IE-094",
     "code": "IE-094",
     "studentCode": "IE-094",
     "name": "TIAMSIM, LOREN JADE JANDUSAY",
@@ -2724,7 +2725,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_095",
+    "id": "IE-095",
     "code": "IE-095",
     "studentCode": "IE-095",
     "name": "TORRES, SER JOAQUIN EMMANUEL DELA VEGA",
@@ -2732,7 +2733,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_096",
+    "id": "IE-096",
     "code": "IE-096",
     "studentCode": "IE-096",
     "name": "TUIZA, LANZ ROBLES",
@@ -2740,7 +2741,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ie_097",
+    "id": "IE-097",
     "code": "IE-097",
     "studentCode": "IE-097",
     "name": "VELASCO, PRINCE CHOLO MASAGNAY",
@@ -2748,7 +2749,7 @@ window.MEODL_DATA = {
     "teamName": "INDUSTRIAL ENGINEERING"
   },
   {
-    "id": "student-ce_001",
+    "id": "CE-001",
     "code": "CE-001",
     "studentCode": "CE-001",
     "name": "ACLAN, SHAYNE PRANCESS E.",
@@ -2756,7 +2757,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_002",
+    "id": "CE-002",
     "code": "CE-002",
     "studentCode": "CE-002",
     "name": "ACULA, MARY HONEY KAYE C.",
@@ -2764,7 +2765,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_003",
+    "id": "CE-003",
     "code": "CE-003",
     "studentCode": "CE-003",
     "name": "AGUANTA, ALYSSA A.",
@@ -2772,7 +2773,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_004",
+    "id": "CE-004",
     "code": "CE-004",
     "studentCode": "CE-004",
     "name": "ALBUFERA, RALF HOMER F.",
@@ -2780,7 +2781,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_005",
+    "id": "CE-005",
     "code": "CE-005",
     "studentCode": "CE-005",
     "name": "ALCANTARA, LIAM GABRIEL L.",
@@ -2788,7 +2789,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_006",
+    "id": "CE-006",
     "code": "CE-006",
     "studentCode": "CE-006",
     "name": "ALMEDA, MARIONNE C.",
@@ -2796,7 +2797,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_007",
+    "id": "CE-007",
     "code": "CE-007",
     "studentCode": "CE-007",
     "name": "ALMONTE, YAEL GABRIEL S.",
@@ -2804,7 +2805,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_008",
+    "id": "CE-008",
     "code": "CE-008",
     "studentCode": "CE-008",
     "name": "AMANTE, CYRA IYA A.",
@@ -2812,7 +2813,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_009",
+    "id": "CE-009",
     "code": "CE-009",
     "studentCode": "CE-009",
     "name": "AMPER, DIVINE JOY B.",
@@ -2820,7 +2821,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_010",
+    "id": "CE-010",
     "code": "CE-010",
     "studentCode": "CE-010",
     "name": "APOSTOL, APPLE-KRIS E.",
@@ -2828,7 +2829,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_011",
+    "id": "CE-011",
     "code": "CE-011",
     "studentCode": "CE-011",
     "name": "AQUINO, JESSA MAE D.",
@@ -2836,7 +2837,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_012",
+    "id": "CE-012",
     "code": "CE-012",
     "studentCode": "CE-012",
     "name": "ARABE, DOMINIC JAMES D.",
@@ -2844,7 +2845,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_013",
+    "id": "CE-013",
     "code": "CE-013",
     "studentCode": "CE-013",
     "name": "ARBO, EVAN JEROME P.",
@@ -2852,7 +2853,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_014",
+    "id": "CE-014",
     "code": "CE-014",
     "studentCode": "CE-014",
     "name": "ASUNCION, KRYSTAL CLAIRE L.",
@@ -2860,7 +2861,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_015",
+    "id": "CE-015",
     "code": "CE-015",
     "studentCode": "CE-015",
     "name": "AVELLANO, FERLIONA C.",
@@ -2868,7 +2869,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_016",
+    "id": "CE-016",
     "code": "CE-016",
     "studentCode": "CE-016",
     "name": "BALDERAMA, CHRISTIAN LLOYD B.",
@@ -2876,7 +2877,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_017",
+    "id": "CE-017",
     "code": "CE-017",
     "studentCode": "CE-017",
     "name": "BALLESTEROS, KIRSTINE DOLL B.",
@@ -2884,7 +2885,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_018",
+    "id": "CE-018",
     "code": "CE-018",
     "studentCode": "CE-018",
     "name": "BANSUELO, SHAINE LARA A.",
@@ -2892,7 +2893,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_019",
+    "id": "CE-019",
     "code": "CE-019",
     "studentCode": "CE-019",
     "name": "BARREDO, JEWEL P.",
@@ -2900,7 +2901,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_020",
+    "id": "CE-020",
     "code": "CE-020",
     "studentCode": "CE-020",
     "name": "BLAZA, ANGELICA LOURINE R.",
@@ -2908,7 +2909,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_021",
+    "id": "CE-021",
     "code": "CE-021",
     "studentCode": "CE-021",
     "name": "BORLAGDATAN, REIGN ASHLEY P.",
@@ -2916,7 +2917,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_022",
+    "id": "CE-022",
     "code": "CE-022",
     "studentCode": "CE-022",
     "name": "BREGANZA, JOHN LOYD R.",
@@ -2924,7 +2925,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_023",
+    "id": "CE-023",
     "code": "CE-023",
     "studentCode": "CE-023",
     "name": "BUENAOBRA, MHICA S.",
@@ -2932,7 +2933,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_024",
+    "id": "CE-024",
     "code": "CE-024",
     "studentCode": "CE-024",
     "name": "BUNDALIAN, KATHLEEN V.",
@@ -2940,7 +2941,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_025",
+    "id": "CE-025",
     "code": "CE-025",
     "studentCode": "CE-025",
     "name": "CACAO, IRISH F.",
@@ -2948,7 +2949,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_026",
+    "id": "CE-026",
     "code": "CE-026",
     "studentCode": "CE-026",
     "name": "CANCEJO, LORIE JANE M.",
@@ -2956,7 +2957,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_027",
+    "id": "CE-027",
     "code": "CE-027",
     "studentCode": "CE-027",
     "name": "CAPIROSO, JEANIE AMBER L.",
@@ -2964,7 +2965,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_028",
+    "id": "CE-028",
     "code": "CE-028",
     "studentCode": "CE-028",
     "name": "CASTRO, JEFFER KERBY M.",
@@ -2972,7 +2973,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_029",
+    "id": "CE-029",
     "code": "CE-029",
     "studentCode": "CE-029",
     "name": "CLEMENTE, LERI ALEXANDRA S.",
@@ -2980,7 +2981,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_030",
+    "id": "CE-030",
     "code": "CE-030",
     "studentCode": "CE-030",
     "name": "CONCEPCION, ROSELYN B.",
@@ -2988,7 +2989,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_031",
+    "id": "CE-031",
     "code": "CE-031",
     "studentCode": "CE-031",
     "name": "CORDETA, LHORENCE BEIN M.",
@@ -2996,7 +2997,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_032",
+    "id": "CE-032",
     "code": "CE-032",
     "studentCode": "CE-032",
     "name": "CORPUZ, JAZMIN MYKHAELA N.",
@@ -3004,7 +3005,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_033",
+    "id": "CE-033",
     "code": "CE-033",
     "studentCode": "CE-033",
     "name": "COSICO, SOPHIA SANE A.",
@@ -3012,7 +3013,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_034",
+    "id": "CE-034",
     "code": "CE-034",
     "studentCode": "CE-034",
     "name": "CRUZ, REI ANNE R.",
@@ -3020,7 +3021,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_035",
+    "id": "CE-035",
     "code": "CE-035",
     "studentCode": "CE-035",
     "name": "CUBE, VAN JUZZEN SENA S.",
@@ -3028,7 +3029,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_036",
+    "id": "CE-036",
     "code": "CE-036",
     "studentCode": "CE-036",
     "name": "CUÑADO, GIAN GABRIEL R.",
@@ -3036,7 +3037,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_037",
+    "id": "CE-037",
     "code": "CE-037",
     "studentCode": "CE-037",
     "name": "DALISAY, APRIL CHARIZ C.",
@@ -3044,7 +3045,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_038",
+    "id": "CE-038",
     "code": "CE-038",
     "studentCode": "CE-038",
     "name": "DALISAY, JOHN CHRIS P.",
@@ -3052,7 +3053,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_039",
+    "id": "CE-039",
     "code": "CE-039",
     "studentCode": "CE-039",
     "name": "DE ALDAY, JOHN FLOYD A.",
@@ -3060,7 +3061,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_040",
+    "id": "CE-040",
     "code": "CE-040",
     "studentCode": "CE-040",
     "name": "DE CASTRO, CHERRYANN L.",
@@ -3068,7 +3069,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_041",
+    "id": "CE-041",
     "code": "CE-041",
     "studentCode": "CE-041",
     "name": "DE JUAN, SHAINE H.",
@@ -3076,7 +3077,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_042",
+    "id": "CE-042",
     "code": "CE-042",
     "studentCode": "CE-042",
     "name": "DE LEON, KIM ALLAINE B.",
@@ -3084,7 +3085,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_043",
+    "id": "CE-043",
     "code": "CE-043",
     "studentCode": "CE-043",
     "name": "DE MESA, LORAINNE P.",
@@ -3092,7 +3093,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_044",
+    "id": "CE-044",
     "code": "CE-044",
     "studentCode": "CE-044",
     "name": "DEGULLADO, ANA MARIE G.",
@@ -3100,7 +3101,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_045",
+    "id": "CE-045",
     "code": "CE-045",
     "studentCode": "CE-045",
     "name": "DELA CRUZ, CZARINAH BEATRICE C.",
@@ -3108,7 +3109,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_046",
+    "id": "CE-046",
     "code": "CE-046",
     "studentCode": "CE-046",
     "name": "DELOS REYES, JOROSS MARK E.",
@@ -3116,7 +3117,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_047",
+    "id": "CE-047",
     "code": "CE-047",
     "studentCode": "CE-047",
     "name": "DEMDAM, MARK GERALD F.",
@@ -3124,7 +3125,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_048",
+    "id": "CE-048",
     "code": "CE-048",
     "studentCode": "CE-048",
     "name": "DICHOSO, JAMES RUSSEL R.",
@@ -3132,7 +3133,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_049",
+    "id": "CE-049",
     "code": "CE-049",
     "studentCode": "CE-049",
     "name": "DOBLES II, ARTURO R.",
@@ -3140,7 +3141,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_050",
+    "id": "CE-050",
     "code": "CE-050",
     "studentCode": "CE-050",
     "name": "DOSADO, CHLOE NICOLE A.",
@@ -3148,7 +3149,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_051",
+    "id": "CE-051",
     "code": "CE-051",
     "studentCode": "CE-051",
     "name": "ENCANTO, GLYCEL R.",
@@ -3156,7 +3157,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_052",
+    "id": "CE-052",
     "code": "CE-052",
     "studentCode": "CE-052",
     "name": "ENCARNACION, JASPER R.",
@@ -3164,7 +3165,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_053",
+    "id": "CE-053",
     "code": "CE-053",
     "studentCode": "CE-053",
     "name": "ENRIQUEZ, MARK DAVE R.",
@@ -3172,7 +3173,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_054",
+    "id": "CE-054",
     "code": "CE-054",
     "studentCode": "CE-054",
     "name": "ESCALANTE, FREDERICK ERVIN ALLEN T.",
@@ -3180,7 +3181,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_055",
+    "id": "CE-055",
     "code": "CE-055",
     "studentCode": "CE-055",
     "name": "ESPINA, VENUS L.",
@@ -3188,7 +3189,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_056",
+    "id": "CE-056",
     "code": "CE-056",
     "studentCode": "CE-056",
     "name": "EVANGELISTA, JOHN DOMINIC B.",
@@ -3196,7 +3197,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_057",
+    "id": "CE-057",
     "code": "CE-057",
     "studentCode": "CE-057",
     "name": "FAMILARAN, PRINCE MHUEL B.",
@@ -3204,7 +3205,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_058",
+    "id": "CE-058",
     "code": "CE-058",
     "studentCode": "CE-058",
     "name": "FERRER, DENNIS PIOLO D.",
@@ -3212,7 +3213,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_059",
+    "id": "CE-059",
     "code": "CE-059",
     "studentCode": "CE-059",
     "name": "FIGUEROA, JUSTIN V.",
@@ -3220,7 +3221,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_060",
+    "id": "CE-060",
     "code": "CE-060",
     "studentCode": "CE-060",
     "name": "FILIO, DANIEL S.",
@@ -3228,7 +3229,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_061",
+    "id": "CE-061",
     "code": "CE-061",
     "studentCode": "CE-061",
     "name": "FLORES, MEL GIBSON L.",
@@ -3236,7 +3237,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_062",
+    "id": "CE-062",
     "code": "CE-062",
     "studentCode": "CE-062",
     "name": "FLORORITA, DHONA MARIE A.",
@@ -3244,7 +3245,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_063",
+    "id": "CE-063",
     "code": "CE-063",
     "studentCode": "CE-063",
     "name": "FRANCISCO, MARC JUSTINE B.",
@@ -3252,7 +3253,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_064",
+    "id": "CE-064",
     "code": "CE-064",
     "studentCode": "CE-064",
     "name": "GALANG, SAMANTHA ADRIENNE Q.",
@@ -3260,7 +3261,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_065",
+    "id": "CE-065",
     "code": "CE-065",
     "studentCode": "CE-065",
     "name": "GALINATO, LORENZO DUSTIN B.",
@@ -3268,7 +3269,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_066",
+    "id": "CE-066",
     "code": "CE-066",
     "studentCode": "CE-066",
     "name": "GALIZA, TRISTAN HARVEY M.",
@@ -3276,7 +3277,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_067",
+    "id": "CE-067",
     "code": "CE-067",
     "studentCode": "CE-067",
     "name": "GARBO, NIRAH S.",
@@ -3284,7 +3285,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_068",
+    "id": "CE-068",
     "code": "CE-068",
     "studentCode": "CE-068",
     "name": "GARCIA, ELISHA RHEIN MULIMBAYAN M.",
@@ -3292,7 +3293,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_069",
+    "id": "CE-069",
     "code": "CE-069",
     "studentCode": "CE-069",
     "name": "GARCIA, FRANCIS P.",
@@ -3300,7 +3301,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_070",
+    "id": "CE-070",
     "code": "CE-070",
     "studentCode": "CE-070",
     "name": "GLINOGA, JHAY EL C.",
@@ -3308,7 +3309,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_071",
+    "id": "CE-071",
     "code": "CE-071",
     "studentCode": "CE-071",
     "name": "GLIPO, CRISTINE NICOLE M.",
@@ -3316,7 +3317,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_072",
+    "id": "CE-072",
     "code": "CE-072",
     "studentCode": "CE-072",
     "name": "GO, MIASHI I.",
@@ -3324,7 +3325,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_073",
+    "id": "CE-073",
     "code": "CE-073",
     "studentCode": "CE-073",
     "name": "GRAPANI, LEEAN MAE T.",
@@ -3332,7 +3333,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_074",
+    "id": "CE-074",
     "code": "CE-074",
     "studentCode": "CE-074",
     "name": "HAEL, MICHAEL CLARK C.",
@@ -3340,7 +3341,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_075",
+    "id": "CE-075",
     "code": "CE-075",
     "studentCode": "CE-075",
     "name": "HAEL, EDMELYN D.",
@@ -3348,7 +3349,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_076",
+    "id": "CE-076",
     "code": "CE-076",
     "studentCode": "CE-076",
     "name": "JAVIER, TRIXIE B.",
@@ -3356,7 +3357,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_077",
+    "id": "CE-077",
     "code": "CE-077",
     "studentCode": "CE-077",
     "name": "JUANANE, LUIS JAN YVES M.",
@@ -3364,7 +3365,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_078",
+    "id": "CE-078",
     "code": "CE-078",
     "studentCode": "CE-078",
     "name": "LABILLES, MARK DARYL R.",
@@ -3372,7 +3373,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_079",
+    "id": "CE-079",
     "code": "CE-079",
     "studentCode": "CE-079",
     "name": "LAGDAMEN, MARK DADEN A.",
@@ -3380,7 +3381,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_080",
+    "id": "CE-080",
     "code": "CE-080",
     "studentCode": "CE-080",
     "name": "LAGOC, EURIELLE CLAIRE L.",
@@ -3388,7 +3389,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_081",
+    "id": "CE-081",
     "code": "CE-081",
     "studentCode": "CE-081",
     "name": "LAGRAZON, GIAN JUDD S.",
@@ -3396,7 +3397,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_082",
+    "id": "CE-082",
     "code": "CE-082",
     "studentCode": "CE-082",
     "name": "LANSANGAN, JOHN DANIEL T.",
@@ -3404,7 +3405,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_083",
+    "id": "CE-083",
     "code": "CE-083",
     "studentCode": "CE-083",
     "name": "LAPITAN, STEPHEN JACOB P.",
@@ -3412,7 +3413,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_084",
+    "id": "CE-084",
     "code": "CE-084",
     "studentCode": "CE-084",
     "name": "LAVENTE, JUDY ANN A.",
@@ -3420,7 +3421,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_085",
+    "id": "CE-085",
     "code": "CE-085",
     "studentCode": "CE-085",
     "name": "LAZARO, JARNIE CARL",
@@ -3428,7 +3429,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_086",
+    "id": "CE-086",
     "code": "CE-086",
     "studentCode": "CE-086",
     "name": "LEYCANO, JAMEROS A.",
@@ -3436,7 +3437,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_087",
+    "id": "CE-087",
     "code": "CE-087",
     "studentCode": "CE-087",
     "name": "LOGO, KERVIN JON N.",
@@ -3444,7 +3445,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_088",
+    "id": "CE-088",
     "code": "CE-088",
     "studentCode": "CE-088",
     "name": "LOPEZ, JOHN CARLO C.",
@@ -3452,7 +3453,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_089",
+    "id": "CE-089",
     "code": "CE-089",
     "studentCode": "CE-089",
     "name": "LOPEZ, JOHN HENRY B.",
@@ -3460,7 +3461,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_090",
+    "id": "CE-090",
     "code": "CE-090",
     "studentCode": "CE-090",
     "name": "LUGTU, CHRYSTAL SAPPHIRE D.",
@@ -3468,7 +3469,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_091",
+    "id": "CE-091",
     "code": "CE-091",
     "studentCode": "CE-091",
     "name": "LULU, AIRA LEI C.",
@@ -3476,7 +3477,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_092",
+    "id": "CE-092",
     "code": "CE-092",
     "studentCode": "CE-092",
     "name": "LUMBRES, JEROME B.",
@@ -3484,7 +3485,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_093",
+    "id": "CE-093",
     "code": "CE-093",
     "studentCode": "CE-093",
     "name": "LUTA, TRISHA SHANE",
@@ -3492,7 +3493,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_094",
+    "id": "CE-094",
     "code": "CE-094",
     "studentCode": "CE-094",
     "name": "MACATOL, KESIA MAE A.",
@@ -3500,7 +3501,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_095",
+    "id": "CE-095",
     "code": "CE-095",
     "studentCode": "CE-095",
     "name": "MAGTAN-AO, LOVELY B.",
@@ -3508,7 +3509,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_096",
+    "id": "CE-096",
     "code": "CE-096",
     "studentCode": "CE-096",
     "name": "MANAIG, KURT ANDREI",
@@ -3516,7 +3517,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_097",
+    "id": "CE-097",
     "code": "CE-097",
     "studentCode": "CE-097",
     "name": "MANAIG, ROBBIE D.",
@@ -3524,7 +3525,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_098",
+    "id": "CE-098",
     "code": "CE-098",
     "studentCode": "CE-098",
     "name": "MARASIGAN, KURT AERRON P.",
@@ -3532,7 +3533,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_099",
+    "id": "CE-099",
     "code": "CE-099",
     "studentCode": "CE-099",
     "name": "MARIANO, JOHN PAUL S.",
@@ -3540,7 +3541,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_100",
+    "id": "CE-100",
     "code": "CE-100",
     "studentCode": "CE-100",
     "name": "MARTEJA, JAMES HECTOR G.",
@@ -3548,7 +3549,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_101",
+    "id": "CE-101",
     "code": "CE-101",
     "studentCode": "CE-101",
     "name": "MAYOLA, JASPER D.",
@@ -3556,7 +3557,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_102",
+    "id": "CE-102",
     "code": "CE-102",
     "studentCode": "CE-102",
     "name": "MELENDREZ, AIRISH JAMES M.",
@@ -3564,7 +3565,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_103",
+    "id": "CE-103",
     "code": "CE-103",
     "studentCode": "CE-103",
     "name": "MENDOZA, ROLDAN L.",
@@ -3572,7 +3573,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_104",
+    "id": "CE-104",
     "code": "CE-104",
     "studentCode": "CE-104",
     "name": "MERAÑA, LORAINE KISHA A.",
@@ -3580,7 +3581,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_105",
+    "id": "CE-105",
     "code": "CE-105",
     "studentCode": "CE-105",
     "name": "MERILLES, JHARED A.",
@@ -3588,7 +3589,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_106",
+    "id": "CE-106",
     "code": "CE-106",
     "studentCode": "CE-106",
     "name": "MERTO, HANNAH CES C.",
@@ -3596,7 +3597,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_107",
+    "id": "CE-107",
     "code": "CE-107",
     "studentCode": "CE-107",
     "name": "MIRANDA, RANIEL Y.",
@@ -3604,7 +3605,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_108",
+    "id": "CE-108",
     "code": "CE-108",
     "studentCode": "CE-108",
     "name": "MORADA, JHANELL SOPHIA B.",
@@ -3612,7 +3613,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_109",
+    "id": "CE-109",
     "code": "CE-109",
     "studentCode": "CE-109",
     "name": "NACARIO, SOFIA MARIE A.",
@@ -3620,7 +3621,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_110",
+    "id": "CE-110",
     "code": "CE-110",
     "studentCode": "CE-110",
     "name": "NAVARRO, GERALD JAMES O.",
@@ -3628,7 +3629,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_111",
+    "id": "CE-111",
     "code": "CE-111",
     "studentCode": "CE-111",
     "name": "NAVARTE, JOSEPH ROEM E.",
@@ -3636,7 +3637,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_112",
+    "id": "CE-112",
     "code": "CE-112",
     "studentCode": "CE-112",
     "name": "OCTAVIO, LEVIN JANE D.",
@@ -3644,7 +3645,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_113",
+    "id": "CE-113",
     "code": "CE-113",
     "studentCode": "CE-113",
     "name": "ORTIZ, ELEUMAR NIMROD ITHEL T.",
@@ -3652,7 +3653,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_114",
+    "id": "CE-114",
     "code": "CE-114",
     "studentCode": "CE-114",
     "name": "PALASIGUE, ANDREI C.",
@@ -3660,7 +3661,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_115",
+    "id": "CE-115",
     "code": "CE-115",
     "studentCode": "CE-115",
     "name": "PANTERIA, SHANELLE B.",
@@ -3668,7 +3669,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_116",
+    "id": "CE-116",
     "code": "CE-116",
     "studentCode": "CE-116",
     "name": "PASATIEMPO, TRICIA N.",
@@ -3676,7 +3677,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_117",
+    "id": "CE-117",
     "code": "CE-117",
     "studentCode": "CE-117",
     "name": "PASTRANA, RENMAR C.",
@@ -3684,7 +3685,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_118",
+    "id": "CE-118",
     "code": "CE-118",
     "studentCode": "CE-118",
     "name": "PEDIDA, KELLY ANNE E.",
@@ -3692,7 +3693,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_119",
+    "id": "CE-119",
     "code": "CE-119",
     "studentCode": "CE-119",
     "name": "PEREZ, CEEJHAE D.",
@@ -3700,7 +3701,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_120",
+    "id": "CE-120",
     "code": "CE-120",
     "studentCode": "CE-120",
     "name": "PEREZ, REAH MAE",
@@ -3708,7 +3709,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_121",
+    "id": "CE-121",
     "code": "CE-121",
     "studentCode": "CE-121",
     "name": "PINEDA, RAISHELL B.",
@@ -3716,7 +3717,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_122",
+    "id": "CE-122",
     "code": "CE-122",
     "studentCode": "CE-122",
     "name": "PISANTE, ERICA A.",
@@ -3724,7 +3725,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_123",
+    "id": "CE-123",
     "code": "CE-123",
     "studentCode": "CE-123",
     "name": "RAFOL, REDGEM M.",
@@ -3732,7 +3733,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_124",
+    "id": "CE-124",
     "code": "CE-124",
     "studentCode": "CE-124",
     "name": "RAMIREZ, JAYCEE D.",
@@ -3740,7 +3741,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_125",
+    "id": "CE-125",
     "code": "CE-125",
     "studentCode": "CE-125",
     "name": "RAMOS, EARL JOSHUA E.",
@@ -3748,7 +3749,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_126",
+    "id": "CE-126",
     "code": "CE-126",
     "studentCode": "CE-126",
     "name": "RAMOS, GLENN LEONARD C.",
@@ -3756,7 +3757,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_127",
+    "id": "CE-127",
     "code": "CE-127",
     "studentCode": "CE-127",
     "name": "RAMOS, JANELLE F.",
@@ -3764,7 +3765,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_128",
+    "id": "CE-128",
     "code": "CE-128",
     "studentCode": "CE-128",
     "name": "REBADEO, JHON RODNEY C.",
@@ -3772,7 +3773,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_129",
+    "id": "CE-129",
     "code": "CE-129",
     "studentCode": "CE-129",
     "name": "REBLORA, JOHN NATHANIEL S.",
@@ -3780,7 +3781,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_130",
+    "id": "CE-130",
     "code": "CE-130",
     "studentCode": "CE-130",
     "name": "REGONDOLA, MARIA ANDREA R.",
@@ -3788,7 +3789,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_131",
+    "id": "CE-131",
     "code": "CE-131",
     "studentCode": "CE-131",
     "name": "RELENTE, JOSH KOJI L.",
@@ -3796,7 +3797,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_132",
+    "id": "CE-132",
     "code": "CE-132",
     "studentCode": "CE-132",
     "name": "RELOJ, KARL ANDREI A.",
@@ -3804,7 +3805,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_133",
+    "id": "CE-133",
     "code": "CE-133",
     "studentCode": "CE-133",
     "name": "REOGO, DRIZELLA JAYNE A.",
@@ -3812,7 +3813,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_134",
+    "id": "CE-134",
     "code": "CE-134",
     "studentCode": "CE-134",
     "name": "RODRIGUEZ, RUSSEL P.",
@@ -3820,7 +3821,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_135",
+    "id": "CE-135",
     "code": "CE-135",
     "studentCode": "CE-135",
     "name": "ROSARIO, LAURENZ JAMES I.",
@@ -3828,7 +3829,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_136",
+    "id": "CE-136",
     "code": "CE-136",
     "studentCode": "CE-136",
     "name": "RUBILLA, VON LAUVIN J.",
@@ -3836,7 +3837,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_137",
+    "id": "CE-137",
     "code": "CE-137",
     "studentCode": "CE-137",
     "name": "SALO, REIN SAM M.",
@@ -3844,7 +3845,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_138",
+    "id": "CE-138",
     "code": "CE-138",
     "studentCode": "CE-138",
     "name": "SALVADOR, CARLOS IVAN N.",
@@ -3852,7 +3853,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_139",
+    "id": "CE-139",
     "code": "CE-139",
     "studentCode": "CE-139",
     "name": "SANDOVAL, JOHN MICHAEL L.",
@@ -3860,7 +3861,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_140",
+    "id": "CE-140",
     "code": "CE-140",
     "studentCode": "CE-140",
     "name": "SARDIDO, LARZ JENRIL R.",
@@ -3868,7 +3869,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_141",
+    "id": "CE-141",
     "code": "CE-141",
     "studentCode": "CE-141",
     "name": "SECRETARIO, ELAIZA M.",
@@ -3876,7 +3877,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_142",
+    "id": "CE-142",
     "code": "CE-142",
     "studentCode": "CE-142",
     "name": "SUBIA, CHIN AIKEE A.",
@@ -3884,7 +3885,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_143",
+    "id": "CE-143",
     "code": "CE-143",
     "studentCode": "CE-143",
     "name": "TABION, RENDEL Q.",
@@ -3892,7 +3893,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_144",
+    "id": "CE-144",
     "code": "CE-144",
     "studentCode": "CE-144",
     "name": "TAHAMIL, ARMANI M.",
@@ -3900,7 +3901,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_145",
+    "id": "CE-145",
     "code": "CE-145",
     "studentCode": "CE-145",
     "name": "TAN, LORENCE DAVID R.",
@@ -3908,7 +3909,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_146",
+    "id": "CE-146",
     "code": "CE-146",
     "studentCode": "CE-146",
     "name": "TEMPLONUEVO, NICOLE G.",
@@ -3916,7 +3917,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_147",
+    "id": "CE-147",
     "code": "CE-147",
     "studentCode": "CE-147",
     "name": "TOLEDO, NICOLE P.",
@@ -3924,7 +3925,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_148",
+    "id": "CE-148",
     "code": "CE-148",
     "studentCode": "CE-148",
     "name": "TORRECAMPO, CHRISTIAN ARON P.",
@@ -3932,7 +3933,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_149",
+    "id": "CE-149",
     "code": "CE-149",
     "studentCode": "CE-149",
     "name": "TORRENDON, JASPHER M.",
@@ -3940,7 +3941,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_150",
+    "id": "CE-150",
     "code": "CE-150",
     "studentCode": "CE-150",
     "name": "VILLA, DAISY ANN S.",
@@ -3948,7 +3949,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_151",
+    "id": "CE-151",
     "code": "CE-151",
     "studentCode": "CE-151",
     "name": "VILLANUEVA, LUIS MIGUEL D.",
@@ -3956,7 +3957,7 @@ window.MEODL_DATA = {
     "teamName": "CIVIL ENGINEERING"
   },
   {
-    "id": "student-ce_152",
+    "id": "CE-152",
     "code": "CE-152",
     "studentCode": "CE-152",
     "name": "YLAGAN, ADRIENNE G.",

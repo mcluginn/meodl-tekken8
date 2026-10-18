@@ -102,14 +102,7 @@ function deterministicToken(index, teamId) {
 // Generate default 175 registered students from assets/meodl_data.js
 function buildDefaultStudentsRoster() {
   const dataPath = path.join(__dirname, 'assets', 'meodl_data.js');
-  let rosters = {};
-  let teams = [
-    { id: 'ee', name: 'TEAM EE', shortCode: 'EE' },
-    { id: 'cpe', name: 'TEAM CPE', shortCode: 'CPE' },
-    { id: 'ece', name: 'TEAM ECE', shortCode: 'ECE' },
-    { id: 'ie', name: 'TEAM IE', shortCode: 'IE' },
-    { id: 'ce', name: 'TEAM CE', shortCode: 'CE' }
-  ];
+  let studentsList = [];
 
   try {
     if (fs.existsSync(dataPath)) {
@@ -117,50 +110,38 @@ function buildDefaultStudentsRoster() {
       const sandbox = { window: {} };
       sandbox.window = sandbox;
       vm.runInNewContext(code, sandbox);
-      if (sandbox.MEODL_DATA && sandbox.MEODL_DATA.rosters) {
-        rosters = sandbox.MEODL_DATA.rosters;
-      }
-      if (sandbox.MEODL_DATA && sandbox.MEODL_DATA.teams) {
-        teams = sandbox.MEODL_DATA.teams;
+      if (sandbox.MEODL_DATA && Array.isArray(sandbox.MEODL_DATA.students)) {
+        studentsList = sandbox.MEODL_DATA.students;
       }
     }
   } catch (err) {
-    console.warn('[Server DB] Could not extract rosters from meodl_data.js, using fallback structure.', err);
+    console.warn('[Server DB] Could not extract students from meodl_data.js, using fallback structure.', err);
   }
 
   const students = {};
-  let studentIndex = 1;
-
-  teams.forEach(team => {
-    const teamKey = (team.shortCode || team.id).toUpperCase();
-    const members = rosters[teamKey] || rosters[team.id.toUpperCase()] || [];
-    members.forEach((item, idx) => {
-      const isObj = typeof item === 'object' && item !== null;
-      const name = isObj ? item.name : item;
-      const code = (isObj && item.code) ? item.code : (teamKey + '-' + String(idx + 1).padStart(3, '0'));
-      const id = 'student-' + code.toLowerCase().replace(/[^a-z0-9]+/g, '_');
-      const token = deterministicToken(studentIndex, team.id);
-
-      students[id] = {
-        id: id,
-        name: name,
-        team: team.id.toLowerCase(),
-        teamName: team.name,
-        studentCode: code,
-        activeToken: token,
-        revokedTokens: [],
-        status: 'OUTSIDE',
-        currentAction: null,
-        lastCheckIn: null,
-        lastCheckOut: null,
-        exitReason: null,
-        expectedReturn: null,
-        totalVisits: 0,
-        totalMinutesInside: 0,
-        history: []
-      };
-      studentIndex++;
-    });
+  studentsList.forEach((s, idx) => {
+    const code = String(s.code || s.id).toUpperCase();
+    const team = String(s.team || 'general').toLowerCase();
+    const token = deterministicToken(idx + 1, team);
+    students[code] = {
+      id: code,
+      code: code,
+      studentCode: code,
+      name: s.name,
+      team: team,
+      teamName: s.teamName || ('TEAM ' + team.toUpperCase()),
+      activeToken: token,
+      revokedTokens: [],
+      status: 'OUTSIDE',
+      currentAction: null,
+      lastCheckIn: null,
+      lastCheckOut: null,
+      exitReason: null,
+      expectedReturn: null,
+      totalVisits: 0,
+      totalMinutesInside: 0,
+      history: []
+    };
   });
 
   return students;
@@ -195,6 +176,7 @@ if (!attendanceState || !attendanceState.students || Object.keys(attendanceState
 // UPHSD Calamba • College of Engineering • Oct 19–20, 2026
 // -------------------------------------------------------------------------
 const SCHEMA_VERSION = '2026.5';
+const ROSTER_VERSION = '2026-EDAYS-411';
 const ENGDAY_GAMES_LIST = [
   'd1-reg',
   'd1-am-block',
@@ -1323,10 +1305,15 @@ export async function handleRequest(req, res) {
         if (!targetEvt.students) targetEvt.students = {};
 
         let validStudentId = studentId;
-        if (!validStudentId || !targetEvt.students[validStudentId]) {
+        const lookupCode = String(studentId || ev.studentCode || '').trim().toUpperCase();
+        if (targetEvt.students[lookupCode]) {
+          validStudentId = lookupCode;
+          ev.studentId = lookupCode;
+        } else if (!validStudentId || !targetEvt.students[validStudentId]) {
           const match = Object.values(targetEvt.students).find(s =>
-            (s.studentCode && s.studentCode.toUpperCase() === String(studentId || ev.studentCode || '').toUpperCase()) ||
-            (s.id && s.id.toLowerCase() === String(studentId || '').toLowerCase())
+            (s.studentCode && s.studentCode.toUpperCase() === lookupCode) ||
+            (s.code && s.code.toUpperCase() === lookupCode) ||
+            (s.id && s.id.toUpperCase() === lookupCode)
           );
           if (match) {
             validStudentId = match.id;
