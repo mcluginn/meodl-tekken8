@@ -1444,99 +1444,79 @@
       rapidToastTimeout = setTimeout(() => toast.classList.add('hidden'), 2200);
     }
 
-    async function refreshCamerasList() {
-      try {
-        if (typeof Html5Qrcode !== 'undefined' && Html5Qrcode.getCameras) {
-          const devs = await Html5Qrcode.getCameras();
-          if (Array.isArray(devs) && devs.length > 0) {
-            camerasList = devs;
-            return camerasList;
-          }
-        }
-      } catch (e) {
-        console.warn('Html5Qrcode.getCameras failed:', e);
+    async function getOrEnumerateVideoDevices() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        return [];
       }
       try {
-        if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
-          const all = await navigator.mediaDevices.enumerateDevices();
-          const vids = all.filter(d => d.kind === 'videoinput');
-          if (vids.length > 0) {
-            camerasList = vids.map((d, i) => ({
-              id: d.deviceId,
-              label: d.label || `Camera ${i + 1}`
-            }));
-            return camerasList;
+        let devices = await navigator.mediaDevices.enumerateDevices();
+        let videoDevs = devices.filter(d => d.kind === 'videoinput');
+
+        // If labels are empty, camera permission hasn't been granted yet in this Chrome tab.
+        // Request dummy stream to trigger permission prompt, then re-enumerate.
+        const hasLabels = videoDevs.some(d => d.label && d.label.trim().length > 0);
+        if (!hasLabels && navigator.mediaDevices.getUserMedia) {
+          console.info('[Camera Engine] Camera labels empty. Requesting dummy stream to acquire permission...');
+          try {
+            const dummyStream = await navigator.mediaDevices.getUserMedia({ video: true });
+            devices = await navigator.mediaDevices.enumerateDevices();
+            videoDevs = devices.filter(d => d.kind === 'videoinput');
+            dummyStream.getTracks().forEach(t => t.stop());
+          } catch (permErr) {
+            console.warn('[Camera Engine] Dummy stream permission prompt dismissed or rejected:', permErr);
           }
         }
-      } catch (e) {
-        console.warn('enumerateDevices failed:', e);
+
+        camerasList = videoDevs.map((d, i) => ({
+          id: d.deviceId,
+          deviceId: d.deviceId,
+          label: d.label || `Camera ${i + 1}`
+        }));
+        return camerasList;
+      } catch (err) {
+        console.warn('[Camera Engine] Error enumerating devices:', err);
+        return [];
       }
-      return camerasList;
     }
 
-    function findBestRearCamera(cams) {
-      if (!Array.isArray(cams) || cams.length === 0) return null;
+    function findRearCameraDeviceId(cameras) {
+      if (!Array.isArray(cameras) || cameras.length === 0) return null;
 
-      // 1. Explicit rear/back labels
+      // 1. Explicit rear keywords in label
       const rearKeywords = ['back', 'rear', 'environment', 'facing back', '0, facing back', 'camera2 0'];
       for (const kw of rearKeywords) {
-        const found = cams.find(c => {
+        const found = cameras.find(c => {
           const lbl = String(c.label || '').toLowerCase();
           return lbl.includes(kw);
         });
-        if (found) return found;
+        if (found && (found.id || found.deviceId)) {
+          return found.id || found.deviceId;
+        }
       }
 
-      // 2. Secondary rear keywords: wide, main, camera 0 (as long as it does not say front/user/selfie)
-      const secondaryKeywords = ['wide', 'main', 'camera 0'];
+      // 2. Secondary rear keywords: wide, main, camera 0 (if not front/user/selfie)
+      const secondaryKeywords = ['wide', 'main', 'camera 0', 'lens 0'];
       for (const kw of secondaryKeywords) {
-        const found = cams.find(c => {
+        const found = cameras.find(c => {
           const lbl = String(c.label || '').toLowerCase();
           const isFront = lbl.includes('front') || lbl.includes('user') || lbl.includes('selfie') || lbl.includes('facing front');
           return !isFront && lbl.includes(kw);
         });
-        if (found) return found;
+        if (found && (found.id || found.deviceId)) {
+          return found.id || found.deviceId;
+        }
       }
 
-      // 3. Any device that explicitly does NOT say front/user/selfie
-      const nonFront = cams.filter(c => {
+      // 3. Explicitly exclude any front/user/selfie camera
+      const nonFront = cameras.filter(c => {
         const lbl = String(c.label || '').toLowerCase();
         return lbl && !lbl.includes('front') && !lbl.includes('user') && !lbl.includes('selfie') && !lbl.includes('facing front');
       });
-      if (nonFront.length > 0) {
-        return nonFront[0];
+      if (nonFront.length > 0 && (nonFront[0].id || nonFront[0].deviceId)) {
+        return nonFront[0].id || nonFront[0].deviceId;
       }
 
-      // 4. If all labels are empty "" (permissions not yet granted in this tab), return null
-      // so startScanner requests { video: { facingMode: { ideal: "environment" } } }
       return null;
-    }
-
-    function findBestFrontCamera(cams) {
-      if (!Array.isArray(cams) || cams.length === 0) return null;
-      const frontKeywords = ['front', 'user', 'selfie', 'facing front', '1, facing front'];
-      for (const kw of frontKeywords) {
-        const found = cams.find(c => {
-          const lbl = String(c.label || '').toLowerCase();
-          return lbl.includes(kw);
-        });
-        if (found) return found;
-      }
-      return null;
-    }
-
-    function isKnownFrontCamera(camIdOrLabel) {
-      if (!camIdOrLabel) return false;
-      const s = String(camIdOrLabel).toLowerCase();
-      if (s.includes('front') || s.includes('user') || s.includes('selfie') || s.includes('facing front')) {
-        return true;
-      }
-      const match = camerasList.find(c => c.id === camIdOrLabel);
-      if (match) {
-        const lbl = String(match.label || '').toLowerCase();
-        return lbl.includes('front') || lbl.includes('user') || lbl.includes('selfie') || lbl.includes('facing front');
-      }
-      return false;
     }
 
     function onCameraReady() {
@@ -1563,7 +1543,7 @@
       }
 
       // Populate camera devices list once permission is granted
-      refreshCamerasList().catch(() => {});
+      getOrEnumerateVideoDevices().catch(() => {});
 
       if (videoWatcherInterval) clearInterval(videoWatcherInterval);
       videoWatcherInterval = setInterval(ensureVideoPlaying, 1000);
@@ -1639,22 +1619,26 @@
         return;
       }
 
-      // Pre-enumerate cameras if permission was already granted in this session
-      await refreshCamerasList();
+      // 1. Explicitly enumerate devices (requesting dummy stream first if labels are empty to acquire permissions)
+      const devices = await getOrEnumerateVideoDevices();
 
-      const bestRear = findBestRearCamera(camerasList);
-      if (bestRear && bestRear.id) {
-        currentCameraId = bestRear.id;
+      // 2. Filter device list to find rear camera deviceId
+      const rearCameraId = findRearCameraDeviceId(devices);
+
+      if (rearCameraId) {
+        console.info('[Camera Engine] Selected rear camera deviceId:', rearCameraId);
+        currentCameraId = rearCameraId;
         currentCameraFacing = 'environment';
-        await launchCamera(bestRear.id);
+        await launchCamera(rearCameraId);
       } else {
+        console.warn('[Camera Engine] No rear camera deviceId identified from labels; falling back to environment constraint');
         currentCameraId = null;
         currentCameraFacing = 'environment';
         await launchCamera({ facingMode: "environment" });
       }
     }
 
-    async function launchCamera(cameraConfig) {
+    async function launchCamera(cameraTarget) {
       await stopAndClearScanner();
       torchOn = false;
       const torchBtn = document.getElementById('btn-torch');
@@ -1670,125 +1654,115 @@
       };
       html5QrScanner = new Html5Qrcode("reader", scannerOpts);
 
-      const isStringId = typeof cameraConfig === 'string';
-      const isRequestingFront = (typeof cameraConfig === 'object' && cameraConfig?.facingMode === 'user') ||
-                                (isStringId && isKnownFrontCamera(cameraConfig));
-      const targetFacing = isRequestingFront ? 'user' : 'environment';
-
-      // Primary flexible constraints using ideal to avoid OverconstrainedError in Chrome Android
-      const primaryVideoConstraints = isStringId
-        ? { deviceId: { ideal: cameraConfig } }
-        : { facingMode: { ideal: targetFacing } };
-
-      const primaryConfig = {
-        fps: 15,
-        disableFlip: false,
-        videoConstraints: primaryVideoConstraints
-      };
-
-      const primaryCameraIdOrConfig = isStringId ? cameraConfig : { facingMode: targetFacing };
-
       setupVideoInlineAttributes();
 
-      // Helper to verify if opened camera matches intended facing mode in Chrome Android
-      const verifyRearOrientation = async () => {
-        if (targetFacing !== 'environment') return true;
-        const videoEl = document.querySelector("#reader video");
-        const stream = videoEl?.srcObject;
-        const track = stream && stream.getVideoTracks ? stream.getVideoTracks()[0] : null;
-        const settings = (track && track.getSettings) ? track.getSettings() : {};
-        const trackLabel = String(track?.label || '').toLowerCase();
-        const isFrontActive = settings.facingMode === 'user' ||
-                              trackLabel.includes('front') ||
-                              trackLabel.includes('user') ||
-                              trackLabel.includes('selfie') ||
-                              trackLabel.includes('facing front');
+      const isStringId = typeof cameraTarget === 'string' && cameraTarget.length > 0;
+      const targetDeviceId = isStringId ? cameraTarget : (cameraTarget && cameraTarget.deviceId);
 
-        if (isFrontActive) {
-          console.warn(`[Camera Engine] Chrome defaulted to front camera (${trackLabel || 'user'}). Enumerate devices to force rear camera...`);
-          await refreshCamerasList();
-          const rearCam = findBestRearCamera(camerasList);
-          if (rearCam && rearCam.id && rearCam.id !== settings.deviceId) {
-            console.info(`[Camera Engine] Switching to explicit rear device: ${rearCam.label} (${rearCam.id})`);
-            await stopAndClearScanner();
-            html5QrScanner = new Html5Qrcode("reader", scannerOpts);
-            currentCameraId = rearCam.id;
-            currentCameraFacing = 'environment';
-            const rearForcedConfig = {
-              fps: 15,
-              disableFlip: false,
-              videoConstraints: { deviceId: { ideal: rearCam.id } }
-            };
-            await html5QrScanner.start(rearCam.id, rearForcedConfig, onScanSuccess, onScanFailure);
-            return true;
-          }
-        }
-        return true;
-      };
-
-      // Attempt 1: Flexible ideal constraints
-      try {
-        await html5QrScanner.start(primaryCameraIdOrConfig, primaryConfig, onScanSuccess, onScanFailure);
-        await verifyRearOrientation();
-        onCameraReady();
-        return;
-      } catch (err1) {
-        console.warn('Attempt 1 (flexible ideal constraints) failed, retrying with enumerated device:', err1);
-      }
-
-      // Attempt 2: Try explicit rear device ID from enumerated devices
-      try {
-        await refreshCamerasList();
-        const targetDev = (targetFacing === 'environment') ? findBestRearCamera(camerasList) : findBestFrontCamera(camerasList);
-        if (targetDev && targetDev.id) {
-          await stopAndClearScanner();
-          html5QrScanner = new Html5Qrcode("reader", scannerOpts);
-          currentCameraId = targetDev.id;
-          currentCameraFacing = targetFacing;
-          const devConfig = {
+      // Attempt 1: Exact deviceId constraint with ideal 1280x720 resolution (forces Chrome to rear hardware)
+      if (targetDeviceId) {
+        try {
+          const exactConfig = {
             fps: 15,
             disableFlip: false,
-            videoConstraints: { deviceId: { ideal: targetDev.id } }
+            videoConstraints: {
+              deviceId: { exact: targetDeviceId },
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            }
           };
-          await html5QrScanner.start(targetDev.id, devConfig, onScanSuccess, onScanFailure);
+          console.info(`[Camera Engine] Starting camera with exact deviceId: ${targetDeviceId}`);
+          await html5QrScanner.start(targetDeviceId, exactConfig, onScanSuccess, onScanFailure);
+          currentCameraId = targetDeviceId;
+          onCameraReady();
+          return;
+        } catch (errExact) {
+          console.warn('[Camera Engine] Exact deviceId constraint failed, retrying with ideal deviceId:', errExact);
+          try {
+            await stopAndClearScanner();
+            html5QrScanner = new Html5Qrcode("reader", scannerOpts);
+            const idealConfig = {
+              fps: 15,
+              disableFlip: false,
+              videoConstraints: {
+                deviceId: { ideal: targetDeviceId },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+              }
+            };
+            await html5QrScanner.start(targetDeviceId, idealConfig, onScanSuccess, onScanFailure);
+            currentCameraId = targetDeviceId;
+            onCameraReady();
+            return;
+          } catch (errIdeal) {
+            console.warn('[Camera Engine] Ideal deviceId constraint failed:', errIdeal);
+          }
+        }
+      }
+
+      // Attempt 2: If no targetDeviceId or targetDeviceId failed, try re-enumerating devices to get rear camera
+      try {
+        await stopAndClearScanner();
+        html5QrScanner = new Html5Qrcode("reader", scannerOpts);
+        const devs = await getOrEnumerateVideoDevices();
+        const rearId = findRearCameraDeviceId(devs);
+        if (rearId && rearId !== targetDeviceId) {
+          console.info(`[Camera Engine] Retrying with newly resolved rear deviceId: ${rearId}`);
+          const rearConfig = {
+            fps: 15,
+            disableFlip: false,
+            videoConstraints: {
+              deviceId: { exact: rearId },
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            }
+          };
+          await html5QrScanner.start(rearId, rearConfig, onScanSuccess, onScanFailure);
+          currentCameraId = rearId;
           onCameraReady();
           return;
         }
-      } catch (err2) {
-        console.warn('Attempt 2 (enumerated device ID) failed:', err2);
+      } catch (errReEnum) {
+        console.warn('[Camera Engine] Re-enumeration fallback failed:', errReEnum);
       }
 
-      // Attempt 3: Standard facingMode string constraint without custom videoConstraints wrapper
+      // Attempt 3: Flexible environment facingMode
       try {
         await stopAndClearScanner();
         html5QrScanner = new Html5Qrcode("reader", scannerOpts);
-        const standardConfig = { fps: 15, disableFlip: false };
-        await html5QrScanner.start({ facingMode: targetFacing }, standardConfig, onScanSuccess, onScanFailure);
-        await verifyRearOrientation();
-        onCameraReady();
-        return;
-      } catch (err3) {
-        console.warn('Attempt 3 (standard facingMode) failed:', err3);
-      }
-
-      // Attempt 4: Opposite facing mode (e.g. user if environment failed)
-      try {
-        const oppositeFacing = (targetFacing === 'environment') ? 'user' : 'environment';
-        await stopAndClearScanner();
-        html5QrScanner = new Html5Qrcode("reader", scannerOpts);
-        const oppConfig = {
+        const envConfig = {
           fps: 15,
           disableFlip: false,
-          videoConstraints: { facingMode: { ideal: oppositeFacing } }
+          videoConstraints: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
         };
-        await html5QrScanner.start({ facingMode: oppositeFacing }, oppConfig, onScanSuccess, onScanFailure);
+        await html5QrScanner.start({ facingMode: "environment" }, envConfig, onScanSuccess, onScanFailure);
         onCameraReady();
         return;
-      } catch (err4) {
-        console.warn('Attempt 4 (opposite facing mode) failed:', err4);
+      } catch (errEnv) {
+        console.warn('[Camera Engine] Flexible environment facingMode failed:', errEnv);
       }
 
-      // Attempt 5: Generic unconstrained getUserMedia probe
+      // Attempt 4: Standard user facingMode fallback
+      try {
+        await stopAndClearScanner();
+        html5QrScanner = new Html5Qrcode("reader", scannerOpts);
+        const userConfig = {
+          fps: 15,
+          disableFlip: false,
+          videoConstraints: { facingMode: { ideal: "user" } }
+        };
+        await html5QrScanner.start({ facingMode: "user" }, userConfig, onScanSuccess, onScanFailure);
+        onCameraReady();
+        return;
+      } catch (errUser) {
+        console.warn('[Camera Engine] User facingMode failed:', errUser);
+      }
+
+      // Attempt 5: Generic unconstrained video probe
       try {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
           const testStream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -1811,11 +1785,11 @@
           }
         }
       } catch (err5) {
-        console.error('Attempt 5 (generic video probe) failed:', err5);
+        console.error('[Camera Engine] Generic video probe failed:', err5);
       }
 
       // All attempts failed
-      console.error('All camera launch attempts exhausted');
+      console.error('[Camera Engine] All camera launch attempts exhausted');
       const msgEl = document.getElementById('cam-fallback-msg');
       if (msgEl) {
         msgEl.innerHTML = 'Camera could not be opened.<br>Please ensure camera permissions are allowed in Chrome settings and tap <strong>Try Camera Again</strong>.';
@@ -1863,39 +1837,33 @@
     }
 
     async function switchCamera() {
-      await refreshCamerasList();
+      const devices = await getOrEnumerateVideoDevices();
 
-      if (!camerasList || camerasList.length <= 1) {
-        currentCameraFacing = (currentCameraFacing === 'user') ? 'environment' : 'user';
-        const label = (currentCameraFacing === 'user') ? 'Front Camera' : 'Rear Camera';
-        showCameraToast(`📷 Switched: ${label}`);
-        await launchCamera({ facingMode: currentCameraFacing });
+      if (!devices || devices.length <= 1) {
+        showCameraToast('ℹ️ Only 1 camera found on device');
         return;
       }
 
-      let currentIdx = camerasList.findIndex(c => (c.id === currentCameraId || (currentCameraId && c.id.includes(currentCameraId))));
+      // Find index of current camera by deviceId
+      let currentIdx = devices.findIndex(c => c.id === currentCameraId || c.deviceId === currentCameraId);
       if (currentIdx === -1) {
-        if (currentCameraFacing === 'environment') {
-          const rearCam = findBestRearCamera(camerasList);
-          currentIdx = rearCam ? camerasList.indexOf(rearCam) : 0;
-        } else {
-          const frontCam = findBestFrontCamera(camerasList);
-          currentIdx = frontCam ? camerasList.indexOf(frontCam) : 0;
-        }
+        currentIdx = 0;
       }
 
-      const nextIdx = (currentIdx + 1) % camerasList.length;
-      const nextCam = camerasList[nextIdx];
-      currentCameraId = nextCam.id;
+      // Toggle to next deviceId
+      const nextIdx = (currentIdx + 1) % devices.length;
+      const nextCam = devices[nextIdx];
+      const nextDeviceId = nextCam.id || nextCam.deviceId;
+      currentCameraId = nextDeviceId;
 
-      const nextLabel = String(nextCam.label || '').toLowerCase();
-      const isFront = nextLabel.includes('front') || nextLabel.includes('user') || nextLabel.includes('selfie') || nextLabel.includes('facing front');
+      const lbl = String(nextCam.label || '').toLowerCase();
+      const isFront = lbl.includes('front') || lbl.includes('user') || lbl.includes('selfie') || lbl.includes('facing front');
       currentCameraFacing = isFront ? 'user' : 'environment';
 
-      const displayName = nextCam.label || (isFront ? 'Front Camera' : `Rear Lens #${nextIdx + 1}`);
+      const displayName = nextCam.label || (isFront ? 'Front Camera' : `Rear Camera #${nextIdx + 1}`);
       showCameraToast(`📷 Switched: ${displayName}`);
 
-      await launchCamera(nextCam.id);
+      await launchCamera(nextDeviceId);
     }
 
     function toggleTorch() {
