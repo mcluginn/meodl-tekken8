@@ -184,6 +184,19 @@ const EDAYS_2026_ADDITIONAL_ROSTER = [{"id":"EE-001","code":"EE-001","name":"ABA
 const EDAYS_2026_ME_ROSTER = [{"id":"student-0001","code":"MEODL-0001","name":"ABSALUD, EDWARD KEEN TAGLE","team":"ME"},{"id":"student-0002","code":"MEODL-0002","name":"ALMORO, STEPHEN NASH GACILLOS","team":"ME"},{"id":"student-0003","code":"MEODL-0003","name":"ASPERIN, ENRIQUE ACLAN","team":"ME"},{"id":"student-0004","code":"MEODL-0004","name":"AUSTRIA, ANDREA RIVERA","team":"ME"},{"id":"student-0005","code":"MEODL-0005","name":"BANATIN, CRISTOFF JIMSON TEJERO","team":"ME"},{"id":"student-0006","code":"MEODL-0006","name":"BARBA III, DANILO MAYLON","team":"ME"},{"id":"student-0007","code":"MEODL-0007","name":"BOLA, AR-JAMES REMOROZA","team":"ME"},{"id":"student-0008","code":"MEODL-0008","name":"CAGANAN, JOHN CEDRIC TAMAYO","team":"ME"},{"id":"student-0009","code":"MEODL-0009","name":"CARANDANG, GABRIEL FLORES","team":"ME"},{"id":"student-0010","code":"MEODL-0010","name":"CHAMIAN, BRADEN CHOZAS","team":"ME"},{"id":"student-0011","code":"MEODL-0011","name":"CONTRERAS, KENDRICK ZABDIEL RECIO","team":"ME"},{"id":"student-0012","code":"MEODL-0012","name":"CREMEN, AMIR MCKALE DEL SOL","team":"ME"},{"id":"student-0013","code":"MEODL-0013","name":"DE JESUS, JOHN JERNIECHO TABUYO","team":"ME"},{"id":"student-0014","code":"MEODL-0014","name":"DEBLOLS, REDD YUAN MERILLES","team":"ME"},{"id":"student-0015","code":"MEODL-0015","name":"DIZON, LEE JHUDIEL ANGARA","team":"ME"},{"id":"student-0016","code":"MEODL-0016","name":"ECHAPARE, PRINCE MEINARD MARCELLANA","team":"ME"},{"id":"student-0017","code":"MEODL-0017","name":"ETORMA, CHRIS ADVIEN LIBELO","team":"ME"},{"id":"student-0018","code":"MEODL-0018","name":"FLORES, HABIB DHEREX","team":"ME"},{"id":"student-0019","code":"MEODL-0019","name":"FONTANILLA, LORDRYAN CLYDE MORANTE","team":"ME"},{"id":"student-0020","code":"MEODL-0020","name":"GALANG, MARK KIRBY MORES","team":"ME"},{"id":"student-0021","code":"MEODL-0021","name":"GARCELLANO, AUDREY CALVIN PRADO","team":"ME"},{"id":"student-0022","code":"MEODL-0022","name":"GARCIA, JOHN LEMUEL","team":"ME"},{"id":"student-0023","code":"MEODL-0023","name":"GARCIA, KERBY ORUGA","team":"ME"},{"id":"student-0024","code":"MEODL-0024","name":"GERVACIO, LJ DENISSE HERNANDEZ","team":"ME"},{"id":"student-0025","code":"MEODL-0025","name":"GRATE, STOFFEL JASEN PERALTA","team":"ME"},{"id":"student-0026","code":"MEODL-0026","name":"ILARDE, RAISEL BORROMEO","team":"ME"},{"id":"student-0027","code":"MEODL-0027","name":"JUAN, MARK CLARENCE HIPOS","team":"ME"},{"id":"student-0028","code":"MEODL-0028","name":"LAFORTEZA, SAMANTHA NICOLE GLIPONEO","team":"ME"},{"id":"student-0029","code":"MEODL-0029","name":"LAIT, MARWELL SELWIN JABONILLO","team":"ME"},{"id":"student-0030","code":"MEODL-0030","name":"LEONOR, JOHN ROVEE VERGARA","team":"ME"},{"id":"student-0031","code":"MEODL-0031","name":"MAGHANOY, DAVID JAN RUZZEL BUMAGAT","team":"ME"},{"id":"student-0032","code":"MEODL-0032","name":"MALIPOL, CARL JEAN NOEL LARIOS","team":"ME"},{"id":"student-0033","code":"MEODL-0033","name":"MALLARI, LOUISE ANDREY DACLIZON","team":"ME"},{"id":"student-0034","code":"MEODL-0034","name":"MANALASTAS, JAMES SERDAN","team":"ME"},{"id":"student-0035","code":"MEODL-0035","name":"MANALO, CHARLES JOSEPH GAMBOA","team":"ME"},{"id":"student-0036","code":"MEODL-0036","name":"MONTERO, JOSHUA TAPIA","team":"ME"},{"id":"student-0037","code":"MEODL-0037","name":"ORENSE, EMIL GABRIEL MANGILIN","team":"ME"},{"id":"student-0038","code":"MEODL-0038","name":"PACLIBAR, JOHN MICHAEL VILLARAZA","team":"ME"},{"id":"student-0039","code":"MEODL-0039","name":"PALICPIC, CHRIS JERICO MIRANDA","team":"ME"},{"id":"student-0040","code":"MEODL-0040","name":"PUA, LIAM AKIEM CARASUS","team":"ME"},{"id":"student-0041","code":"MEODL-0041","name":"PUBLICO, JOHN MICHAEL BANAAG","team":"ME"},{"id":"student-0042","code":"MEODL-0042","name":"PULGAR, ROWEN VICTOR CUBILE","team":"ME"},{"id":"student-0043","code":"MEODL-0043","name":"QUIRANTE, SHIANELA BALANAY","team":"ME"},{"id":"student-0044","code":"MEODL-0044","name":"RIPO, RENZ ALJUN DOMINGUEZ","team":"ME"},{"id":"student-0045","code":"MEODL-0045","name":"SALIBA, GIAN KARLO BRAGADO","team":"ME"},{"id":"student-0046","code":"MEODL-0046","name":"SAN PASCUAL, JAMES DOMINIC TADONG","team":"ME"},{"id":"student-0047","code":"MEODL-0047","name":"SANTOS, KARL ANGELO DIAGO","team":"ME"},{"id":"student-0048","code":"MEODL-0048","name":"TALASTASIN, ALHJHON ANCHETA","team":"ME"},{"id":"student-0049","code":"MEODL-0049","name":"TAYAG, JAYSON BARQUILLA","team":"ME"},{"id":"student-0050","code":"MEODL-0050","name":"TEJERO, ARCH RYLER LOZADA","team":"ME"},{"id":"student-0051","code":"MEODL-0051","name":"TIZON, THEO DAN GHERICK MERALPES","team":"ME"},{"id":"student-0052","code":"MEODL-0052","name":"TULUD, MARCOS JOHN BONSO","team":"ME"},{"id":"student-0053","code":"MEODL-0053","name":"TURAJA, VIEN XYRILLE SANGALANG","team":"ME"},{"id":"student-0054","code":"MEODL-0054","name":"VILLAPANDO, RUSSEL THOMSON C.","team":"ME"},{"id":"student-0055","code":"MEODL-0055","name":"ZUÑIGA, KENNETH JOHN RIVEL","team":"ME"},{"id":"student-0056","code":"MEODL-0056","name":"ABERDE, NOMEL ACE CERBO","team":"ME"},{"id":"student-0057","code":"MEODL-0057","name":"ALGIRE, JEROME DAVE DEVOMA","team":"ME"},{"id":"student-0058","code":"MEODL-0058","name":"ALMORO, AERON JAMES PALENTINOS","team":"ME"},{"id":"student-0059","code":"MEODL-0059","name":"ASI, JOSH EROLD GOPOLLA","team":"ME"},{"id":"student-0060","code":"MEODL-0060","name":"CANA, AARON JAY CONDALOR","team":"ME"},{"id":"student-0061","code":"MEODL-0061","name":"CONTRERAS, CHAUNCEY DRE MALAPITAN","team":"ME"},{"id":"student-0062","code":"MEODL-0062","name":"DELA VIÑA, RHYME SOLAMO","team":"ME"},{"id":"student-0063","code":"MEODL-0063","name":"ELAURIA, JYMNASH CZAR ENDOZO","team":"ME"},{"id":"student-0064","code":"MEODL-0064","name":"ERJAS, CARL ANTHONY LAMAR","team":"ME"},{"id":"student-0065","code":"MEODL-0065","name":"ESPINA, CARL DUSTIN INOC","team":"ME"},{"id":"student-0066","code":"MEODL-0066","name":"GARCIA, JAMES ANDREW","team":"ME"},{"id":"student-0067","code":"MEODL-0067","name":"GAVINO, JHON RAVEN","team":"ME"},{"id":"student-0068","code":"MEODL-0068","name":"GLIPONEO, PRINCESS KYLE GUIM","team":"ME"},{"id":"student-0069","code":"MEODL-0069","name":"HERNANDEZ, NATHANIEL TUÑACAO","team":"ME"},{"id":"student-0070","code":"MEODL-0070","name":"HODRIAL, ALLEN VINCE CEDRO","team":"ME"},{"id":"student-0071","code":"MEODL-0071","name":"LACORTE, JOHN LAWRENCE DELATADO","team":"ME"},{"id":"student-0072","code":"MEODL-0072","name":"LIMBO, MARK REGIE ASISTIDO","team":"ME"},{"id":"student-0073","code":"MEODL-0073","name":"LLAMZON, ZYMON HILL PASCUAL","team":"ME"},{"id":"student-0074","code":"MEODL-0074","name":"MANZANILLA, BRIXTER JOSEPH GONZALES","team":"ME"},{"id":"student-0075","code":"MEODL-0075","name":"MATUNDAN, KHAEOUS AERAY COLLADO","team":"ME"},{"id":"student-0076","code":"MEODL-0076","name":"MIRASOL, MARTIN NEIL LAQUINDANUM","team":"ME"},{"id":"student-0077","code":"MEODL-0077","name":"NERO, GABBIELLE CACAL","team":"ME"},{"id":"student-0078","code":"MEODL-0078","name":"NUNO, RON EXEQUIEL","team":"ME"},{"id":"student-0079","code":"MEODL-0079","name":"OBLIPIAS, ZIGGY SABDAO","team":"ME"},{"id":"student-0080","code":"MEODL-0080","name":"OLINO, JOPETH ORBESO","team":"ME"},{"id":"student-0081","code":"MEODL-0081","name":"OLIQUINO, CHRISTIAN ARROYO","team":"ME"},{"id":"student-0082","code":"MEODL-0082","name":"ONTE, RAFAEL PAMPLONA","team":"ME"},{"id":"student-0083","code":"MEODL-0083","name":"PEÑA, CARLOS MIGUEL ANTIDO","team":"ME"},{"id":"student-0084","code":"MEODL-0084","name":"PRADO, JOHN LENRICK TABERNILLA","team":"ME"},{"id":"student-0085","code":"MEODL-0085","name":"QUILAO, LORD JOHN LUMACAD","team":"ME"},{"id":"student-0086","code":"MEODL-0086","name":"REAL, JILLIAN CAÑUBAS","team":"ME"},{"id":"student-0087","code":"MEODL-0087","name":"RUTAQUIO, BENEDICT GUCILATAR","team":"ME"},{"id":"student-0088","code":"MEODL-0088","name":"SALON, JAN MIKHAIL FORTUNO","team":"ME"},{"id":"student-0089","code":"MEODL-0089","name":"SANTOS, KARYLLE JOY SADIA","team":"ME"},{"id":"student-0090","code":"MEODL-0090","name":"TAGUIAM, JAE HARVEY BALASTA","team":"ME"},{"id":"student-0091","code":"MEODL-0091","name":"TALATALA, REIN EISEN BANDOLA","team":"ME"},{"id":"student-0092","code":"MEODL-0092","name":"ALVAREZ, VANNA JENILLE ROCCO","team":"ME"},{"id":"student-0093","code":"MEODL-0093","name":"ARGAÑOSA, RYU EMANUEL DELA CRUZ","team":"ME"},{"id":"student-0094","code":"MEODL-0094","name":"BAÑEZ, JOSEL DE CASTRO","team":"ME"},{"id":"student-0095","code":"MEODL-0095","name":"BARLETA, BRYANT DOCTORA","team":"ME"},{"id":"student-0096","code":"MEODL-0096","name":"BENGCO, EPHRAIM RICK REYES","team":"ME"},{"id":"student-0097","code":"MEODL-0097","name":"CABUCO, ZEDRICK CABANIG","team":"ME"},{"id":"student-0098","code":"MEODL-0098","name":"CAJUCOM, AEROL JOHN MARASIGAN","team":"ME"},{"id":"student-0099","code":"MEODL-0099","name":"CARLOS, KING ARDEE NHEL FLORES","team":"ME"},{"id":"student-0100","code":"MEODL-0100","name":"CATLI, JIJAH KARAN CAAGBAY","team":"ME"},{"id":"student-0101","code":"MEODL-0101","name":"DADIS, JARUZZ LANCELOT LAXAMANA","team":"ME"},{"id":"student-0102","code":"MEODL-0102","name":"DANTE, KEN-ZY RACHO","team":"ME"},{"id":"student-0103","code":"MEODL-0103","name":"DE JURAS, IVAN DICHOSO","team":"ME"},{"id":"student-0104","code":"MEODL-0104","name":"DELA ROSA, KEN ALVIN ULEP","team":"ME"},{"id":"student-0105","code":"MEODL-0105","name":"DIMAPILIS, EIDRIAN ROA","team":"ME"},{"id":"student-0106","code":"MEODL-0106","name":"ESTRELLADO, GABRIELLE LANCE MALALUAN","team":"ME"},{"id":"student-0107","code":"MEODL-0107","name":"GLOVO, RISTY AGULLANO","team":"ME"},{"id":"student-0108","code":"MEODL-0108","name":"MARTINEZ, JAY MAR ROMERO","team":"ME"},{"id":"student-0109","code":"MEODL-0109","name":"MEJILLA, JEDIMAR MAGLANGIT","team":"ME"},{"id":"student-0110","code":"MEODL-0110","name":"MERABE, PRINCE ANDEL RODRIGUEZ","team":"ME"},{"id":"student-0111","code":"MEODL-0111","name":"MILAR, EARL JOHN FEDILES","team":"ME"},{"id":"student-0112","code":"MEODL-0112","name":"MIRONES, GIANN CARLO ORTIZ","team":"ME"},{"id":"student-0113","code":"MEODL-0113","name":"OCBINA, ANTHONY REYES","team":"ME"},{"id":"student-0114","code":"MEODL-0114","name":"OPINIO, EDMEL JOHN CONDE","team":"ME"},{"id":"student-0115","code":"MEODL-0115","name":"PEREY, LUIS EMMANUEL MARASIGAN","team":"ME"},{"id":"student-0116","code":"MEODL-0116","name":"QUILITIS, VINCE ALJOE ROBLES","team":"ME"},{"id":"student-0117","code":"MEODL-0117","name":"RECIO, JHEZRIEL EDWARD FLORES","team":"ME"},{"id":"student-0118","code":"MEODL-0118","name":"REYES, LEILA MAY LABACO","team":"ME"},{"id":"student-0119","code":"MEODL-0119","name":"SANDOVAL, EDWARD SOLOMON ALVAREZ","team":"ME"},{"id":"student-0120","code":"MEODL-0120","name":"SEÑEREZ, KYLE CYRIS LLANTO","team":"ME"},{"id":"student-0121","code":"MEODL-0121","name":"TAJAO, PAUL ALDREY BARENG","team":"ME"},{"id":"student-0122","code":"MEODL-0122","name":"TORRES, JAMES CARLOS LAGDAAN","team":"ME"},{"id":"student-0123","code":"MEODL-0123","name":"VASQUEZ, JEPTHAH AGUILA","team":"ME"},{"id":"student-0124","code":"MEODL-0124","name":"YABUT, ASHLEY KURT BERMILLO","team":"ME"},{"id":"student-0125","code":"MEODL-0125","name":"AÑONUEVO, CHRIS","team":"ME"},{"id":"student-0126","code":"MEODL-0126","name":"ATIENZA, MATHEW GARCIA","team":"ME"},{"id":"student-0127","code":"MEODL-0127","name":"BALLESTEROS, MARK ANDERSEN TANDOC","team":"ME"},{"id":"student-0128","code":"MEODL-0128","name":"BANDIOLA, JOHN MARC TORRES","team":"ME"},{"id":"student-0129","code":"MEODL-0129","name":"BARCARSE, SEALTIEL UZZIEL LEGASPI","team":"ME"},{"id":"student-0130","code":"MEODL-0130","name":"BARONIA, JOHN RICHIE DIAZ","team":"ME"},{"id":"student-0131","code":"MEODL-0131","name":"BAYLON, JUSTINE IAN BANAWA","team":"ME"},{"id":"student-0132","code":"MEODL-0132","name":"CAGANAN, JOHN CEDRIC TAMAYO","team":"ME"},{"id":"student-0133","code":"MEODL-0133","name":"CALARA, TYRON JOEL VINOYA","team":"ME"},{"id":"student-0134","code":"MEODL-0134","name":"CAPERARE, CYRUS CESAR MAGAHIS","team":"ME"},{"id":"student-0135","code":"MEODL-0135","name":"CARANIWAN, RHODYLIE KIANA LUNA","team":"ME"},{"id":"student-0136","code":"MEODL-0136","name":"CAYAYAN, LANCE RUSSEL SUMICAD","team":"ME"},{"id":"student-0137","code":"MEODL-0137","name":"CEDALLA, JOHN LESTER HERNANDEZ","team":"ME"},{"id":"student-0138","code":"MEODL-0138","name":"CONVENTO, ADRIAN JAMES LADIA","team":"ME"},{"id":"student-0139","code":"MEODL-0139","name":"DE MESA, ANNA LOREN TUSCANO","team":"ME"},{"id":"student-0140","code":"MEODL-0140","name":"DE TORRES, JAMES IMMANUEL ASILO","team":"ME"},{"id":"student-0141","code":"MEODL-0141","name":"DELA CRUZ, JOHN RINGGO ADELINO","team":"ME"},{"id":"student-0142","code":"MEODL-0142","name":"DELA TORRE, JERALD ROBEL","team":"ME"},{"id":"student-0143","code":"MEODL-0143","name":"DESCALLAR, JOHN PAUL TRAJANO","team":"ME"},{"id":"student-0144","code":"MEODL-0144","name":"ELEFANE, DANAH VALERIE MORALES","team":"ME"},{"id":"student-0145","code":"MEODL-0145","name":"ENRIQUEZ, RAE SHERIZ NECESITO","team":"ME"},{"id":"student-0146","code":"MEODL-0146","name":"EVASCO, ONIMUS AMIR SANCHEZ","team":"ME"},{"id":"student-0147","code":"MEODL-0147","name":"FAJARDO, KING ZHAREN MAMALAYAN","team":"ME"},{"id":"student-0148","code":"MEODL-0148","name":"FAMINIAL, EARL VINCENT MAZO","team":"ME"},{"id":"student-0149","code":"MEODL-0149","name":"FERNANDEZ, NATHANIEL FRANCISCO","team":"ME"},{"id":"student-0150","code":"MEODL-0150","name":"FRANCISCO, RIDJY VILLARIN","team":"ME"},{"id":"student-0151","code":"MEODL-0151","name":"GALANG, KOBIE CONSTANTINE CAPILOS","team":"ME"},{"id":"student-0152","code":"MEODL-0152","name":"JAVIER, DENZEL JOHN LIMSON","team":"ME"},{"id":"student-0153","code":"MEODL-0153","name":"LABRADOR, JOHN PAUL PLASTINAA","team":"ME"},{"id":"student-0154","code":"MEODL-0154","name":"LUMINATE, JIETHER SALMORIN","team":"ME"},{"id":"student-0155","code":"MEODL-0155","name":"MADRONA, CARLOS MIGUEL BANAL","team":"ME"},{"id":"student-0156","code":"MEODL-0156","name":"MAÑEBO, KEITH RUSSELL ALVAREZ","team":"ME"},{"id":"student-0157","code":"MEODL-0157","name":"MARAÑA, RICK JAMES EVANGELISTA","team":"ME"},{"id":"student-0158","code":"MEODL-0158","name":"MARASIGAN, KEMP JOHN RACEL RAMOS","team":"ME"},{"id":"student-0159","code":"MEODL-0159","name":"MESINA, CEDRICK BALLARAN","team":"ME"},{"id":"student-0160","code":"MEODL-0160","name":"MOLDEZ, CARMELO CUNANAN","team":"ME"},{"id":"student-0161","code":"MEODL-0161","name":"ORENSE, EMIL GABRIEL MANGILIN","team":"ME"},{"id":"student-0162","code":"MEODL-0162","name":"PADUGA, EARL JUSTINE ESPELETA","team":"ME"},{"id":"student-0163","code":"MEODL-0163","name":"PAMPLONA, JAMES ADRIAN ENRIQUEZ","team":"ME"},{"id":"student-0164","code":"MEODL-0164","name":"PAYO, DYLAN ATIENZA","team":"ME"},{"id":"student-0165","code":"MEODL-0165","name":"PAYO, PATRICK DANIEL CASTILLO","team":"ME"},{"id":"student-0166","code":"MEODL-0166","name":"QUINTOS, LANCE KENNETH VICTA","team":"ME"},{"id":"student-0167","code":"MEODL-0167","name":"RAMOS, RED MATTHEW DE LEON","team":"ME"},{"id":"student-0168","code":"MEODL-0168","name":"RAPSING, EARL CONTRERAS","team":"ME"},{"id":"student-0169","code":"MEODL-0169","name":"RODIS, CLIFFORD ULLYSSES CASTOR","team":"ME"},{"id":"student-0170","code":"MEODL-0170","name":"SONGALLA, EZEKIEL JENNEL PENIDA","team":"ME"},{"id":"student-0171","code":"MEODL-0171","name":"STEVENS, GILBERT CARAAN","team":"ME"},{"id":"student-0172","code":"MEODL-0172","name":"SUYAT, RYAN BANCORO","team":"ME"},{"id":"student-0173","code":"MEODL-0173","name":"TALAY, SIMON JOHN ASISTORES","team":"ME"},{"id":"student-0174","code":"MEODL-0174","name":"TAN, TYRON JAMES","team":"ME"},{"id":"student-0175","code":"MEODL-0175","name":"VILLACERAN, EMMUEL ROI RIVERA","team":"ME"},{"id":"stu_2026-ece-777","code":"2026-ECE-777","name":"SANTOS, MARIA","team":"ME"}] ;
 
 
+const SCHEMA_VERSION = '2026.5';
+const ROSTER_VERSION = '2026-EDAYS-588';
+const ENGDAY_GAMES_LIST = [
+  'd1-reg',
+  'd1-am-block',
+  'd1-pm-block',
+  'd1-finals',
+  'd2-am-palaro',
+  'd2-esports',
+  'd2-pageant',
+  'd2-colorfest'
+];
+
 function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
   if (!targetStudentsMap || typeof targetStudentsMap !== 'object') {
     targetStudentsMap = {};
@@ -273,19 +286,6 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
 if (attendanceState && attendanceState.students) {
   ensureFullMasterRoster(attendanceState.students);
 }
-
-const SCHEMA_VERSION = '2026.5';
-const ROSTER_VERSION = '2026-EDAYS-588';
-const ENGDAY_GAMES_LIST = [
-  'd1-reg',
-  'd1-am-block',
-  'd1-pm-block',
-  'd1-finals',
-  'd2-am-palaro',
-  'd2-esports',
-  'd2-pageant',
-  'd2-colorfest'
-];
 
 const DEFAULT_ENGDAY_SESSIONS = [
   {
@@ -420,32 +420,8 @@ const DEFAULT_ENGDAY_GROUPS = [
 ];
 
 function buildDefaultEngDayRoster(sessionIds = ENGDAY_GAMES_LIST) {
-  const baseStudents = buildDefaultStudentsRoster();
   const students = {};
-  for (const [id, s] of Object.entries(baseStudents)) {
-    const gm = {};
-    sessionIds.forEach(g => {
-      gm[g] = {
-        gameId: g,
-        status: 'OUTSIDE',
-        lastAction: null,
-        checkInTime: null,
-        checkOutTime: null,
-        displayCheckIn: null,
-        displayCheckOut: null,
-        visits: 0,
-        history: []
-      };
-    });
-    students[id] = {
-      id: s.id,
-      name: s.name,
-      team: s.team,
-      teamName: s.teamName,
-      studentCode: s.studentCode,
-      games: gm
-    };
-  }
+  ensureFullMasterRoster(students, sessionIds);
   return students;
 }
 
@@ -1020,22 +996,37 @@ function parseJsonBody(req) {
   if (typeof req.body === 'string' && req.body.trim()) {
     try { return Promise.resolve(JSON.parse(req.body)); } catch (e) {}
   }
+  if (req.readableEnded || req.complete) {
+    return Promise.resolve(req.body || {});
+  }
   return new Promise((resolve, reject) => {
     let body = '';
+    const timer = setTimeout(() => {
+      try {
+        resolve(body ? JSON.parse(body) : (req.body || {}));
+      } catch (e) {
+        resolve(req.body || {});
+      }
+    }, 4000);
     req.on('data', chunk => {
       body += chunk;
       if (body.length > 10 * 1024 * 1024) { // 10MB limit
+        clearTimeout(timer);
         reject(new Error('Payload too large'));
       }
     });
     req.on('end', () => {
+      clearTimeout(timer);
       try {
-        resolve(body ? JSON.parse(body) : {});
+        resolve(body ? JSON.parse(body) : (req.body || {}));
       } catch (err) {
         reject(new Error('Invalid JSON format: ' + err.message));
       }
     });
-    req.on('error', reject);
+    req.on('error', err => {
+      clearTimeout(timer);
+      reject(err);
+    });
   });
 }
 
@@ -1395,6 +1386,8 @@ export async function handleRequest(req, res) {
           });
         }
 
+        ensureFullMasterRoster(mergedStudents, sessionIds);
+
         engdayState.eventsCatalog[evtId] = {
           ...existingEvt,
           ...payload.event,
@@ -1410,6 +1403,7 @@ export async function handleRequest(req, res) {
       } else if (payload.event && payload.event.id === engdayState.activeEventId) {
         engdayState.students = engdayState.eventsCatalog[payload.event.id].students || {};
       }
+      ensureFullMasterRoster(engdayState.students, ENGDAY_GAMES_LIST);
 
       engdayState.schemaVersion = SCHEMA_VERSION;
       engdayState.version = (engdayState.version || 1) + 1;
@@ -1500,19 +1494,22 @@ export async function handleRequest(req, res) {
           continue;
         }
 
-        // Ensure event entry exists in eventsCatalog
+        // Ensure event entry exists in eventsCatalog with complete 588-student roster
         if (!engdayState.eventsCatalog) engdayState.eventsCatalog = {};
         if (!engdayState.eventsCatalog[eventKey]) {
           engdayState.eventsCatalog[eventKey] = {
             id: eventKey,
-            title: eventKey === 'engday_2026' ? 'Engineering Day 2026' : eventKey,
-            students: eventKey === 'engday_2026' ? (engdayState.students || buildDefaultEngDayRoster()) : {},
-            sessions: [],
+            title: eventKey === 'engday_2026' ? 'ENGINEERING DAYS 2026' : eventKey,
+            students: eventKey === 'engday_2026' ? (engdayState.students || buildDefaultEngDayRoster()) : buildDefaultEngDayRoster(),
+            sessions: DEFAULT_ENGDAY_SESSIONS,
+            groups: DEFAULT_ENGDAY_GROUPS,
             updatedAt: new Date().toISOString()
           };
         }
         const targetEvt = engdayState.eventsCatalog[eventKey];
         if (!targetEvt.students) targetEvt.students = {};
+        ensureFullMasterRoster(targetEvt.students, getActiveSessionIdsForEvent(eventKey));
+        ensureFullMasterRoster(engdayState.students, ENGDAY_GAMES_LIST);
 
         let validStudentId = studentId;
         const lookupCode = String(studentId || ev.studentCode || '').trim().toUpperCase();

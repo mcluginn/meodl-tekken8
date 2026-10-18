@@ -1875,12 +1875,59 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           if (host && host.includes('github.io')) {
             return 'https://meodl.vercel.app';
           }
-          return window.location.origin.replace(/\/$/, '');
+          return window.location.origin ? window.location.origin.replace(/\/$/, '') : 'https://meodl.vercel.app';
         }
-        return '';
+        return 'https://meodl.vercel.app';
       }
       return url.replace(/\/$/, '');
     }
+
+    resolveApiUrl(endpointPath) {
+      const cleanPath = (endpointPath || '').startsWith('/') ? endpointPath : `/${endpointPath || ''}`;
+      if (typeof window === 'undefined' || !window.location) {
+        return cleanPath;
+      }
+
+      const host = window.location.hostname || '';
+      const origin = window.location.origin ? window.location.origin.replace(/\/$/, '') : '';
+
+      let configuredUrl = (this.config.serverUrl || '').trim();
+      if (!configuredUrl && typeof localStorage !== 'undefined') {
+        const saved = localStorage.getItem('ENGDAY_SERVER_URL');
+        if (saved && saved.trim()) configuredUrl = saved.trim();
+      }
+      if (configuredUrl) {
+        configuredUrl = configuredUrl.replace(/\/$/, '');
+      }
+
+      // 1. If running on Vercel (*.vercel.app)
+      if (host.includes('vercel.app')) {
+        // If no custom URL configured, or configured URL points to vercel or origin, use same-origin relative path!
+        if (!configuredUrl || configuredUrl.includes('vercel.app') || (origin && configuredUrl.startsWith(origin))) {
+          return cleanPath;
+        }
+        return `${configuredUrl}${cleanPath}`;
+      }
+
+      // 2. If running locally (localhost, 127.0.0.1, or local private IP)
+      const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '[::1]' ||
+        host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.') || host.endsWith('.local');
+
+      if (isLocalHost) {
+        // If user explicitly configured an external remote URL (like https://meodl.vercel.app), use it
+        if (configuredUrl && !configuredUrl.includes('localhost') && !configuredUrl.includes('127.0.0.1') && (!origin || !configuredUrl.startsWith(origin))) {
+          return `${configuredUrl}${cleanPath}`;
+        }
+        return cleanPath;
+      }
+
+      // 3. If running on GitHub Pages (github.io) or static file
+      if (configuredUrl) {
+        return `${configuredUrl}${cleanPath}`;
+      }
+      return `https://meodl.vercel.app${cleanPath}`;
+    }
+
 
     getOrCreateDeviceId() {
       try {
@@ -2635,10 +2682,10 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       await this.updatePendingCount();
 
       // Sync reset to server if online
-      const base = this.getApiBaseUrl();
-      if (base && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
+      if (typeof navigator === 'undefined' || navigator.onLine !== false) {
         try {
-          await fetch(`${base}/api/engday/attendance/reset`, {
+          const resetUrl = this.resolveApiUrl('/api/engday/attendance/reset');
+          await fetch(resetUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -2650,6 +2697,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           });
         } catch (e) {}
       }
+
 
       return { success: true };
     }
@@ -3795,14 +3843,6 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
 
     initSseStream() {
       if (typeof window === 'undefined' || typeof EventSource === 'undefined') return;
-      const base = this.getApiBaseUrl();
-      if (!base) {
-        if (this.sseSource) {
-          try { this.sseSource.close(); } catch(e) {}
-          this.sseSource = null;
-        }
-        return;
-      }
 
       if (this.sseSource) {
         try { this.sseSource.close(); } catch(e) {}
@@ -3810,9 +3850,10 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       }
 
       try {
-        const streamUrl = `${base}/api/engday/attendance/stream`;
+        const streamUrl = this.resolveApiUrl('/api/engday/attendance/stream');
         const sse = new EventSource(streamUrl);
         this.sseSource = sse;
+
 
         sse.onopen = () => {
           this.serverOnline = true;
@@ -4112,24 +4153,22 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           if (localEvents.length > 0) {
             await Promise.all(localEvents.map(ev => this.db.enqueuePending(ev)));
             await this.updatePendingCount();
-            const base = this.getApiBaseUrl();
-            if (base) {
-              const { deduplicated } = this.deduplicatePendingQueue(localEvents);
-              const healRes = await fetch(`${base}/api/engday/attendance/sync`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  deviceId: this.deviceId,
-                  activeEventId: this.activeEventId,
-                  events: deduplicated
-                })
-              });
-              if (healRes.ok) {
-                const healData = await healRes.json();
-                const syncedIds = [...(healData.accepted || []), ...(healData.duplicate || [])];
-                await this.db.markEventsSynced(syncedIds);
-                await this.updatePendingCount();
-              }
+            const { deduplicated } = this.deduplicatePendingQueue(localEvents);
+            const syncUrl = this.resolveApiUrl('/api/engday/attendance/sync');
+            const healRes = await fetch(syncUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                deviceId: this.deviceId,
+                activeEventId: this.activeEventId,
+                events: deduplicated
+              })
+            });
+            if (healRes.ok) {
+              const healData = await healRes.json();
+              const syncedIds = [...(healData.accepted || []), ...(healData.duplicate || [])];
+              await this.db.markEventsSynced(syncedIds);
+              await this.updatePendingCount();
             }
           }
         } catch (healErr) {
@@ -4141,11 +4180,11 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
     }
 
     async syncConfigWithServer() {
-      const base = this.getApiBaseUrl();
-      if (!base || (typeof navigator !== 'undefined' && navigator.onLine === false)) return false;
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return false;
       this.syncActiveBranchToCatalog();
       try {
-        const res = await fetch(`${base}/api/engday/attendance/config`, {
+        const configUrl = this.resolveApiUrl('/api/engday/attendance/config');
+        const res = await fetch(configUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -4163,6 +4202,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       } catch (e) {}
       return false;
     }
+
 
     syncNow() {
       this.initSseStream();
@@ -4243,15 +4283,12 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           await this.db.markEventsSynced(duplicateIds);
         }
 
-        const base = this.getApiBaseUrl();
-        if (!base) {
-          this.serverOnline = false;
-          return;
-        }
+        const syncUrl = this.resolveApiUrl('/api/engday/attendance/sync');
+        const stateUrl = this.resolveApiUrl(`/api/engday/attendance/state?eventKey=${encodeURIComponent(this.activeEventId)}`);
 
         // 1. Flush local outbox queue to server
         if (queue.length > 0) {
-          const res = await fetch(`${base}/api/engday/attendance/sync`, {
+          const res = await fetch(syncUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -4273,7 +4310,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         }
 
         // 2. Fetch latest server state & reconcile safely
-        const stateRes = await fetch(`${base}/api/engday/attendance/state?eventKey=${encodeURIComponent(this.activeEventId)}`, {
+        const stateRes = await fetch(stateUrl, {
           headers: { 'Accept': 'application/json' },
           cache: 'no-store'
         });
