@@ -34,7 +34,7 @@
   </script>
 
   <!-- Local Standalone Libraries with Resilient Multi-Network Fallback -->
-  <script src="./assets/html5-qrcode.min.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/html5-qrcode.min.js';document.head.appendChild(s);}"></script>
+  <script src="./assets/html5-qrcode.min.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';document.head.appendChild(s);}"></script>
   <script src="./assets/meodl_data.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_data.js';document.head.appendChild(s);}"></script>
   <script src="./assets/meodl_attendance.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_attendance.js';document.head.appendChild(s);}"></script>
   <script src="./assets/engday_attendance.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/engday_attendance.js';document.head.appendChild(s);}"></script>
@@ -1332,42 +1332,60 @@
     }
 
     // -----------------------------------------------------------------------
-    // 4. CAMERA ENGINE & ASYNC RACE-FREE STREAM LIFECYCLE (FIXED)
+    // 4. CAMERA ENGINE & ASYNC RACE-FREE STREAM LIFECYCLE (FIXED FOR IOS/SAFARI)
     // -----------------------------------------------------------------------
-    function ensureVideoPlaying() {
-      const video = document.querySelector("#reader video");
-      if (!video) return;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    let videoObserver = null;
 
-      video.setAttribute("playsinline", "true");
-      video.setAttribute("webkit-playsinline", "true");
-      video.setAttribute("autoplay", "true");
-      video.setAttribute("muted", "true");
-      if (video.hasAttribute("controls")) video.removeAttribute("controls");
-      video.muted = true;
-      video.playsInline = true;
-      video.autoplay = true;
-
-      if (video.paused) {
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {});
+    function setupVideoInlineAttributes() {
+      const reader = document.getElementById('reader');
+      if (!reader) return;
+      const applyAttrs = () => {
+        const video = reader.querySelector('video');
+        if (video) {
+          video.setAttribute('playsinline', 'true');
+          video.setAttribute('webkit-playsinline', 'true');
+          video.setAttribute('autoplay', 'true');
+          video.setAttribute('muted', 'true');
+          video.playsInline = true;
+          video.muted = true;
+          video.autoplay = true;
+          if (video.hasAttribute('controls')) video.removeAttribute('controls');
+          if (video.paused) {
+            video.play().catch(() => {});
+          }
         }
+      };
+      applyAttrs();
+      if (!videoObserver) {
+        videoObserver = new MutationObserver(applyAttrs);
+        videoObserver.observe(reader, { childList: true, subtree: true });
       }
+    }
 
+    function ensureVideoPlaying() {
+      setupVideoInlineAttributes();
+      const video = document.querySelector("#reader video");
+      if (video && video.paused) {
+        video.play().catch(() => {});
+      }
       const pausedAlert = document.getElementById("video-paused-alert");
       if (pausedAlert) {
-        pausedAlert.classList.toggle("hidden", !video.paused);
+        pausedAlert.classList.add("hidden");
       }
     }
 
     function onCameraReady() {
       document.getElementById('cam-fallback')?.classList.add('hidden');
+      document.getElementById('video-paused-alert')?.classList.add('hidden');
+      setupVideoInlineAttributes();
 
       const video = document.querySelector("#reader video");
       if (video) {
-        ensureVideoPlaying();
-        ['loadedmetadata', 'canplay', 'pause', 'play', 'stalled', 'suspend'].forEach(evtName => {
-          video.addEventListener(evtName, ensureVideoPlaying);
+        ['loadedmetadata', 'canplay', 'pause', 'play'].forEach(evtName => {
+          video.addEventListener(evtName, () => {
+            if (video.paused) video.play().catch(() => {});
+          });
         });
         try {
           const stream = video.srcObject;
@@ -1381,7 +1399,7 @@
       }
 
       if (videoWatcherInterval) clearInterval(videoWatcherInterval);
-      videoWatcherInterval = setInterval(ensureVideoPlaying, 350);
+      videoWatcherInterval = setInterval(ensureVideoPlaying, 1000);
 
       try {
         if (html5QrScanner && html5QrScanner.applyVideoConstraints) {
@@ -1395,12 +1413,18 @@
         applyZoom(currentZoom);
       }
 
-      Html5Qrcode.getCameras().then(devices => {
-        if (devices && devices.length) camerasList = devices;
-      }).catch(() => {});
+      if (!isIOS) {
+        Html5Qrcode.getCameras().then(devices => {
+          if (devices && devices.length) camerasList = devices;
+        }).catch(() => {});
+      }
     }
 
     async function stopAndClearScanner() {
+      if (videoWatcherInterval) {
+        clearInterval(videoWatcherInterval);
+        videoWatcherInterval = null;
+      }
       cameraTransitionPromise = cameraTransitionPromise.then(async () => {
         if (!html5QrScanner) return;
         const inst = html5QrScanner;
@@ -1443,14 +1467,15 @@
 
     function startScanner() {
       document.getElementById('cam-fallback')?.classList.add('hidden');
+      document.getElementById('video-paused-alert')?.classList.add('hidden');
 
-      if (!window.Html5Qrcode) {
-        document.getElementById('cam-fallback')?.classList.remove('hidden');
-        document.getElementById('cam-fallback-msg').textContent = 'QR scanning library not available.';
+      if (typeof Html5Qrcode === 'undefined') {
+        const msgEl = document.getElementById('cam-fallback-msg');
+        if (msgEl) msgEl.textContent = 'Loading scanner library...';
+        setTimeout(startScanner, 200);
         return;
       }
 
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       if (isIOS) {
         currentCameraId = null;
         launchCamera({ facingMode: "environment" });
@@ -1487,9 +1512,10 @@
         torchBtn.className = 'p-2 rounded-xl bg-black/65 backdrop-blur-md border border-white/20 text-white text-xs hover:bg-black/85 transition-colors';
       }
 
+      // CRITICAL: useBarCodeDetectorIfSupported MUST BE FALSE to prevent crashes on iOS Safari & Android WebViews
       const scannerOpts = {
-        formatsToSupport: [ 0 ],
-        experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+        formatsToSupport: [ 0 ], // 0 = Html5QrcodeSupportedFormats.QR_CODE
+        experimentalFeatures: { useBarCodeDetectorIfSupported: false },
         verbose: false
       };
       html5QrScanner = new Html5Qrcode("reader", scannerOpts);
@@ -1502,29 +1528,46 @@
         fps: 24,
         qrbox: function(viewfinderWidth, viewfinderHeight) {
           const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-          const edge = Math.max(190, Math.floor(minEdge * 0.85));
-          return { width: edge, height: edge };
+          // Ensure qrbox dimensions NEVER exceed the element dimensions (html5-qrcode requirement)
+          const edge = Math.max(100, Math.min(minEdge - 10, Math.floor(minEdge * 0.80)));
+          return { width: Math.max(80, edge), height: Math.max(80, edge) };
         },
         disableFlip: false
       };
 
-      html5QrScanner.start(cameraIdOrConfig, config, onScanSuccess, onScanFailure)
-        .then(() => onCameraReady())
-        .catch(async () => {
+      try {
+        await html5QrScanner.start(cameraIdOrConfig, config, onScanSuccess, onScanFailure);
+        onCameraReady();
+      } catch (err1) {
+        console.warn('Primary camera start failed, retrying with facingMode: environment', err1);
+        try {
           await stopAndClearScanner();
           html5QrScanner = new Html5Qrcode("reader", scannerOpts);
-          html5QrScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
-            .then(() => onCameraReady())
-            .catch(async () => {
-              await stopAndClearScanner();
-              html5QrScanner = new Html5Qrcode("reader", scannerOpts);
-              html5QrScanner.start({ facingMode: "user" }, config, onScanSuccess, onScanFailure)
-                .then(() => onCameraReady())
-                .catch(() => {
-                  document.getElementById('cam-fallback')?.classList.remove('hidden');
-                });
-            });
-        });
+          await html5QrScanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure);
+          onCameraReady();
+        } catch (err2) {
+          console.warn('Environment facingMode failed, retrying with facingMode: user', err2);
+          try {
+            await stopAndClearScanner();
+            html5QrScanner = new Html5Qrcode("reader", scannerOpts);
+            await html5QrScanner.start({ facingMode: "user" }, config, onScanSuccess, onScanFailure);
+            onCameraReady();
+          } catch (err3) {
+            console.error('All camera launch attempts failed:', err3);
+            const msgEl = document.getElementById('cam-fallback-msg');
+            if (msgEl) {
+              if (err3 && (err3.name === 'NotAllowedError' || String(err3).includes('Permission'))) {
+                msgEl.textContent = 'Camera Permission Denied';
+              } else if (err3 && (err3.name === 'NotFoundError' || String(err3).includes('DevicesNotFoundError'))) {
+                msgEl.textContent = 'No Camera Device Detected';
+              } else {
+                msgEl.textContent = 'Unable to Start Camera Stream';
+              }
+            }
+            document.getElementById('cam-fallback')?.classList.remove('hidden');
+          }
+        }
+      }
     }
 
     function cycleZoom(level) {
