@@ -83,7 +83,7 @@
   <!-- TOP NAVIGATION BAR (UNIFIED STYLING WITH SCANNER) -->
   <!-- ================================================================= -->
   <header class="no-print sticky top-0 z-40 bg-[#140b09]/95 backdrop-blur-xl border-b border-amber-500/30 px-4 py-3 shadow-xl shadow-black/60">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
       
       <!-- Left: Brand + Dynamic Event Selector -->
       <div class="flex items-center gap-3">
@@ -107,8 +107,8 @@
         </button>
       </div>
 
-      <!-- Right: Action Buttons -->
-      <div class="flex items-center gap-2 flex-wrap">
+      <!-- Right: Action Buttons (Unified Top Toolbar on Wide Screens) -->
+      <div class="flex items-center gap-2 flex-wrap lg:justify-end">
         <!-- Event & Roster Admin Setup Button -->
         <button onclick="openAdminSetupModal('events')" class="px-3 py-2 rounded-xl bg-[#1c100d] hover:bg-[#2a1713] border border-amber-500/40 text-amber-300 font-mono font-bold text-xs flex items-center gap-1.5 transition-all shadow">
           <span>⚙️</span>
@@ -183,11 +183,11 @@
         </div>
       </div>
 
-      <div class="p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 col-span-2 sm:col-span-1">
+      <div class="p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 col-span-2 sm:col-span-1 min-w-0">
         <span class="text-[10px] text-zinc-400 uppercase block">Venue & Time (PH)</span>
         <div class="mt-1">
           <span id="kpi-live-clock" class="text-lg font-extrabold text-white block leading-tight">--:--</span>
-          <span id="kpi-venue-name" class="text-[10px] text-emerald-400 truncate block">Gymnasium / Oval & Engineering Labs</span>
+          <span id="kpi-venue-name" class="text-[10px] text-emerald-400 leading-snug break-words block mt-0.5">Gymnasium / Oval & Engineering Labs</span>
         </div>
       </div>
     </section>
@@ -255,7 +255,7 @@
           />
 
           <!-- Dynamic Group Filter -->
-          <select id="team-filter-select" onchange="renderStudentTable()" class="px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs focus:outline-none focus:border-amber-500">
+          <select id="team-filter-select" onchange="onTeamFilterChange()" class="px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs focus:outline-none focus:border-amber-500">
             <option value="all">All Groups</option>
           </select>
 
@@ -280,11 +280,16 @@
         </div>
       </div>
 
-      <!-- Responsive Matrix Table -->
-      <div class="overflow-x-auto rounded-2xl border border-zinc-800/90">
+      <!-- Quick Department Filter Pills Bar -->
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-3 mb-2 text-xs font-mono" id="dept-quick-filter-bar">
+        <!-- Dynamically rendered pills: All (588) | CE | IE | EE | CPE | ECE | ME -->
+      </div>
+
+      <!-- Responsive Matrix Table with Sticky Thead -->
+      <div class="overflow-x-auto overflow-y-auto max-h-[72vh] rounded-2xl border border-zinc-800/90 relative">
         <table class="w-full text-left border-collapse font-mono text-xs">
-          <thead>
-            <tr id="matrix-thead-row" class="bg-zinc-900/95 text-zinc-400 text-[10px] uppercase border-b border-zinc-800">
+          <thead class="sticky top-0 z-20">
+            <tr id="matrix-thead-row" class="bg-zinc-900/95 backdrop-blur-md text-zinc-400 text-[10px] uppercase border-b border-zinc-800 shadow-sm">
               <!-- Dynamically rendered columns matching active event sessions -->
             </tr>
           </thead>
@@ -378,7 +383,7 @@
           <select id="qr-gen-limit" onchange="renderQrGeneratorPreview()" class="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 text-amber-300 text-xs">
             <option value="24">Preview First 24 Cards</option>
             <option value="60">Preview First 60 Cards</option>
-            <option value="500">Show All Cards (For Printing)</option>
+            <option value="1000">Show All 588+ Cards (For Printing)</option>
           </select>
         </div>
 
@@ -812,6 +817,7 @@
       document.getElementById('kpi-sessions-label').textContent = `Across ${(engine.games || []).length} Checkpoints`;
 
       populateDynamicFilters();
+      renderDeptQuickFilterBar();
       renderTeamsLeaderboard(stats);
       renderCategoryFilterBar();
       renderGameCards(stats);
@@ -841,6 +847,63 @@
           games.map(g => `<option value="${g.id}">${g.icon || '📋'} ${g.shortName} (${g.timeSlot || g.time || ''})</option>`).join('');
         if ([...gameSel.options].some(o => o.value === curVal)) gameSel.value = curVal;
       }
+    }
+
+    function quickFilterDepartment(deptId) {
+      const select = document.getElementById('team-filter-select');
+      if (select) {
+        select.value = deptId;
+      }
+      renderDeptQuickFilterBar();
+      renderStudentTable();
+    }
+
+    function onTeamFilterChange() {
+      renderDeptQuickFilterBar();
+      renderStudentTable();
+    }
+
+    function renderDeptQuickFilterBar() {
+      const bar = document.getElementById('dept-quick-filter-bar');
+      if (!bar || !window.ENGDAY_ATTENDANCE) return;
+      const engine = window.ENGDAY_ATTENDANCE;
+      const groups = engine.getGroups();
+      const currentTeam = (document.getElementById('team-filter-select')?.value || 'all').toLowerCase();
+      const totalRoster = Object.keys(engine.state.students || {}).length;
+
+      const isAllActive = currentTeam === 'all';
+      let html = `
+        <button 
+          type="button"
+          onclick="quickFilterDepartment('all')" 
+          class="px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 border ${
+            isAllActive 
+              ? 'bg-amber-600 text-white border-amber-400 shadow-md ring-2 ring-amber-400/30' 
+              : 'bg-zinc-900 text-zinc-300 border-zinc-800 hover:border-zinc-700 hover:text-white'
+          }"
+        >
+          All (${totalRoster})
+        </button>
+      `;
+
+      groups.forEach(g => {
+        const isActive = currentTeam === g.id.toLowerCase();
+        html += `
+          <button 
+            type="button"
+            onclick="quickFilterDepartment('${g.id}')" 
+            class="px-3 py-1.5 rounded-xl font-bold transition-all shrink-0 border ${
+              isActive 
+                ? `${g.badgeClass} ring-2 ring-white/40 shadow-md scale-[1.02]` 
+                : `${g.bgClass} ${g.textClass} ${g.borderClass} opacity-80 hover:opacity-100`
+            }"
+          >
+            ${g.shortCode || g.name} (${g.count})
+          </button>
+        `;
+      });
+
+      bar.innerHTML = html;
     }
 
     function renderTeamsLeaderboard(stats) {
@@ -1050,16 +1113,16 @@
       const games = window.ENGDAY_ATTENDANCE.games || [];
 
       tr.innerHTML = `
-        <th class="py-3 px-3">Student ID</th>
-        <th class="py-3 px-3">Full Name</th>
-        <th class="py-3 px-3">Program / Group</th>
+        <th class="sticky top-0 bg-zinc-900/95 backdrop-blur-md z-20 py-3 px-3">Student ID</th>
+        <th class="sticky top-0 bg-zinc-900/95 backdrop-blur-md z-20 py-3 px-3">Full Name</th>
+        <th class="sticky top-0 bg-zinc-900/95 backdrop-blur-md z-20 py-3 px-3">Program / Group</th>
         ${games.map(g => `
-          <th class="py-3 px-2 text-center" title="${g.name} (${g.timeSlot || g.time || ''})">
+          <th class="sticky top-0 bg-zinc-900/95 backdrop-blur-md z-20 py-3 px-2 text-center" title="${g.name} (${g.timeSlot || g.time || ''})">
             ${g.icon || '📋'} ${g.shortName}
           </th>
         `).join('')}
-        <th class="py-3 px-3 text-center">Checkpoints</th>
-        <th class="py-3 px-3 text-right">Action</th>
+        <th class="sticky top-0 bg-zinc-900/95 backdrop-blur-md z-20 py-3 px-3 text-center">Checkpoints</th>
+        <th class="sticky top-0 bg-zinc-900/95 backdrop-blur-md z-20 py-3 px-3 text-right">Action</th>
       `;
     }
 

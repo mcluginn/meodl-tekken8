@@ -211,12 +211,12 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
   ];
 
   const DEFAULT_GROUPS = [
-    { id: 'ce', name: 'CE (Civil Engineering)', shortCode: 'CE', color: 'yellow', hex: '#facc15' },
-    { id: 'cpe', name: 'CPE (Computer Engineering)', shortCode: 'CPE', color: 'pink', hex: '#f472b6' },
-    { id: 'ee', name: 'EE (Electrical Engineering)', shortCode: 'EE', color: 'zinc', hex: '#27272a' },
-    { id: 'ece', name: 'ECE (Electronics Engineering)', shortCode: 'ECE', color: 'red', hex: '#ef4444' },
+    { id: 'ce', name: 'CE (Civil Engineering)', shortCode: 'CE', color: 'cyan', hex: '#06b6d4' },
     { id: 'ie', name: 'IE (Industrial Engineering)', shortCode: 'IE', color: 'emerald', hex: '#10b981' },
-    { id: 'me', name: 'ME (Mechanical Engineering)', shortCode: 'ME', color: 'blue', hex: '#3b82f6' }
+    { id: 'ee', name: 'EE (Electrical Engineering)', shortCode: 'EE', color: 'amber', hex: '#f59e0b' },
+    { id: 'cpe', name: 'CPE (Computer Engineering)', shortCode: 'CPE', color: 'purple', hex: '#a855f7' },
+    { id: 'ece', name: 'ECE (Electronics Engineering)', shortCode: 'ECE', color: 'rose', hex: '#f43f5e' },
+    { id: 'me', name: 'ME (Mechanical Engineering)', shortCode: 'ME', color: 'orange', hex: '#ea580c' }
   ];
 
   const ENGDAY_GAMES = [
@@ -1455,61 +1455,19 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       const norm = normalizeGroupProgramKey(raw);
       const key = norm.id;
 
-      // Official 6 Engineering Programs (Official Color Coding Attire: CE-Yellow, CPE-Pink, EE-Black, ECE-Red, IE-Green, ME-Blue)
+      // Official 6 Engineering Programs (Distinct High-Contrast Program Badges)
       if (key === 'ce') {
         return {
           id: 'ce',
           name: 'CE (Civil Engineering)',
           shortCode: 'CE',
-          color: 'yellow',
-          hex: '#facc15',
-          badgeClass: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/50',
-          bgClass: 'bg-yellow-950/25',
-          borderClass: 'border-yellow-400/50',
-          textClass: 'text-yellow-300',
-          barClass: 'bg-yellow-400'
-        };
-      }
-      if (key === 'cpe') {
-        return {
-          id: 'cpe',
-          name: 'CPE (Computer Engineering)',
-          shortCode: 'CPE',
-          color: 'pink',
-          hex: '#f472b6',
-          badgeClass: 'bg-pink-500/20 text-pink-300 border-pink-400/50',
-          bgClass: 'bg-pink-950/25',
-          borderClass: 'border-pink-400/50',
-          textClass: 'text-pink-300',
-          barClass: 'bg-pink-400'
-        };
-      }
-      if (key === 'ee') {
-        return {
-          id: 'ee',
-          name: 'EE (Electrical Engineering)',
-          shortCode: 'EE',
-          color: 'zinc',
-          hex: '#27272a',
-          badgeClass: 'bg-zinc-950 text-zinc-100 border-zinc-400',
-          bgClass: 'bg-zinc-900/60',
-          borderClass: 'border-zinc-400',
-          textClass: 'text-zinc-100',
-          barClass: 'bg-zinc-400'
-        };
-      }
-      if (key === 'ece') {
-        return {
-          id: 'ece',
-          name: 'ECE (Electronics Engineering)',
-          shortCode: 'ECE',
-          color: 'red',
-          hex: '#ef4444',
-          badgeClass: 'bg-red-600/25 text-red-300 border-red-500/60',
-          bgClass: 'bg-red-950/25',
-          borderClass: 'border-red-500/60',
-          textClass: 'text-red-300',
-          barClass: 'bg-red-500'
+          color: 'cyan',
+          hex: '#06b6d4',
+          badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50',
+          bgClass: 'bg-cyan-950/25',
+          borderClass: 'border-cyan-400/50',
+          textClass: 'text-cyan-300',
+          barClass: 'bg-cyan-500'
         };
       }
       if (key === 'ie') {
@@ -1526,18 +1484,60 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           barClass: 'bg-emerald-500'
         };
       }
+      if (key === 'ee') {
+        return {
+          id: 'ee',
+          name: 'EE (Electrical Engineering)',
+          shortCode: 'EE',
+          color: 'amber',
+          hex: '#f59e0b',
+          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/50',
+          bgClass: 'bg-amber-950/25',
+          borderClass: 'border-amber-400/50',
+          textClass: 'text-amber-300',
+          barClass: 'bg-amber-500'
+        };
+      }
+      if (key === 'cpe') {
+        return {
+          id: 'cpe',
+          name: 'CPE (Computer Engineering)',
+          shortCode: 'CPE',
+          color: 'purple',
+          hex: '#a855f7',
+          badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-400/50',
+          bgClass: 'bg-purple-950/25',
+          borderClass: 'border-purple-400/50',
+          textClass: 'text-purple-300',
+          barClass: 'bg-purple-500'
+        };
+      }
+      if (key === 'ece') {
+        return {
+          id: 'ece',
+          name: 'ECE (Electronics Engineering)',
+          shortCode: 'ECE',
+          color: 'rose',
+          hex: '#f43f5e',
+          badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-400/50',
+          bgClass: 'bg-rose-950/25',
+          borderClass: 'border-rose-400/50',
+          textClass: 'text-rose-300',
+          barClass: 'bg-rose-500'
+        };
+      }
       if (key === 'me') {
         return {
           id: 'me',
           name: 'ME (Mechanical Engineering)',
           shortCode: 'ME',
-          color: 'blue',
-          hex: '#3b82f6',
-          badgeClass: 'bg-blue-600/25 text-blue-300 border-blue-400/60',
-          bgClass: 'bg-blue-950/25',
-          borderClass: 'border-blue-400/60',
-          textClass: 'text-blue-300',
-          barClass: 'bg-blue-500'
+          color: 'orange',
+          hex: '#ea580c',
+          badgeClass: 'bg-orange-600/25 text-orange-300 border-orange-500/60',
+          bgClass: 'bg-orange-950/25',
+          borderClass: 'border-orange-500/60',
+          textClass: 'text-orange-300',
+          barClass: 'bg-orange-500'
         };
       }
 
@@ -1547,13 +1547,13 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           id: 'rankine',
           name: 'TEAM RANKINE',
           shortCode: 'R',
-          color: 'blue',
-          hex: '#3b82f6',
-          badgeClass: 'bg-blue-600/25 text-blue-300 border-blue-400/60',
-          bgClass: 'bg-blue-950/25',
-          borderClass: 'border-blue-400/60',
-          textClass: 'text-blue-300',
-          barClass: 'bg-blue-500'
+          color: 'orange',
+          hex: '#ea580c',
+          badgeClass: 'bg-orange-600/25 text-orange-300 border-orange-500/60',
+          bgClass: 'bg-orange-950/25',
+          borderClass: 'border-orange-500/60',
+          textClass: 'text-orange-300',
+          barClass: 'bg-orange-500'
         };
       }
       if (key === 'otto') {
@@ -1561,13 +1561,13 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           id: 'otto',
           name: 'TEAM OTTO',
           shortCode: 'O',
-          color: 'yellow',
-          hex: '#facc15',
-          badgeClass: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/50',
-          bgClass: 'bg-yellow-950/25',
-          borderClass: 'border-yellow-400/50',
-          textClass: 'text-yellow-300',
-          barClass: 'bg-yellow-400'
+          color: 'amber',
+          hex: '#f59e0b',
+          badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-400/50',
+          bgClass: 'bg-amber-950/25',
+          borderClass: 'border-amber-400/50',
+          textClass: 'text-amber-300',
+          barClass: 'bg-amber-500'
         };
       }
       if (key === 'brayton') {
@@ -1575,13 +1575,13 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           id: 'brayton',
           name: 'TEAM BRAYTON',
           shortCode: 'B',
-          color: 'red',
-          hex: '#ef4444',
-          badgeClass: 'bg-red-600/25 text-red-300 border-red-500/60',
-          bgClass: 'bg-red-950/25',
-          borderClass: 'border-red-500/60',
-          textClass: 'text-red-300',
-          barClass: 'bg-red-500'
+          color: 'cyan',
+          hex: '#06b6d4',
+          badgeClass: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50',
+          bgClass: 'bg-cyan-950/25',
+          borderClass: 'border-cyan-400/50',
+          textClass: 'text-cyan-300',
+          barClass: 'bg-cyan-500'
         };
       }
       if (key === 'diesel') {

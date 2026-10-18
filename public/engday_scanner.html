@@ -289,17 +289,17 @@
 
         <!-- High-Contrast Live Occupancy Counters -->
         <div class="flex items-center gap-1.5 font-mono text-center shrink-0">
-          <div class="px-2.5 py-1 rounded-xl bg-emerald-950/80 border border-emerald-700/70">
-            <span class="text-[8px] text-emerald-400 font-bold block leading-none">🟢 INSIDE</span>
-            <span id="stat-inside" class="text-sm font-black text-emerald-300 leading-tight">0</span>
+          <div class="px-2.5 py-1 rounded-xl bg-emerald-950 border-2 border-emerald-500 shadow-sm">
+            <span class="text-[8px] text-emerald-300 font-bold block leading-none">🟢 INSIDE</span>
+            <span id="stat-inside" class="text-base sm:text-lg font-black text-emerald-200 leading-tight">0</span>
           </div>
-          <div class="px-2 py-1 rounded-xl bg-zinc-900 border border-zinc-800">
-            <span class="text-[8px] text-zinc-400 font-bold block leading-none">🔴 OUT</span>
-            <span id="stat-outside" class="text-sm font-bold text-zinc-200 leading-tight">0</span>
+          <div class="px-2.5 py-1 rounded-xl bg-zinc-900 border-2 border-zinc-600 shadow-sm">
+            <span class="text-[8px] text-zinc-300 font-bold block leading-none">🔴 OUT</span>
+            <span id="stat-outside" class="text-base sm:text-lg font-bold text-zinc-100 leading-tight">0</span>
           </div>
-          <div class="px-2 py-1 rounded-xl bg-amber-950/60 border border-amber-800/60" title="Total Unique Attendees vs Total Roster">
-            <span class="text-[8px] text-amber-400 font-bold block leading-none">✅ TOTAL</span>
-            <span class="text-xs font-bold text-amber-300 leading-tight"><span id="stat-total-in">0</span>/<span id="stat-roster">0</span></span>
+          <div class="px-2.5 py-1 rounded-xl bg-amber-950 border-2 border-amber-500 shadow-sm" title="Total Unique Attendees vs Total Roster">
+            <span class="text-[8px] text-amber-300 font-bold block leading-none">✅ TOTAL</span>
+            <span class="text-base sm:text-lg font-black text-amber-200 leading-tight"><span id="stat-total-in">0</span>/<span id="stat-roster">0</span></span>
           </div>
         </div>
       </div>
@@ -420,6 +420,7 @@
               placeholder="Search ID, Code, or Student Name..." 
               autocomplete="off"
               class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white text-xs font-mono placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+              onfocus="onManualInputFocus()"
               oninput="onManualSearchInput(this.value)"
               onkeydown="if(event.key==='Enter') processManualInput()"
             />
@@ -491,7 +492,7 @@
           <div class="flex items-center gap-2 mt-1 flex-wrap font-mono text-xs">
             <span id="modal-student-code" class="text-amber-400 font-bold">ID-0001</span>
             <span class="text-zinc-600">•</span>
-            <span id="modal-team-badge" class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border">
+            <span id="modal-team-badge" class="px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider border-2 shadow-md">
               GROUP
             </span>
           </div>
@@ -507,7 +508,7 @@
           <span class="text-zinc-400 block text-[10px]">Status in <strong id="modal-active-game-name" class="text-white">Session</strong>:</span>
           <span id="modal-visit-count" class="text-[10px] text-zinc-500">0 check-ins recorded</span>
         </div>
-        <span id="modal-current-status" class="px-3 py-1 rounded-lg text-xs font-bold">
+        <span id="modal-current-status" class="px-4 py-1.5 rounded-xl text-sm font-black tracking-wide border-2 shadow-md">
           🔴 OUTSIDE
         </span>
       </div>
@@ -1297,8 +1298,8 @@
           const totalCount = st ? st.totalCheckIns : 0;
 
           const activeClasses = isActive
-            ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white border-amber-400 shadow-md'
-            : 'bg-zinc-900/90 text-zinc-400 border-zinc-800 hover:bg-zinc-800 hover:text-zinc-200';
+            ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white border-2 border-amber-300 ring-4 ring-amber-500/30 shadow-lg scale-[1.03]'
+            : 'bg-zinc-900/90 text-zinc-400 border border-zinc-800 hover:bg-zinc-800 hover:text-zinc-200';
 
           return `
             <button 
@@ -1818,6 +1819,15 @@
     // -----------------------------------------------------------------------
     // 6. MANUAL LOOKUP & OFFSCREEN QR IMAGE UPLOAD (COLLISION BUG FIXED)
     // -----------------------------------------------------------------------
+    function onManualInputFocus() {
+      setTimeout(() => {
+        const inp = document.getElementById('manual-code-input');
+        if (inp && inp.scrollIntoView) {
+          inp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
+
     function onManualSearchInput(query) {
       const box = document.getElementById('manual-autocomplete');
       if (!box || !window.ENGDAY_ATTENDANCE) return;
@@ -1867,6 +1877,12 @@
         `;
       }).join('');
       box.classList.remove('hidden');
+      setTimeout(() => {
+        const inp = document.getElementById('manual-code-input');
+        if (inp && inp.scrollIntoView && window.innerHeight < 700) {
+          inp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
     }
 
     function quickAutocompleteToggle(studentId) {
@@ -1988,7 +2004,7 @@
       const grpStyle = engine.getGroupStyle(freshStudent.team);
       const teamBadge = document.getElementById('modal-team-badge');
       teamBadge.textContent = freshStudent.teamName || grpStyle.name;
-      teamBadge.className = `px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${grpStyle.badgeClass}`;
+      teamBadge.className = `px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider border-2 shadow-md ${grpStyle.badgeClass}`;
 
       // Populate dynamic Exit Notes dropdown for active session
       const exitSelect = document.getElementById('checkout-reason-select');
@@ -2017,7 +2033,7 @@
 
       if (gRecord.status === 'INSIDE') {
         statusEl.textContent = isCheckInOnly ? '✅ CHECKED IN' : '🟢 INSIDE VENUE';
-        statusEl.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-700/80';
+        statusEl.className = 'px-4 py-1.5 rounded-xl text-sm font-black tracking-wide bg-emerald-950 text-emerald-300 border-2 border-emerald-500 shadow-md';
 
         if (isCheckInOnly) {
           reasonBox.classList.add('hidden');
@@ -2030,7 +2046,7 @@
         }
       } else {
         statusEl.textContent = gRecord.visits > 0 ? '🔴 CHECKED OUT' : '⚪ NOT YET IN';
-        statusEl.className = 'px-3 py-1 rounded-lg text-xs font-bold bg-zinc-900 text-zinc-400 border border-zinc-700';
+        statusEl.className = 'px-4 py-1.5 rounded-xl text-sm font-black tracking-wide bg-zinc-900 text-zinc-300 border-2 border-zinc-600 shadow-md';
 
         reasonBox.classList.add('hidden');
         primaryBtn.innerHTML = `🟢 CHECK IN TO ${activeGame.shortName}`;
