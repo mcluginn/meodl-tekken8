@@ -635,15 +635,21 @@
                 <option value="default_meodl">Default Engineering 175-Student Roster</option>
               </select>
             </div>
-            <div class="flex items-center justify-between gap-2 pt-2">
-              <button onclick="confirmResetActiveEventScans()" class="px-3 py-2 rounded-xl bg-red-950/70 hover:bg-red-900/80 border border-red-700/80 text-red-300 font-bold text-[11px] flex items-center gap-1.5 transition-colors">
-                ⚠️ Reset All Attendance Data (Zero Check-Ins)
-              </button>
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="confirmResetActiveEventScans()" class="px-3 py-2 rounded-xl bg-red-950/70 hover:bg-red-900/80 border border-red-700/80 text-red-300 font-bold text-[11px] flex items-center gap-1.5 transition-colors">
+                  ⚠️ Reset All Attendance Data (Zero Check-Ins)
+                </button>
+                <button onclick="confirmPurgePre4AMScans()" class="px-3 py-2 rounded-xl bg-amber-950/70 hover:bg-amber-900/80 border border-amber-700/80 text-amber-300 font-bold text-[11px] flex items-center gap-1.5 transition-colors">
+                  🧹 Purge All Scans Before 4:00 AM Today
+                </button>
+              </div>
 
               <button onclick="saveEventFromAdmin()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-lg">
                 💾 Save Event
               </button>
             </div>
+
           </div>
         </div>
 
@@ -1887,6 +1893,19 @@
       renderAllDashboard();
       alert(`✅ All attendance data for "${evt.title}" has been reset to zero.\n\nAll ${stCount} students and 8 sessions were preserved.`);
     }
+
+    async function confirmPurgePre4AMScans() {
+      if (!window.ENGDAY_ATTENDANCE) return;
+      const evt = window.ENGDAY_ATTENDANCE.getActiveEvent();
+      const ok = confirm(`🧹 PURGE STALE TEST SCANS\n\nAre you sure you want to purge all attendance scans timestamped before 4:00 AM today for "${evt.title}"?\n\nThis will remove any lingering test data while keeping all ${Object.keys(window.ENGDAY_ATTENDANCE.state.students || {}).length || 588} registered students and 8 Track A checkpoints intact.`);
+      if (!ok) return;
+
+      const res = await window.ENGDAY_ATTENDANCE.purgeAttendanceBefore();
+      populateAdminModalData();
+      renderAllDashboard();
+      alert(`✅ Purge complete!\n\nDeleted ${res.purgedCount || 0} stale scan records recorded before 4:00 AM.\nRemaining valid scans: ${res.remainingCount || 0}.`);
+    }
+
 
 
     function editSessionInAdmin(sessionId) {

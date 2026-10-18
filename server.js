@@ -1347,10 +1347,12 @@ export async function handleRequest(req, res) {
       totalEventsCount: engdayEvents.length,
       lastResetTimestamp: (evtObj && evtObj.lastResetTimestamp) || engdayState.lastResetTimestamp || null,
       resetSequence: (evtObj && evtObj.resetSequence) || engdayState.resetSequence || 0,
+      lastPurgeTimestamp: (evtObj && evtObj.lastPurgeTimestamp) || engdayState.lastPurgeTimestamp || null,
       version: engdayState.version || 1,
       lastUpdated: engdayState.lastUpdated
     });
   }
+
 
 
   if (reqPath === '/api/engday/attendance/config' && req.method === 'POST') {
@@ -1370,6 +1372,21 @@ export async function handleRequest(req, res) {
         const sessionIds = Array.isArray(payload.event.sessions) && payload.event.sessions.length > 0
           ? payload.event.sessions.map(s => s.id)
           : getActiveSessionIdsForEvent(evtId);
+
+        if (payload.event.lastPurgeTimestamp) {
+          const purgeTime = new Date(payload.event.lastPurgeTimestamp).getTime();
+          engdayEvents = engdayEvents.filter(e => {
+            if ((e.eventKey || 'engday_2026') !== evtId) return true;
+            return new Date(e.occurredAt || e.time || e.createdAt || 0).getTime() >= purgeTime;
+          });
+          engdayEventsMap.clear();
+          engdayEvents.forEach(ev => {
+            if (ev && ev.eventId) engdayEventsMap.set(ev.eventId, ev);
+          });
+          existingEvt.lastPurgeTimestamp = payload.event.lastPurgeTimestamp;
+          engdayState.lastPurgeTimestamp = payload.event.lastPurgeTimestamp;
+        }
+
 
         for (const [stId, stObj] of Object.entries(mergedStudents)) {
           const stEvents = engdayEvents.filter(e => e.studentId === stId && (e.eventKey || 'engday_2026') === evtId);
@@ -1523,6 +1540,17 @@ export async function handleRequest(req, res) {
             continue;
           }
         }
+
+        // Discard any incoming events that occurred prior to an attendance purge
+        if (targetEvt.lastPurgeTimestamp) {
+          const purgeTime = new Date(targetEvt.lastPurgeTimestamp).getTime();
+          const evTime = new Date(ev.occurredAt).getTime();
+          if (evTime < purgeTime) {
+            duplicate.push(eventId);
+            continue;
+          }
+        }
+
 
         let validStudentId = studentId;
         const lookupCode = String(studentId || ev.studentCode || '').trim().toUpperCase();
@@ -1707,6 +1735,80 @@ export async function handleRequest(req, res) {
       return sendJson(res, 500, { ok: false, error: err.message });
     }
   }
+
+  if (reqPath === '/api/engday/attendance/purge' && req.method === 'POST') {
+    try {
+      const payload = await parseJsonBody(req);
+      const targetEventKey = payload.eventKey || engdayState.activeEventId || 'engday_2026';
+      const cutoffIso = payload.cutoff || payload.purgeBefore || '2026-10-19T04:00:00+08:00';
+      const cutoffTime = new Date(cutoffIso).getTime();
+
+      const initialCount = engdayEvents.length;
+      engdayEvents = engdayEvents.filter(e => {
+        const ek = e.eventKey || 'engday_2026';
+        if (ek !== targetEventKey) return true;
+        const evTime = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
+        return evTime >= cutoffTime;
+      });
+      engdayEventsMap.clear();
+      engdayEvents.forEach(ev => {
+        if (ev && ev.eventId) engdayEventsMap.set(ev.eventId, ev);
+      });
+
+      const purgedCount = initialCount - engdayEvents.length;
+      const sessionIds = getActiveSessionIdsForEvent(targetEventKey);
+      if (!engdayState.eventsCatalog) engdayState.eventsCatalog = {};
+      if (!engdayState.eventsCatalog[targetEventKey]) {
+        engdayState.eventsCatalog[targetEventKey] = {
+          id: targetEventKey,
+          title: targetEventKey === 'engday_2026' ? 'ENGINEERING DAYS 2026' : targetEventKey,
+          students: buildDefaultEngDayRoster(sessionIds),
+          sessions: DEFAULT_ENGDAY_SESSIONS,
+          groups: DEFAULT_ENGDAY_GROUPS,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      const evtObj = engdayState.eventsCatalog[targetEventKey];
+      if (!evtObj.students) evtObj.students = {};
+      ensureFullMasterRoster(evtObj.students, sessionIds);
+      ensureFullMasterRoster(engdayState.students, ENGDAY_GAMES_LIST);
+
+      Object.keys(evtObj.students).forEach(stId => {
+        const remaining = engdayEvents.filter(e => e.studentId === stId && (e.eventKey || 'engday_2026') === targetEventKey);
+        evtObj.students[stId] = rederiveEngDayStudentState(evtObj.students[stId], remaining, sessionIds);
+      });
+
+      if (targetEventKey === (engdayState.activeEventId || 'engday_2026')) {
+        Object.keys(engdayState.students).forEach(stId => {
+          const remaining = engdayEvents.filter(e => e.studentId === stId && (e.eventKey || 'engday_2026') === targetEventKey);
+          engdayState.students[stId] = rederiveEngDayStudentState(engdayState.students[stId], remaining, ENGDAY_GAMES_LIST);
+        });
+      }
+
+      evtObj.lastPurgeTimestamp = cutoffIso;
+      evtObj.updatedAt = new Date().toISOString();
+
+      engdayState.lastPurgeTimestamp = cutoffIso;
+      engdayState.version = (engdayState.version || 1) + 5;
+      engdayState.lastUpdated = new Date().toISOString();
+
+      atomicWriteJson(ENGDAY_EVENTS_FILE, engdayEvents);
+      atomicWriteJson(ENGDAY_STATE_FILE, engdayState);
+      broadcastEngDayUpdate();
+
+      return sendJson(res, 200, {
+        ok: true,
+        message: `Purged ${purgedCount} events before ${cutoffIso}`,
+        purgedCount,
+        remainingEvents: engdayEvents.length,
+        cutoff: cutoffIso,
+        stats: calculateEngDayStats(targetEventKey)
+      });
+    } catch (err) {
+      return sendJson(res, 500, { ok: false, error: err.message });
+    }
+  }
+
 
 
   // -----------------------------------------------------------------------

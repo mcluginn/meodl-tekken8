@@ -453,6 +453,28 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
     }
   }
 
+  function getToday4AMCutoff() {
+    try {
+      const now = new Date();
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Asia/Manila',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).formatToParts(now);
+      const year = parts.find(p => p.type === 'year')?.value || now.getFullYear();
+      const month = parts.find(p => p.type === 'month')?.value || String(now.getMonth() + 1).padStart(2, '0');
+      const day = parts.find(p => p.type === 'day')?.value || String(now.getDate()).padStart(2, '0');
+      const isoManila = `${year}-${month}-${day}T04:00:00+08:00`;
+      const d = new Date(isoManila);
+      if (!isNaN(d.getTime())) return d;
+    } catch (e) {}
+    const local = new Date();
+    local.setHours(4, 0, 0, 0);
+    return local;
+  }
+
+
   function generateUUID(prefix = 'eng_evt_') {
     if (typeof window !== 'undefined' && window.crypto && window.crypto.randomUUID) {
       try { return prefix + window.crypto.randomUUID(); } catch (e) {}
@@ -908,7 +930,9 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       this.autoSelectGameByTime();
       this.initNetworkListeners();
       this.startSyncLoop();
+      setTimeout(() => this.checkAndPurgePre4AMData(), 300);
     }
+
 
     // -----------------------------------------------------------------------
     // EVENT, SESSION & GROUP METADATA MANAGEMENT
@@ -2762,6 +2786,197 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       return this.resetAllAttendanceData(sessionIdFilter);
     }
 
+    async purgeAttendanceBefore(cutoffTimestampOrString = null) {
+      this.ensureEventsCatalogStructure();
+      const targetEventKey = this.activeEventId || 'engday_2026';
+
+      let cutoff = null;
+      if (cutoffTimestampOrString) {
+        cutoff = (cutoffTimestampOrString instanceof Date) ? cutoffTimestampOrString : new Date(cutoffTimestampOrString);
+        if (isNaN(cutoff.getTime())) cutoff = null;
+      }
+      if (!cutoff) {
+        cutoff = getToday4AMCutoff();
+      }
+
+      const cutoffTime = cutoff.getTime();
+      const cutoffIso = cutoff.toISOString();
+
+      // 1. Filter local IndexedDB events & queue
+      const allEvents = await this.db.getAllEvents();
+      const validEvents = allEvents.filter(e => {
+        const ek = e.eventKey || 'engday_2026';
+        if (ek !== targetEventKey) return true; // keep other events untouched
+        const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
+        return t >= cutoffTime;
+      });
+      const staleEventIds = allEvents.filter(e => {
+        const ek = e.eventKey || 'engday_2026';
+        if (ek !== targetEventKey) return false;
+        const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
+        return t < cutoffTime;
+      }).map(e => e.eventId);
+
+      // Remove stale event IDs from IndexedDB
+      if (staleEventIds.length > 0 && this.db.db) {
+        await new Promise(resolve => {
+          try {
+            const tx = this.db.db.transaction(['attendanceEvents', 'syncQueue'], 'readwrite');
+            const evStore = tx.objectStore('attendanceEvents');
+            const qStore = tx.objectStore('syncQueue');
+            staleEventIds.forEach(id => {
+              try { evStore.delete(id); } catch(e) {}
+              try { qStore.delete(id); } catch(e) {}
+            });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => resolve();
+          } catch (e) {
+            resolve();
+          }
+        });
+      }
+
+      // Update localStorage fallbacks
+      try {
+        if (typeof localStorage !== 'undefined') {
+          const fbEvents = this.db.getAllEventsFromLocalStorage().filter(e => {
+            const ek = e.eventKey || 'engday_2026';
+            if (ek !== targetEventKey) return true;
+            const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
+            return t >= cutoffTime;
+          });
+          localStorage.setItem('ENGDAY_EVENTS_FALLBACK_V1', JSON.stringify(fbEvents));
+
+          const fbQueue = this.db.getQueueFromLocalStorage().filter(e => {
+            const ek = e.eventKey || 'engday_2026';
+            if (ek !== targetEventKey) return true;
+            const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
+            return t >= cutoffTime;
+          });
+          this.db.saveQueueToLocalStorage(fbQueue);
+        }
+      } catch (e) {}
+
+      // 2. Filter state.auditLog and state.scanLogs
+      this.state.auditLog = (this.state.auditLog || []).filter(l => {
+        const ek = l.eventKey || targetEventKey;
+        if (ek !== targetEventKey) return true;
+        const t = new Date(l.timestamp || l.time || l.occurredAt || 0).getTime();
+        return t >= cutoffTime;
+      });
+      if (Array.isArray(this.state.scanLogs)) {
+        this.state.scanLogs = this.state.scanLogs.filter(l => {
+          const t = new Date(l.time || l.occurredAt || l.timestamp || 0).getTime();
+          return t >= cutoffTime;
+        });
+      }
+
+      // 3. Reset student records to empty games, then replay remaining valid events
+      const targetStudents = this.state.students || {};
+      Object.values(targetStudents).forEach(s => {
+        if (s) s.games = this.createEmptyGamesRecord();
+      });
+
+      if (this.state.eventsCatalog && this.state.eventsCatalog[targetEventKey]?.students) {
+        Object.values(this.state.eventsCatalog[targetEventKey].students).forEach(s => {
+          if (s) s.games = this.createEmptyGamesRecord();
+        });
+      }
+
+      // Chronologically replay valid events
+      const activeValidEvents = validEvents.filter(e => (e.eventKey || 'engday_2026') === targetEventKey);
+      activeValidEvents.sort((a, b) => new Date(a.occurredAt || 0) - new Date(b.occurredAt || 0));
+      for (const ev of activeValidEvents) {
+        this.applySingleEventToStudentState(ev);
+      }
+
+      // Rebuild state.attendance summary map
+      this.state.attendance = {};
+      Object.values(targetStudents).forEach(s => {
+        if (!s) return;
+        const code = String(s.code || s.studentCode || s.id || '').toUpperCase();
+        if (code) {
+          this.state.attendance[code] = {
+            id: s.id,
+            code: code,
+            name: s.name,
+            team: s.team,
+            games: s.games
+          };
+        }
+      });
+
+      // 4. Ensure master 588 roster remains intact
+      this.ensureFullMasterRoster(this.state.students);
+      this.reconcileStudentGamesStructure();
+      this.reconcileGroupsFromStudents();
+
+      // 5. Update metadata
+      this.state.lastPurgeTimestamp = cutoffIso;
+      this.state.lastPurgeAt = new Date().toISOString();
+      this.state.version = (this.state.version || 1) + 5;
+      this.state.lastUpdated = new Date().toISOString();
+      this.lastSyncedServerVersion = this.state.version;
+
+      // 6. Save locally
+      this.save({ preserveVersion: true });
+      await this.updatePendingCount();
+
+      // 7. Push purge to backend server if online
+      if (typeof navigator === 'undefined' || navigator.onLine !== false) {
+        try {
+          const purgeUrl = this.resolveApiUrl('/api/engday/attendance/purge');
+          await fetch(purgeUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              eventKey: targetEventKey,
+              cutoff: cutoffIso
+            })
+          });
+          await this.syncConfigWithServer();
+          this.serverOnline = true;
+          this.lastSyncTime = formatManilaTime(new Date());
+        } catch (e) {
+          console.warn('[EngDay Purge] Server sync failed (will retry on next sync):', e);
+        }
+      }
+
+      this.notify();
+      return {
+        success: true,
+        purgedCount: staleEventIds.length,
+        remainingCount: activeValidEvents.length,
+        cutoff: cutoffIso
+      };
+    }
+
+    async checkAndPurgePre4AMData() {
+      try {
+        const cutoff = getToday4AMCutoff();
+        const cutoffTime = cutoff.getTime();
+        const targetEventKey = this.activeEventId || 'engday_2026';
+
+        const allLocalEvents = await this.collectAllLocalEventsForEvent(targetEventKey);
+        const hasStaleEvents = allLocalEvents.some(e => {
+          const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
+          return t > 0 && t < cutoffTime;
+        });
+        const hasStaleAudit = (this.state.auditLog || []).some(l => {
+          const t = new Date(l.timestamp || l.time || l.occurredAt || 0).getTime();
+          return t > 0 && t < cutoffTime;
+        });
+
+        if (hasStaleEvents || hasStaleAudit) {
+          console.info(`[EngDay Purge] Found scan records timestamped before 4:00 AM (${cutoff.toISOString()}). Purging...`);
+          await this.purgeAttendanceBefore(cutoff);
+        }
+      } catch (err) {
+        console.warn('[EngDay Purge] Auto-purge check warning:', err);
+      }
+    }
+
+
 
     async rederiveAllStatesFromDb() {
       const allEvents = await this.db.getAllEvents();
@@ -4188,8 +4403,18 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         return;
       }
 
+      // Check if server broadcasted a pre-4AM or time-based attendance purge
+      const serverPurgeTime = serverState.lastPurgeTimestamp ? new Date(serverState.lastPurgeTimestamp).getTime() : 0;
+      const localPurgeTime = this.state.lastPurgeTimestamp ? new Date(this.state.lastPurgeTimestamp).getTime() : 0;
+      if (serverPurgeTime > 0 && serverPurgeTime > localPurgeTime) {
+        console.info(`[EngDay Purge] Server broadcasted attendance purge before ${serverState.lastPurgeTimestamp}. Purging locally...`);
+        await this.purgeAttendanceBefore(serverState.lastPurgeTimestamp);
+        return;
+      }
+
       // Count local vs server scan events & visits BEFORE overwriting so we can detect Vercel cold-starts
       const localEvents = await this.collectAllLocalEventsForEvent(this.activeEventId);
+
       const localStudentsMap = this.state.students || {};
 
       const localStudentCount = Object.keys(localStudentsMap).length;

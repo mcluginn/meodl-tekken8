@@ -57789,7 +57789,7 @@
           }
         }
       },
-      "updatedAt": "2026-10-18T19:51:34.854Z",
+      "updatedAt": "2026-10-18T20:01:56.330Z",
       "lastResetTimestamp": "2026-10-18T19:51:34.854Z",
       "resetSequence": 2,
       "groups": [
@@ -57835,7 +57835,8 @@
           "color": "orange",
           "hex": "#ea580c"
         }
-      ]
+      ],
+      "lastPurgeTimestamp": "2026-10-18T20:00:00.000Z"
     }
   },
   "students": {
@@ -115366,11 +115367,13 @@
       }
     }
   },
-  "version": 22,
-  "lastUpdated": "2026-10-18T19:51:34.854Z",
+  "version": 27,
+  "lastUpdated": "2026-10-18T20:01:56.329Z",
   "lastResetTimestamp": "2026-10-18T19:51:34.854Z",
   "resetSequence": 2,
   "auditLog": [],
   "scanLogs": [],
-  "attendance": {}
+  "attendance": {},
+  "lastPurgeTimestamp": "2026-10-18T20:00:00.000Z",
+  "lastPurgeAt": "2026-10-18T20:01:56.329Z"
 }
