@@ -63,6 +63,30 @@ function formatManilaDate(dateOrIso, options = {}) {
   }
 }
 
+function getToday4AMCutoffServer() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 4, 0, 0, 0);
+}
+
+function isTimestampBeforeToday4AMServer(timeVal) {
+  if (!timeVal) return true;
+  const d = new Date(timeVal);
+  if (isNaN(d.getTime())) return true;
+  const now = new Date();
+  if (d.getFullYear() < now.getFullYear()) return true;
+  if (d.getFullYear() === now.getFullYear()) {
+    if (d.getMonth() < now.getMonth()) return true;
+    if (d.getMonth() === now.getMonth()) {
+      if (d.getDate() < now.getDate()) return true;
+      if (d.getDate() === now.getDate()) {
+        return d.getHours() < 4;
+      }
+    }
+  }
+  const today4AM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 4, 0, 0, 0);
+  return d.getTime() < today4AM.getTime();
+}
+
 // -------------------------------------------------------------------------
 // PERSISTENT DATA LAYER (ATOMIC SAFE WRITES)
 // -------------------------------------------------------------------------
@@ -1645,6 +1669,12 @@ export async function handleRequest(req, res) {
           }
         }
 
+        // Discard any incoming events timestamped before 4:00 AM today local time
+        if (isTimestampBeforeToday4AMServer(ev.occurredAt || ev.time)) {
+          duplicate.push(eventId);
+          continue;
+        }
+
         // Discard any incoming events that occurred prior to an attendance purge
         if (targetEvt.lastPurgeTimestamp) {
           const purgeTime = new Date(targetEvt.lastPurgeTimestamp).getTime();
@@ -1928,15 +1958,26 @@ export async function handleRequest(req, res) {
     try {
       const payload = await parseJsonBody(req);
       const targetEventKey = payload.eventKey || engdayState.activeEventId || 'engday_2026';
-      const cutoffIso = payload.cutoff || payload.purgeBefore || '2026-10-19T04:00:00+08:00';
-      const cutoffTime = new Date(cutoffIso).getTime();
+      const cutoffIso = payload.cutoff || payload.purgeBefore;
+      const today4AM = getToday4AMCutoffServer();
+      const cutoffTime = cutoffIso ? new Date(cutoffIso).getTime() : today4AM.getTime();
+      const effectiveCutoffIso = (cutoffIso && !isNaN(cutoffTime)) ? cutoffIso : today4AM.toISOString();
+      const isPre4AMToday = !cutoffIso || isNaN(cutoffTime) || Math.abs(cutoffTime - today4AM.getTime()) < 60000;
+
+      const isStale = (timeVal) => {
+        if (!timeVal) return true;
+        if (isPre4AMToday) {
+          return isTimestampBeforeToday4AMServer(timeVal);
+        }
+        const t = new Date(timeVal).getTime();
+        return isNaN(t) || t < cutoffTime;
+      };
 
       const initialCount = engdayEvents.length;
       engdayEvents = engdayEvents.filter(e => {
         const ek = e.eventKey || 'engday_2026';
         if (ek !== targetEventKey) return true;
-        const evTime = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
-        return evTime >= cutoffTime;
+        return !isStale(e.occurredAt || e.time || e.createdAt);
       });
       engdayEventsMap.clear();
       engdayEvents.forEach(ev => {
@@ -1944,6 +1985,20 @@ export async function handleRequest(req, res) {
       });
 
       const purgedCount = initialCount - engdayEvents.length;
+
+      // Filter scanLogs and auditLog
+      if (Array.isArray(payload.scanLogs)) {
+        engdayState.scanLogs = payload.scanLogs.filter(l => !isStale(l.time || l.occurredAt || l.timestamp));
+      } else if (Array.isArray(engdayState.scanLogs)) {
+        engdayState.scanLogs = engdayState.scanLogs.filter(l => !isStale(l.time || l.occurredAt || l.timestamp));
+      } else {
+        engdayState.scanLogs = [];
+      }
+
+      if (Array.isArray(engdayState.auditLog)) {
+        engdayState.auditLog = engdayState.auditLog.filter(l => !isStale(l.timestamp || l.time || l.occurredAt));
+      }
+
       const sessionIds = getActiveSessionIdsForEvent(targetEventKey);
       if (!engdayState.eventsCatalog) engdayState.eventsCatalog = {};
       if (!engdayState.eventsCatalog[targetEventKey]) {
@@ -1961,6 +2016,11 @@ export async function handleRequest(req, res) {
       ensureFullMasterRoster(evtObj.students, sessionIds);
       ensureFullMasterRoster(engdayState.students, ENGDAY_GAMES_LIST);
 
+      evtObj.scanLogs = [...(engdayState.scanLogs || [])];
+      if (Array.isArray(evtObj.auditLog)) {
+        evtObj.auditLog = evtObj.auditLog.filter(l => !isStale(l.timestamp || l.time || l.occurredAt));
+      }
+
       Object.keys(evtObj.students).forEach(stId => {
         const remaining = engdayEvents.filter(e => e.studentId === stId && (e.eventKey || 'engday_2026') === targetEventKey);
         evtObj.students[stId] = rederiveEngDayStudentState(evtObj.students[stId], remaining, sessionIds);
@@ -1973,10 +2033,27 @@ export async function handleRequest(req, res) {
         });
       }
 
-      evtObj.lastPurgeTimestamp = cutoffIso;
+      // Rebuild attendance summary maps
+      engdayState.attendance = {};
+      Object.values(evtObj.students).forEach(s => {
+        if (!s) return;
+        const code = String(s.code || s.studentCode || s.id || '').toUpperCase();
+        if (code) {
+          engdayState.attendance[code] = {
+            id: s.id,
+            code: code,
+            name: s.name,
+            team: s.team,
+            games: s.games
+          };
+        }
+      });
+      evtObj.attendance = { ...engdayState.attendance };
+
+      evtObj.lastPurgeTimestamp = effectiveCutoffIso;
       evtObj.updatedAt = new Date().toISOString();
 
-      engdayState.lastPurgeTimestamp = cutoffIso;
+      engdayState.lastPurgeTimestamp = effectiveCutoffIso;
       engdayState.version = (engdayState.version || 1) + 5;
       engdayState.lastUpdated = new Date().toISOString();
 
@@ -1986,10 +2063,10 @@ export async function handleRequest(req, res) {
 
       return sendJson(res, 200, {
         ok: true,
-        message: `Purged ${purgedCount} events before ${cutoffIso}`,
+        message: `Purged ${purgedCount} events before ${effectiveCutoffIso}`,
         purgedCount,
         remainingEvents: engdayEvents.length,
-        cutoff: cutoffIso,
+        cutoff: effectiveCutoffIso,
         stats: calculateEngDayStats(targetEventKey)
       });
     } catch (err) {

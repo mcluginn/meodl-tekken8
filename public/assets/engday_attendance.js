@@ -454,24 +454,29 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
   }
 
   function getToday4AMCutoff() {
-    try {
-      const now = new Date();
-      const parts = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'Asia/Manila',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      }).formatToParts(now);
-      const year = parts.find(p => p.type === 'year')?.value || now.getFullYear();
-      const month = parts.find(p => p.type === 'month')?.value || String(now.getMonth() + 1).padStart(2, '0');
-      const day = parts.find(p => p.type === 'day')?.value || String(now.getDate()).padStart(2, '0');
-      const isoManila = `${year}-${month}-${day}T04:00:00+08:00`;
-      const d = new Date(isoManila);
-      if (!isNaN(d.getTime())) return d;
-    } catch (e) {}
-    const local = new Date();
-    local.setHours(4, 0, 0, 0);
-    return local;
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 4, 0, 0, 0);
+  }
+
+  function isTimestampBeforeToday4AM(timeVal) {
+    if (!timeVal) return true;
+    const d = new Date(timeVal);
+    if (isNaN(d.getTime())) return true;
+
+    const now = new Date();
+    // Compare in device's local timezone (e.g. UTC+8) to eliminate UTC offset bugs
+    if (d.getFullYear() < now.getFullYear()) return true;
+    if (d.getFullYear() === now.getFullYear()) {
+      if (d.getMonth() < now.getMonth()) return true;
+      if (d.getMonth() === now.getMonth()) {
+        if (d.getDate() < now.getDate()) return true; // Yesterday or earlier!
+        if (d.getDate() === now.getDate()) {
+          return d.getHours() < 4; // Today before 4:00 AM local time!
+        }
+      }
+    }
+    const today4AM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 4, 0, 0, 0);
+    return d.getTime() < today4AM.getTime();
   }
 
 
@@ -2930,20 +2935,28 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
 
       const cutoffTime = cutoff.getTime();
       const cutoffIso = cutoff.toISOString();
+      const isPre4AMToday = !cutoffTimestampOrString || Math.abs(cutoffTime - getToday4AMCutoff().getTime()) < 60000;
+
+      const isStale = (timeVal) => {
+        if (!timeVal) return false;
+        if (isPre4AMToday) {
+          return isTimestampBeforeToday4AM(timeVal);
+        }
+        const t = new Date(timeVal).getTime();
+        return !isNaN(t) && t < cutoffTime;
+      };
 
       // 1. Filter local IndexedDB events & queue
       const allEvents = await this.db.getAllEvents();
       const validEvents = allEvents.filter(e => {
         const ek = e.eventKey || 'engday_2026';
         if (ek !== targetEventKey) return true; // keep other events untouched
-        const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
-        return t >= cutoffTime;
+        return !isStale(e.occurredAt || e.time || e.createdAt);
       });
       const staleEventIds = allEvents.filter(e => {
         const ek = e.eventKey || 'engday_2026';
         if (ek !== targetEventKey) return false;
-        const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
-        return t < cutoffTime;
+        return isStale(e.occurredAt || e.time || e.createdAt);
       }).map(e => e.eventId);
 
       // Remove stale event IDs from IndexedDB
@@ -2971,16 +2984,14 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           const fbEvents = this.db.getAllEventsFromLocalStorage().filter(e => {
             const ek = e.eventKey || 'engday_2026';
             if (ek !== targetEventKey) return true;
-            const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
-            return t >= cutoffTime;
+            return !isStale(e.occurredAt || e.time || e.createdAt);
           });
           localStorage.setItem('ENGDAY_EVENTS_FALLBACK_V1', JSON.stringify(fbEvents));
 
           const fbQueue = this.db.getQueueFromLocalStorage().filter(e => {
             const ek = e.eventKey || 'engday_2026';
             if (ek !== targetEventKey) return true;
-            const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
-            return t >= cutoffTime;
+            return !isStale(e.occurredAt || e.time || e.createdAt);
           });
           this.db.saveQueueToLocalStorage(fbQueue);
         }
@@ -2990,14 +3001,14 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       this.state.auditLog = (this.state.auditLog || []).filter(l => {
         const ek = l.eventKey || targetEventKey;
         if (ek !== targetEventKey) return true;
-        const t = new Date(l.timestamp || l.time || l.occurredAt || 0).getTime();
-        return t >= cutoffTime;
+        return !isStale(l.timestamp || l.time || l.occurredAt);
       });
       if (Array.isArray(this.state.scanLogs)) {
         this.state.scanLogs = this.state.scanLogs.filter(l => {
-          const t = new Date(l.time || l.occurredAt || l.timestamp || 0).getTime();
-          return t >= cutoffTime;
+          return !isStale(l.time || l.occurredAt || l.timestamp);
         });
+      } else {
+        this.state.scanLogs = [];
       }
 
       // 3. Reset student records to empty games, then replay remaining valid events
@@ -3051,7 +3062,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       this.save({ preserveVersion: true });
       await this.updatePendingCount();
 
-      // 7. Push purge to backend server if online
+      // 7. Push purge to backend server if online (with cleanEvents and scanLogs array)
       if (typeof navigator === 'undefined' || navigator.onLine !== false) {
         try {
           const purgeUrl = this.resolveApiUrl('/api/engday/attendance/purge');
@@ -3060,7 +3071,9 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               eventKey: targetEventKey,
-              cutoff: cutoffIso
+              cutoff: cutoffIso,
+              cleanEvents: activeValidEvents,
+              scanLogs: this.state.scanLogs || []
             })
           });
           await this.syncConfigWithServer();
@@ -3083,20 +3096,20 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
     async checkAndPurgePre4AMData() {
       try {
         const cutoff = getToday4AMCutoff();
-        const cutoffTime = cutoff.getTime();
         const targetEventKey = this.activeEventId || 'engday_2026';
 
         const allLocalEvents = await this.collectAllLocalEventsForEvent(targetEventKey);
         const hasStaleEvents = allLocalEvents.some(e => {
-          const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
-          return t > 0 && t < cutoffTime;
+          return isTimestampBeforeToday4AM(e.occurredAt || e.time || e.createdAt);
         });
         const hasStaleAudit = (this.state.auditLog || []).some(l => {
-          const t = new Date(l.timestamp || l.time || l.occurredAt || 0).getTime();
-          return t > 0 && t < cutoffTime;
+          return isTimestampBeforeToday4AM(l.timestamp || l.time || l.occurredAt);
+        });
+        const hasStaleScanLogs = (this.state.scanLogs || []).some(l => {
+          return isTimestampBeforeToday4AM(l.time || l.occurredAt || l.timestamp);
         });
 
-        if (hasStaleEvents || hasStaleAudit) {
+        if (hasStaleEvents || hasStaleAudit || hasStaleScanLogs) {
           console.info(`[EngDay Purge] Found scan records timestamped before 4:00 AM (${cutoff.toISOString()}). Purging...`);
           await this.purgeAttendanceBefore(cutoff);
         }
@@ -4907,6 +4920,8 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
   root.EDAYS_2026_ME_ROSTER = EDAYS_2026_ME_ROSTER;
   root.formatManilaTime = formatManilaTime;
   root.formatManilaDate = formatManilaDate;
+  root.getToday4AMCutoff = getToday4AMCutoff;
+  root.isTimestampBeforeToday4AM = isTimestampBeforeToday4AM;
 
   if (typeof window !== 'undefined') {
     try {
@@ -4923,7 +4938,9 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       ENGDAY_GAMES,
       EngDayAttendanceEngine,
       formatManilaTime,
-      formatManilaDate
+      formatManilaDate,
+      getToday4AMCutoff,
+      isTimestampBeforeToday4AM
     };
   }
 

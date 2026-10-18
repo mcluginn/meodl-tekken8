@@ -15,32 +15,46 @@ console.log('  ENGINEERING DAYS 2026 - PRE-4AM PURGE UTILITY');
 console.log('=====================================================');
 
 function getToday4AMCutoff() {
-  try {
-    const now = new Date();
-    const parts = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Asia/Manila',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }).formatToParts(now);
-    const year = parts.find(p => p.type === 'year')?.value || now.getFullYear();
-    const month = parts.find(p => p.type === 'month')?.value || String(now.getMonth() + 1).padStart(2, '0');
-    const day = parts.find(p => p.type === 'day')?.value || String(now.getDate()).padStart(2, '0');
-    const isoManila = `${year}-${month}-${day}T04:00:00+08:00`;
-    const d = new Date(isoManila);
-    if (!isNaN(d.getTime())) return d;
-  } catch (e) {}
-  const local = new Date();
-  local.setHours(4, 0, 0, 0);
-  return local;
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 4, 0, 0, 0);
+}
+
+function isTimestampBeforeToday4AM(timeVal) {
+  if (!timeVal) return true;
+  const d = new Date(timeVal);
+  if (isNaN(d.getTime())) return true;
+  const now = new Date();
+  if (d.getFullYear() < now.getFullYear()) return true;
+  if (d.getFullYear() === now.getFullYear()) {
+    if (d.getMonth() < now.getMonth()) return true;
+    if (d.getMonth() === now.getMonth()) {
+      if (d.getDate() < now.getDate()) return true;
+      if (d.getDate() === now.getDate()) {
+        return d.getHours() < 4;
+      }
+    }
+  }
+  const today4AM = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 4, 0, 0, 0);
+  return d.getTime() < today4AM.getTime();
 }
 
 try {
-  const cutoff = process.argv[2] ? new Date(process.argv[2]) : getToday4AMCutoff();
+  const customCutoff = process.argv[2] ? new Date(process.argv[2]) : null;
+  const cutoff = (customCutoff && !isNaN(customCutoff.getTime())) ? customCutoff : getToday4AMCutoff();
   const cutoffTime = cutoff.getTime();
   const cutoffIso = cutoff.toISOString();
+  const isPre4AMToday = !customCutoff || Math.abs(cutoffTime - getToday4AMCutoff().getTime()) < 60000;
 
-  console.log(`Purge Cutoff Timestamp: ${cutoffIso} (Asia/Manila: 4:00 AM)`);
+  const isStale = (timeVal) => {
+    if (!timeVal) return true;
+    if (isPre4AMToday) {
+      return isTimestampBeforeToday4AM(timeVal);
+    }
+    const t = new Date(timeVal).getTime();
+    return isNaN(t) || t < cutoffTime;
+  };
+
+  console.log(`Purge Cutoff Timestamp: ${cutoffIso} (Local Time: 4:00 AM)`);
 
   let initialEventsCount = 0;
   let remainingEvents = [];
@@ -51,8 +65,7 @@ try {
     const events = JSON.parse(rawEvents || '[]');
     initialEventsCount = events.length;
     remainingEvents = events.filter(e => {
-      const t = new Date(e.occurredAt || e.time || e.createdAt || 0).getTime();
-      return t >= cutoffTime;
+      return !isStale(e.occurredAt || e.time || e.createdAt);
     });
     fs.writeFileSync(EVENTS_FILE, JSON.stringify(remainingEvents, null, 2) + '\n', 'utf8');
     console.log(`✓ Purged ${initialEventsCount - remainingEvents.length} events older than 4:00 AM.`);
@@ -70,15 +83,15 @@ try {
     state.lastUpdated = new Date().toISOString();
 
     state.auditLog = (state.auditLog || []).filter(l => {
-      const t = new Date(l.timestamp || l.time || l.occurredAt || 0).getTime();
-      return t >= cutoffTime;
+      return !isStale(l.timestamp || l.time || l.occurredAt);
     });
 
     if (Array.isArray(state.scanLogs)) {
       state.scanLogs = state.scanLogs.filter(l => {
-        const t = new Date(l.time || l.occurredAt || l.timestamp || 0).getTime();
-        return t >= cutoffTime;
+        return !isStale(l.time || l.occurredAt || l.timestamp);
       });
+    } else {
+      state.scanLogs = [];
     }
 
     // Reset student games and replay remaining events
@@ -111,6 +124,10 @@ try {
       Object.values(state.eventsCatalog).forEach(evt => {
         evt.lastPurgeTimestamp = cutoffIso;
         evt.updatedAt = new Date().toISOString();
+        evt.scanLogs = [...(state.scanLogs || [])];
+        if (Array.isArray(evt.auditLog)) {
+          evt.auditLog = evt.auditLog.filter(l => !isStale(l.timestamp || l.time || l.occurredAt));
+        }
         if (evt.students && typeof evt.students === 'object') {
           Object.values(evt.students).forEach(s => {
             const games = s.games || {};
@@ -134,6 +151,24 @@ try {
       });
     }
 
+    // Rebuild attendance map
+    state.attendance = {};
+    if (state.students && typeof state.students === 'object') {
+      Object.values(state.students).forEach(s => {
+        if (!s) return;
+        const code = String(s.code || s.studentCode || s.id || '').toUpperCase();
+        if (code) {
+          state.attendance[code] = {
+            id: s.id,
+            code: code,
+            name: s.name,
+            team: s.team,
+            games: s.games
+          };
+        }
+      });
+    }
+
     fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2) + '\n', 'utf8');
     console.log(`✓ Roster of ${studentCount} students and 8 sessions preserved.`);
   }
@@ -146,7 +181,9 @@ try {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         eventKey: 'engday_2026',
-        cutoff: cutoffIso
+        cutoff: cutoffIso,
+        cleanEvents: remainingEvents,
+        scanLogs: state ? (state.scanLogs || []) : []
       }),
       signal: AbortSignal.timeout(1500)
     });
