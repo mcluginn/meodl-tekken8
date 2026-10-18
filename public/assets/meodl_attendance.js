@@ -12,7 +12,7 @@
 (function(window) {
   'use strict';
 
-  const ROSTER_SEED_KEY = '2026-EDAYS-411';
+  const ROSTER_SEED_KEY = '2026-EDAYS-588';
   const STORAGE_KEY = 'MEODL_ATTENDANCE_STATE_V1';
   const CONFIG_STORAGE_KEY = 'MEODL_ATTENDANCE_CONFIG_V1';
   const DB_NAME = 'MEODL_ATTENDANCE_DB_V1';

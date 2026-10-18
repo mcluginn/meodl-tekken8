@@ -120,13 +120,15 @@ function buildDefaultStudentsRoster() {
 
   const students = {};
   studentsList.forEach((s, idx) => {
+    const key = s.id || s.code;
     const code = String(s.code || s.id).toUpperCase();
+    const id = String(s.id || s.code || key);
     const team = String(s.team || 'general').toLowerCase();
     const token = deterministicToken(idx + 1, team);
-    students[code] = {
-      id: code,
+    students[key] = {
+      id: id,
       code: code,
-      studentCode: code,
+      studentCode: s.studentCode || code,
       name: s.name,
       team: team,
       teamName: s.teamName || ('TEAM ' + team.toUpperCase()),
@@ -146,6 +148,8 @@ function buildDefaultStudentsRoster() {
 
   return students;
 }
+
+const buildInitialRoster = buildDefaultStudentsRoster;
 
 function getBundledJson(relPath, defaultVal) {
   try {
@@ -176,7 +180,7 @@ if (!attendanceState || !attendanceState.students || Object.keys(attendanceState
 // UPHSD Calamba • College of Engineering • Oct 19–20, 2026
 // -------------------------------------------------------------------------
 const SCHEMA_VERSION = '2026.5';
-const ROSTER_VERSION = '2026-EDAYS-411';
+const ROSTER_VERSION = '2026-EDAYS-588';
 const ENGDAY_GAMES_LIST = [
   'd1-reg',
   'd1-am-block',
@@ -364,6 +368,44 @@ function ensureStudentsHaveSessions(studentsMap, sessionIds = ENGDAY_GAMES_LIST)
   return studentsMap;
 }
 
+function forceMergeSeedStudents(targetStudentsMap, sessionIds = ENGDAY_GAMES_LIST) {
+  if (!targetStudentsMap || typeof targetStudentsMap !== 'object') {
+    return buildDefaultEngDayRoster(sessionIds);
+  }
+  const defaultEngDayStudents = buildDefaultEngDayRoster(sessionIds);
+  
+  const existingByCodeOrId = new Set();
+  for (const [k, s] of Object.entries(targetStudentsMap)) {
+    if (k) existingByCodeOrId.add(String(k).trim().toUpperCase());
+    if (s) {
+      if (s.id) existingByCodeOrId.add(String(s.id).trim().toUpperCase());
+      if (s.code) existingByCodeOrId.add(String(s.code).trim().toUpperCase());
+      if (s.studentCode) existingByCodeOrId.add(String(s.studentCode).trim().toUpperCase());
+    }
+  }
+
+  let addedCount = 0;
+  for (const [seedKey, seedStudent] of Object.entries(defaultEngDayStudents)) {
+    const sId = String(seedStudent.id || seedKey).trim().toUpperCase();
+    const sCode = String(seedStudent.code || seedStudent.studentCode || seedKey).trim().toUpperCase();
+    
+    if (!existingByCodeOrId.has(sId) && !existingByCodeOrId.has(sCode)) {
+      const keyToUse = seedStudent.id || seedStudent.code || seedKey;
+      targetStudentsMap[keyToUse] = { ...seedStudent };
+      existingByCodeOrId.add(sId);
+      existingByCodeOrId.add(sCode);
+      addedCount++;
+    }
+  }
+
+  ensureStudentsHaveSessions(targetStudentsMap, sessionIds);
+
+  if (addedCount > 0) {
+    console.log(`[Server DB] Force-merged ${addedCount} missing seed students into roster. Total: ${Object.keys(targetStudentsMap).length}`);
+  }
+  return targetStudentsMap;
+}
+
 let engdayEvents = safeReadJson(ENGDAY_EVENTS_FILE, getBundledJson('./engday_attendance_events.json', []));
 let engdayEventsMap = new Map();
 engdayEvents.forEach(ev => {
@@ -375,11 +417,13 @@ if (!engdayState || !engdayState.students || Object.keys(engdayState.students).l
   const defaultStudents = buildDefaultEngDayRoster();
   engdayState = {
     schemaVersion: SCHEMA_VERSION,
+    rosterVersion: ROSTER_VERSION,
     activeEventId: 'engday_2026',
     eventsCatalog: {
       engday_2026: {
         id: 'engday_2026',
         schemaVersion: SCHEMA_VERSION,
+        rosterVersion: ROSTER_VERSION,
         title: 'ENGINEERING DAYS 2026',
         subtitle: 'UPHSD Calamba • College of Engineering (Oct 19–20, 2026)',
         venueName: 'Gymnasium / Oval & Engineering Labs',
@@ -395,54 +439,41 @@ if (!engdayState || !engdayState.students || Object.keys(engdayState.students).l
   };
   try { atomicWriteJson(ENGDAY_STATE_FILE, engdayState); } catch(e) {}
 } else {
+  // Always force-merge missing seed students on startup into both root students and eventsCatalog!
+  forceMergeSeedStudents(engdayState.students);
+  if (engdayState.eventsCatalog) {
+    Object.values(engdayState.eventsCatalog).forEach(evt => {
+      if (evt && evt.students) {
+        forceMergeSeedStudents(evt.students, evt.sessions?.map(s => s.id) || ENGDAY_GAMES_LIST);
+      }
+    });
+  }
   if (!engdayState.activeEventId) engdayState.activeEventId = 'engday_2026';
   if (!engdayState.eventsCatalog || typeof engdayState.eventsCatalog !== 'object') {
     engdayState.eventsCatalog = {
       engday_2026: {
         id: 'engday_2026',
         schemaVersion: SCHEMA_VERSION,
+        rosterVersion: ROSTER_VERSION,
         title: 'ENGINEERING DAYS 2026',
         subtitle: 'UPHSD Calamba • College of Engineering (Oct 19–20, 2026)',
         venueName: 'Gymnasium / Oval & Engineering Labs',
         staffPin: '2026',
         sessions: DEFAULT_ENGDAY_SESSIONS,
-        students: ensureStudentsHaveSessions(engdayState.students, ENGDAY_GAMES_LIST),
+        students: engdayState.students,
         updatedAt: engdayState.lastUpdated || new Date().toISOString()
       }
     };
   }
-  // Force migration to SCHEMA_VERSION = '2026.4' if cached state used older 7-game basketball schedule
   const defaultEvt = engdayState.eventsCatalog.engday_2026;
-  const hasLegacyGames = defaultEvt && Array.isArray(defaultEvt.sessions) && defaultEvt.sessions.some(
-    s => s && (String(s.id).startsWith('vb_') || String(s.id).startsWith('bb_'))
-  );
-  if (engdayState.schemaVersion !== SCHEMA_VERSION || !defaultEvt || defaultEvt.schemaVersion !== SCHEMA_VERSION || hasLegacyGames) {
-    engdayState.schemaVersion = SCHEMA_VERSION;
-    const preservedStudents = ensureStudentsHaveSessions(
-      (defaultEvt && defaultEvt.students && Object.keys(defaultEvt.students).length > 0)
-        ? defaultEvt.students
-        : engdayState.students,
-      ENGDAY_GAMES_LIST
-    );
-    engdayState.eventsCatalog.engday_2026 = {
-      ...(defaultEvt || {}),
-      id: 'engday_2026',
-      schemaVersion: SCHEMA_VERSION,
-      title: 'ENGINEERING DAYS 2026',
-      subtitle: 'UPHSD Calamba • College of Engineering (Oct 19–20, 2026)',
-      venueName: 'Gymnasium / Oval & Engineering Labs',
-      staffPin: (defaultEvt && defaultEvt.staffPin) || '2026',
-      sessions: (!hasLegacyGames && defaultEvt && Array.isArray(defaultEvt.sessions) && defaultEvt.sessions.length > 0)
-        ? defaultEvt.sessions
-        : DEFAULT_ENGDAY_SESSIONS,
-      students: preservedStudents,
-      updatedAt: new Date().toISOString()
-    };
-    if (engdayState.activeEventId === 'engday_2026') {
-      engdayState.students = preservedStudents;
-    }
-    try { atomicWriteJson(ENGDAY_STATE_FILE, engdayState); } catch(e) {}
+  if (defaultEvt) {
+    defaultEvt.schemaVersion = SCHEMA_VERSION;
+    defaultEvt.rosterVersion = ROSTER_VERSION;
+    forceMergeSeedStudents(defaultEvt.students, defaultEvt.sessions?.map(s => s.id) || ENGDAY_GAMES_LIST);
   }
+  engdayState.schemaVersion = SCHEMA_VERSION;
+  engdayState.rosterVersion = ROSTER_VERSION;
+  try { atomicWriteJson(ENGDAY_STATE_FILE, engdayState); } catch(e) {}
 }
 
 function getActiveSessionIdsForEvent(eventKey = 'engday_2026') {
@@ -1141,12 +1172,20 @@ export async function handleRequest(req, res) {
   if (reqPath === '/api/engday/attendance/state' && req.method === 'GET') {
     const reqEventKey = urlParams.get('eventKey') || engdayState.activeEventId || 'engday_2026';
     const evtObj = engdayState.eventsCatalog && engdayState.eventsCatalog[reqEventKey];
+
+    // Force-merge missing seed students so all 6 departments (~588 students) are always reported
+    if (evtObj && evtObj.students) {
+      forceMergeSeedStudents(evtObj.students, evtObj.sessions?.map(s => s.id) || ENGDAY_GAMES_LIST);
+    }
+    forceMergeSeedStudents(engdayState.students, ENGDAY_GAMES_LIST);
+
     const studentsMap = (evtObj && evtObj.students) ? evtObj.students : engdayState.students;
     const activeEventsCount = engdayEvents.filter(e => (e.eventKey || 'engday_2026') === reqEventKey).length;
     return sendJson(res, 200, {
       ok: true,
       serverTime: new Date().toISOString(),
       schemaVersion: SCHEMA_VERSION,
+      rosterVersion: ROSTER_VERSION,
       activeEventId: engdayState.activeEventId || 'engday_2026',
       eventsCatalog: engdayState.eventsCatalog || {},
       students: studentsMap,

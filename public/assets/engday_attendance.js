@@ -16,7 +16,7 @@
   'use strict';
 
   const SCHEMA_VERSION = '2026.5';
-  const ROSTER_VERSION = '2026-EDAYS-411';
+  const ROSTER_VERSION = '2026-EDAYS-588';
   const STORAGE_KEY = 'ENGDAY_ATTENDANCE_STATE_V1';
   const CONFIG_STORAGE_KEY = 'ENGDAY_ATTENDANCE_CONFIG_V1';
   const DB_NAME = 'ENGDAY_ATTENDANCE_DB_V1';
@@ -387,7 +387,7 @@
     if (clean === 'IE' || clean === 'BSIE' || clean.includes('INDUSTRIAL')) {
       return { id: 'ie', name: 'IE (Industrial Engineering)', shortCode: 'IE' };
     }
-    if (clean === 'ME' || clean === 'BSME' || clean.includes('MECHANICAL')) {
+    if (clean === 'ME' || clean === 'BSME' || clean.includes('MECHANICAL') || clean.includes('RANKINE') || clean.includes('OTTO') || clean.includes('BRAYTON') || clean.includes('DIESEL')) {
       return { id: 'me', name: 'ME (Mechanical Engineering)', shortCode: 'ME' };
     }
     if (clean === 'ECE' || clean === 'BSECE' || clean.includes('ELECTRONICS')) {
@@ -401,18 +401,6 @@
     }
     if (clean === 'CE' || clean === 'BSCE' || clean.includes('CIVIL')) {
       return { id: 'ce', name: 'CE (Civil Engineering)', shortCode: 'CE' };
-    }
-    if (clean === 'RANKINE' || clean === 'TEAM RANKINE') {
-      return { id: 'rankine', name: 'TEAM RANKINE', shortCode: 'R' };
-    }
-    if (clean === 'OTTO' || clean === 'TEAM OTTO') {
-      return { id: 'otto', name: 'TEAM OTTO', shortCode: 'O' };
-    }
-    if (clean === 'BRAYTON' || clean === 'TEAM BRAYTON') {
-      return { id: 'brayton', name: 'TEAM BRAYTON', shortCode: 'B' };
-    }
-    if (clean === 'DIESEL' || clean === 'TEAM DIESEL') {
-      return { id: 'diesel', name: 'TEAM DIESEL', shortCode: 'D' };
     }
     const id = slugify(clean.replace(/^TEAM\s+/i, ''), 'general');
     return {
@@ -831,6 +819,7 @@
 
       this.loadConfig();
       this.load();
+      this.forceMergeSeedStudents();
       this.autoSelectGameByTime();
       this.initNetworkListeners();
       this.startSyncLoop();
@@ -863,13 +852,15 @@
 
       if (Array.isArray(data.students) && data.students.length >= 411) {
         data.students.forEach(s => {
+          const key = s.id || s.code;
           const code = String(s.code || s.id || '').trim().toUpperCase();
+          const id = String(s.id || s.code || key).trim();
           const teamLower = String(s.team || 'general').trim().toLowerCase();
           const teamName = s.teamName || ('TEAM ' + teamLower.toUpperCase());
-          students[code] = {
-            id: code,
+          students[key] = {
+            id: id,
             code: code,
-            studentCode: code,
+            studentCode: s.studentCode || code,
             name: s.name,
             team: teamLower,
             teamName: teamName,
@@ -880,6 +871,7 @@
       }
 
       const teams = data.teams || [
+        { id: 'me', name: 'TEAM ME', shortCode: 'ME' },
         { id: 'ee', name: 'TEAM EE', shortCode: 'EE' },
         { id: 'cpe', name: 'TEAM CPE', shortCode: 'CPE' },
         { id: 'ece', name: 'TEAM ECE', shortCode: 'ECE' },
@@ -895,9 +887,10 @@
           const isObj = typeof item === 'object' && item !== null;
           const name = isObj ? item.name : item;
           const code = (isObj && (item.code || item.id)) ? (item.code || item.id) : (teamKey + '-' + String(idx + 1).padStart(3, '0'));
-          const id = code;
+          const id = (isObj && item.id) ? item.id : code;
+          const key = id || code;
 
-          students[id] = {
+          students[key] = {
             id: id,
             code: code,
             studentCode: code,
@@ -912,48 +905,75 @@
       return students;
     }
 
+    buildInitialRoster(sessionsList = null) {
+      return this.buildDefaultStudentsMap(sessionsList);
+    }
+
+    forceMergeSeedStudents(targetStudents = null) {
+      const studentsMap = targetStudents || this.state.students || {};
+      const defaultMap = this.buildDefaultStudentsMap(this.games);
+
+      const existingLookup = new Set();
+      for (const [k, s] of Object.entries(studentsMap)) {
+        if (k) existingLookup.add(String(k).trim().toUpperCase());
+        if (s) {
+          if (s.id) existingLookup.add(String(s.id).trim().toUpperCase());
+          if (s.code) existingLookup.add(String(s.code).trim().toUpperCase());
+          if (s.studentCode) existingLookup.add(String(s.studentCode).trim().toUpperCase());
+        }
+      }
+
+      let addedCount = 0;
+      for (const [seedKey, seedStudent] of Object.entries(defaultMap)) {
+        const seedId = String(seedStudent.id || seedKey).trim().toUpperCase();
+        const seedCode = String(seedStudent.code || seedStudent.studentCode || seedKey).trim().toUpperCase();
+
+        if (!existingLookup.has(seedId) && !existingLookup.has(seedCode)) {
+          const keyToUse = seedStudent.id || seedStudent.code || seedKey;
+          studentsMap[keyToUse] = {
+            ...seedStudent,
+            games: this.createEmptyGamesRecord(this.games)
+          };
+          existingLookup.add(seedId);
+          existingLookup.add(seedCode);
+          addedCount++;
+        }
+      }
+
+      this.state.students = studentsMap;
+      if (this.state.eventsCatalog && this.state.eventsCatalog[this.activeEventId]) {
+        this.state.eventsCatalog[this.activeEventId].students = studentsMap;
+      }
+      if (this.state.eventsCatalog && this.state.eventsCatalog['engday_2026']) {
+        this.state.eventsCatalog['engday_2026'].students = studentsMap;
+      }
+
+      this.reconcileStudentGamesStructure();
+      this.reconcileGroupsFromStudents();
+
+      if (addedCount > 0) {
+        console.log(`[EngDay] Force-merged ${addedCount} missing seed students into state. Total roster: ${Object.keys(studentsMap).length}`);
+        this.save({ preserveVersion: true });
+      }
+
+      return studentsMap;
+    }
+
     checkAndMigrateRoster() {
       const isMissingEE = !this.state.students || !this.state.students['EE-001'];
       const isMissingCE = !this.state.students || !this.state.students['CE-001'];
-      const countTooLow = Object.keys(this.state.students || {}).length < 411;
+      const isMissingME = !this.state.students || (!this.state.students['student-0001'] && !this.state.students['MEODL-0001']);
+      const countTooLow = Object.keys(this.state.students || {}).length < 580;
       const versionMismatch = this.state.rosterVersion !== ROSTER_VERSION;
 
-      if (isMissingEE || isMissingCE || countTooLow || versionMismatch) {
-        console.log(`[EngDay] Auto-migrating roster to ${ROSTER_VERSION} (missingEE: ${isMissingEE}, missingCE: ${isMissingCE}, count: ${Object.keys(this.state.students || {}).length})...`);
-        
-        const defaultStudentsMap = this.buildDefaultStudentsMap(this.games);
-        const catStudents = (this.state.eventsCatalog && this.state.eventsCatalog['engday_2026'] && this.state.eventsCatalog['engday_2026'].students) || {};
-        const existingStudents = { ...catStudents, ...(this.state.students || {}) };
-
-        for (const [code, student] of Object.entries(defaultStudentsMap)) {
-          const existing = existingStudents[code] ||
-            Object.values(existingStudents).find(s =>
-              (s.studentCode && s.studentCode.toUpperCase() === code) ||
-              (s.code && s.code.toUpperCase() === code) ||
-              (s.id && s.id.toUpperCase() === code) ||
-              (s.name && s.name.toUpperCase().trim() === student.name.toUpperCase().trim())
-            );
-
-          if (existing && existing.games && typeof existing.games === 'object') {
-            for (const [gId, gData] of Object.entries(existing.games)) {
-              if (student.games[gId]) {
-                student.games[gId] = {
-                  ...student.games[gId],
-                  ...gData
-                };
-              } else {
-                student.games[gId] = gData;
-              }
-            }
-          }
-        }
-
-        this.state.students = defaultStudentsMap;
+      if (isMissingEE || isMissingCE || isMissingME || countTooLow || versionMismatch) {
+        console.log(`[EngDay] Auto-migrating roster to ${ROSTER_VERSION} (missingEE: ${isMissingEE}, missingCE: ${isMissingCE}, missingME: ${isMissingME}, count: ${Object.keys(this.state.students || {}).length})...`);
+        this.forceMergeSeedStudents();
         this.state.rosterVersion = ROSTER_VERSION;
         this.state.schemaVersion = SCHEMA_VERSION;
 
         if (this.state.eventsCatalog && this.state.eventsCatalog['engday_2026']) {
-          this.state.eventsCatalog['engday_2026'].students = defaultStudentsMap;
+          this.state.eventsCatalog['engday_2026'].students = this.state.students;
           this.state.eventsCatalog['engday_2026'].rosterVersion = ROSTER_VERSION;
           this.state.eventsCatalog['engday_2026'].schemaVersion = SCHEMA_VERSION;
           this.state.eventsCatalog['engday_2026'].updatedAt = new Date().toISOString();
@@ -1733,6 +1753,7 @@
                 ...parsed
               };
               this.ensureEventsCatalogStructure();
+              this.forceMergeSeedStudents();
               this.checkAndMigrateRoster();
               this.updatePendingCount();
               return;
@@ -3251,6 +3272,9 @@
           this.state.eventsCatalog[this.activeEventId].students = mergedStudents;
         }
       }
+
+      // Automatically force-merge any seed students missing from state so all 6 departments are present
+      this.forceMergeSeedStudents();
 
       // Re-apply any local events (including IndexedDB events and pending outbox) so nothing is lost
       for (const ev of localEvents) {
