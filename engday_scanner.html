@@ -1394,8 +1394,30 @@
           video.style.objectFit = 'contain';
           video.style.display = 'block';
           if (video.hasAttribute('controls')) video.removeAttribute('controls');
+
+          // Ensure onloadedmetadata listener triggers video.play() safely for fast first-frame rendering
+          if (!video.onloadedmetadata) {
+            video.onloadedmetadata = () => {
+              try {
+                const p = video.play();
+                if (p && p.catch) p.catch(() => {});
+              } catch (e) {}
+            };
+          }
+
+          // Explicitly bind MediaStream if available on html5QrScanner but not on videoElement
+          if (!video.srcObject && html5QrScanner) {
+            const activeStream = html5QrScanner.localMediaStream || (html5QrScanner.renderedCamera && html5QrScanner.renderedCamera.mediaStream);
+            if (activeStream) {
+              try { video.srcObject = activeStream; } catch (e) {}
+            }
+          }
+
           if (video.paused) {
-            video.play().catch(() => {});
+            try {
+              const p = video.play();
+              if (p && p.catch) p.catch(() => {});
+            } catch (e) {}
           }
         }
       };
@@ -1411,7 +1433,10 @@
         reader.addEventListener('click', () => {
           const video = reader.querySelector('video');
           if (video && video.paused) {
-            video.play().catch(() => {});
+            try {
+              const p = video.play();
+              if (p && p.catch) p.catch(() => {});
+            } catch (e) {}
           } else if (!html5QrScanner || !html5QrScanner.isScanning) {
             startScanner();
           }
@@ -1422,8 +1447,19 @@
     function ensureVideoPlaying() {
       setupVideoInlineAttributes();
       const video = document.querySelector("#reader video");
-      if (video && video.paused) {
-        video.play().catch(() => {});
+      if (video) {
+        if (!video.srcObject && html5QrScanner) {
+          const activeStream = html5QrScanner.localMediaStream || (html5QrScanner.renderedCamera && html5QrScanner.renderedCamera.mediaStream);
+          if (activeStream) {
+            try { video.srcObject = activeStream; } catch (e) {}
+          }
+        }
+        if (video.paused) {
+          try {
+            const p = video.play();
+            if (p && p.catch) p.catch(() => {});
+          } catch (e) {}
+        }
       }
       const pausedAlert = document.getElementById("video-paused-alert");
       if (pausedAlert) {
@@ -1462,6 +1498,7 @@
             devices = await navigator.mediaDevices.enumerateDevices();
             videoDevs = devices.filter(d => d.kind === 'videoinput');
             dummyStream.getTracks().forEach(t => t.stop());
+            await new Promise(r => setTimeout(r, 200));
           } catch (permErr) {
             console.warn('[Camera Engine] Dummy stream permission prompt dismissed or rejected:', permErr);
           }
@@ -1519,6 +1556,95 @@
       return null;
     }
 
+    let blackScreenTimer = null;
+    let fallbackInProgress = false;
+
+    function scheduleBlackScreenCheck(forcedDeviceId) {
+      if (blackScreenTimer) {
+        clearTimeout(blackScreenTimer);
+        blackScreenTimer = null;
+      }
+      if (!forcedDeviceId) return;
+
+      blackScreenTimer = setTimeout(() => {
+        const video = document.querySelector("#reader video");
+        if (!video || !html5QrScanner || !html5QrScanner.isScanning) return;
+
+        let isBlack = false;
+        // Condition 1: Video dimensions are 0 (no frame stream rendered)
+        if (video.videoWidth === 0 || video.videoHeight === 0) {
+          isBlack = true;
+          console.warn('[Camera Engine] Black screen detected: videoWidth/videoHeight is 0');
+        } else if (video.readyState >= 2) {
+          // Condition 2: Sample canvas pixels to detect solid black frames delivered by driver
+          try {
+            const probeCanvas = document.createElement('canvas');
+            probeCanvas.width = 8;
+            probeCanvas.height = 8;
+            const ctx = probeCanvas.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(video, 0, 0, 8, 8);
+              const data = ctx.getImageData(0, 0, 8, 8).data;
+              let nonZeroCount = 0;
+              for (let i = 0; i < data.length; i += 4) {
+                if (data[i] > 5 || data[i + 1] > 5 || data[i + 2] > 5) {
+                  nonZeroCount++;
+                }
+              }
+              if (nonZeroCount === 0) {
+                isBlack = true;
+                console.warn('[Camera Engine] Black screen detected: all sampled pixels are pitch black');
+              }
+            }
+          } catch (canvasErr) {
+            // Ignore canvas read error if any
+          }
+        }
+
+        if (isBlack && !fallbackInProgress) {
+          console.warn('[Camera Engine] Black screen confirmed on forced deviceId. Auto-recovering via environment facingMode...');
+          fallbackToEnvironmentFacing();
+        }
+      }, 1200);
+    }
+
+    async function fallbackToEnvironmentFacing() {
+      if (fallbackInProgress) return;
+      fallbackInProgress = true;
+      if (blackScreenTimer) {
+        clearTimeout(blackScreenTimer);
+        blackScreenTimer = null;
+      }
+      console.info('[Camera Engine] Running clean automatic fallback to { facingMode: "environment" }');
+      try {
+        await stopAndClearScanner();
+        const scannerOpts = {
+          formatsToSupport: [ 0 ],
+          experimentalFeatures: { useBarCodeDetectorIfSupported: false },
+          verbose: false
+        };
+        html5QrScanner = new Html5Qrcode("reader", scannerOpts);
+        const envConfig = {
+          fps: 15,
+          disableFlip: false,
+          videoConstraints: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          }
+        };
+        await html5QrScanner.start({ facingMode: "environment" }, envConfig, onScanSuccess, onScanFailure);
+        currentCameraId = null;
+        currentCameraFacing = 'environment';
+        onCameraReady();
+        showCameraToast('📷 Camera recovered (standard rear lens)');
+      } catch (fbErr) {
+        console.error('[Camera Engine] Environment facingMode fallback failed:', fbErr);
+      } finally {
+        fallbackInProgress = false;
+      }
+    }
+
     function onCameraReady() {
       document.getElementById('cam-fallback')?.classList.add('hidden');
       document.getElementById('video-paused-alert')?.classList.add('hidden');
@@ -1526,11 +1652,41 @@
 
       const video = document.querySelector("#reader video");
       if (video) {
-        ['loadedmetadata', 'canplay', 'pause', 'play'].forEach(evtName => {
+        // Ensure MediaStream is explicitly bound as videoElement.srcObject
+        try {
+          const activeStream = video.srcObject || (html5QrScanner && (html5QrScanner.localMediaStream || (html5QrScanner.renderedCamera && html5QrScanner.renderedCamera.mediaStream)));
+          if (activeStream && video.srcObject !== activeStream) {
+            video.srcObject = activeStream;
+          }
+        } catch (err) {
+          console.warn('[Camera Engine] Error assigning videoElement.srcObject:', err);
+        }
+
+        // Add event listeners (videoElement.onloadedmetadata = () => { videoElement.play(); }) so video renders frames immediately
+        video.onloadedmetadata = () => {
+          try {
+            const p = video.play();
+            if (p && p.catch) p.catch(() => {});
+          } catch (e) {}
+        };
+
+        ['loadedmetadata', 'canplay', 'playing', 'pause', 'play'].forEach(evtName => {
           video.addEventListener(evtName, () => {
-            if (video.paused) video.play().catch(() => {});
+            if (video.paused) {
+              try {
+                const p = video.play();
+                if (p && p.catch) p.catch(() => {});
+              } catch (e) {}
+            }
           });
         });
+
+        // Trigger safe play() in try/catch to handle browser autoplay policies
+        try {
+          const p = video.play();
+          if (p && p.catch) p.catch((e) => console.warn('[Camera Engine] Autoplay policy warning:', e));
+        } catch (e) {}
+
         try {
           const stream = video.srcObject;
           const track = stream && stream.getVideoTracks ? stream.getVideoTracks()[0] : null;
@@ -1562,6 +1718,10 @@
     }
 
     async function stopAndClearScanner() {
+      if (blackScreenTimer) {
+        clearTimeout(blackScreenTimer);
+        blackScreenTimer = null;
+      }
       if (videoWatcherInterval) {
         clearInterval(videoWatcherInterval);
         videoWatcherInterval = null;
@@ -1659,7 +1819,7 @@
       const isStringId = typeof cameraTarget === 'string' && cameraTarget.length > 0;
       const targetDeviceId = isStringId ? cameraTarget : (cameraTarget && cameraTarget.deviceId);
 
-      // Attempt 1: Exact deviceId constraint with ideal 1280x720 resolution (forces Chrome to rear hardware)
+      // Attempt 1: Exact deviceId constraint with standard 640x480 resolution (prevents Android camera HAL black screens)
       if (targetDeviceId) {
         try {
           const exactConfig = {
@@ -1667,17 +1827,24 @@
             disableFlip: false,
             videoConstraints: {
               deviceId: { exact: targetDeviceId },
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
+              width: { ideal: 640 },
+              height: { ideal: 480 }
             }
           };
-          console.info(`[Camera Engine] Starting camera with exact deviceId: ${targetDeviceId}`);
+          console.info(`[Camera Engine] Starting camera with exact deviceId: ${targetDeviceId} (640x480)`);
           await html5QrScanner.start(targetDeviceId, exactConfig, onScanSuccess, onScanFailure);
           currentCameraId = targetDeviceId;
           onCameraReady();
+          scheduleBlackScreenCheck(targetDeviceId);
           return;
         } catch (errExact) {
-          console.warn('[Camera Engine] Exact deviceId constraint failed, retrying with ideal deviceId:', errExact);
+          console.warn('[Camera Engine] Exact deviceId constraint failed, evaluating fallback:', errExact);
+          const errStr = String(errExact && (errExact.name || errExact.message || errExact));
+          if (errStr.includes('NotReadableError')) {
+            console.warn('[Camera Engine] NotReadableError on exact deviceId; immediately falling back to environment facingMode');
+            await fallbackToEnvironmentFacing();
+            return;
+          }
           try {
             await stopAndClearScanner();
             html5QrScanner = new Html5Qrcode("reader", scannerOpts);
@@ -1686,16 +1853,22 @@
               disableFlip: false,
               videoConstraints: {
                 deviceId: { ideal: targetDeviceId },
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
+                width: { ideal: 640 },
+                height: { ideal: 480 }
               }
             };
             await html5QrScanner.start(targetDeviceId, idealConfig, onScanSuccess, onScanFailure);
             currentCameraId = targetDeviceId;
             onCameraReady();
+            scheduleBlackScreenCheck(targetDeviceId);
             return;
           } catch (errIdeal) {
             console.warn('[Camera Engine] Ideal deviceId constraint failed:', errIdeal);
+            const errIdealStr = String(errIdeal && (errIdeal.name || errIdeal.message || errIdeal));
+            if (errIdealStr.includes('NotReadableError')) {
+              await fallbackToEnvironmentFacing();
+              return;
+            }
           }
         }
       }
@@ -1707,19 +1880,20 @@
         const devs = await getOrEnumerateVideoDevices();
         const rearId = findRearCameraDeviceId(devs);
         if (rearId && rearId !== targetDeviceId) {
-          console.info(`[Camera Engine] Retrying with newly resolved rear deviceId: ${rearId}`);
+          console.info(`[Camera Engine] Retrying with newly resolved rear deviceId: ${rearId} (640x480)`);
           const rearConfig = {
             fps: 15,
             disableFlip: false,
             videoConstraints: {
               deviceId: { exact: rearId },
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
+              width: { ideal: 640 },
+              height: { ideal: 480 }
             }
           };
           await html5QrScanner.start(rearId, rearConfig, onScanSuccess, onScanFailure);
           currentCameraId = rearId;
           onCameraReady();
+          scheduleBlackScreenCheck(rearId);
           return;
         }
       } catch (errReEnum) {
@@ -1735,11 +1909,13 @@
           disableFlip: false,
           videoConstraints: {
             facingMode: { ideal: "environment" },
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
+            width: { ideal: 640 },
+            height: { ideal: 480 }
           }
         };
+        console.info('[Camera Engine] Starting with flexible environment facingMode (640x480)');
         await html5QrScanner.start({ facingMode: "environment" }, envConfig, onScanSuccess, onScanFailure);
+        currentCameraFacing = 'environment';
         onCameraReady();
         return;
       } catch (errEnv) {
@@ -1753,9 +1929,14 @@
         const userConfig = {
           fps: 15,
           disableFlip: false,
-          videoConstraints: { facingMode: { ideal: "user" } }
+          videoConstraints: {
+            facingMode: { ideal: "user" },
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          }
         };
         await html5QrScanner.start({ facingMode: "user" }, userConfig, onScanSuccess, onScanFailure);
+        currentCameraFacing = 'user';
         onCameraReady();
         return;
       } catch (errUser) {
@@ -1765,10 +1946,11 @@
       // Attempt 5: Generic unconstrained video probe
       try {
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-          const testStream = await navigator.mediaDevices.getUserMedia({ video: true });
+          const testStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 } } });
           const testTrack = testStream.getVideoTracks ? testStream.getVideoTracks()[0] : null;
           const foundDevId = testTrack && testTrack.getSettings ? testTrack.getSettings().deviceId : null;
           testStream.getTracks().forEach(t => t.stop());
+          await new Promise(r => setTimeout(r, 200));
 
           if (foundDevId) {
             await stopAndClearScanner();
@@ -1777,7 +1959,11 @@
             const genericConfig = {
               fps: 15,
               disableFlip: false,
-              videoConstraints: { deviceId: { ideal: foundDevId } }
+              videoConstraints: {
+                deviceId: { ideal: foundDevId },
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+              }
             };
             await html5QrScanner.start(foundDevId, genericConfig, onScanSuccess, onScanFailure);
             onCameraReady();
