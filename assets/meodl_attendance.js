@@ -1379,7 +1379,7 @@
 
     getQRPayload(student) {
       if (!student) return '';
-      return `${DOMAIN_BASE}?token=${student.activeToken}&code=${student.studentCode}`;
+      return student.studentCode || `${DOMAIN_BASE}?token=${student.activeToken}&code=${student.studentCode}`;
     }
 
     // -------------------------------------------------------------------------
