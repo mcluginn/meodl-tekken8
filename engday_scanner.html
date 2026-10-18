@@ -33,6 +33,37 @@
     }
   </script>
 
+  <!-- Universal iOS Safari & Android Video Inline Playback Polyfill -->
+  <script>
+    (function() {
+      // 1. Intercept document.createElement to ensure all <video> elements have inline attributes from birth
+      const origCreate = document.createElement.bind(document);
+      document.createElement = function(tagName, options) {
+        const el = origCreate(tagName, options);
+        if (typeof tagName === 'string' && tagName.toLowerCase() === 'video') {
+          el.setAttribute('playsinline', 'true');
+          el.setAttribute('webkit-playsinline', 'true');
+          el.setAttribute('autoplay', 'true');
+          el.setAttribute('muted', 'true');
+          el.playsInline = true;
+          el.muted = true;
+          el.autoplay = true;
+        }
+        return el;
+      };
+      // 2. Intercept HTMLVideoElement.prototype.play to ensure playsinline is present
+      if (typeof HTMLVideoElement !== 'undefined') {
+        const origPlay = HTMLVideoElement.prototype.play;
+        HTMLVideoElement.prototype.play = function() {
+          if (!this.hasAttribute('playsinline')) this.setAttribute('playsinline', 'true');
+          if (!this.hasAttribute('webkit-playsinline')) this.setAttribute('webkit-playsinline', 'true');
+          this.playsInline = true;
+          return origPlay.apply(this, arguments);
+        };
+      }
+    })();
+  </script>
+
   <!-- Local Standalone Libraries with Resilient Multi-Network Fallback -->
   <script src="./assets/html5-qrcode.min.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';document.head.appendChild(s);}"></script>
   <script src="./assets/meodl_data.js" onerror="if(!this.dataset.retried){this.dataset.retried=1;var s=document.createElement('script');s.src='https://mcluginn.github.io/meodl-tekken8/assets/meodl_data.js';document.head.appendChild(s);}"></script>
@@ -52,13 +83,19 @@
       position: relative;
       width: 100% !important;
       height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
       overflow: hidden;
       border-radius: 1rem;
+      background-color: #000;
     }
     #reader video {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
+      max-width: 100% !important;
+      max-height: 100% !important;
+      width: auto !important;
+      height: auto !important;
+      object-fit: contain !important;
       border-radius: 1rem !important;
     }
     /* Suppress iOS Safari WebKit native media controls and pause/play button */
@@ -276,7 +313,7 @@
       </div>
 
       <!-- Live Video Viewport -->
-      <div class="relative w-full h-[250px] sm:h-[270px] bg-zinc-900 flex items-center justify-center overflow-hidden">
+      <div class="relative w-full h-[320px] sm:h-[380px] bg-zinc-950 flex items-center justify-center overflow-hidden">
         <div id="reader" class="w-full h-full"></div>
 
         <!-- 5-Part Precision Reticle -->
@@ -1517,9 +1554,11 @@
 
       // Note: Omit qrbox to scan entire camera viewfinder and prevent fatal "config.qrbox dimensions" exceptions
       const config = {
-        fps: 12,
+        fps: 15,
         disableFlip: false
       };
+
+      setupVideoInlineAttributes();
 
       try {
         await html5QrScanner.start(cameraIdOrConfig, config, onScanSuccess, onScanFailure);
