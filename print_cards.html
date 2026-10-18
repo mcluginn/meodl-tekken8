@@ -97,6 +97,15 @@
 
       <!-- Controls -->
       <div class="flex items-center gap-2.5 flex-wrap font-mono text-xs">
+        <!-- Search Input -->
+        <input 
+          type="text" 
+          id="student-search-input" 
+          placeholder="Search Name, Code (e.g. Garcia, Ramos)..." 
+          oninput="renderSheets()" 
+          class="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500 w-52 sm:w-64 text-xs font-mono"
+        />
+
         <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-lg px-2.5 py-1">
           <span class="text-zinc-400">Team:</span>
           <select id="team-filter" onchange="renderSheets()" class="bg-transparent text-white font-bold focus:outline-none">
@@ -129,6 +138,28 @@
       renderSheets();
     });
 
+    function matchesMultiSearch(student, rawQuery) {
+      if (!student) return false;
+      if (!rawQuery) return true;
+      const q = String(rawQuery).trim();
+      if (!q) return true;
+
+      const terms = q.split(/[,/;\n]+/).map(t => t.trim().toUpperCase()).filter(Boolean);
+      if (!terms.length) return true;
+
+      const name = String(student.name || '').toUpperCase();
+      const code = String(student.studentCode || student.code || student.id || '').toUpperCase();
+      const team = String(student.team || '').toUpperCase();
+      const teamName = String(student.teamName || '').toUpperCase();
+      const combined = `${code} ${name} ${team} ${teamName}`;
+
+      return terms.some(term => {
+        const words = term.split(/\s+/).filter(Boolean);
+        if (!words.length) return true;
+        return words.every(w => combined.includes(w));
+      });
+    }
+
     function renderSheets() {
       const container = document.getElementById('sheets-container');
       container.innerHTML = '<div class="text-center text-zinc-400 py-12 font-mono text-sm">Generating printable QR badges...</div>';
@@ -139,10 +170,14 @@
       }
 
       const teamFilter = document.getElementById('team-filter').value;
+      const searchRaw = (document.getElementById('student-search-input')?.value || '').trim();
       let students = window.MEODL_ATTENDANCE.getStudents();
 
       if (teamFilter !== 'all') {
         students = students.filter(s => s.team === teamFilter);
+      }
+      if (searchRaw) {
+        students = students.filter(s => matchesMultiSearch(s, searchRaw));
       }
 
       if (!students.length) {

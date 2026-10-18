@@ -1623,6 +1623,27 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       };
     }
 
+    matchesSearch(student, rawQuery) {
+      if (!rawQuery) return true;
+      const q = String(rawQuery).trim();
+      if (!q) return true;
+
+      const terms = q.split(/[,/;\n]+/).map(t => t.trim().toUpperCase()).filter(Boolean);
+      if (!terms.length) return true;
+
+      const name = String(student.name || '').toUpperCase();
+      const code = String(student.studentCode || student.code || student.id || '').toUpperCase();
+      const team = String(student.team || '').toUpperCase();
+      const teamName = String(student.teamName || '').toUpperCase();
+      const combined = `${code} ${name} ${team} ${teamName}`;
+
+      return terms.some(term => {
+        const words = term.split(/\s+/).filter(Boolean);
+        if (!words.length) return true;
+        return words.every(w => combined.includes(w));
+      });
+    }
+
     // -----------------------------------------------------------------------
     // CSV / EXCEL (TSV) / JSON STUDENT ROSTER IMPORTER
     // -----------------------------------------------------------------------

@@ -249,9 +249,9 @@
           <input 
             type="text" 
             id="student-search-input" 
-            placeholder="Search ID, Name, Group..." 
+            placeholder="Search Name, Code (e.g. Garcia, Ramos, EE-001)..." 
             oninput="renderStudentTable()"
-            class="px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white text-xs placeholder-zinc-500 focus:outline-none focus:border-amber-500 w-48 sm:w-56"
+            class="px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-700 text-white text-xs placeholder-zinc-500 focus:outline-none focus:border-amber-500 w-56 sm:w-72"
           />
 
           <!-- Dynamic Group Filter -->
@@ -373,17 +373,17 @@
           <input 
             type="text" 
             id="qr-gen-search" 
-            placeholder="Filter by ID or Name..." 
+            placeholder="Filter Name, ID, or multiple (e.g. Garcia, Ramos)..." 
             oninput="renderQrGeneratorPreview()"
-            class="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white text-xs"
+            class="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 text-white text-xs placeholder-zinc-500 w-56 sm:w-72"
           />
           <select id="qr-gen-group" onchange="renderQrGeneratorPreview()" class="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs">
             <option value="all">All Groups</option>
           </select>
-          <select id="qr-gen-limit" onchange="renderQrGeneratorPreview()" class="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 text-amber-300 text-xs">
+          <select id="qr-gen-limit" name="qr-limit-select" onchange="renderQrGeneratorPreview()" class="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-700 text-amber-300 text-xs">
             <option value="24">Preview First 24 Cards</option>
             <option value="60">Preview First 60 Cards</option>
-            <option value="1000">Show All 588+ Cards (For Printing)</option>
+            <option value="1000" selected>Show All 588+ Cards (For Printing)</option>
           </select>
         </div>
 
@@ -1126,13 +1126,39 @@
       `;
     }
 
+    function matchesMultiSearch(student, rawQuery) {
+      if (!student) return false;
+      if (!rawQuery) return true;
+      if (window.ENGDAY_ATTENDANCE && typeof window.ENGDAY_ATTENDANCE.matchesSearch === 'function') {
+        return window.ENGDAY_ATTENDANCE.matchesSearch(student, rawQuery);
+      }
+      const q = String(rawQuery).trim();
+      if (!q) return true;
+
+      // Allow multi-term separation by commas, slashes, semicolons, or newlines (OR logic)
+      const terms = q.split(/[,/;\n]+/).map(t => t.trim().toUpperCase()).filter(Boolean);
+      if (!terms.length) return true;
+
+      const name = String(student.name || '').toUpperCase();
+      const code = String(student.studentCode || student.code || student.id || '').toUpperCase();
+      const team = String(student.team || '').toUpperCase();
+      const teamName = String(student.teamName || '').toUpperCase();
+      const combined = `${code} ${name} ${team} ${teamName}`;
+
+      return terms.some(term => {
+        const words = term.split(/\s+/).filter(Boolean);
+        if (!words.length) return true;
+        return words.every(w => combined.includes(w));
+      });
+    }
+
     function renderStudentTable() {
       if (!window.ENGDAY_ATTENDANCE) return;
       const engine = window.ENGDAY_ATTENDANCE;
       const tbody = document.getElementById('student-matrix-tbody');
       if (!tbody) return;
 
-      const searchQ = (document.getElementById('student-search-input')?.value || '').trim().toUpperCase();
+      const searchQ = (document.getElementById('student-search-input')?.value || '').trim();
       const teamFilter = document.getElementById('team-filter-select')?.value || 'all';
       const gameFilter = document.getElementById('game-filter-select')?.value || 'all';
       const statusFilter = document.getElementById('status-filter-select')?.value || 'all';
@@ -1142,12 +1168,7 @@
 
       students = students.filter(s => {
         if (teamFilter !== 'all' && String(s.team || '').toLowerCase() !== teamFilter) return false;
-        if (searchQ) {
-          const matchName = String(s.name || '').toUpperCase().includes(searchQ);
-          const matchCode = String(s.studentCode || '').toUpperCase().includes(searchQ);
-          const matchGroup = String(s.teamName || s.team || '').toUpperCase().includes(searchQ);
-          if (!matchName && !matchCode && !matchGroup) return false;
-        }
+        if (searchQ && !matchesMultiSearch(s, searchQ)) return false;
         if (statusFilter !== 'all') {
           if (statusFilter === 'FLAGGED') {
             if (gameFilter === 'all') {
@@ -1421,19 +1442,19 @@
 
     function getFilteredQrStudents() {
       if (!window.ENGDAY_ATTENDANCE) return [];
-      const q = (document.getElementById('qr-gen-search')?.value || '').trim().toUpperCase();
+      const searchRaw = (document.getElementById('qr-gen-search')?.value || '').trim();
       const grp = document.getElementById('qr-gen-group')?.value || 'all';
-      const limit = parseInt(document.getElementById('qr-gen-limit')?.value || '24', 10);
+      const limitEl = document.getElementById('qr-gen-limit') || document.getElementById('qr-limit-select');
+      const limit = parseInt(limitEl?.value || '1000', 10);
 
       let list = Object.values(window.ENGDAY_ATTENDANCE.state.students || {});
       if (grp !== 'all') {
         list = list.filter(s => String(s.team || '').toLowerCase() === grp);
       }
-      if (q) {
-        list = list.filter(s =>
-          String(s.name || '').toUpperCase().includes(q) ||
-          String(s.studentCode || '').toUpperCase().includes(q)
-        );
+      if (searchRaw) {
+        list = list.filter(s => matchesMultiSearch(s, searchRaw));
+        // Show all matching students without capping when searching
+        return list;
       }
       return list.slice(0, limit);
     }
@@ -1445,6 +1466,15 @@
       const evt = engine.getActiveEvent();
       const students = getFilteredQrStudents();
 
+      const deptColors = {
+        ce: 'bg-cyan-100 text-cyan-900 border-cyan-400',
+        cpe: 'bg-purple-100 text-purple-900 border-purple-400',
+        ee: 'bg-amber-100 text-amber-900 border-amber-400',
+        ece: 'bg-rose-100 text-rose-900 border-rose-400',
+        ie: 'bg-emerald-100 text-emerald-900 border-emerald-400',
+        me: 'bg-orange-100 text-orange-900 border-orange-400'
+      };
+
       if (!students.length) {
         grid.innerHTML = `<div class="col-span-full text-center text-zinc-500 py-8 text-xs">No students match this filter.</div>`;
         return;
@@ -1452,14 +1482,15 @@
 
       grid.innerHTML = students.map(s => {
         const grpStyle = engine.getGroupStyle(s.team);
+        const printBadgeClass = deptColors[String(s.team || '').toLowerCase()] || 'bg-zinc-100 text-zinc-900 border-zinc-400';
         return `
           <div class="p-3 rounded-2xl bg-white text-zinc-900 border-2 border-zinc-300 flex items-center justify-between gap-2.5 shadow">
             <div class="min-w-0 flex-1">
               <span class="text-[9px] font-mono font-bold text-zinc-500 uppercase block truncate">${evt.title}</span>
               <h4 class="text-xs font-extrabold text-zinc-950 uppercase leading-tight line-clamp-2 mt-0.5">${s.name}</h4>
               <span class="text-xs font-mono font-black text-amber-700 block mt-1">${s.studentCode}</span>
-              <span class="inline-block mt-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-zinc-100 text-zinc-800 border border-zinc-300 uppercase">
-                ${s.teamName || grpStyle.name}
+              <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-mono font-black border uppercase shadow-sm ${printBadgeClass}">
+                ${s.teamName || (s.team ? s.team.toUpperCase() : grpStyle.name)}
               </span>
             </div>
             <div id="preview-qr-${s.id}" class="w-[84px] h-[84px] bg-white p-1 rounded border border-zinc-300 flex items-center justify-center shrink-0"></div>
@@ -1491,20 +1522,35 @@
       const printGrid = document.getElementById('print-qr-cards-grid');
       if (!printGrid) return;
 
-      printGrid.innerHTML = students.map(s => `
-        <div class="qr-print-card p-3 rounded-xl flex items-center justify-between gap-3" style="height: 58mm;">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-1.5 mb-1">
-              <img src="assets/esc_logo.jpg" alt="ESC Logo" class="w-6 h-6 rounded-md object-cover border border-amber-500/40 shrink-0">
-              <div class="text-[9px] font-mono font-bold uppercase text-zinc-600 truncate">${evt.title} • ${evt.venueName || 'OFFICIAL PASS'}</div>
+      const deptColors = {
+        ce: 'bg-cyan-100 text-cyan-900 border-cyan-400',
+        cpe: 'bg-purple-100 text-purple-900 border-purple-400',
+        ee: 'bg-amber-100 text-amber-900 border-amber-400',
+        ece: 'bg-rose-100 text-rose-900 border-rose-400',
+        ie: 'bg-emerald-100 text-emerald-900 border-emerald-400',
+        me: 'bg-orange-100 text-orange-900 border-orange-400'
+      };
+
+      printGrid.innerHTML = students.map(s => {
+        const grpStyle = engine.getGroupStyle(s.team);
+        const printBadgeClass = deptColors[String(s.team || '').toLowerCase()] || 'bg-zinc-100 text-zinc-900 border-zinc-400';
+        return `
+          <div class="qr-print-card p-3 rounded-xl flex items-center justify-between gap-3" style="height: 58mm;">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-1.5 mb-1">
+                <img src="assets/esc_logo.jpg" alt="ESC Logo" class="w-6 h-6 rounded-md object-cover border border-amber-500/40 shrink-0">
+                <div class="text-[9px] font-mono font-bold uppercase text-zinc-600 truncate">${evt.title} • ${evt.venueName || 'OFFICIAL PASS'}</div>
+              </div>
+              <div class="text-sm font-extrabold uppercase text-black mt-1 leading-tight">${s.name}</div>
+              <div class="text-xs font-mono font-bold text-black mt-1.5">ID: ${s.studentCode}</div>
+              <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-mono font-black uppercase border ${printBadgeClass}">
+                ${s.teamName || ('TEAM ' + (s.team ? s.team.toUpperCase() : ''))}
+              </span>
             </div>
-            <div class="text-sm font-extrabold uppercase text-black mt-1 leading-tight">${s.name}</div>
-            <div class="text-xs font-mono font-bold text-black mt-1.5">ID: ${s.studentCode}</div>
-            <div class="text-[10px] font-mono font-bold uppercase text-zinc-700 mt-1">GROUP: ${s.teamName || s.team.toUpperCase()}</div>
+            <div id="print-qr-node-${s.id}" class="w-[96px] h-[96px] p-1 border border-zinc-400 rounded flex items-center justify-center shrink-0"></div>
           </div>
-          <div id="print-qr-node-${s.id}" class="w-[96px] h-[96px] p-1 border border-zinc-400 rounded flex items-center justify-center shrink-0"></div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       students.forEach(s => {
         const el = document.getElementById('print-qr-node-' + s.id);
