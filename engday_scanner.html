@@ -196,11 +196,16 @@
 
     <!-- Right Quick Controls: Backup, Cloud Sync, Audio, Lock, Admin -->
     <div class="flex items-center gap-1.5 shrink-0">
-      <!-- 4-Layer Local Backup Status Button -->
-      <button onclick="openBackupModal()" id="btn-backup-status" class="px-2 py-1.5 rounded-xl bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-700/60 text-[10px] font-mono font-bold text-emerald-300 flex items-center gap-1 transition-all" title="4-Layer Local Backup & Restore">
-        <span id="backup-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-        <span id="backup-status-text">💾 <span class="hidden md:inline">SAVED</span></span>
-      </button>
+      <!-- 4-Layer Local Backup Status Button (Tap to Download Immediately, Gear for Settings) -->
+      <div class="flex items-center gap-0.5">
+        <button onclick="downloadImmediateBackup()" id="btn-backup-status" class="px-2 py-1.5 rounded-l-xl bg-emerald-950/70 hover:bg-emerald-900/80 border border-emerald-700/60 text-[10px] font-mono font-bold text-emerald-300 flex items-center gap-1 transition-all" title="Click to Download Backup JSON Now">
+          <span id="backup-status-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span id="backup-status-text">💾 <span class="hidden md:inline">SAVED</span></span>
+        </button>
+        <button onclick="openBackupModal()" class="px-1.5 py-1.5 rounded-r-xl bg-emerald-950/70 hover:bg-emerald-900/80 border-t border-b border-r border-emerald-700/60 text-[10px] font-mono font-bold text-emerald-400 hover:text-white" title="Backup Settings & Restore">
+          ⚙️
+        </button>
+      </div>
 
       <!-- Cloud Auto-Sync Status Button (Includes Live Test Inside Modal) -->
       <button onclick="openSyncModal()" id="btn-sync-status" class="px-2 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[10px] font-mono font-bold text-zinc-300 flex items-center gap-1.5 transition-all" title="Cloud Sync Settings & Live Test">
@@ -1714,24 +1719,25 @@
       lastScanByPayloadMap.set(student.id, Date.now());
       lastScanByPayloadMap.set(student.studentCode, Date.now());
 
-      if (rapidModeEnabled && method === 'qr_scan') {
+      if (rapidModeEnabled && (method === 'qr_scan' || method === 'image_upload')) {
         if (res.statusInGame === 'INSIDE') {
           if (isCheckInOnly) {
             playBeep('success');
             showRapidScanToast(student, activeGame, 'ALREADY_IN');
+            onScanCompletedBackupHook();
             return;
           }
           window.ENGDAY_ATTENDANCE.recordCheckOut(student.id, activeGame.id, {
             reason: (activeGame.exitNotes && activeGame.exitNotes[0]) || 'Gate Exit',
             performedBy: 'Auto Gate Scanner',
-            method: 'qr_scan'
+            method: method
           });
           playBeep('checkout');
           showRapidScanToast(student, activeGame, 'OUT');
         } else {
           window.ENGDAY_ATTENDANCE.recordCheckIn(student.id, activeGame.id, {
             performedBy: 'Auto Gate Scanner',
-            method: 'qr_scan'
+            method: method
           });
           playBeep('success');
           showRapidScanToast(student, activeGame, 'IN');
@@ -1743,6 +1749,7 @@
 
       playBeep('success');
       showVerificationModal(student);
+      onScanCompletedBackupHook();
     }
 
     function showRapidScanToast(student, game, direction) {
@@ -1765,14 +1772,19 @@
             <h4 class="text-xs font-black text-white truncate">${student.name}</h4>
             <span class="text-[10px] opacity-90 block">${student.studentCode} • ${student.teamName || student.team.toUpperCase()}</span>
           </div>
-          <button onclick="openLastScannedModal('${student.id}')" class="pointer-events-auto px-2.5 py-1.5 rounded-xl bg-black/50 hover:bg-black/80 text-[10px] font-bold text-white border border-white/20 shrink-0">
-            Details
-          </button>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="downloadImmediateBackup()" class="pointer-events-auto px-2 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-[10px] font-black text-white border border-emerald-400 flex items-center gap-1 shadow-lg active:scale-95 transition-transform" title="Download backup JSON now">
+              <span>📥</span><span>Backup</span>
+            </button>
+            <button onclick="openLastScannedModal('${student.id}')" class="pointer-events-auto px-2.5 py-1.5 rounded-xl bg-black/50 hover:bg-black/80 text-[10px] font-bold text-white border border-white/20 shrink-0">
+              Details
+            </button>
+          </div>
         </div>
       `;
       toast.classList.remove('hidden');
       if (rapidToastTimeout) clearTimeout(rapidToastTimeout);
-      rapidToastTimeout = setTimeout(() => toast.classList.add('hidden'), 2800);
+      rapidToastTimeout = setTimeout(() => toast.classList.add('hidden'), 3500);
     }
 
     function showRapidScanErrorToast(msg) {
@@ -2504,13 +2516,27 @@
       scansSinceLastAutoDownload++;
 
       if (autoBackupMode === 'every' || !autoBackupMode) {
-        window.ENGDAY_ATTENDANCE?.downloadJSON();
+        if (window.ENGDAY_ATTENDANCE) {
+          try {
+            const fn = window.ENGDAY_ATTENDANCE.downloadJSON();
+            console.log('[Auto-Backup Download] Triggered:', fn);
+            flashHeaderSavedIndicator('DOWNLOADED');
+          } catch (e) {
+            console.error('[Auto-Backup Download] Error:', e);
+          }
+        }
         scansSinceLastAutoDownload = 0;
       } else if (autoBackupMode === 'every_5' && scansSinceLastAutoDownload >= 5) {
-        window.ENGDAY_ATTENDANCE?.downloadJSON();
+        if (window.ENGDAY_ATTENDANCE) {
+          window.ENGDAY_ATTENDANCE.downloadJSON();
+          flashHeaderSavedIndicator('DOWNLOADED');
+        }
         scansSinceLastAutoDownload = 0;
       } else if (autoBackupMode === 'every_10' && scansSinceLastAutoDownload >= 10) {
-        window.ENGDAY_ATTENDANCE?.downloadJSON();
+        if (window.ENGDAY_ATTENDANCE) {
+          window.ENGDAY_ATTENDANCE.downloadJSON();
+          flashHeaderSavedIndicator('DOWNLOADED');
+        }
         scansSinceLastAutoDownload = 0;
       }
     }

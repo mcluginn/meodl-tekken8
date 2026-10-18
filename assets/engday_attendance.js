@@ -2685,9 +2685,13 @@
       const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
+      a.style.position = 'fixed';
+      a.style.top = '-9999px';
+      a.style.left = '-9999px';
+      a.style.opacity = '0';
+      a.style.pointerEvents = 'none';
       a.href = url;
       a.download = filename;
-      a.rel = 'noopener';
       document.body.appendChild(a);
 
       try {
