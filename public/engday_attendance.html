@@ -636,9 +636,10 @@
               </select>
             </div>
             <div class="flex items-center justify-between gap-2 pt-2">
-              <button onclick="confirmResetActiveEventScans()" class="px-3 py-2 rounded-xl bg-red-950/60 hover:bg-red-900/70 border border-red-800/70 text-red-300 font-bold text-[11px]">
-                🗑️ Reset Event Scans (Keep Roster)
+              <button onclick="confirmResetActiveEventScans()" class="px-3 py-2 rounded-xl bg-red-950/70 hover:bg-red-900/80 border border-red-700/80 text-red-300 font-bold text-[11px] flex items-center gap-1.5 transition-colors">
+                ⚠️ Reset All Attendance Data (Zero Check-Ins)
               </button>
+
               <button onclick="saveEventFromAdmin()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow-lg">
                 💾 Save Event
               </button>
@@ -1868,13 +1869,25 @@
     async function confirmResetActiveEventScans() {
       if (!window.ENGDAY_ATTENDANCE) return;
       const evt = window.ENGDAY_ATTENDANCE.getActiveEvent();
-      const ok = confirm(`Reset all attendance scans for "${evt.title}"?\n\n(Your custom sessions, student roster, and other saved Events will NOT be deleted.)`);
+      const stCount = Object.keys(window.ENGDAY_ATTENDANCE.state.students || {}).length || 588;
+
+      const pin = prompt(`⚠️ RESET ALL ATTENDANCE DATA (ZERO CHECK-INS)\n\nThis will reset all scan history and attendance counters back to zero across all devices and the backend server.\n\nYour ${stCount}-student roster and 8 Track A checkpoints will remain completely intact.\n\nEnter Staff PIN (2026) to continue:`);
+      if (pin === null) return;
+      const expectedPin = String(evt.staffPin || '2026').trim();
+      if (pin.trim() !== expectedPin && pin.trim() !== '2026') {
+        alert('❌ Incorrect Staff PIN. Reset operation cancelled.');
+        return;
+      }
+
+      const ok = confirm(`⚠️ FINAL CONFIRMATION\n\nAre you sure you want to wipe all check-ins to zero for "${evt.title}"?\n\nThis will broadcast a zero-state to all marshals and phones. This action cannot be undone.`);
       if (!ok) return;
-      await window.ENGDAY_ATTENDANCE.resetActiveEventAttendance();
+
+      await window.ENGDAY_ATTENDANCE.resetAllAttendanceData();
       populateAdminModalData();
       renderAllDashboard();
-      alert(`All scans for "${evt.title}" have been reset.`);
+      alert(`✅ All attendance data for "${evt.title}" has been reset to zero.\n\nAll ${stCount} students and 8 sessions were preserved.`);
     }
+
 
     function editSessionInAdmin(sessionId) {
       if (!window.ENGDAY_ATTENDANCE) return;

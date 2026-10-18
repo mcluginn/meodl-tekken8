@@ -17412,104 +17412,6 @@
             }
           }
         },
-        "custom_stu_999": {
-          "id": "custom_stu_999",
-          "code": "2026-CPE-999",
-          "name": "DELA CRUZ, ENGR",
-          "team": "cpe",
-          "teamName": "CPE (Computer Engineering)",
-          "studentCode": "2026-CPE-999",
-          "games": {
-            "d1-reg": {
-              "gameId": "d1-reg",
-              "status": "OUTSIDE",
-              "lastAction": null,
-              "checkInTime": null,
-              "checkOutTime": null,
-              "displayCheckIn": null,
-              "displayCheckOut": null,
-              "visits": 0,
-              "history": []
-            },
-            "d1-am-block": {
-              "gameId": "d1-am-block",
-              "status": "OUTSIDE",
-              "lastAction": null,
-              "checkInTime": null,
-              "checkOutTime": null,
-              "displayCheckIn": null,
-              "displayCheckOut": null,
-              "visits": 0,
-              "history": []
-            },
-            "d1-pm-block": {
-              "gameId": "d1-pm-block",
-              "status": "OUTSIDE",
-              "lastAction": null,
-              "checkInTime": null,
-              "checkOutTime": null,
-              "displayCheckIn": null,
-              "displayCheckOut": null,
-              "visits": 0,
-              "history": []
-            },
-            "d1-finals": {
-              "gameId": "d1-finals",
-              "status": "OUTSIDE",
-              "lastAction": null,
-              "checkInTime": null,
-              "checkOutTime": null,
-              "displayCheckIn": null,
-              "displayCheckOut": null,
-              "visits": 0,
-              "history": []
-            },
-            "d2-am-palaro": {
-              "gameId": "d2-am-palaro",
-              "status": "OUTSIDE",
-              "lastAction": null,
-              "checkInTime": null,
-              "checkOutTime": null,
-              "displayCheckIn": null,
-              "displayCheckOut": null,
-              "visits": 0,
-              "history": []
-            },
-            "d2-esports": {
-              "gameId": "d2-esports",
-              "status": "OUTSIDE",
-              "lastAction": null,
-              "checkInTime": null,
-              "checkOutTime": null,
-              "displayCheckIn": null,
-              "displayCheckOut": null,
-              "visits": 0,
-              "history": []
-            },
-            "d2-pageant": {
-              "gameId": "d2-pageant",
-              "status": "OUTSIDE",
-              "lastAction": null,
-              "checkInTime": null,
-              "checkOutTime": null,
-              "displayCheckIn": null,
-              "displayCheckOut": null,
-              "visits": 0,
-              "history": []
-            },
-            "d2-colorfest": {
-              "gameId": "d2-colorfest",
-              "status": "OUTSIDE",
-              "lastAction": null,
-              "checkInTime": null,
-              "checkOutTime": null,
-              "displayCheckIn": null,
-              "displayCheckOut": null,
-              "visits": 0,
-              "history": []
-            }
-          }
-        },
         "stu_2026-ece-777": {
           "id": "stu_2026-ece-777",
           "code": "2026-ECE-777",
@@ -57887,7 +57789,53 @@
           }
         }
       },
-      "updatedAt": "2026-10-18T16:08:53.359Z"
+      "updatedAt": "2026-10-18T19:51:34.854Z",
+      "lastResetTimestamp": "2026-10-18T19:51:34.854Z",
+      "resetSequence": 2,
+      "groups": [
+        {
+          "id": "ce",
+          "name": "CE (Civil Engineering)",
+          "shortCode": "CE",
+          "color": "cyan",
+          "hex": "#06b6d4"
+        },
+        {
+          "id": "ie",
+          "name": "IE (Industrial Engineering)",
+          "shortCode": "IE",
+          "color": "emerald",
+          "hex": "#10b981"
+        },
+        {
+          "id": "ee",
+          "name": "EE (Electrical Engineering)",
+          "shortCode": "EE",
+          "color": "orange",
+          "hex": "#f97316"
+        },
+        {
+          "id": "cpe",
+          "name": "CPE (Computer Engineering)",
+          "shortCode": "CPE",
+          "color": "purple",
+          "hex": "#a855f7"
+        },
+        {
+          "id": "ece",
+          "name": "ECE (Electronics Engineering)",
+          "shortCode": "ECE",
+          "color": "rose",
+          "hex": "#f43f5e"
+        },
+        {
+          "id": "me",
+          "name": "ME (Mechanical Engineering)",
+          "shortCode": "ME",
+          "color": "orange",
+          "hex": "#ea580c"
+        }
+      ]
     }
   },
   "students": {
@@ -74950,104 +74898,6 @@
       "team": "me",
       "teamName": "ME (Mechanical Engineering)",
       "studentCode": "MEODL-0175",
-      "games": {
-        "d1-reg": {
-          "gameId": "d1-reg",
-          "status": "OUTSIDE",
-          "lastAction": null,
-          "checkInTime": null,
-          "checkOutTime": null,
-          "displayCheckIn": null,
-          "displayCheckOut": null,
-          "visits": 0,
-          "history": []
-        },
-        "d1-am-block": {
-          "gameId": "d1-am-block",
-          "status": "OUTSIDE",
-          "lastAction": null,
-          "checkInTime": null,
-          "checkOutTime": null,
-          "displayCheckIn": null,
-          "displayCheckOut": null,
-          "visits": 0,
-          "history": []
-        },
-        "d1-pm-block": {
-          "gameId": "d1-pm-block",
-          "status": "OUTSIDE",
-          "lastAction": null,
-          "checkInTime": null,
-          "checkOutTime": null,
-          "displayCheckIn": null,
-          "displayCheckOut": null,
-          "visits": 0,
-          "history": []
-        },
-        "d1-finals": {
-          "gameId": "d1-finals",
-          "status": "OUTSIDE",
-          "lastAction": null,
-          "checkInTime": null,
-          "checkOutTime": null,
-          "displayCheckIn": null,
-          "displayCheckOut": null,
-          "visits": 0,
-          "history": []
-        },
-        "d2-am-palaro": {
-          "gameId": "d2-am-palaro",
-          "status": "OUTSIDE",
-          "lastAction": null,
-          "checkInTime": null,
-          "checkOutTime": null,
-          "displayCheckIn": null,
-          "displayCheckOut": null,
-          "visits": 0,
-          "history": []
-        },
-        "d2-esports": {
-          "gameId": "d2-esports",
-          "status": "OUTSIDE",
-          "lastAction": null,
-          "checkInTime": null,
-          "checkOutTime": null,
-          "displayCheckIn": null,
-          "displayCheckOut": null,
-          "visits": 0,
-          "history": []
-        },
-        "d2-pageant": {
-          "gameId": "d2-pageant",
-          "status": "OUTSIDE",
-          "lastAction": null,
-          "checkInTime": null,
-          "checkOutTime": null,
-          "displayCheckIn": null,
-          "displayCheckOut": null,
-          "visits": 0,
-          "history": []
-        },
-        "d2-colorfest": {
-          "gameId": "d2-colorfest",
-          "status": "OUTSIDE",
-          "lastAction": null,
-          "checkInTime": null,
-          "checkOutTime": null,
-          "displayCheckIn": null,
-          "displayCheckOut": null,
-          "visits": 0,
-          "history": []
-        }
-      }
-    },
-    "custom_stu_999": {
-      "id": "custom_stu_999",
-      "code": "2026-CPE-999",
-      "name": "DELA CRUZ, ENGR",
-      "team": "cpe",
-      "teamName": "CPE (Computer Engineering)",
-      "studentCode": "2026-CPE-999",
       "games": {
         "d1-reg": {
           "gameId": "d1-reg",
@@ -115516,6 +115366,11 @@
       }
     }
   },
-  "version": 2,
-  "lastUpdated": "2026-10-18T16:08:53.360Z"
+  "version": 22,
+  "lastUpdated": "2026-10-18T19:51:34.854Z",
+  "lastResetTimestamp": "2026-10-18T19:51:34.854Z",
+  "resetSequence": 2,
+  "auditLog": [],
+  "scanLogs": [],
+  "attendance": {}
 }

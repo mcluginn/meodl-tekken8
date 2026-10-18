@@ -1345,10 +1345,13 @@ export async function handleRequest(req, res) {
       stats: calculateEngDayStats(reqEventKey),
       eventsCount: activeEventsCount,
       totalEventsCount: engdayEvents.length,
+      lastResetTimestamp: (evtObj && evtObj.lastResetTimestamp) || engdayState.lastResetTimestamp || null,
+      resetSequence: (evtObj && evtObj.resetSequence) || engdayState.resetSequence || 0,
       version: engdayState.version || 1,
       lastUpdated: engdayState.lastUpdated
     });
   }
+
 
   if (reqPath === '/api/engday/attendance/config' && req.method === 'POST') {
     try {
@@ -1511,6 +1514,16 @@ export async function handleRequest(req, res) {
         ensureFullMasterRoster(targetEvt.students, getActiveSessionIdsForEvent(eventKey));
         ensureFullMasterRoster(engdayState.students, ENGDAY_GAMES_LIST);
 
+        // Discard any incoming events that occurred prior to an intentional administrative reset
+        if (targetEvt.lastResetTimestamp) {
+          const resetTime = new Date(targetEvt.lastResetTimestamp).getTime();
+          const evTime = new Date(ev.occurredAt).getTime();
+          if (evTime < resetTime) {
+            duplicate.push(eventId);
+            continue;
+          }
+        }
+
         let validStudentId = studentId;
         const lookupCode = String(studentId || ev.studentCode || '').trim().toUpperCase();
         if (targetEvt.students[lookupCode]) {
@@ -1623,8 +1636,9 @@ export async function handleRequest(req, res) {
 
       const targetEventKey = payload.eventKey || engdayState.activeEventId || 'engday_2026';
       const sessionFilter = payload.sessionId || null;
+      const nowIso = payload.resetTimestamp || new Date().toISOString();
 
-      // Filter out only events matching targetEventKey (and optional sessionFilter)
+      // Filter out events matching targetEventKey (and optional sessionFilter)
       engdayEvents = engdayEvents.filter(e => {
         const ek = e.eventKey || 'engday_2026';
         if (ek !== targetEventKey) return true;
@@ -1637,24 +1651,43 @@ export async function handleRequest(req, res) {
       });
 
       const sessionIds = getActiveSessionIdsForEvent(targetEventKey);
-      const evtObj = engdayState.eventsCatalog && engdayState.eventsCatalog[targetEventKey];
+      if (!engdayState.eventsCatalog) engdayState.eventsCatalog = {};
+      if (!engdayState.eventsCatalog[targetEventKey]) {
+        engdayState.eventsCatalog[targetEventKey] = {
+          id: targetEventKey,
+          title: targetEventKey === 'engday_2026' ? 'ENGINEERING DAYS 2026' : targetEventKey,
+          students: buildDefaultEngDayRoster(sessionIds),
+          sessions: DEFAULT_ENGDAY_SESSIONS,
+          groups: DEFAULT_ENGDAY_GROUPS,
+          updatedAt: nowIso
+        };
+      }
+      const evtObj = engdayState.eventsCatalog[targetEventKey];
+      if (!evtObj.students) evtObj.students = {};
+      ensureFullMasterRoster(evtObj.students, sessionIds);
+      ensureFullMasterRoster(engdayState.students, ENGDAY_GAMES_LIST);
 
-      if (evtObj && evtObj.students && payload.keepRoster !== false) {
-        Object.keys(evtObj.students).forEach(stId => {
+      // Re-derive or zero student records across active sessions
+      Object.keys(evtObj.students).forEach(stId => {
+        const remaining = engdayEvents.filter(e => e.studentId === stId && (e.eventKey || 'engday_2026') === targetEventKey);
+        evtObj.students[stId] = rederiveEngDayStudentState(evtObj.students[stId], remaining, sessionIds);
+      });
+
+      if (targetEventKey === (engdayState.activeEventId || 'engday_2026')) {
+        Object.keys(engdayState.students).forEach(stId => {
           const remaining = engdayEvents.filter(e => e.studentId === stId && (e.eventKey || 'engday_2026') === targetEventKey);
-          evtObj.students[stId] = rederiveEngDayStudentState(evtObj.students[stId], remaining, sessionIds);
+          engdayState.students[stId] = rederiveEngDayStudentState(engdayState.students[stId], remaining, ENGDAY_GAMES_LIST);
         });
-        evtObj.updatedAt = new Date().toISOString();
-        if (targetEventKey === (engdayState.activeEventId || 'engday_2026')) {
-          engdayState.students = evtObj.students;
-        }
-      } else if (targetEventKey === 'engday_2026') {
-        engdayState.students = buildDefaultEngDayRoster(sessionIds);
-        if (evtObj) evtObj.students = engdayState.students;
       }
 
-      engdayState.version = (engdayState.version || 1) + 1;
-      engdayState.lastUpdated = new Date().toISOString();
+      evtObj.lastResetTimestamp = nowIso;
+      evtObj.resetSequence = (evtObj.resetSequence || 0) + 1;
+      evtObj.updatedAt = nowIso;
+
+      engdayState.lastResetTimestamp = nowIso;
+      engdayState.resetSequence = (engdayState.resetSequence || 0) + 1;
+      engdayState.version = (engdayState.version || 1) + 10;
+      engdayState.lastUpdated = nowIso;
 
       atomicWriteJson(ENGDAY_EVENTS_FILE, engdayEvents);
       atomicWriteJson(ENGDAY_STATE_FILE, engdayState);
@@ -1663,13 +1696,18 @@ export async function handleRequest(req, res) {
       return sendJson(res, 200, {
         ok: true,
         message: `Attendance reset successful for ${targetEventKey}`,
-        serverTime: new Date().toISOString(),
+        serverTime: nowIso,
+        lastResetTimestamp: nowIso,
+        resetSequence: engdayState.resetSequence,
+        version: engdayState.version,
+        eventsCount: 0,
         stats: calculateEngDayStats(targetEventKey)
       });
     } catch (err) {
       return sendJson(res, 500, { ok: false, error: err.message });
     }
   }
+
 
   // -----------------------------------------------------------------------
   // STATIC ASSETS FILE SERVING (PRESERVED)

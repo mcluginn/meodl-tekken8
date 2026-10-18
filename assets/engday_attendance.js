@@ -2649,11 +2649,30 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
     // -------------------------------------------------------------------------
     // 8. EVENT-SCOPED RESET & RE-DERIVATION (SAFEGUARD 2)
     // -------------------------------------------------------------------------
-    async resetActiveEventAttendance(sessionIdFilter = null) {
+    async resetAllAttendanceData(sessionIdFilter = null) {
       this.ensureEventsCatalogStructure();
-      await this.db.clearEventsForEventKey(this.activeEventId, sessionIdFilter);
+      const targetEventKey = this.activeEventId || 'engday_2026';
+      const nowIso = new Date().toISOString();
 
-      Object.values(this.state.students || {}).forEach(s => {
+      // 1. Clear IndexedDB stores & localStorage event outboxes
+      await this.db.clearEventsForEventKey(targetEventKey, sessionIdFilter);
+
+      // 2. Clear state scan logs, audit log, and attendance map
+      if (sessionIdFilter) {
+        this.state.auditLog = (this.state.auditLog || []).filter(l => l.gameId !== sessionIdFilter);
+        if (Array.isArray(this.state.scanLogs)) {
+          this.state.scanLogs = this.state.scanLogs.filter(l => l.gameId !== sessionIdFilter);
+        }
+      } else {
+        this.state.auditLog = [];
+        this.state.scanLogs = [];
+        this.state.attendance = {};
+      }
+
+      // 3. Reset student records back to zero (OUTSIDE, 0 visits, null timestamps, empty history)
+      const targetStudents = this.state.students || {};
+      Object.values(targetStudents).forEach(s => {
+        if (!s) return;
         if (!s.games) s.games = this.createEmptyGamesRecord();
         if (sessionIdFilter) {
           s.games[sessionIdFilter] = {
@@ -2672,16 +2691,46 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         }
       });
 
-      if (sessionIdFilter) {
-        this.state.auditLog = (this.state.auditLog || []).filter(l => l.gameId !== sessionIdFilter);
-      } else {
-        this.state.auditLog = [];
+      // Also reset in active catalog event if separated
+      if (this.state.eventsCatalog && this.state.eventsCatalog[targetEventKey]?.students) {
+        Object.values(this.state.eventsCatalog[targetEventKey].students).forEach(s => {
+          if (!s) return;
+          if (!s.games) s.games = this.createEmptyGamesRecord();
+          if (sessionIdFilter) {
+            s.games[sessionIdFilter] = {
+              gameId: sessionIdFilter,
+              status: 'OUTSIDE',
+              lastAction: null,
+              checkInTime: null,
+              checkOutTime: null,
+              displayCheckIn: null,
+              displayCheckOut: null,
+              visits: 0,
+              history: []
+            };
+          } else {
+            s.games = this.createEmptyGamesRecord();
+          }
+        });
       }
 
-      this.save();
+      // 4. Ensure all ~588 master students remain 100% intact
+      this.ensureFullMasterRoster(this.state.students);
+      this.reconcileStudentGamesStructure();
+      this.reconcileGroupsFromStudents();
+
+      // 5. Update reset metadata & increment version
+      this.state.lastResetTimestamp = nowIso;
+      this.state.resetSequence = (this.state.resetSequence || 0) + 1;
+      this.state.version = (this.state.version || 1) + 10;
+      this.state.lastUpdated = nowIso;
+      this.lastSyncedServerVersion = this.state.version;
+
+      // 6. Save locally
+      this.save({ preserveVersion: true });
       await this.updatePendingCount();
 
-      // Sync reset to server if online
+      // 7. Sync reset to server if online
       if (typeof navigator === 'undefined' || navigator.onLine !== false) {
         try {
           const resetUrl = this.resolveApiUrl('/api/engday/attendance/reset');
@@ -2690,17 +2739,29 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               confirmation: 'RESET_ENGDAY_ATTENDANCE',
-              eventKey: this.activeEventId,
+              eventKey: targetEventKey,
               sessionId: sessionIdFilter || null,
-              keepRoster: true
+              resetAll: !sessionIdFilter,
+              keepRoster: true,
+              resetTimestamp: nowIso,
+              resetSequence: this.state.resetSequence
             })
           });
-        } catch (e) {}
+          this.serverOnline = true;
+          this.lastSyncTime = formatManilaTime(new Date());
+        } catch (e) {
+          console.warn('[EngDay Reset] Server sync failed (will retry on next sync):', e);
+        }
       }
 
-
-      return { success: true };
+      this.notify();
+      return { success: true, timestamp: nowIso, resetSequence: this.state.resetSequence };
     }
+
+    async resetActiveEventAttendance(sessionIdFilter = null) {
+      return this.resetAllAttendanceData(sessionIdFilter);
+    }
+
 
     async rederiveAllStatesFromDb() {
       const allEvents = await this.db.getAllEvents();
@@ -4077,9 +4138,60 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       const incomingStudents = (serverState.eventsCatalog && serverState.eventsCatalog[this.activeEventId]?.students)
         || (this.activeEventId === 'engday_2026' ? serverState.students : null);
 
+      // Check if server performed an intentional administrative attendance reset to zero
+      const serverResetTime = serverState.lastResetTimestamp ? new Date(serverState.lastResetTimestamp).getTime() : 0;
+      const localResetTime = this.state.lastResetTimestamp ? new Date(this.state.lastResetTimestamp).getTime() : 0;
+      const isNewServerReset = (serverResetTime > 0 && serverResetTime > localResetTime) ||
+        ((serverState.resetSequence || 0) > (this.state.resetSequence || 0));
+
+      if (isNewServerReset) {
+        console.info(`[EngDay Reset] Server broadcasted zero-reset from ${serverState.lastResetTimestamp}. Wiping local attendance to 0...`);
+        await this.db.clearEventsForEventKey(this.activeEventId);
+        this.state.auditLog = [];
+        this.state.scanLogs = [];
+        this.state.attendance = {};
+
+        // Directly adopt clean reset student records
+        if (incomingStudents && typeof incomingStudents === 'object') {
+          const resetStudents = {};
+          Object.entries(incomingStudents).forEach(([sId, sObj]) => {
+            resetStudents[sId] = {
+              ...sObj,
+              games: this.createEmptyGamesRecord()
+            };
+          });
+          this.state.students = resetStudents;
+          if (this.state.eventsCatalog[this.activeEventId]) {
+            this.state.eventsCatalog[this.activeEventId].students = resetStudents;
+          }
+        } else {
+          Object.values(this.state.students || {}).forEach(s => {
+            if (s) s.games = this.createEmptyGamesRecord();
+          });
+        }
+
+        this.ensureFullMasterRoster(this.state.students);
+        this.reconcileStudentGamesStructure();
+        this.reconcileGroupsFromStudents();
+
+        this.state.lastResetTimestamp = serverState.lastResetTimestamp;
+        this.state.resetSequence = serverState.resetSequence || 0;
+        this.state.version = Math.max(this.state.version || 1, serverVer);
+        this.lastSyncedServerVersion = this.state.version;
+        this.state.lastUpdated = serverState.lastUpdated || new Date().toISOString();
+        this.serverOnline = true;
+        this.lastSyncTime = formatManilaTime(new Date());
+
+        this.save({ preserveVersion: true });
+        await this.updatePendingCount();
+        this.notify();
+        return;
+      }
+
       // Count local vs server scan events & visits BEFORE overwriting so we can detect Vercel cold-starts
       const localEvents = await this.collectAllLocalEventsForEvent(this.activeEventId);
       const localStudentsMap = this.state.students || {};
+
       const localStudentCount = Object.keys(localStudentsMap).length;
       const incomingStudentCount = incomingStudents ? Object.keys(incomingStudents).length : 0;
 
