@@ -3024,19 +3024,122 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       return csv;
     }
 
+    exportAttendanceReportCSV() {
+      if (typeof this.ensureFullMasterRoster === 'function') {
+        this.ensureFullMasterRoster(this.state.students);
+      }
+
+      const students = Object.values(this.state.students || {});
+      const games = (this.games && this.games.length) ? this.games : ENGDAY_GAMES;
+
+      // Sort students by Department (CE, CPE, EE, ECE, IE, ME) then by student code
+      const deptOrder = { CE: 1, CPE: 2, EE: 3, ECE: 4, IE: 5, ME: 6 };
+      students.sort((a, b) => {
+        const teamA = String(a.team || '').toUpperCase();
+        const teamB = String(b.team || '').toUpperCase();
+        const orderA = deptOrder[teamA] || 99;
+        const orderB = deptOrder[teamB] || 99;
+        if (orderA !== orderB) return orderA - orderB;
+        const codeA = String(a.studentCode || a.code || a.id || '').toUpperCase();
+        const codeB = String(b.studentCode || b.code || b.id || '').toUpperCase();
+        return codeA.localeCompare(codeB, undefined, { numeric: true });
+      });
+
+      const escapeCsv = (val) => {
+        if (val === null || val === undefined) return '""';
+        return `"${String(val).replace(/"/g, '""')}"`;
+      };
+
+      // Header row: Student ID, Full Name, Department/Group, [8 Track A Checkpoints], Total Minutes Inside
+      const headerCols = ['Student ID', 'Full Name', 'Department/Group'];
+      games.forEach(g => {
+        const cleanLabel = String(g.shortName || g.name || g.id).replace(/"/g, '""');
+        headerCols.push(`${cleanLabel} Status`);
+      });
+      headerCols.push('Total Minutes Inside');
+
+      let csv = headerCols.map(escapeCsv).join(',') + '\r\n';
+
+      // Rows for all 588 students
+      students.forEach(s => {
+        const studentId = s.studentCode || s.code || s.id || '';
+        const fullName = s.name || '';
+        const deptGroup = (s.team || '').toUpperCase();
+
+        const rowCols = [
+          escapeCsv(studentId),
+          escapeCsv(fullName),
+          escapeCsv(deptGroup)
+        ];
+
+        let totalMinutesInside = 0;
+
+        games.forEach(g => {
+          const gr = (s.games && s.games[g.id]) || {};
+          const ds = this.getSessionDwellStats(s, g.id, {
+            minMinutesRequired: g.mode === 'check_in_only' ? 0 : 45
+          });
+          const dwellMins = Number(ds.dwellMinutes) || 0;
+          totalMinutesInside += dwellMins;
+
+          let status = 'ABSENT';
+          if (gr.status === 'INSIDE') {
+            status = 'INSIDE';
+          } else if (gr.visits > 0 || ds.hasScanned) {
+            if (g.mode === 'check_in_only' || ds.creditStatus === 'VERIFIED') {
+              status = 'VERIFIED';
+            } else {
+              status = 'UNDER_TIME';
+            }
+          } else {
+            status = 'ABSENT';
+          }
+
+          rowCols.push(escapeCsv(status));
+        });
+
+        rowCols.push(totalMinutesInside);
+        csv += rowCols.join(',') + '\r\n';
+      });
+
+      return csv;
+    }
+
+    downloadAttendanceReportCSV(filename = 'Engineering_Days_2026_Attendance_Report.csv') {
+      const csv = this.exportAttendanceReportCSV();
+      const targetFilename = filename || 'Engineering_Days_2026_Attendance_Report.csv';
+      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = targetFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      return targetFilename;
+    }
+
     downloadCSV(gameIdFilter = null) {
+      if (!gameIdFilter) {
+        return this.downloadAttendanceReportCSV();
+      }
       const csv = this.exportCSV(gameIdFilter);
       const evtSlug = slugify(this.getActiveEvent().title, 'Attendance');
-      const tag = gameIdFilter ? `_${gameIdFilter.toUpperCase()}` : '_ALL_SESSIONS';
+      const tag = `_${gameIdFilter.toUpperCase()}`;
       const filename = `${evtSlug}${tag}_${new Date().toISOString().slice(0, 10)}.csv`;
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      return filename;
     }
 
     exportJSON() {
