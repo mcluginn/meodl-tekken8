@@ -83,18 +83,13 @@
       position: relative;
       width: 100% !important;
       height: 100% !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
       overflow: hidden;
       border-radius: 1rem;
       background-color: #000;
     }
     #reader video {
-      max-width: 100% !important;
-      max-height: 100% !important;
-      width: auto !important;
-      height: auto !important;
+      width: 100% !important;
+      height: 100% !important;
       object-fit: contain !important;
       border-radius: 1rem !important;
     }
@@ -1382,6 +1377,10 @@
           video.playsInline = true;
           video.muted = true;
           video.autoplay = true;
+          video.style.width = '100%';
+          video.style.height = '100%';
+          video.style.objectFit = 'contain';
+          video.style.display = 'block';
           if (video.hasAttribute('controls')) video.removeAttribute('controls');
           if (video.paused) {
             video.play().catch(() => {});
@@ -1457,12 +1456,6 @@
       if (currentZoom > 1.0) {
         applyZoom(currentZoom);
       }
-
-      if (typeof Html5Qrcode.getCameras === 'function') {
-        Html5Qrcode.getCameras().then(devices => {
-          if (devices && devices.length) camerasList = devices;
-        }).catch(() => {});
-      }
     }
 
     async function stopAndClearScanner() {
@@ -1488,25 +1481,8 @@
 
     async function requestCameraPermissionAndStart() {
       const msgEl = document.getElementById('cam-fallback-msg');
-      if (msgEl) msgEl.textContent = 'Requesting camera access...';
-
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: 'environment' },
-            audio: false
-          });
-          stream.getTracks().forEach(t => t.stop());
-        } catch (err) {
-          try {
-            const stream2 = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-            stream2.getTracks().forEach(t => t.stop());
-          } catch (err2) {
-            if (msgEl) msgEl.textContent = 'Camera permission blocked. Tap "Try Camera Again" or allow camera in browser settings.';
-            return;
-          }
-        }
-      }
+      if (msgEl) msgEl.textContent = 'Starting camera stream...';
+      document.getElementById('cam-fallback')?.classList.add('hidden');
       startScanner();
     }
 
@@ -1521,15 +1497,28 @@
         return;
       }
 
+      // Check for In-App browser (Messenger, Instagram, Facebook on iOS)
+      const ua = navigator.userAgent || '';
+      const isIOSDevice = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isInApp = isIOSDevice && /FBAN|FBAV|Instagram|Messenger|Line|MicroMessenger|Discord|Viber/i.test(ua);
+      if (isInApp) {
+        const msgEl = document.getElementById('cam-fallback-msg');
+        if (msgEl) msgEl.innerHTML = '⚠️ Opened inside In-App Browser (Messenger/FB).<br>Apple blocks camera in In-App WebViews.<br><span class="text-amber-300 font-bold">Tap ••• at top-right & select "Open in Safari"</span>';
+        document.getElementById('cam-fallback')?.classList.remove('hidden');
+        return;
+      }
+
+      // Check if mediaDevices.getUserMedia is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        const msgEl = document.getElementById('cam-fallback-msg');
+        if (msgEl) msgEl.innerHTML = 'Camera API not supported or blocked by browser.<br>Ensure site is opened in <strong>Safari (HTTPS)</strong>.';
+        document.getElementById('cam-fallback')?.classList.remove('hidden');
+        return;
+      }
+
       // Always launch environment (back) camera directly across mobile devices (iOS Safari & Android)
       currentCameraId = null;
       launchCamera({ facingMode: "environment" });
-
-      if (typeof Html5Qrcode.getCameras === 'function') {
-        Html5Qrcode.getCameras().then(devices => {
-          if (devices && devices.length) camerasList = devices;
-        }).catch(() => {});
-      }
     }
 
     async function launchCamera(cameraConfig) {
@@ -1581,12 +1570,13 @@
             console.error('All camera launch attempts failed:', err3);
             const msgEl = document.getElementById('cam-fallback-msg');
             if (msgEl) {
-              if (err3 && (err3.name === 'NotAllowedError' || String(err3).includes('Permission'))) {
-                msgEl.textContent = 'Camera Permission Denied. Please allow camera in browser address bar.';
-              } else if (err3 && (err3.name === 'NotFoundError' || String(err3).includes('DevicesNotFoundError'))) {
+              const errStr = String((err3 && (err3.message || err3.name)) || err3);
+              if (err3 && (err3.name === 'NotAllowedError' || errStr.includes('Permission'))) {
+                msgEl.textContent = 'Camera Permission Denied. Tap "aA" in Safari address bar and select "Allow Camera".';
+              } else if (err3 && (err3.name === 'NotFoundError' || errStr.includes('DevicesNotFoundError'))) {
                 msgEl.textContent = 'No Camera Device Detected';
               } else {
-                msgEl.textContent = 'Unable to Start Camera Stream (' + (err3 && err3.name ? err3.name : 'Tap Try Camera Again') + ')';
+                msgEl.textContent = 'Camera Error: ' + errStr + ' (Tap "Try Camera Again")';
               }
             }
             document.getElementById('cam-fallback')?.classList.remove('hidden');
