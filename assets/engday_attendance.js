@@ -211,12 +211,12 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
   ];
 
   const DEFAULT_GROUPS = [
-    { id: 'ie', name: 'IE (Industrial Engineering)', shortCode: 'IE', color: 'amber', hex: '#f59e0b' },
-    { id: 'me', name: 'ME (Mechanical Engineering)', shortCode: 'ME', color: 'red', hex: '#ef4444' },
-    { id: 'ce', name: 'CE (Civil Engineering)', shortCode: 'CE', color: 'cyan', hex: '#06b6d4' },
-    { id: 'ee', name: 'EE (Electrical Engineering)', shortCode: 'EE', color: 'emerald', hex: '#10b981' },
-    { id: 'ece', name: 'ECE (Electronics Engineering)', shortCode: 'ECE', color: 'violet', hex: '#8b5cf6' },
-    { id: 'cpe', name: 'CPE (Computer Engineering)', shortCode: 'CPE', color: 'sky', hex: '#0ea5e9' }
+    { id: 'ce', name: 'CE (Civil Engineering)', shortCode: 'CE', color: 'yellow', hex: '#facc15' },
+    { id: 'cpe', name: 'CPE (Computer Engineering)', shortCode: 'CPE', color: 'pink', hex: '#f472b6' },
+    { id: 'ee', name: 'EE (Electrical Engineering)', shortCode: 'EE', color: 'zinc', hex: '#27272a' },
+    { id: 'ece', name: 'ECE (Electronics Engineering)', shortCode: 'ECE', color: 'red', hex: '#ef4444' },
+    { id: 'ie', name: 'IE (Industrial Engineering)', shortCode: 'IE', color: 'emerald', hex: '#10b981' },
+    { id: 'me', name: 'ME (Mechanical Engineering)', shortCode: 'ME', color: 'blue', hex: '#3b82f6' }
   ];
 
   const ENGDAY_GAMES = [
@@ -919,7 +919,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         id: 'engday_2026',
         schemaVersion: SCHEMA_VERSION,
         title: 'ENGINEERING DAYS 2026',
-        subtitle: 'UPHSD Calamba • College of Engineering (Oct 19–20, 2026)',
+        subtitle: 'UPHSD CALAMBA • ENGINEERING STUDENT COUNCIL • OCT 19–20, 2026 (7:30 AM – 8:00 PM) • UPHSD GYMNASIUM / OVAL',
         venueName: 'Gymnasium / Oval & Engineering Labs',
         staffPin: '2026',
         groups: DEFAULT_GROUPS.map(g => ({ ...g })),
@@ -1121,8 +1121,8 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           if (!defEvt.title || defEvt.title === 'Engineering Day 2026') {
             defEvt.title = 'ENGINEERING DAYS 2026';
           }
-          if (!defEvt.subtitle || defEvt.subtitle === 'Sports & Venue Attendance') {
-            defEvt.subtitle = 'UPHSD Calamba • College of Engineering (Oct 19–20, 2026)';
+          if (!defEvt.subtitle || defEvt.subtitle.includes('Sports') || defEvt.subtitle.includes('College of Engineering')) {
+            defEvt.subtitle = 'UPHSD CALAMBA • ENGINEERING STUDENT COUNCIL • OCT 19–20, 2026 (7:30 AM – 8:00 PM) • UPHSD GYMNASIUM / OVAL';
           }
           if (!defEvt.venueName || defEvt.venueName === 'UPHSD Gymnasium & Courts') {
             defEvt.venueName = 'Gymnasium / Oval & Engineering Labs';
@@ -1455,19 +1455,149 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       const norm = normalizeGroupProgramKey(raw);
       const key = norm.id;
 
-      // Official 6 Engineering Programs (Distinct High-Contrast Badge Colors)
-      if (key === 'ie') return { id: 'ie', name: 'IE (Industrial Engineering)', shortCode: 'IE', ...GROUP_COLOR_PALETTE[0] };
-      if (key === 'me') return { id: 'me', name: 'ME (Mechanical Engineering)', shortCode: 'ME', ...GROUP_COLOR_PALETTE[1] };
-      if (key === 'ce') return { id: 'ce', name: 'CE (Civil Engineering)', shortCode: 'CE', ...GROUP_COLOR_PALETTE[2] };
-      if (key === 'ee') return { id: 'ee', name: 'EE (Electrical Engineering)', shortCode: 'EE', ...GROUP_COLOR_PALETTE[3] };
-      if (key === 'ece') return { id: 'ece', name: 'ECE (Electronics Engineering)', shortCode: 'ECE', ...GROUP_COLOR_PALETTE[4] };
-      if (key === 'cpe') return { id: 'cpe', name: 'CPE (Computer Engineering)', shortCode: 'CPE', ...GROUP_COLOR_PALETTE[5] };
+      // Official 6 Engineering Programs (Official Color Coding Attire: CE-Yellow, CPE-Pink, EE-Black, ECE-Red, IE-Green, ME-Blue)
+      if (key === 'ce') {
+        return {
+          id: 'ce',
+          name: 'CE (Civil Engineering)',
+          shortCode: 'CE',
+          color: 'yellow',
+          hex: '#facc15',
+          badgeClass: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/50',
+          bgClass: 'bg-yellow-950/25',
+          borderClass: 'border-yellow-400/50',
+          textClass: 'text-yellow-300',
+          barClass: 'bg-yellow-400'
+        };
+      }
+      if (key === 'cpe') {
+        return {
+          id: 'cpe',
+          name: 'CPE (Computer Engineering)',
+          shortCode: 'CPE',
+          color: 'pink',
+          hex: '#f472b6',
+          badgeClass: 'bg-pink-500/20 text-pink-300 border-pink-400/50',
+          bgClass: 'bg-pink-950/25',
+          borderClass: 'border-pink-400/50',
+          textClass: 'text-pink-300',
+          barClass: 'bg-pink-400'
+        };
+      }
+      if (key === 'ee') {
+        return {
+          id: 'ee',
+          name: 'EE (Electrical Engineering)',
+          shortCode: 'EE',
+          color: 'zinc',
+          hex: '#27272a',
+          badgeClass: 'bg-zinc-950 text-zinc-100 border-zinc-400',
+          bgClass: 'bg-zinc-900/60',
+          borderClass: 'border-zinc-400',
+          textClass: 'text-zinc-100',
+          barClass: 'bg-zinc-400'
+        };
+      }
+      if (key === 'ece') {
+        return {
+          id: 'ece',
+          name: 'ECE (Electronics Engineering)',
+          shortCode: 'ECE',
+          color: 'red',
+          hex: '#ef4444',
+          badgeClass: 'bg-red-600/25 text-red-300 border-red-500/60',
+          bgClass: 'bg-red-950/25',
+          borderClass: 'border-red-500/60',
+          textClass: 'text-red-300',
+          barClass: 'bg-red-500'
+        };
+      }
+      if (key === 'ie') {
+        return {
+          id: 'ie',
+          name: 'IE (Industrial Engineering)',
+          shortCode: 'IE',
+          color: 'emerald',
+          hex: '#10b981',
+          badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50',
+          bgClass: 'bg-emerald-950/25',
+          borderClass: 'border-emerald-400/50',
+          textClass: 'text-emerald-300',
+          barClass: 'bg-emerald-500'
+        };
+      }
+      if (key === 'me') {
+        return {
+          id: 'me',
+          name: 'ME (Mechanical Engineering)',
+          shortCode: 'ME',
+          color: 'blue',
+          hex: '#3b82f6',
+          badgeClass: 'bg-blue-600/25 text-blue-300 border-blue-400/60',
+          bgClass: 'bg-blue-950/25',
+          borderClass: 'border-blue-400/60',
+          textClass: 'text-blue-300',
+          barClass: 'bg-blue-500'
+        };
+      }
 
-      // Preserve classic 4 house colors as fallback
-      if (key === 'rankine') return { id: 'rankine', name: 'TEAM RANKINE', shortCode: 'R', ...GROUP_COLOR_PALETTE[1] };
-      if (key === 'otto') return { id: 'otto', name: 'TEAM OTTO', shortCode: 'O', ...GROUP_COLOR_PALETTE[0] };
-      if (key === 'brayton') return { id: 'brayton', name: 'TEAM BRAYTON', shortCode: 'B', ...GROUP_COLOR_PALETTE[2] };
-      if (key === 'diesel') return { id: 'diesel', name: 'TEAM DIESEL', shortCode: 'D', ...GROUP_COLOR_PALETTE[3] };
+      // Preserve classic 4 house colors as fallback (mapped to official attire)
+      if (key === 'rankine') {
+        return {
+          id: 'rankine',
+          name: 'TEAM RANKINE',
+          shortCode: 'R',
+          color: 'blue',
+          hex: '#3b82f6',
+          badgeClass: 'bg-blue-600/25 text-blue-300 border-blue-400/60',
+          bgClass: 'bg-blue-950/25',
+          borderClass: 'border-blue-400/60',
+          textClass: 'text-blue-300',
+          barClass: 'bg-blue-500'
+        };
+      }
+      if (key === 'otto') {
+        return {
+          id: 'otto',
+          name: 'TEAM OTTO',
+          shortCode: 'O',
+          color: 'yellow',
+          hex: '#facc15',
+          badgeClass: 'bg-yellow-500/20 text-yellow-300 border-yellow-400/50',
+          bgClass: 'bg-yellow-950/25',
+          borderClass: 'border-yellow-400/50',
+          textClass: 'text-yellow-300',
+          barClass: 'bg-yellow-400'
+        };
+      }
+      if (key === 'brayton') {
+        return {
+          id: 'brayton',
+          name: 'TEAM BRAYTON',
+          shortCode: 'B',
+          color: 'red',
+          hex: '#ef4444',
+          badgeClass: 'bg-red-600/25 text-red-300 border-red-500/60',
+          bgClass: 'bg-red-950/25',
+          borderClass: 'border-red-500/60',
+          textClass: 'text-red-300',
+          barClass: 'bg-red-500'
+        };
+      }
+      if (key === 'diesel') {
+        return {
+          id: 'diesel',
+          name: 'TEAM DIESEL',
+          shortCode: 'D',
+          color: 'emerald',
+          hex: '#10b981',
+          badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-400/50',
+          bgClass: 'bg-emerald-950/25',
+          borderClass: 'border-emerald-400/50',
+          textClass: 'text-emerald-300',
+          barClass: 'bg-emerald-500'
+        };
+      }
 
       const evt = this.state.eventsCatalog?.[this.activeEventId];
       const foundIdx = evt && Array.isArray(evt.groups) ? evt.groups.findIndex(g => String(g.id).toLowerCase() === key) : -1;

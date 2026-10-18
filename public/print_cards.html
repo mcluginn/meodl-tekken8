@@ -101,12 +101,12 @@
           <span class="text-zinc-400">Team:</span>
           <select id="team-filter" onchange="renderSheets()" class="bg-transparent text-white font-bold focus:outline-none">
             <option value="all" class="bg-zinc-900 text-white">All Teams (588 Cards)</option>
-            <option value="me" class="bg-zinc-900 text-red-400">ME (175 Cards)</option>
-            <option value="ee" class="bg-zinc-900 text-emerald-400">EE (92 Cards)</option>
-            <option value="cpe" class="bg-zinc-900 text-sky-400">CPE (60 Cards)</option>
-            <option value="ece" class="bg-zinc-900 text-violet-400">ECE (10 Cards)</option>
-            <option value="ie" class="bg-zinc-900 text-amber-400">IE (97 Cards)</option>
-            <option value="ce" class="bg-zinc-900 text-cyan-400">CE (152 Cards)</option>
+            <option value="ce" class="bg-zinc-900 text-yellow-400">CE (152 Cards)</option>
+            <option value="cpe" class="bg-zinc-900 text-pink-400">CPE (60 Cards)</option>
+            <option value="ee" class="bg-zinc-900 text-zinc-300">EE (92 Cards)</option>
+            <option value="ece" class="bg-zinc-900 text-red-400">ECE (10 Cards)</option>
+            <option value="ie" class="bg-zinc-900 text-emerald-400">IE (97 Cards)</option>
+            <option value="me" class="bg-zinc-900 text-blue-400">ME (175 Cards)</option>
           </select>
         </div>
 
@@ -155,15 +155,16 @@
       container.innerHTML = '';
 
       const teamColors = {
-        ee: { badge: 'bg-emerald-100 text-emerald-800 border-emerald-300', header: 'bg-emerald-700 text-white', accent: '#047857' },
-        cpe: { badge: 'bg-sky-100 text-sky-800 border-sky-300', header: 'bg-sky-700 text-white', accent: '#0284c7' },
-        ece: { badge: 'bg-violet-100 text-violet-800 border-violet-300', header: 'bg-violet-700 text-white', accent: '#7c3aed' },
-        ie: { badge: 'bg-amber-100 text-amber-800 border-amber-300', header: 'bg-amber-600 text-white', accent: '#d97706' },
-        ce: { badge: 'bg-cyan-100 text-cyan-800 border-cyan-300', header: 'bg-cyan-700 text-white', accent: '#0e7490' },
-        rankine: { badge: 'bg-red-100 text-red-800 border-red-300', header: 'bg-red-700 text-white', accent: '#b91c1c' },
-        otto: { badge: 'bg-amber-100 text-amber-800 border-amber-300', header: 'bg-amber-600 text-white', accent: '#d97706' },
-        brayton: { badge: 'bg-cyan-100 text-cyan-800 border-cyan-300', header: 'bg-cyan-700 text-white', accent: '#0e7490' },
-        diesel: { badge: 'bg-emerald-100 text-emerald-800 border-emerald-300', header: 'bg-emerald-700 text-white', accent: '#047857' }
+        ce: { badge: 'bg-yellow-100 text-yellow-800 border-yellow-300', header: 'bg-yellow-600 text-white', accent: '#ca8a04' },
+        cpe: { badge: 'bg-pink-100 text-pink-800 border-pink-300', header: 'bg-pink-600 text-white', accent: '#db2777' },
+        ee: { badge: 'bg-zinc-900 text-white border-zinc-700', header: 'bg-zinc-900 text-white', accent: '#18181b' },
+        ece: { badge: 'bg-red-100 text-red-800 border-red-300', header: 'bg-red-700 text-white', accent: '#dc2626' },
+        ie: { badge: 'bg-emerald-100 text-emerald-800 border-emerald-300', header: 'bg-emerald-700 text-white', accent: '#059669' },
+        me: { badge: 'bg-blue-100 text-blue-800 border-blue-300', header: 'bg-blue-700 text-white', accent: '#2563eb' },
+        rankine: { badge: 'bg-blue-100 text-blue-800 border-blue-300', header: 'bg-blue-700 text-white', accent: '#2563eb' },
+        otto: { badge: 'bg-yellow-100 text-yellow-800 border-yellow-300', header: 'bg-yellow-600 text-white', accent: '#ca8a04' },
+        brayton: { badge: 'bg-red-100 text-red-800 border-red-300', header: 'bg-red-700 text-white', accent: '#dc2626' },
+        diesel: { badge: 'bg-emerald-100 text-emerald-800 border-emerald-300', header: 'bg-emerald-700 text-white', accent: '#059669' }
       };
 
       for (let sIdx = 0; sIdx < totalSheets; sIdx++) {
@@ -183,10 +184,10 @@
                   <!-- Header Banner -->
                   <div class="flex items-center justify-between border-b pb-1.5 mb-1.5">
                     <div class="flex items-center gap-1.5">
-                      <img src="./assets/mes_logo.png" alt="MES Seal" class="w-6 h-6 rounded-full border bg-white" />
+                      <img src="assets/esc_logo.jpg" alt="ESC Logo" class="w-8 h-8 rounded-lg object-cover border border-amber-500/40 shadow-sm shrink-0" />
                       <div>
-                        <span class="text-[8px] font-mono tracking-widest text-zinc-500 block uppercase leading-none">MEODL 2026</span>
-                        <span class="text-[10px] font-bold text-zinc-900 font-mono tracking-wider block leading-tight uppercase">UPHSD DALTA</span>
+                        <span class="text-[8px] font-mono tracking-widest text-zinc-500 block uppercase leading-none">ESC • UPHSD</span>
+                        <span class="text-[10px] font-bold text-zinc-900 font-mono tracking-wider block leading-tight uppercase">ENG DAYS 2026</span>
                       </div>
                     </div>
                     <span class="text-[9px] font-mono font-bold px-2 py-0.5 rounded border uppercase ${tc.badge}">

@@ -24,8 +24,10 @@
               mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
             },
             colors: {
-              obsidian: '#09090b',
-              cardBg: '#111317'
+              obsidian: '#140b09',
+              cardBg: '#1c100d',
+              carnivalDark: '#140b09',
+              carnivalSurface: '#1c100d'
             }
           }
         }
@@ -42,7 +44,10 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background-color: #09090b;
+      background-color: #140b09;
+      background-image: 
+        radial-gradient(circle at 50% -10%, rgba(220, 38, 38, 0.14), transparent 60%),
+        radial-gradient(circle at 50% 10%, rgba(245, 158, 11, 0.12), transparent 50%);
       color: #f4f4f5;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
@@ -77,25 +82,26 @@
   <!-- ================================================================= -->
   <!-- TOP NAVIGATION BAR (UNIFIED STYLING WITH SCANNER) -->
   <!-- ================================================================= -->
-  <header class="no-print sticky top-0 z-40 bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-800/80 px-4 py-3 shadow-xl">
+  <header class="no-print sticky top-0 z-40 bg-[#140b09]/95 backdrop-blur-xl border-b border-amber-500/30 px-4 py-3 shadow-xl shadow-black/60">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
       
       <!-- Left: Brand + Dynamic Event Selector -->
       <div class="flex items-center gap-3">
-        <a href="index.html" class="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono font-bold text-zinc-300 flex items-center gap-1.5 transition-colors">
+        <a href="index.html" class="px-3 py-1.5 rounded-xl bg-[#1c100d] hover:bg-[#2a1713] border border-amber-500/30 text-xs font-mono font-bold text-amber-200 flex items-center gap-1.5 transition-colors">
           <span>↩</span> HUB
         </a>
-        <button onclick="openAdminSetupModal('events')" class="flex items-center gap-2.5 text-left px-2.5 py-1 rounded-xl hover:bg-zinc-900 border border-transparent hover:border-zinc-800 transition-all group" title="Switch or Configure Event">
-          <img src="./assets/mes_logo.png" alt="Logo" class="w-8 h-8 rounded-full bg-white p-0.5 shrink-0" onerror="this.style.display='none'" />
+        <button onclick="openAdminSetupModal('events')" class="flex items-center gap-2.5 text-left px-2.5 py-1 rounded-xl hover:bg-[#1c100d] border border-transparent hover:border-amber-500/30 transition-all group" title="Switch or Configure Event">
+          <img src="assets/esc_logo.jpg" alt="ESC Logo" class="w-10 h-10 rounded-lg object-cover border border-amber-500/40 shadow-md shrink-0">
           <div>
             <div class="flex items-center gap-1.5">
-              <h1 id="dash-event-title" class="text-sm sm:text-base font-extrabold text-white tracking-tight leading-none">
+              <h1 id="dash-event-title" class="text-sm sm:text-base font-extrabold text-amber-50 tracking-tight leading-none drop-shadow-sm">
                 ENGINEERING DAYS 2026
               </h1>
-              <span class="text-xs text-amber-400 font-mono">▾</span>
+              <span class="px-1.5 py-0.2 rounded bg-red-600/30 text-amber-300 border border-amber-500/40 text-[9px] font-mono font-bold uppercase shrink-0">2026</span>
+              <span class="text-xs text-amber-400 font-mono shrink-0">▾</span>
             </div>
-            <p id="dash-event-subtitle" class="text-[11px] font-mono text-amber-400 mt-0.5">
-              UPHSD Calamba • College of Engineering (Oct 19–20, 2026)
+            <p id="dash-event-subtitle" class="text-[11px] font-mono text-amber-300/90 mt-0.5">
+              UPHSD CALAMBA • ENGINEERING STUDENT COUNCIL • OCT 19–20, 2026 (7:30 AM – 8:00 PM) • UPHSD GYMNASIUM / OVAL
             </p>
           </div>
         </button>
@@ -104,13 +110,13 @@
       <!-- Right: Action Buttons -->
       <div class="flex items-center gap-2 flex-wrap">
         <!-- Event & Roster Admin Setup Button -->
-        <button onclick="openAdminSetupModal('events')" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-amber-500/50 text-amber-300 font-mono font-bold text-xs flex items-center gap-1.5 transition-all shadow">
+        <button onclick="openAdminSetupModal('events')" class="px-3 py-2 rounded-xl bg-[#1c100d] hover:bg-[#2a1713] border border-amber-500/40 text-amber-300 font-mono font-bold text-xs flex items-center gap-1.5 transition-all shadow">
           <span>⚙️</span>
           <span>Event & Roster Setup</span>
         </button>
 
         <!-- Generate / Print QR Cards Button (Safeguard 1) -->
-        <button onclick="openQrGeneratorModal()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-cyan-500/50 text-cyan-300 font-mono font-bold text-xs flex items-center gap-1.5 transition-all">
+        <button onclick="openQrGeneratorModal()" class="px-3 py-2 rounded-xl bg-[#1c100d] hover:bg-[#2a1713] border border-amber-500/40 text-amber-200 font-mono font-bold text-xs flex items-center gap-1.5 transition-all">
           <span>🪪</span>
           <span>Print QR Cards</span>
         </button>
@@ -122,14 +128,14 @@
         </button>
 
         <!-- Cloud Sync & Phone Link -->
-        <button onclick="openPhoneConnectModal()" class="px-3 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 font-mono font-bold text-xs flex items-center gap-1.5 transition-all">
+        <button onclick="openPhoneConnectModal()" class="px-3 py-2 rounded-xl bg-[#1c100d] hover:bg-[#2a1713] border border-amber-500/30 text-amber-100 font-mono font-bold text-xs flex items-center gap-1.5 transition-all">
           <span id="dash-sync-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
           <span id="dash-sync-label">☁️ Cloud Sync</span>
           <span id="dash-pending-badge" class="hidden px-1.5 py-0.2 rounded bg-amber-500 text-black text-[9px] font-extrabold">0</span>
         </button>
 
         <!-- Open QR Scanner -->
-        <a href="engday_scanner.html" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-mono font-bold text-xs shadow-lg flex items-center gap-1.5 transition-all">
+        <a href="engday_scanner.html" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 border border-amber-400/40 text-white font-mono font-bold text-xs shadow-lg shadow-red-950/50 flex items-center gap-1.5 transition-all">
           <span>📷</span>
           <span>Open Scanner</span>
         </a>
@@ -785,7 +791,9 @@
 
       // Update Header & Venue
       document.getElementById('dash-event-title').textContent = (activeEvent.title || 'ENGINEERING DAYS 2026').toUpperCase();
-      document.getElementById('dash-event-subtitle').textContent = `${activeEvent.subtitle || 'UPHSD Calamba • College of Engineering (Oct 19–20, 2026)'} • ${(engine.games || []).length} Checkpoints`;
+      document.getElementById('dash-event-subtitle').textContent = (activeEvent.subtitle && !activeEvent.subtitle.includes('College of Engineering'))
+        ? activeEvent.subtitle
+        : 'UPHSD CALAMBA • ENGINEERING STUDENT COUNCIL • OCT 19–20, 2026 (7:30 AM – 8:00 PM) • UPHSD GYMNASIUM / OVAL';
       document.getElementById('kpi-venue-name').textContent = activeEvent.venueName || 'Gymnasium / Oval & Engineering Labs';
       document.getElementById('section-session-count').textContent = (engine.games || []).length;
 
@@ -1423,7 +1431,10 @@
       printGrid.innerHTML = students.map(s => `
         <div class="qr-print-card p-3 rounded-xl flex items-center justify-between gap-3" style="height: 58mm;">
           <div class="flex-1 min-w-0">
-            <div class="text-[9px] font-mono font-bold uppercase text-zinc-600">${evt.title} • ${evt.venueName || 'OFFICIAL PASS'}</div>
+            <div class="flex items-center gap-1.5 mb-1">
+              <img src="assets/esc_logo.jpg" alt="ESC Logo" class="w-6 h-6 rounded-md object-cover border border-amber-500/40 shrink-0">
+              <div class="text-[9px] font-mono font-bold uppercase text-zinc-600 truncate">${evt.title} • ${evt.venueName || 'OFFICIAL PASS'}</div>
+            </div>
             <div class="text-sm font-extrabold uppercase text-black mt-1 leading-tight">${s.name}</div>
             <div class="text-xs font-mono font-bold text-black mt-1.5">ID: ${s.studentCode}</div>
             <div class="text-[10px] font-mono font-bold uppercase text-zinc-700 mt-1">GROUP: ${s.teamName || s.team.toUpperCase()}</div>
