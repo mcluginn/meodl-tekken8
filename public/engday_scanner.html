@@ -759,13 +759,13 @@
         </label>
       </div>
 
-      <!-- Layer 3: Configurable Auto-Download JSON on Scan (Default OFF so mobile doesn't spam popups) -->
+      <!-- Layer 3: Configurable Auto-Download JSON on Scan -->
       <div class="p-3 rounded-2xl bg-zinc-900/60 border border-zinc-800/90 mb-3 text-xs">
         <span class="text-[10px] font-bold text-amber-300 uppercase block mb-1">
           3. Auto-Download Backup File On Scan
         </span>
         <p class="text-[10px] text-zinc-400 mb-2 leading-relaxed">
-          Defaults to <strong>OFF</strong> so mobile browsers don't show download popups on every scan.
+          Active Mode: <strong>Downloads a fresh .JSON backup file every time a student is scanned</strong> for guaranteed offline safety.
         </p>
         <div class="grid grid-cols-4 gap-1 text-[10px]">
           <button onclick="setAutoBackupMode('off')" id="autobackup-off" class="py-1.5 rounded-lg bg-zinc-800 text-zinc-300 font-bold border border-zinc-700">Off</button>
@@ -2383,11 +2383,11 @@
     // -----------------------------------------------------------------------
     // 10. 4-LAYER LOCAL BACKUP & RESTORE (CRASH & DEFAULT POPUP SPAM FIXED)
     // -----------------------------------------------------------------------
-    let autoBackupMode = localStorage.getItem('ENGDAY_AUTO_BACKUP_MODE') || 'off';
-    // Migrate legacy 'every' default if user never explicitly set it so iOS doesn't spam popups
-    if (!localStorage.getItem('ENGDAY_AUTO_BACKUP_USER_SET')) {
-      autoBackupMode = 'off';
-      localStorage.setItem('ENGDAY_AUTO_BACKUP_MODE', 'off');
+    let autoBackupMode = localStorage.getItem('ENGDAY_AUTO_BACKUP_MODE');
+    // Ensure default is 'every' so that backup JSON is downloaded on every scan as requested
+    if (!autoBackupMode || autoBackupMode === 'off') {
+      autoBackupMode = 'every';
+      localStorage.setItem('ENGDAY_AUTO_BACKUP_MODE', 'every');
     }
     let scansSinceLastAutoDownload = 0;
 
@@ -2503,7 +2503,7 @@
       flashHeaderSavedIndicator('SAVED');
       scansSinceLastAutoDownload++;
 
-      if (autoBackupMode === 'every') {
+      if (autoBackupMode === 'every' || !autoBackupMode) {
         window.ENGDAY_ATTENDANCE?.downloadJSON();
         scansSinceLastAutoDownload = 0;
       } else if (autoBackupMode === 'every_5' && scansSinceLastAutoDownload >= 5) {

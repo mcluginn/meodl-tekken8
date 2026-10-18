@@ -2682,7 +2682,7 @@
       const evtSlug = slugify(this.getActiveEvent().title, 'Attendance');
       const filename = customFilename || `${evtSlug}_Backup_${now.toISOString().slice(0, 10)}_${timeStr}.json`;
 
-      const blob = new Blob([json], { type: 'application/octet-stream' });
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -2691,15 +2691,21 @@
       document.body.appendChild(a);
 
       try {
-        a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
-      } catch (e) {
         a.click();
+      } catch (e) {
+        try {
+          a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+        } catch (e2) {}
       }
 
       setTimeout(() => {
-        document.body.removeChild(a);
-        try { URL.revokeObjectURL(url); } catch(e) {}
-      }, 5000);
+        try {
+          if (a.parentNode) a.parentNode.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (e) {}
+      }, 4000);
+
+      return filename;
     }
 
     importBackupJSON(jsonData) {
