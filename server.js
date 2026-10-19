@@ -1032,6 +1032,33 @@ function generateEngDayReportCSV(eventKey = 'engday_2026') {
   return csv;
 }
 
+// -------------------------------------------------------------------------
+// SERVER 20-MINUTE SCHEDULED BACKUP SNAPSHOT ENGINE
+// -------------------------------------------------------------------------
+let serverNewEventsSinceBackup = 0;
+
+function performServer20MinuteBackup() {
+  try {
+    if (serverNewEventsSinceBackup === 0 && engdayEvents.length === 0) return;
+    const activeKey = engdayState.activeEventId || 'engday_2026';
+    const backupData = generateEngDayBackupJSON(activeKey);
+    const backupDir = path.join(__dirname, 'data', 'backups');
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir, { recursive: true });
+    }
+    const backupFile = path.join(backupDir, 'engday_backup_latest.json');
+    atomicWriteJson(backupFile, backupData);
+    serverNewEventsSinceBackup = 0;
+    console.log(`[EngDay Server] 20-minute scheduled backup snapshot saved for ${activeKey}`);
+  } catch (err) {
+    console.warn('[EngDay Server] 20-minute scheduled backup failed:', err);
+  }
+}
+
+if (!IS_VERCEL) {
+  setInterval(performServer20MinuteBackup, 20 * 60 * 1000);
+}
+
 // Deterministic event ordering comparator
 function compareEvents(a, b) {
   const timeA = new Date(a.occurredAt || 0).getTime();
@@ -2064,6 +2091,7 @@ export async function handleRequest(req, res) {
 
         atomicWriteJson(ENGDAY_EVENTS_FILE, engdayEvents);
         atomicWriteJson(ENGDAY_STATE_FILE, engdayState);
+        serverNewEventsSinceBackup += accepted.length;
         broadcastEngDayUpdate();
       }
 

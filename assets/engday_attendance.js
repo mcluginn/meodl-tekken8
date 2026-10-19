@@ -958,6 +958,13 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       this.lastSyncedServerVersion = 0;
       this.serverOnline = false;
 
+      // 20-Minute Scheduled Backup Tracking (Replaces bandwidth-destroying per-scan backups)
+      this.hasUnsavedBackupChanges = false;
+      this.scansSinceLastBackup = 0;
+      this.lastBackupTime = null;
+      this.backupIntervalMs = 1200000; // 20 minutes (1,200,000 ms)
+      this.backupTimer = null;
+
       this.loadConfig();
       this.load();
       this.forceMergeSeedStudents();
@@ -965,6 +972,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       this.autoSelectGameByTime();
       this.initNetworkListeners();
       this.startSyncLoop();
+      this.startScheduledBackupTimer();
       setTimeout(() => this.checkAndPurgePre4AMData(), 300);
     }
 
@@ -2157,6 +2165,57 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       }
     }
 
+    startScheduledBackupTimer() {
+      if (typeof window === 'undefined' || typeof setInterval === 'undefined') return;
+      if (this.backupTimer && typeof clearInterval !== 'undefined') {
+        clearInterval(this.backupTimer);
+      }
+
+      // Scheduled 20-minute backup interval (1,200,000 ms)
+      this.backupTimer = setInterval(() => {
+        this.performScheduledBackup().catch(err => {
+          console.warn('[EngDay Backup] Scheduled 20-minute backup error:', err);
+        });
+      }, this.backupIntervalMs || 1200000);
+    }
+
+    async performScheduledBackup() {
+      // Bandwidth & Resource Saver: Only run if new scans or changes have occurred
+      if (!this.hasUnsavedBackupChanges && (this.scansSinceLastBackup || 0) === 0) {
+        return { skipped: true, reason: 'No new scans since last backup' };
+      }
+
+      console.log(`[EngDay Backup] 20-Minute Scheduled Backup Triggered (${this.scansSinceLastBackup || 0} scans since last backup)...`);
+
+      // 1. Silent Disk Link write (PC Chrome/Edge File System Access API)
+      let diskSaved = false;
+      if (this.localFileHandle) {
+        try {
+          diskSaved = await this.writeToLocalFileHandle();
+        } catch (e) {
+          console.warn('[EngDay Backup] Local file handle write failed:', e);
+        }
+      }
+
+      // 2. Refresh local IndexedDB snapshot
+      if (this.db && typeof this.db.saveSnapshot === 'function') {
+        try {
+          await this.db.saveSnapshot(this.state);
+        } catch (e) {}
+      }
+
+      this.hasUnsavedBackupChanges = false;
+      this.scansSinceLastBackup = 0;
+      this.lastBackupTime = new Date().toISOString();
+      this.notify();
+
+      return {
+        success: true,
+        diskSaved,
+        lastBackupTime: this.lastBackupTime
+      };
+    }
+
     save(options = {}) {
       try {
         this.syncActiveBranchToCatalog();
@@ -2170,9 +2229,11 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         if (this.db && typeof this.db.saveSnapshot === 'function') {
           this.db.saveSnapshot(this.state);
         }
-        if (this.localFileHandle) {
-          this.writeToLocalFileHandle();
-        }
+        // Multi-Device & Bandwidth Saver:
+        // Do NOT write entire backup JSON to disk on every single scan!
+        // Scans are marked dirty and backed up automatically on the 20-minute scheduled interval.
+        this.hasUnsavedBackupChanges = true;
+        this.scansSinceLastBackup = (this.scansSinceLastBackup || 0) + 1;
       } catch (e) {
         console.error('[EngDay] Save error:', e);
       }
@@ -3863,6 +3924,9 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           if (res.ok) {
             const data = await res.json();
             const jsonText = JSON.stringify(data, null, 2);
+            this.hasUnsavedBackupChanges = false;
+            this.scansSinceLastBackup = 0;
+            this.lastBackupTime = new Date().toISOString();
             return triggerBlobDownload(jsonText, filename, 'application/json;charset=utf-8');
           }
         } catch (e) {
@@ -3872,6 +3936,9 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
 
       // 2. Fallback to local state if offline or server unreachable
       const localJson = this.exportJSON();
+      this.hasUnsavedBackupChanges = false;
+      this.scansSinceLastBackup = 0;
+      this.lastBackupTime = new Date().toISOString();
       return triggerBlobDownload(localJson, filename, 'application/json;charset=utf-8');
     }
 

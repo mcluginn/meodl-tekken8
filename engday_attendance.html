@@ -280,8 +280,11 @@
           </select>
 
           <!-- Event-Scoped Export Buttons -->
-          <button onclick="exportCurrentViewCSV()" class="px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center gap-1 shadow">
+          <button onclick="exportCurrentViewCSV()" class="px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs flex items-center gap-1 shadow" title="Export Attendance Report CSV">
             <span>📊</span> Export CSV
+          </button>
+          <button onclick="window.ENGDAY_ATTENDANCE && window.ENGDAY_ATTENDANCE.downloadJSON()" class="px-3 py-2 rounded-xl bg-amber-700 hover:bg-amber-600 text-white font-bold text-xs flex items-center gap-1 shadow" title="Export / Backup Now (Instant Master JSON)">
+            <span>💾</span> Export / Backup Now
           </button>
         </div>
       </div>
@@ -447,7 +450,7 @@
         </button>
 
         <button onclick="window.ENGDAY_ATTENDANCE && window.ENGDAY_ATTENDANCE.downloadJSON()" class="w-full py-2 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-amber-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2">
-          <span>📥</span> Download System Backup (.JSON)
+          <span>💾</span> Export / Backup Now (.JSON)
         </button>
 
         <label class="w-full py-2 px-4 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-cyan-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer">
@@ -456,7 +459,7 @@
         </label>
 
         <button onclick="connectDashboardHardDriveFile()" class="w-full py-2 px-4 rounded-xl bg-emerald-950/50 hover:bg-emerald-900/70 border border-emerald-700/60 text-emerald-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2">
-          <span>🔗</span> Link Local PC File (Auto-Save Every Scan)
+          <span>🔗</span> Link Local PC File (Auto-Save Every 20 Mins)
         </button>
       </div>
 
