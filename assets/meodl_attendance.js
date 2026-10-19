@@ -1524,10 +1524,10 @@
     initSyncWorker() {
       if (typeof window === 'undefined') return;
 
-      // Periodic Sync / Heartbeat (Every 10 seconds)
+      // Periodic Sync / Heartbeat (Every 20 minutes - 1,200,000 ms to protect Vercel bandwidth)
       setInterval(() => {
         this.syncPendingEvents();
-      }, 10000);
+      }, 1200000);
 
       // Window connectivity events
       window.addEventListener('online', () => {
@@ -1541,17 +1541,8 @@
         this.notifySyncStatus();
       });
 
-      // App focus / visibility resumption
-      if (typeof document !== 'undefined') {
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') {
-            this.syncPendingEvents();
-          }
-        });
-      }
-      window.addEventListener('focus', () => {
-        this.syncPendingEvents();
-      });
+      // App focus / visibility resumption:
+      // Bandwidth-Saver: Do NOT auto-refetch on visibilitychange or focus
 
       // Initial sync run on load
       setTimeout(() => {

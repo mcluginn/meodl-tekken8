@@ -964,13 +964,14 @@ function calculateAttendanceStats() {
   return { total, inside, outside, overdue, byTeam };
 }
 
-// Helper: send JSON with CORS
-function sendJson(res, statusCode, data) {
+// Helper: send JSON with CORS & optional extra headers
+function sendJson(res, statusCode, data, extraHeaders = {}) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With'
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, If-None-Match',
+    ...extraHeaders
   });
   res.end(JSON.stringify(data));
 }
@@ -1089,13 +1090,28 @@ export async function handleRequest(req, res) {
     if (attendanceState && attendanceState.students) {
       ensureFullMasterRoster(attendanceState.students);
     }
+    const currentVersion = attendanceState.version || 1;
+    const stateEtag = `W/"att-${currentVersion}-${attendanceEvents.length}"`;
+
+    if (req.headers && req.headers['if-none-match'] === stateEtag) {
+      res.writeHead(304, {
+        'ETag': stateEtag,
+        'Cache-Control': 'public, max-age=60, stale-while-revalidate=1200',
+        'Access-Control-Allow-Origin': '*'
+      });
+      return res.end();
+    }
+
     return sendJson(res, 200, {
       ok: true,
       serverTime: new Date().toISOString(),
       students: attendanceState.students,
       stats: calculateAttendanceStats(),
-      version: attendanceState.version || 1,
+      version: currentVersion,
       lastUpdated: attendanceState.lastUpdated
+    }, {
+      'ETag': stateEtag,
+      'Cache-Control': 'public, max-age=60, stale-while-revalidate=1200'
     });
   }
 
@@ -1358,6 +1374,23 @@ export async function handleRequest(req, res) {
     }
     const studentsMap = (evtObj && evtObj.students) ? evtObj.students : engdayState.students;
     const activeEventsCount = engdayEvents.filter(e => (e.eventKey || 'engday_2026') === reqEventKey).length;
+
+    // Bandwidth-Saver: Compute ETag and check If-None-Match for 304 Not Modified
+    const currentVersion = engdayState.version || 1;
+    const hardResetSeq = (evtObj && evtObj.hardResetSequence) || engdayState.hardResetSequence || 0;
+    const resetSeq = (evtObj && evtObj.resetSequence) || engdayState.resetSequence || 0;
+    const purgeTime = (evtObj && evtObj.lastPurgeTimestamp) || engdayState.lastPurgeTimestamp || '';
+    const stateEtag = `W/"ed-${reqEventKey}-${currentVersion}-${activeEventsCount}-${hardResetSeq}-${resetSeq}-${purgeTime}"`;
+
+    if (req.headers && req.headers['if-none-match'] === stateEtag) {
+      res.writeHead(304, {
+        'ETag': stateEtag,
+        'Cache-Control': 'public, max-age=60, stale-while-revalidate=1200',
+        'Access-Control-Allow-Origin': '*'
+      });
+      return res.end();
+    }
+
     return sendJson(res, 200, {
       ok: true,
       serverTime: new Date().toISOString(),
@@ -1374,8 +1407,11 @@ export async function handleRequest(req, res) {
       lastResetTimestamp: (evtObj && evtObj.lastResetTimestamp) || engdayState.lastResetTimestamp || null,
       resetSequence: (evtObj && evtObj.resetSequence) || engdayState.resetSequence || 0,
       lastPurgeTimestamp: (evtObj && evtObj.lastPurgeTimestamp) || engdayState.lastPurgeTimestamp || null,
-      version: engdayState.version || 1,
+      version: currentVersion,
       lastUpdated: engdayState.lastUpdated
+    }, {
+      'ETag': stateEtag,
+      'Cache-Control': 'public, max-age=60, stale-while-revalidate=1200'
     });
   }
 

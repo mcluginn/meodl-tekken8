@@ -127,6 +127,12 @@
           <span>💾 Backup / Restore</span>
         </button>
 
+        <!-- Manual On-Demand Refresh Button -->
+        <button id="btn-manual-refresh" onclick="triggerManualDashboardRefresh()" title="Fetch latest attendance from server" class="px-3 py-2 rounded-xl bg-[#1c100d] hover:bg-[#2a1713] border border-sky-500/40 text-sky-300 font-mono font-bold text-xs flex items-center gap-1.5 transition-all shadow">
+          <span id="btn-refresh-icon">🔄</span>
+          <span id="btn-refresh-text">Refresh</span>
+        </button>
+
         <!-- Cloud Sync & Phone Link -->
         <button onclick="openPhoneConnectModal()" class="px-3 py-2 rounded-xl bg-[#1c100d] hover:bg-[#2a1713] border border-amber-500/30 text-amber-100 font-mono font-bold text-xs flex items-center gap-1.5 transition-all">
           <span id="dash-sync-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
@@ -1713,6 +1719,27 @@
         if (resEl) resEl.textContent = `❌ Error: ${e.message}`;
       } finally {
         if (btn) btn.textContent = 'Run Test';
+      }
+    }
+
+    async function triggerManualDashboardRefresh() {
+      const icon = document.getElementById('btn-refresh-icon');
+      const text = document.getElementById('btn-refresh-text');
+      if (icon) icon.classList.add('inline-block', 'animate-spin');
+      if (text) text.textContent = 'Syncing...';
+      try {
+        if (window.ENGDAY_ATTENDANCE) {
+          await window.ENGDAY_ATTENDANCE.syncWithServer(true);
+        } else if (window.engDayAttendance) {
+          await window.engDayAttendance.syncWithServer(true);
+        }
+      } catch (err) {
+        console.error('[EngDay] Manual refresh error:', err);
+      } finally {
+        setTimeout(() => {
+          if (icon) icon.classList.remove('animate-spin');
+          if (text) text.textContent = 'Refresh';
+        }, 500);
       }
     }
 

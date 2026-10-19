@@ -901,10 +901,11 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       this.deviceId = this.getOrCreateDeviceId();
       this.localSequence = 1;
       this.lastSelfHealAt = 0;
+      this.lastStateEtag = null;
 
       this.config = {
         serverUrl: (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : '',
-        syncIntervalMs: 3000,
+        syncIntervalMs: 1200000,
         syncEnabled: true,
         autoSuggestGameByTime: true
       };
@@ -1882,16 +1883,9 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         this.notify();
       });
 
-      if (typeof document !== 'undefined') {
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') {
-            this.syncWithServer();
-          }
-        });
-      }
-      window.addEventListener('focus', () => {
-        this.syncWithServer();
-      });
+      // Bandwidth-Saver: Do not refetch full state on visibilitychange or window focus
+      // to prevent excessive Fast Origin Transfer bandwidth consumption.
+      // Admins and marshals can use the manual 'Refresh' button if immediate data is desired.
     }
 
     getApiBaseUrl() {
@@ -1977,6 +1971,10 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         if (typeof localStorage !== 'undefined') {
           const raw = localStorage.getItem(CONFIG_STORAGE_KEY);
           if (raw) Object.assign(this.config, JSON.parse(raw));
+          // Enforce minimum 20 minutes (1,200,000 ms) to prevent high-frequency polling from legacy local storage
+          if (!this.config.syncIntervalMs || this.config.syncIntervalMs < 1200000) {
+            this.config.syncIntervalMs = 1200000;
+          }
           const savedUrl = localStorage.getItem('ENGDAY_SERVER_URL');
           if (savedUrl) this.config.serverUrl = savedUrl.trim();
         }
@@ -4251,7 +4249,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         if (this.config.syncEnabled && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
           this.syncWithServer();
         }
-      }, this.config.syncIntervalMs || 3500);
+      }, this.config.syncIntervalMs || 1200000);
 
       if (typeof navigator === 'undefined' || navigator.onLine !== false) {
         setTimeout(() => this.syncWithServer(), 600);
@@ -4290,9 +4288,9 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         };
 
         sse.onerror = () => {
-          if (this.config.syncEnabled) {
-            this.syncWithServer();
-          }
+          // Bandwidth-Saver: Do NOT trigger syncWithServer() on SSE error.
+          // On serverless environments like Vercel, SSE drops periodically,
+          // so polling on error causes a continuous high-volume loop.
         };
       } catch(e) {
         console.warn('[EngDay SSE] Init error:', e);
@@ -4864,13 +4862,22 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           }
         }
 
-        // 2. Fetch latest server state & reconcile safely
+        // 2. Fetch latest server state & reconcile safely (with ETag bandwidth-saver support)
+        const fetchHeaders = { 'Accept': 'application/json' };
+        if (this.lastStateEtag && !isManual) {
+          fetchHeaders['If-None-Match'] = this.lastStateEtag;
+        }
         const stateRes = await fetch(stateUrl, {
-          headers: { 'Accept': 'application/json' },
-          cache: 'no-store'
+          headers: fetchHeaders
         });
 
-        if (stateRes.ok) {
+        if (stateRes.status === 304) {
+          // 304 Not Modified: Data is unchanged on server, 0 body bytes consumed
+          this.serverOnline = true;
+          this.lastSyncTime = formatManilaTime(new Date());
+        } else if (stateRes.ok) {
+          const etag = stateRes.headers.get('ETag');
+          if (etag) this.lastStateEtag = etag;
           const serverState = await stateRes.json();
           this.serverOnline = true;
           this.lastSyncTime = formatManilaTime(new Date());
