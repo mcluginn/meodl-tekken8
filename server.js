@@ -801,6 +801,237 @@ function calculateEngDayStats(eventKey = null) {
   return { totalStudents, totalUniqueAttendees, gameStats };
 }
 
+// ---------------------------------------------------------------------------
+// SERVER-SIDE MERGED BACKUP & ATTENDANCE REPORT GENERATOR
+// Merges all cumulative events from all devices into an authoritative dataset
+// ---------------------------------------------------------------------------
+function generateEngDayBackupJSON(eventKey = 'engday_2026') {
+  const targetKey = eventKey || engdayState.activeEventId || 'engday_2026';
+  const evtObj = (engdayState.eventsCatalog && engdayState.eventsCatalog[targetKey]) || {
+    id: targetKey,
+    title: targetKey === 'engday_2026' ? 'ENGINEERING DAYS 2026' : targetKey,
+    sessions: DEFAULT_ENGDAY_SESSIONS,
+    groups: DEFAULT_ENGDAY_GROUPS,
+    students: engdayState.students || {}
+  };
+
+  const sessionIds = getActiveSessionIdsForEvent(targetKey);
+  const studentsMap = (evtObj && evtObj.students) ? evtObj.students : (engdayState.students || {});
+  ensureFullMasterRoster(studentsMap, sessionIds);
+  const allStudents = Object.values(studentsMap);
+
+  const roster = allStudents.map(s => {
+    const rawCode = String(s.code || s.studentCode || s.id || '').trim();
+    return {
+      id: s.id || rawCode,
+      code: rawCode,
+      name: s.name || '',
+      team: s.team || s.group || 'general'
+    };
+  });
+
+  const sessions = (evtObj.sessions || DEFAULT_ENGDAY_SESSIONS).map(g => ({
+    id: g.id,
+    shortLabel: g.shortName || g.shortLabel || g.name || g.id,
+    label: g.name || g.label || g.shortName || g.id,
+    timeSlot: g.timeSlot || g.time || '',
+    location: g.location || g.court || g.venue || '',
+    day: g.day || (String(g.id).startsWith('d2') ? 'Day 2' : 'Day 1'),
+    category: g.category || (String(g.id).startsWith('d2') ? 'Day 2 (Oct 20)' : 'Day 1 (Oct 19)'),
+    mode: g.mode === 'check_in_only' ? 'check_in_only' : 'entry_exit',
+    icon: g.icon || '📋',
+    minMinutesRequired: typeof g.minMinutesRequired === 'number' ? g.minMinutesRequired : (g.mode === 'check_in_only' ? 0 : 45)
+  }));
+
+  const groups = (evtObj.groups || DEFAULT_ENGDAY_GROUPS).map(g => {
+    const gid = String(g.id).toLowerCase();
+    if (gid === 'ee') {
+      return { id: 'ee', name: g.name || 'EE (Electrical Engineering)', shortCode: 'EE', color: 'orange', hex: '#f97316' };
+    }
+    return { ...g };
+  });
+
+  const attendance = {};
+  allStudents.forEach(s => {
+    const rawCode = String(s.code || s.studentCode || s.id || '').trim();
+    if (!rawCode) return;
+    let totalVerifiedSessions = 0;
+    let totalDwellMinutes = 0;
+    const sessionsMap = {};
+
+    sessions.forEach(g => {
+      const gr = (s.games && s.games[g.id]) || {};
+      let status = 'ABSENT';
+      let dwellMins = 0;
+
+      if (gr.checkInTime && gr.checkOutTime) {
+        dwellMins = Math.max(0, Math.round((new Date(gr.checkOutTime) - new Date(gr.checkInTime)) / 60000));
+      } else if (gr.checkInTime && gr.status === 'INSIDE') {
+        dwellMins = Math.max(0, Math.round((Date.now() - new Date(gr.checkInTime)) / 60000));
+      }
+
+      totalDwellMinutes += dwellMins;
+      const minReq = g.minMinutesRequired || 0;
+      if (gr.status === 'INSIDE') {
+        status = 'INSIDE';
+      } else if (gr.visits > 0) {
+        if (g.mode === 'check_in_only' || dwellMins >= minReq) {
+          status = 'VERIFIED';
+        } else {
+          status = 'UNDER_TIME';
+        }
+      }
+
+      if (status === 'VERIFIED') totalVerifiedSessions++;
+
+      sessionsMap[g.id] = {
+        status,
+        visits: gr.visits || 0,
+        dwellMinutes: dwellMins,
+        checkInTime: gr.checkInTime || null,
+        checkOutTime: gr.checkOutTime || null,
+        displayCheckIn: gr.displayCheckIn || null,
+        displayCheckOut: gr.displayCheckOut || null,
+        history: (gr.history || []).map(h => ({
+          eventId: h.eventId,
+          action: h.action,
+          timestamp: h.timestamp,
+          performedBy: h.performedBy,
+          court: h.court,
+          reason: h.reason
+        }))
+      };
+    });
+
+    attendance[rawCode] = {
+      studentSummary: {
+        code: rawCode,
+        name: s.name || '',
+        team: s.team || s.group || 'general',
+        totalVerifiedSessions,
+        totalDwellMinutes
+      },
+      ...sessionsMap
+    };
+  });
+
+  const scanLogs = engdayEvents
+    .filter(e => (e.eventKey || 'engday_2026') === targetKey)
+    .map(l => ({
+      eventId: l.eventId,
+      code: l.studentCode || l.studentId,
+      name: l.studentName || l.name || '',
+      team: l.team,
+      gameId: l.gameId,
+      action: l.action || 'check_in',
+      time: l.occurredAt || l.time,
+      by: l.marshalId || l.performedBy || 'Marshal',
+      court: l.court || 'Main Venue',
+      notes: l.reason || null
+    }))
+    .sort((a, b) => new Date(a.time || 0) - new Date(b.time || 0));
+
+  return {
+    format: 'engday_full_v3',
+    version: 3,
+    exportedAt: new Date().toISOString(),
+    deviceId: 'server-master',
+    activeEventId: targetKey,
+    eventConfig: {
+      id: targetKey,
+      title: evtObj.title || 'ENGINEERING DAYS 2026',
+      subtitle: evtObj.subtitle || '',
+      venueName: evtObj.venueName || 'Gymnasium / Oval & Engineering Labs',
+      staffPin: evtObj.staffPin || '2026',
+      sessions,
+      groups
+    },
+    roster,
+    attendance,
+    scanLogs
+  };
+}
+
+function generateEngDayReportCSV(eventKey = 'engday_2026') {
+  const targetKey = eventKey || engdayState.activeEventId || 'engday_2026';
+  const evtObj = (engdayState.eventsCatalog && engdayState.eventsCatalog[targetKey]) || {};
+  const sessionIds = getActiveSessionIdsForEvent(targetKey);
+  const studentsMap = (evtObj && evtObj.students) ? evtObj.students : (engdayState.students || {});
+  ensureFullMasterRoster(studentsMap, sessionIds);
+  const students = Object.values(studentsMap);
+
+  const deptOrder = { CE: 1, CPE: 2, EE: 3, ECE: 4, IE: 5, ME: 6 };
+  students.sort((a, b) => {
+    const teamA = String(a.team || '').toUpperCase();
+    const teamB = String(b.team || '').toUpperCase();
+    const orderA = deptOrder[teamA] || 99;
+    const orderB = deptOrder[teamB] || 99;
+    if (orderA !== orderB) return orderA - orderB;
+    const codeA = String(a.studentCode || a.code || a.id || '').toUpperCase();
+    const codeB = String(b.studentCode || b.code || b.id || '').toUpperCase();
+    return codeA.localeCompare(codeB, undefined, { numeric: true });
+  });
+
+  const escapeCsv = (val) => {
+    if (val === null || val === undefined) return '""';
+    return `"${String(val).replace(/"/g, '""')}"`;
+  };
+
+  const sessions = (evtObj.sessions && evtObj.sessions.length > 0) ? evtObj.sessions : DEFAULT_ENGDAY_SESSIONS;
+  const headerCols = ['Student ID', 'Full Name', 'Department/Group'];
+  sessions.forEach(g => {
+    const cleanLabel = String(g.shortName || g.name || g.id).replace(/"/g, '""');
+    headerCols.push(`${cleanLabel} Status`);
+  });
+  headerCols.push('Total Minutes Inside');
+
+  let csv = headerCols.map(escapeCsv).join(',') + '\r\n';
+
+  students.forEach(s => {
+    const studentId = s.studentCode || s.code || s.id || '';
+    const fullName = s.name || '';
+    const deptGroup = (s.team || '').toUpperCase();
+
+    const rowCols = [
+      escapeCsv(studentId),
+      escapeCsv(fullName),
+      escapeCsv(deptGroup)
+    ];
+
+    let totalMinutesInside = 0;
+
+    sessions.forEach(g => {
+      const gr = (s.games && s.games[g.id]) || {};
+      let dwellMins = 0;
+      if (gr.checkInTime && gr.checkOutTime) {
+        dwellMins = Math.max(0, Math.round((new Date(gr.checkOutTime) - new Date(gr.checkInTime)) / 60000));
+      } else if (gr.checkInTime && gr.status === 'INSIDE') {
+        dwellMins = Math.max(0, Math.round((Date.now() - new Date(gr.checkInTime)) / 60000));
+      }
+      totalMinutesInside += dwellMins;
+
+      let status = 'ABSENT';
+      const minReq = g.mode === 'check_in_only' ? 0 : 45;
+      if (gr.status === 'INSIDE') {
+        status = 'INSIDE';
+      } else if (gr.visits > 0) {
+        if (g.mode === 'check_in_only' || dwellMins >= minReq) {
+          status = 'VERIFIED';
+        } else {
+          status = 'UNDER_TIME';
+        }
+      }
+
+      rowCols.push(escapeCsv(status));
+    });
+
+    rowCols.push(totalMinutesInside);
+    csv += rowCols.join(',') + '\r\n';
+  });
+
+  return csv;
+}
+
 // Deterministic event ordering comparator
 function compareEvents(a, b) {
   const timeA = new Date(a.occurredAt || 0).getTime();
@@ -1415,7 +1646,32 @@ export async function handleRequest(req, res) {
     });
   }
 
+  // ---------------------------------------------------------------------------
+  // SERVER-SIDE MERGED BACKUP & ATTENDANCE REPORT DOWNLOAD (MULTI-DEVICE SAFE)
+  // Queries server's complete master database rather than single device state
+  // ---------------------------------------------------------------------------
+  if (reqPath === '/api/engday/attendance/backup' && req.method === 'GET') {
+    const reqEventKey = urlParams.get('eventKey') || engdayState.activeEventId || 'engday_2026';
+    const format = (urlParams.get('format') || 'json').toLowerCase();
 
+    if (format === 'csv') {
+      const csvData = generateEngDayReportCSV(reqEventKey);
+      res.writeHead(200, {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': `attachment; filename="${reqEventKey}_Attendance_Report.csv"`,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+        'Cache-Control': 'no-cache'
+      });
+      return res.end(csvData);
+    }
+
+    const jsonData = generateEngDayBackupJSON(reqEventKey);
+    return sendJson(res, 200, jsonData, {
+      'Cache-Control': 'no-cache'
+    });
+  }
 
   if (reqPath === '/api/engday/attendance/config' && req.method === 'POST') {
     try {

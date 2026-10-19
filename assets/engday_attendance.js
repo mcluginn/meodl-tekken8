@@ -492,6 +492,35 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
     return s || fallback;
   }
 
+  function triggerBlobDownload(content, filename, mimeType) {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return filename;
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.position = 'fixed';
+    a.style.top = '-9999px';
+    a.style.left = '-9999px';
+    a.style.opacity = '0';
+    a.style.pointerEvents = 'none';
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    try {
+      a.click();
+    } catch (e) {
+      try {
+        a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+      } catch (e2) {}
+    }
+    setTimeout(() => {
+      try {
+        if (a.parentNode) a.parentNode.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {}
+    }, 4000);
+    return filename;
+  }
+
   function normalizeGroupProgramKey(rawStr) {
     const clean = String(rawStr || '').trim().toUpperCase();
     if (!clean) return { id: 'general', name: 'GENERAL', shortCode: 'GEN' };
@@ -2513,7 +2542,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         return this.updatePendingCount();
       }).then(() => {
         if (this.config.syncEnabled && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
-          this.syncWithServer().catch(() => {});
+          this.syncWithServer({ pushOnly: true }).catch(() => {});
         }
       }).catch(() => {});
 
@@ -2590,7 +2619,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         return this.updatePendingCount();
       }).then(() => {
         if (this.config.syncEnabled && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
-          this.syncWithServer().catch(() => {});
+          this.syncWithServer({ pushOnly: true }).catch(() => {});
         }
       }).catch(() => {});
 
@@ -2656,7 +2685,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
         return this.updatePendingCount();
       }).then(() => {
         if (this.config.syncEnabled && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
-          this.syncWithServer().catch(() => {});
+          this.syncWithServer({ pushOnly: true }).catch(() => {});
         }
       }).catch(() => {});
 
@@ -3625,23 +3654,29 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       return csv;
     }
 
-    downloadAttendanceReportCSV(filename = 'Engineering_Days_2026_Attendance_Report.csv') {
-      const csv = this.exportAttendanceReportCSV();
+    async downloadAttendanceReportCSV(filename = 'Engineering_Days_2026_Attendance_Report.csv') {
       const targetFilename = filename || 'Engineering_Days_2026_Attendance_Report.csv';
-      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = targetFilename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+
+      // 1. Try to fetch authoritative server-merged master CSV if online
+      if (this.config.syncEnabled && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
+        try {
+          const backupUrl = this.resolveApiUrl(`/api/engday/attendance/backup?eventKey=${encodeURIComponent(this.activeEventId)}&format=csv`);
+          const res = await fetch(backupUrl);
+          if (res.ok) {
+            const csvText = await res.text();
+            return triggerBlobDownload(csvText, targetFilename, 'text/csv;charset=utf-8;');
+          }
+        } catch (e) {
+          console.warn('[EngDay Backup] Server CSV fetch failed, falling back to local state:', e);
+        }
       }
-      return targetFilename;
+
+      // 2. Fallback to local state if offline or server unreachable
+      const csv = this.exportAttendanceReportCSV();
+      return triggerBlobDownload(csv, targetFilename, 'text/csv;charset=utf-8;');
     }
 
-    downloadCSV(gameIdFilter = null) {
+    async downloadCSV(gameIdFilter = null) {
       if (!gameIdFilter) {
         return this.downloadAttendanceReportCSV();
       }
@@ -3649,17 +3684,7 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       const evtSlug = slugify(this.getActiveEvent().title, 'Attendance');
       const tag = `_${gameIdFilter.toUpperCase()}`;
       const filename = `${evtSlug}${tag}_${new Date().toISOString().slice(0, 10)}.csv`;
-      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
-      return filename;
+      return triggerBlobDownload(csv, filename, 'text/csv;charset=utf-8;');
     }
 
     exportJSON() {
@@ -3822,42 +3847,32 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       return JSON.stringify(payload);
     }
 
-    downloadJSON(customFilename = null) {
-      const json = this.exportJSON();
+    async downloadJSON(customFilename = null) {
+      const activeEvt = this.getActiveEvent() || {};
+      const evtSlug = slugify(activeEvt.title || 'Engineering_Days_2026', 'Attendance');
       const now = new Date();
       const pad = (n) => String(n).padStart(2, '0');
       const timeStr = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-      const evtSlug = slugify(this.getActiveEvent().title, 'Attendance');
       const filename = customFilename || `${evtSlug}_Backup_${now.toISOString().slice(0, 10)}_${timeStr}.json`;
 
-      const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.position = 'fixed';
-      a.style.top = '-9999px';
-      a.style.left = '-9999px';
-      a.style.opacity = '0';
-      a.style.pointerEvents = 'none';
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-
-      try {
-        a.click();
-      } catch (e) {
+      // 1. Try to fetch authoritative server-merged master backup if online
+      if (this.config.syncEnabled && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
         try {
-          a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
-        } catch (e2) {}
+          const backupUrl = this.resolveApiUrl(`/api/engday/attendance/backup?eventKey=${encodeURIComponent(this.activeEventId)}&format=json`);
+          const res = await fetch(backupUrl);
+          if (res.ok) {
+            const data = await res.json();
+            const jsonText = JSON.stringify(data, null, 2);
+            return triggerBlobDownload(jsonText, filename, 'application/json;charset=utf-8');
+          }
+        } catch (e) {
+          console.warn('[EngDay Backup] Server backup fetch failed, falling back to local state:', e);
+        }
       }
 
-      setTimeout(() => {
-        try {
-          if (a.parentNode) a.parentNode.removeChild(a);
-          URL.revokeObjectURL(url);
-        } catch (e) {}
-      }, 4000);
-
-      return filename;
+      // 2. Fallback to local state if offline or server unreachable
+      const localJson = this.exportJSON();
+      return triggerBlobDownload(localJson, filename, 'application/json;charset=utf-8');
     }
 
     importBackupJSON(jsonData) {
@@ -4801,10 +4816,13 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
       return { deduplicated, duplicateIds };
     }
 
-    async syncWithServer(isManual = false) {
+    async syncWithServer(options = false) {
       if (this.isSyncing) return;
       this.isSyncing = true;
       this.notify();
+
+      const isManual = options === true || (typeof options === 'object' && options.isManual === true);
+      const pushOnly = typeof options === 'object' && options.pushOnly === true;
 
       try {
         if (typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -4860,6 +4878,13 @@ function ensureFullMasterRoster(targetStudentsMap, sessionsList) {
           } else {
             this.serverOnline = false;
           }
+        }
+
+        // Multi-Device Safe Bandwidth Saver:
+        // When pushing immediate scan records, return early to avoid full-state downloading bandwidth.
+        // Full-state fetching remains throttled to 20 minutes (or manual refresh).
+        if (pushOnly) {
+          return;
         }
 
         // 2. Fetch latest server state & reconcile safely (with ETag bandwidth-saver support)

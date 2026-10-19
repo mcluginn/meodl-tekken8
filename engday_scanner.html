@@ -2974,11 +2974,18 @@
       flashHeaderSavedIndicator('SAVED');
       scansSinceLastAutoDownload++;
 
-      if (autoBackupMode === 'every' || !autoBackupMode) {
+      // In auto gate scanner, scans are immediately persisted to local IndexedDB
+      // and pushed atomically to the cloud. File downloads are only triggered if
+      // explicitly enabled by the admin in the backup modal settings.
+      const isExplicitUserSet = localStorage.getItem('ENGDAY_AUTO_BACKUP_USER_SET') === 'true';
+      if (!isExplicitUserSet) {
+        return;
+      }
+
+      if (autoBackupMode === 'every') {
         if (window.ENGDAY_ATTENDANCE) {
           try {
-            const fn = window.ENGDAY_ATTENDANCE.downloadJSON();
-            console.log('[Auto-Backup Download] Triggered:', fn);
+            window.ENGDAY_ATTENDANCE.downloadJSON();
             flashHeaderSavedIndicator('DOWNLOADED');
           } catch (e) {
             console.error('[Auto-Backup Download] Error:', e);
